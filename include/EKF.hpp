@@ -15,7 +15,9 @@
 class EKF {
 public:
     EKF(SettingPara para){
-        
+
+
+
     }
 
 
@@ -23,6 +25,19 @@ protected:
 
 
 private:
+    //Parameters in here.
+    SettingPara para_;
+
+    //P for single foot
+    Eigen::MatrixXd<9,9> P_;
+
+    Eigen::MatrixXd<6,6> Q_;
+
+    Eigen::MatrixXd<3,9> H_;
+
+    Eigen::VectorXd<9> x_h_;
+
+
 
 
 

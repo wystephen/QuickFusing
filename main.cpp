@@ -57,6 +57,11 @@ int main() {
 
     ekf.InitNavEq(ImuData.block(0, 1, 20, 6));
 
+    for (int i(0); i < ImuData.rows(); ++i) {
+        Eigen::VectorXd vec = ekf.GetPosition(ImuData.block(i, 1, 1, 6), Zupt(i));
+        std::cout << vec << std::endl;
+    }
+
 
 
 

@@ -38,6 +38,12 @@ add_executable(QuickFusing ${SOURCE_FILES} )
 target_link_libraries(QuickFusing ${PYTHON_LIBRARIES})
 
 
+# For test
+
+add_executable(fun_test func_test.cpp)
+target_link_libraries(fun_test ${PYTHON_LIBRARIES})
+
+
 ###CUDA SETTING
 
 #cuda_add_executable(cuda_test cuda_test.cu)

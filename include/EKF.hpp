@@ -444,15 +444,15 @@ public:
             x_h_ = ComputeInternalState(x_h_, dx, quat_);
         }
 //        MYCHECK(1);
-        if (isnan(P_(1, 1)))
-            MYERROR("P_ is nan.")
-        std::cout << "before:" << P_ << std::endl;
+//        if (isnan(P_(1, 1)))
+//            MYERROR("P_ is nan.")
+//        std::cout << "before:" << P_ << std::endl;
         P_ = (P_.eval() * 0.5 + P_.transpose().eval() * 0.5);
         std::cout << "after:" << P_ << std::endl;
 
-        if (isnan(P_(1, 1)))
-            MYERROR("P_ is nan.")
-        MYCHECK(1);
+//        if (isnan(P_(1, 1)))
+//            MYERROR("P_ is nan.")
+//        MYCHECK(1);
 //        MYCHECK(1);
         return x_h_;
     }

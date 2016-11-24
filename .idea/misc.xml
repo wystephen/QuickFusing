@@ -6,4 +6,5 @@
       <file path="$PROJECT_DIR$/cmake-build-debug/CMakeFiles" />
     </excludeRoots>
   </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.5.2 (~/anaconda3/bin/python)" project-jdk-type="Python SDK" />
 </project>

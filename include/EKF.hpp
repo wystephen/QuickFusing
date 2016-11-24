@@ -38,6 +38,9 @@ public:
         x_h_.resize(9, 1);
         x_h_.setZero();
 
+        K_.resize(9,3);
+        K_.setIdentity();
+
     }
 
     bool InitNavEq(Eigen::MatrixXd u) {
@@ -229,6 +232,11 @@ public:
         return R;
     }
 
+    /*
+     * @brief : Navigation Equation .
+     *
+     *
+     */
     Eigen::VectorXd NavigationEquation(Eigen::VectorXd x_h,
                                        Eigen::VectorXd u,
                                        Eigen::VectorXd q,
@@ -272,17 +280,21 @@ public:
                      2.0 / v * sin(v / 2.0) * OMEGA) * (q);
 
             quat_ /= quat_.norm();
+//            quat_ /= quat_(3);
 
 
         } else {
-            quat_ = q;
+            /*
+             * Need not do any thing.
+             */
+//            quat_ = q;
         }
 
 //        MYCHECK(1);
 
         //---------------
         Eigen::Vector3d g_t(0, 0, 9.8173);
-        g_t = g_t.transpose();
+//        g_t = g_t.transpose();
 
         Eigen::Matrix3d Rb2t(q2dcm(quat_));
         Eigen::MatrixXd f_t(Rb2t * (u.block(0, 0, 3, 1)));
@@ -304,8 +316,8 @@ public:
         Eigen::Matrix3d tmp;
 
 //        std::cout << B.rows() << " x " << B.cols() << std::endl;
-        tmp.setZero();
-        B.block(0, 0, 3, 3) = tmp;
+//        tmp.setZero();
+//        B.block(0, 0, 3, 3) = tmp;
         B.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * dt;
 
 //        MYCHECK(1);
@@ -357,7 +369,7 @@ public:
         Id.setIdentity();
 
         F_ = Id + (Fc * dt);
-        G_ = Gc.array() * dt;
+        G_ = Gc * dt;
 
         return true;
 
@@ -404,15 +416,22 @@ public:
 //        MYCHECK(1);
         StateMatrix(quat_, u, para_.Ts_);
 //        MYCHECK(1);
-        P_ = (F_ * (P_)) * (F_.transpose()) +
-             (G_ * Q_ * G_.transpose());
+        P_ = (F_ * (P_)) * (F_.transpose().eval()) +
+             (G_ * Q_ * G_.transpose().eval());
 //        MYCHECK(1);
         if (zupt1 > 0.5) {
             Eigen::Vector3d z(-x_h_.block(3, 0, 3, 1));
 
 
             Eigen::MatrixXd K;
-            K = P_ * H_.transpose() * (H_ * P_ * H_.transpose() + R_).inverse();
+            K = P_ * H_.transpose().eval() * (H_ * P_ * H_.transpose().eval() + R_).inverse();
+            std::cout <<"K:" <<std::endl <<  K << std::endl;
+            if(isnan(K(1,1)))
+            {
+                K = K_;
+            }else{
+                K_ = K;
+            }
 
             Eigen::VectorXd dx = K * z;
 
@@ -428,8 +447,8 @@ public:
         if (isnan(P_(1, 1)))
             MYERROR("P_ is nan.")
         std::cout << "before:" << P_ << std::endl;
-        Eigen::MatrixXd tp = P_.transpose();
         P_ = (P_.eval() * 0.5 + P_.transpose().eval() * 0.5);
+        std::cout << "after:" << P_ << std::endl;
 
         if (isnan(P_(1, 1)))
             MYERROR("P_ is nan.")
@@ -456,6 +475,8 @@ private:
 
     Eigen::MatrixXd F_;
     Eigen::MatrixXd G_;
+
+    Eigen::MatrixXd K_;
 
 
     Eigen::Vector4d quat_;

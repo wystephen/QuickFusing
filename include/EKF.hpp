@@ -416,8 +416,16 @@ public:
 //        MYCHECK(1);
         StateMatrix(quat_, u, para_.Ts_);
 //        MYCHECK(1);
+        std::cout << " P_ FIRST"<< P_ << std::endl;
         P_ = (F_ * (P_)) * (F_.transpose().eval()) +
              (G_ * Q_ * G_.transpose().eval());
+//        std::cout << "P_:" << P_ << std::endl;
+//        if(isnan(P_(2,2))) {
+//            std::cout << "F_:" << F_ << std::endl;
+//            std::cout << "G_:" << G_ << std::endl;
+//            std::cout << "Q_:" << Q_ << std::endl;
+//            std::cout <<"---------------" << std::endl;
+//        }
 //        MYCHECK(1);
         if (zupt1 > 0.5) {
             Eigen::Vector3d z(-x_h_.block(3, 0, 3, 1));
@@ -446,8 +454,9 @@ public:
 //        MYCHECK(1);
 //        if (isnan(P_(1, 1)))
 //            MYERROR("P_ is nan.")
-//        std::cout << "before:" << P_ << std::endl;
+        std::cout << "before:" << P_ << std::endl;
         P_ = (P_.eval() * 0.5 + P_.transpose().eval() * 0.5);
+//        P_ = P_ * 1.0;
         std::cout << "after:" << P_ << std::endl;
 
 //        if (isnan(P_(1, 1)))

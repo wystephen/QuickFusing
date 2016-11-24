@@ -25,4 +25,7 @@ int main()
     B.setIdentity();
 
     std::cout << (A) * B << std::endl;
+
+
+//    B = Eigen::MatrixXd.diagonal(Eigen::Vector4d(1.0,2.0,3.0,4.0));
 }

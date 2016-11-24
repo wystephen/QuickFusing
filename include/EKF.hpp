@@ -12,15 +12,36 @@
 #define QUICKFUSING_EKF_HPP
 
 
+
 class Ekf {
 public:
     Ekf(SettingPara para) {
+//        MYCHECK(1);
+
 
         para_ = para;
+
+        R_ = Eigen::Matrix3d::Zero();
+
+        P_.resize(9, 9);
+        P_.setZero();
+
+        Q_.resize(6, 6);
+        Q_.setZero();
+
+        H_.resize(3, 9);
+        H_.setZero();
+
+
+        InitialFilter();
+
+        x_h_.resize(9, 1);
+        x_h_.setZero();
 
     }
 
     bool InitNavEq(Eigen::MatrixXd u) {
+//        MYCHECK(1);
 
         double f_u(0.0), f_v(0.0), f_w(0.0);
 
@@ -34,6 +55,33 @@ public:
         double roll(atan2(-f_v, -f_w)), pitch(atan2(f_u, sqrt(f_v * f_v + f_w * f_w)));
 
         Eigen::Vector3d attitude(roll, pitch, para_.init_heading1_);
+
+        Eigen::Matrix3d Rb2t = Rt2b(attitude);
+        Rb2t.transposeInPlace();
+
+        quat_ = dcm2q(Rb2t);
+
+        x_h_.block(0, 0, 3, 1) = para_.init_pos1_;
+        x_h_.block(6, 0, 3, 1) = attitude;
+
+
+        return true;
+    }
+
+    bool InitialFilter() {
+//        MYCHECK("1");
+        for (int i(0); i < 3; ++i) {
+            P_(i, i) = para_.sigma_initial_pos1_(i) * para_.sigma_initial_pos1_(i);
+            P_(i + 3, i + 3) = para_.sigma_initial_vel1_(i) * para_.sigma_initial_vel1_(i);
+            P_(i + 6, i + 6) = para_.sigma_initial_att1_(i) * para_.sigma_initial_att1_(i);
+
+            R_(i, i) = para_.sigma_vel_(i) * para_.sigma_vel_(i);
+
+            Q_(i, i) = para_.sigma_acc_(i) * para_.sigma_acc_(i);
+            Q_(i + 3, i + 3) = para_.sigma_gyro_(i) * para_.sigma_gyro_(i);
+
+            H_(i, i + 3) = 1.0;
+        }
 
 
         return true;
@@ -72,6 +120,7 @@ public:
      * Rotation matrix to quanternions.
      */
     Eigen::Vector4d dcm2q(Eigen::Matrix3d R) {
+//        MYCHECK(1);
         double T(1.0 + R(0, 0) + R(1, 1) + R(2, 2));
 
         double qw(0.0), qx(0.0), qy(0.0), qz(0.0);
@@ -117,7 +166,7 @@ public:
             }
 
             Eigen::Vector4d quart(qx, qy, qz, qw);
-            std::cout << "quart:" << quart << "norm:" << quart.norm() << std::endl;
+//            std::cout << "quart:" << quart << "norm:" << quart.norm() << std::endl;
             quart /= quart.norm();
 
             return quart;
@@ -133,6 +182,7 @@ public:
      *Quanternions to rotation matrix.
      */
     Eigen::Matrix3d q2dcm(Eigen::Vector4d q) {
+//        MYCHECK(1);
 
         Eigen::VectorXd p;
         p.resize(6);
@@ -183,6 +233,9 @@ public:
                                        Eigen::VectorXd u,
                                        Eigen::VectorXd q,
                                        double dt) {
+
+//        MYCHECK(1);
+
         Eigen::VectorXd y;
         y.resize(9);
 
@@ -216,7 +269,7 @@ public:
             OMEGA(3, 2) = -R;
 
             quat_ = (cos(v / 2.0) * Eigen::Matrix4d::Identity() +
-                     2.0 / v * sin(v / 2.0) * OMEGA).dot(q);
+                     2.0 / v * sin(v / 2.0) * OMEGA) * (q);
 
             quat_ /= quat_.norm();
 
@@ -225,14 +278,14 @@ public:
             quat_ = q;
         }
 
-
+//        MYCHECK(1);
 
         //---------------
-        Eigen::Vector4d g_t(0, 0, 9.8173);
+        Eigen::Vector3d g_t(0, 0, 9.8173);
         g_t = g_t.transpose();
 
         Eigen::Matrix3d Rb2t(q2dcm(quat_));
-        Eigen::MatrixXd f_t(Rb2t.dot(u.block(0, 0, 3, 1)));
+        Eigen::MatrixXd f_t(Rb2t * (u.block(0, 0, 3, 1)));
 
         Eigen::Vector3d acc_t(f_t + g_t);
 
@@ -240,26 +293,39 @@ public:
 
         A.resize(6, 6);
         A.setIdentity();
-
+//        MYCHECK(1);
+//        std::cout << A.rows() << " x " << A.cols() << std::endl;
         A(0, 3) = dt;
         A(1, 4) = dt;
         A(2, 5) = dt;
 
         B.resize(6, 3);
-        B.block(0, 0, 3, 3) = Eigen::Matrix3d.setZero();
-        B.block(3, 0, 3, 3) = Eigen::Matrix3d.setIdentity() * dt;
+        B.setZero();
+        Eigen::Matrix3d tmp;
+
+//        std::cout << B.rows() << " x " << B.cols() << std::endl;
+        tmp.setZero();
+        B.block(0, 0, 3, 3) = tmp;
+        B.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * dt;
+
+//        MYCHECK(1);
+        y.block(0, 0, 6, 1) = A * (x_h.block(0, 0, 6, 1)) +
+                              B * acc_t;
+//        MYCHECK(1);
 
 
-        y = A.dot(x_h.block(0, 0, 6, 1)) +
-            B.dot(acc_t);
-
+        x_h_ = y;
+//        MYCHECK(1);
         return y;
     }
 
     bool StateMatrix(Eigen::Vector4d q, Eigen::VectorXd u, double dt) {
+
+//        MYCHECK(1);
+
         Eigen::Matrix3d Rb2t(q2dcm(q));
 
-        Eigen::Vector3d f_t(Rb2t.dot(u.block(0, 0, 3, 1)));
+        Eigen::Vector3d f_t(Rb2t * (u.block(0, 0, 3, 1)));
 
         Eigen::Matrix3d St;
         St.setZero();
@@ -276,7 +342,7 @@ public:
         Eigen::MatrixXd Fc;
         Fc.resize(9, 9);
 
-        Fc.block(0, 0, 3, 3) = Eigen::Matrix3d.setIdentity();
+        Fc.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity();
         Fc.block(3, 6, 3, 3) = St;
 
         Eigen::MatrixXd Gc;
@@ -290,7 +356,7 @@ public:
         Id.resize(9, 9);
         Id.setIdentity();
 
-        F_ = Id + (Fc.array() * dt);
+        F_ = Id + (Fc * dt);
         G_ = Gc.array() * dt;
 
         return true;
@@ -300,6 +366,9 @@ public:
     Eigen::VectorXd ComputeInternalState(Eigen::VectorXd x_in,
                                          Eigen::VectorXd dx,
                                          Eigen::VectorXd q_in) {
+
+//        MYCHECK(1);
+
         Eigen::MatrixXd R(q2dcm(q_in));
 
         Eigen::VectorXd x_out = x_in + dx;
@@ -319,7 +388,7 @@ public:
         OMEGA(2, 1) = epsilon(0);
 
 
-        R = (Eigen::Matrix3d.setIdentity() - OMEGA) * (R);
+        R = (Eigen::Matrix3d::Identity() - OMEGA) * (R);
 
         quat_ = dcm2q(R);
 
@@ -328,13 +397,16 @@ public:
     }
 
     Eigen::VectorXd GetPosition(Eigen::VectorXd u, double zupt1) {
+
+//        MYCHECK(1);
+
         x_h_ = NavigationEquation(x_h_, u, quat_, para_.Ts_);
-
+//        MYCHECK(1);
         StateMatrix(quat_, u, para_.Ts_);
-
+//        MYCHECK(1);
         P_ = (F_ * (P_)) * (F_.transpose()) +
              (G_ * Q_ * G_.transpose());
-
+//        MYCHECK(1);
         if (zupt1 > 0.5) {
             Eigen::Vector3d z(-x_h_.block(3, 0, 3, 1));
 
@@ -352,15 +424,19 @@ public:
 
             x_h_ = ComputeInternalState(x_h_, dx, quat_);
         }
+//        MYCHECK(1);
+        if (isnan(P_(1, 1)))
+            MYERROR("P_ is nan.")
+        std::cout << "before:" << P_ << std::endl;
+        Eigen::MatrixXd tp = P_.transpose();
+        P_ = (P_.eval() * 0.5 + P_.transpose().eval() * 0.5);
 
-        P_ = (P_ * 0.5 + P_.transpose() * 0.5);
-
-
+        if (isnan(P_(1, 1)))
+            MYERROR("P_ is nan.")
+        MYCHECK(1);
+//        MYCHECK(1);
         return x_h_;
     }
-
-
-
 
 
 private:

@@ -57,7 +57,7 @@ int main() {
 
     ekf.InitNavEq(ImuData.block(0, 1, 20, 6));
 
-    std::vector<double> gx, gy;
+    std::vector<double> imux, imuy;
     for (int i(0); i < ImuData.rows(); ++i) {
 
         Eigen::VectorXd vec = ekf.GetPosition(ImuData.block(i, 1, 1, 6).transpose(), Zupt(i));
@@ -67,14 +67,15 @@ int main() {
             break;
 
         } else {
-            gx.push_back(double(vec(0)));
-            gy.push_back(double(vec(1)));
+            imux.push_back(double(vec(0)));
+            imuy.push_back(double(vec(1)));
         }
         std::cout << i << ":" << ImuData.rows() << ":" << Zupt(i) << "   :   " << vec.transpose() << std::endl;
     }
 
+
 //    plt::subplot(2,1,1);
-    plt::named_plot("result", gx, gy, "r+-");
+    plt::named_plot("result", imux, imuy, "r+-");
     plt::grid(true);
     plt::show();
 

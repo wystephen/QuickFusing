@@ -420,12 +420,14 @@ public:
         P_ = (F_ * (P_)) * (F_.transpose().eval()) +
              (G_ * Q_ * G_.transpose().eval());
 //        std::cout << "P_:" << P_ << std::endl;
-//        if(isnan(P_(2,2))) {
-//            std::cout << "F_:" << F_ << std::endl;
-//            std::cout << "G_:" << G_ << std::endl;
-//            std::cout << "Q_:" << Q_ << std::endl;
-//            std::cout <<"---------------" << std::endl;
-//        }
+        if(isnan(P_(2,2))) {
+            std::cout << "F_:" << F_ << std::endl;
+            std::cout << "G_:" << G_ << std::endl;
+            std::cout << "Q_:" << Q_ << std::endl;
+            std::cout << "R_:" << R_ << std::endl;
+            std::cout << "H_" << H_ << std::endl;
+            std::cout <<"---------------" << std::endl;
+        }
 //        MYCHECK(1);
         if (zupt1 > 0.5) {
             Eigen::Vector3d z(-x_h_.block(3, 0, 3, 1));

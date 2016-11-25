@@ -70,7 +70,7 @@ int main() {
             imux.push_back(double(vec(0)));
             imuy.push_back(double(vec(1)));
         }
-        std::cout << i << ":" << ImuData.rows() << ":" << Zupt(i) << "   :   " << vec.transpose() << std::endl;
+//        std::cout << i << ":" << ImuData.rows() << ":" << Zupt(i) << "   :   " << vec.transpose() << std::endl;
     }
 
 
@@ -78,7 +78,36 @@ int main() {
     /*
      * Load uwb data.
      */
-    
+
+    CSVReader BeaconsetReader(dir_name + "beaconset.data.csv");
+    CSVReader UwbdataReader(dir_name + "UwbData.data.csv");
+
+    Eigen::MatrixXd beaconset,UwbData;
+
+    beaconset.resize(BeaconsetReader.GetMatrix().GetRows(),BeaconsetReader.GetMatrix().GetCols());
+    for(int i(0);i<beaconset.rows();++i)
+    {
+        for(int j(0);j<beaconset.cols();++j)
+        {
+            beaconset(i,j) = *BeaconsetReader.GetMatrix()(i,j);
+        }
+    }
+
+    UwbData.resize(UwbdataReader.GetMatrix().GetRows(),UwbdataReader.GetMatrix().GetCols());
+    for(int i(0);i<UwbData.rows();++i)
+    {
+        for(int j(0);j<UwbData.cols();++j)
+        {
+            UwbData(i,j) = *(UwbdataReader.GetMatrix()(i,j));
+        }
+    }
+
+
+   std::cout << beaconset << std::endl;
+
+    std::cout <<"  uwbdata :" << std::endl << UwbData << std::endl;
+
+
 
 
 

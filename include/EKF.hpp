@@ -353,12 +353,14 @@ public:
 
         Eigen::MatrixXd Fc;
         Fc.resize(9, 9);
+        Fc.setZero();
 
         Fc.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity();
         Fc.block(3, 6, 3, 3) = St;
 
         Eigen::MatrixXd Gc;
         Gc.resize(9, 6);
+        Gc.setZero();
 
         Gc.block(3, 0, 3, 3) = Rb2t;
         Gc.block(6, 3, 3, 3) = -Rb2t;
@@ -416,11 +418,16 @@ public:
 //        MYCHECK(1);
         StateMatrix(quat_, u, para_.Ts_);
 //        MYCHECK(1);
+
+        std::cout << "F_:" << F_ << std::endl;
+        std::cout << "FPF" << F_ * P_ * F_.transpose().eval() << std::endl;
+        std::cout << "G_:" << G_ << std::endl;
+        std::cout << "GQG'" << G_*Q_ * G_.transpose().eval() << std::endl;
         std::cout << " P_ FIRST"<< P_ << std::endl;
         P_ = (F_ * (P_)) * (F_.transpose().eval()) +
              (G_ * Q_ * G_.transpose().eval());
-//        std::cout << "P_:" << P_ << std::endl;
-        if(isnan(P_(2,2))) {
+        std::cout << "P_ second:" << P_ << std::endl;
+        if(isnan(P_(2,2)) || true) {
             std::cout << "F_:" << F_ << std::endl;
             std::cout << "G_:" << G_ << std::endl;
             std::cout << "Q_:" << Q_ << std::endl;
@@ -436,12 +443,14 @@ public:
             Eigen::MatrixXd K;
             K = P_ * H_.transpose().eval() * (H_ * P_ * H_.transpose().eval() + R_).inverse();
             std::cout <<"K:" <<std::endl <<  K << std::endl;
-            if(isnan(K(1,1)))
-            {
-                K = K_;
-            }else{
-                K_ = K;
-            }
+            std::cout << " HPH' + R:" << H_*P_*H_.transpose().eval() + R_ << std::endl;
+            std::cout << " inverse : " << (H_*P_*H_.transpose().eval() + R_).inverse() << std::endl;
+//            if(isnan(K(1,1)))
+//            {
+//                K = K_;
+//            }else{
+//                K_ = K;
+//            }
 
             Eigen::VectorXd dx = K * z;
 

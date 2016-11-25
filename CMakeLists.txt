@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(QuickFusing)
 
-set(CMAKE_CXX_STANDARD 11)
+#set(CMAKE_CXX_STANDARD 11)
 
+set(CMAKE_BUILD_TOOL Release)
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3  -lpython2.7")
 #set(CUDA_NVCC_FLAGSS ${CUDA_NVCC_FLAGS} --gpu-architecture sm_20)
 

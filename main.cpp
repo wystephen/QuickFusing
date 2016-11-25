@@ -113,6 +113,83 @@ int main() {
 //
 //    std::cout <<"  uwbdata :" << std::endl << UwbData << std::endl;
 
+    /*
+     * Particle filter
+     */
+
+    /////-------------Filter parameter----------------------
+
+    int particle_num = 100;
+    double noise_sigma = 1.0;
+    double evaluate_sigma = 2.0;
+
+    std::vector<double> fx,fy;
+
+
+
+    std::vector<Ekf> P_vec;
+    std::vector<Eigen::Vector2d> Pose_vec ;
+    std::vector<double> Score_vec;
+
+    Ekf ekf_sample(init_para);
+    ekf_sample.InitNavEq(ImuData.block(0,1,20,6));
+
+    for(int i(0);i<particle_num;++i)
+    {
+        P_vec.push_back(Ekf(ekf_sample));
+
+        Pose_vec.push_back((Eigen::Vector2d(0.0,0.0)));
+
+        Score_vec.push_back(1.0);
+    }
+
+    int imu_step(0),uwb_step(0);
+
+    while(true)
+    {
+        if(imu_step == ImuData.rows() || uwb_step == UwbData.rows())
+        {
+            break;
+        }
+
+        if(imu_step==0)
+        {
+            Eigen::VectorXd tx;
+            for(int i(0);i<P_vec.size();++i)
+            {
+                tx = P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6),Zupt(imu_step));
+            }
+            ++imu_step;
+        }
+        if(uwb_step == 0)
+        {
+            ++uwb_step;
+        }
+
+        if(ImuData(imu_step,0) < UwbData(uwb_step,0))
+        {
+            Eigen::VectorXd tx;
+            for(int i(0);i<P_vec.size();++i)
+            {
+                tx = P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6),Zupt(imu_step));
+
+            }
+
+            ++imu_step;
+        }else{
+
+
+
+
+        }
+
+
+    }
+
+
+
+
+
 
 
 

@@ -8,6 +8,7 @@
 
 #include "CSVReader.h"
 #include "matplotlib_interface.h"
+#include "time_stamp.h"
 
 #include "SettingPara.h"
 #include "EKF.hpp"
@@ -53,6 +54,10 @@ int main() {
     /*
      * Initial filter.
      */
+
+    double b_time(TimeStamp::now());
+
+
     Ekf ekf(init_para);
 
     ekf.InitNavEq(ImuData.block(0, 1, 20, 6));
@@ -72,6 +77,7 @@ int main() {
         }
 //        std::cout << i << ":" << ImuData.rows() << ":" << Zupt(i) << "   :   " << vec.transpose() << std::endl;
     }
+    std::cout << " Cost time :" << TimeStamp::now() - b_time << std::endl;
 
 
 
@@ -103,9 +109,10 @@ int main() {
     }
 
 
-   std::cout << beaconset << std::endl;
+//   std::cout << beaconset << std::endl;
+//
+//    std::cout <<"  uwbdata :" << std::endl << UwbData << std::endl;
 
-    std::cout <<"  uwbdata :" << std::endl << UwbData << std::endl;
 
 
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <random>
 
 
 
@@ -16,7 +17,44 @@
 
 namespace plt = matplotlibcpp;
 
+/*
+ * return the probability of N(x|miu,sigma);
+ */
+double NormalPdf(double x,double miu,double sigma)
+{
+    double para1( (x-miu) * (x-miu) / 2 / sigma/sigma);
+    double para2(1/std::sqrt(2 * sigma * sigma * M_PI));
+    return para2 * std::exp(-para1);
+}
+
+/*
+ * Evaluation function.
+ */
+double Pdf(Eigen::Vector2d vecx,Eigen::MatrixXd beaconset,Eigen::VectorXd Range,double z_offset,double sigma)
+{
+    try{
+        double res(1.0);
+        double dis(0.0);
+        for(int i(0);i<beaconset.rows();++i)
+        {
+            dis = 0.0;
+            dis += (vecx(0)-beaconset(i,0)) * (vecx(0)-beaconset(i,0));
+            dis += (vecx(1) - beaconset(i,1)) * (vecx(1) -beaconset(i,1));
+            dis += (z_offset - beaconset(i,2)) * (z_offset - beaconset(i,2));
+
+            res += NormalPdf(Range(i),std::sqrt(dis),sigma);
+        }
+        return res;
+    }catch (...)
+    {
+        return 1.0;
+    }
+
+}
+
+
 int main() {
+
 
     /*
      * Load Imu data.
@@ -119,11 +157,19 @@ int main() {
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 100;
+    int particle_num = 1000;
     double noise_sigma = 1.0;
     double evaluate_sigma = 2.0;
+    double filter_btime(TimeStamp::now());
 
     std::vector<double> fx,fy;
+
+    /*
+     * Random engine and normal distribution
+     */
+    std::default_random_engine e;
+    std::normal_distribution<> n_distribution(0,noise_sigma);
+
 
 
 
@@ -157,7 +203,8 @@ int main() {
             Eigen::VectorXd tx;
             for(int i(0);i<P_vec.size();++i)
             {
-                tx = P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6),Zupt(imu_step));
+//                std::cout << " i-u : "<< i << std::endl;
+                P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6).transpose(),Zupt(imu_step));
             }
             ++imu_step;
         }
@@ -168,23 +215,79 @@ int main() {
 
         if(ImuData(imu_step,0) < UwbData(uwb_step,0))
         {
+            ////////---------------------SAMPLE--------------------------///////////////
             Eigen::VectorXd tx;
+            Eigen::VectorXd noise;
+            noise.resize(6);
             for(int i(0);i<P_vec.size();++i)
             {
-                tx = P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6),Zupt(imu_step));
+                for(int j(0);j<6;++j)
+                {
+                    noise(j) = n_distribution(e);
+                }
+                Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6).transpose()+noise,Zupt(imu_step))).block(0,0,2,1);
+            }
+            ++imu_step;
+        }else{
+            ////////-------------------------EVALUATE-------------------/////////////////
+
+            double sum_score(0.0);
+            for(int i(0);i<Score_vec.size();++i)
+            {
+                Score_vec[i] *= Pdf(Pose_vec[i],beaconset,UwbData.block(uwb_step,1,1,UwbData.cols()-1).transpose(),1.95,evaluate_sigma);
+                sum_score += Score_vec[i];
+            }
+            for(int i(0);i<Score_vec.size();++i)
+            {
+                Score_vec[i] = Score_vec[i] / sum_score;
+            }
+
+            ///////////-------------------GET RESULT-------------------////////////////////
+
+            double tmp_x,tmp_y;
+
+            for(int i(0);i<Score_vec.size();++i)
+            {
+                tmp_x += Score_vec[i] * Pose_vec[i](0);
+                tmp_y += Score_vec[i] * Pose_vec[i](1);
+            }
+            fx.push_back(tmp_x);
+            fy.push_back(tmp_y);
+
+            ////////////-----------------RESAMPLE---------------------/////////////////////////
+
+            std::vector<Ekf> tmp_p = P_vec;
+            P_vec.clear();
+            std::vector<double> tmp_score = Score_vec;
+            Score_vec.clear();
+
+            std::uniform_real_distribution<> uniform_distribution(0.0,1.0);
+
+            for(int i(0);i < P_vec.size();++i)
+            {
+                double val(uniform_distribution(e));
+
+                int target_index(0);
+                while(val>0)
+                {
+                    val -= tmp_score[target_index];
+                    ++ target_index;
+                }
+
+                P_vec.push_back(Ekf(tmp_p[target_index]));
+                Score_vec.push_back(tmp_score[target_index]);
 
             }
 
-            ++imu_step;
-        }else{
 
-
-
-
+            ++uwb_step;
         }
 
 
     }
+
+    std::cout << " Filter total time is : " <<  TimeStamp::now()-filter_btime << std::endl;
+    std::cout << " Data total time is :" << UwbData(UwbData.rows()-1,0) - UwbData(0,0) << std::endl;
 
 
 
@@ -200,6 +303,10 @@ int main() {
 
 //    plt::subplot(2,1,1);
     plt::named_plot("result", imux, imuy, "r+-");
+    plt::named_plot("Fusing result",fx,fy,"b+-");
+    plt::save("dir_name-"+std::to_string(particle_num)
+              +"-"+std::to_string(noise_sigma) +"-"
+              + std::to_string(evaluate_sigma) +".jpg");
     plt::grid(true);
     plt::show();
 

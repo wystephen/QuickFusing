@@ -53,6 +53,10 @@ add_executable(fun_test func_test.cpp)
 target_link_libraries(fun_test ${PYTHON_LIBRARIES})
 
 
+add_executable(resultevaluation ResultEvaluation.cpp)
+target_link_libraries(resultevaluation ${PYTHON_LIBRARIES})
+
+
 ###CUDA SETTING
 
 #cuda_add_executable(cuda_test cuda_test.cu)

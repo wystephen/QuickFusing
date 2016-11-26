@@ -158,7 +158,7 @@ int main(int argc,char * argv[]) {
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 40000;
+    int particle_num = 400;
     double noise_sigma = 0.1;
     double evaluate_sigma = 1.0;
     double filter_btime(TimeStamp::now());

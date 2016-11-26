@@ -22,6 +22,7 @@ namespace plt = matplotlibcpp;
  */
 double NormalPdf(double x,double miu,double sigma)
 {
+//    std::cout << "dis :" << x << " range:" << miu << std::endl;
     double para1( (x-miu) * (x-miu) / 2 / sigma/sigma);
     double para2(1/std::sqrt(2 * sigma * sigma * M_PI));
     return para2 * std::exp(-para1);
@@ -54,7 +55,7 @@ double Pdf(Eigen::Vector2d vecx,Eigen::MatrixXd beaconset,Eigen::VectorXd Range,
 }
 
 
-int main() {
+int main(  ) {
 
 
     /*
@@ -116,7 +117,7 @@ int main() {
         }
 //        std::cout << i << ":" << ImuData.rows() << ":" << Zupt(i) << "   :   " << vec.transpose() << std::endl;
     }
-    std::cout << " Cost time :" << TimeStamp::now() - b_time << std::endl;
+//    std::cout << " Cost time :" << TimeStamp::now() - b_time << std::endl;
 
 
 
@@ -168,10 +169,32 @@ int main() {
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 3000;
+    int particle_num = 40000;
     double noise_sigma = 0.1;
-    double evaluate_sigma = 2.0;
+    double evaluate_sigma = 1.0;
     double filter_btime(TimeStamp::now());
+
+    std::vector<int> particle_number_vec;
+    particle_number_vec.push_back(40);
+    particle_number_vec.push_back(60);
+
+    std::vector<double> noise_sigam_vec;
+    noise_sigam_vec.push_back(0.01);
+    noise_sigam_vec.push_back(0.04);
+
+    std::vector<double> evaluate_sigam_vec;
+    evaluate_sigam_vec.push_back(1.0);
+    evaluate_sigam_vec.push_back(3.0);
+
+    for(int test_x(0);test_x < particle_number_vec.size() ;++test_x)
+    {
+        for(int test_y(0);test_y < noise_sigam_vec.size();++test_y)
+        {
+            for(int test_z(0);test_z<evaluate_sigam_vec.size();++test_z)
+            {
+                particle_num = particle_number_vec[test_x];
+                noise_sigma = noise_sigam_vec[test_y];
+                evaluate_sigma = evaluate_sigam_vec[test_z];
 
 
     ///////---------------Save result----------------
@@ -219,7 +242,8 @@ int main() {
             for(int i(0);i<P_vec.size();++i)
             {
 //                std::cout << " i-u : "<< i << std::endl;
-                Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6).transpose(),Zupt(imu_step))).block(0,0,2,1);
+                Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6).transpose(),
+                                                    Zupt(imu_step)) ).block(0,0,2,1);
             }
             ++imu_step;
         }
@@ -243,19 +267,26 @@ int main() {
                 {
                     noise(j) = n_distribution(e);
                 }
-                Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6).transpose()+noise,Zupt(imu_step))).block(0,0,2,1);
+                Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6).transpose()+noise,
+                                                    Zupt(imu_step))).block(0,0,2,1);
             }
             ++imu_step;
         }else{
             ////////-------------------------EVALUATE-------------------/////////////////
 
             double sum_score(0.0);
+
             for(int i(0);i<Score_vec.size();++i)
             {
-                Score_vec[i] *= Pdf(Pose_vec[i],beaconset,UwbData.block(uwb_step,1,1,UwbData.cols()-1).transpose(),1.95,evaluate_sigma);
+                Score_vec[i] *= Pdf(Pose_vec[i],
+                                    beaconset,
+                                    UwbData.block(uwb_step,1,1,UwbData.cols()-1).transpose(),
+                                    1.95,
+                                    evaluate_sigma);
                 sum_score += Score_vec[i];
             }
-            for(int i(0);i<Score_vec.size();++i)
+#pragma omp parallel for
+            for(int i=(0);i<Score_vec.size();++i)
             {
                 Score_vec[i] = Score_vec[i] / sum_score;
             }
@@ -265,20 +296,24 @@ int main() {
             ////////////-----------------RESAMPLE---------------------/////////////////////////
 
             std::vector<Ekf> tmp_p = P_vec;
-            P_vec.clear();
+//            P_vec.clear();
             std::vector<double> tmp_score = Score_vec;
-            Score_vec.clear();
+//            Score_vec.clear();
 
             std::uniform_real_distribution<> uniform_distribution(0.0,0.999999);
-            std::cout << "uwb index: " << uwb_step << std::endl;
+            if(uwb_step % 20 == 0)
+            {
+                std::cout << "Finished :" << double(uwb_step) / double(UwbData.rows()) * 100.0 << "  % " << std::endl;
+            }
+//            std::cout << "uwb index: " << uwb_step << std::endl;
 
-
-            for(int i(0);i < tmp_p.size();++i)
+#pragma omp parallel for
+            for(int i=0;i < tmp_p.size();++i)
             {
                 double val(uniform_distribution(e));
 
                 int target_index(0);
-                while(val>0)
+                while(val > 0.0)
                 {
                     val -= tmp_score[target_index];
                     ++ target_index;
@@ -288,12 +323,11 @@ int main() {
                     }
                 }
 
-                P_vec.push_back(Ekf(tmp_p[target_index]));
-                Score_vec.push_back(tmp_score[target_index]);
+                P_vec[i] = (Ekf(tmp_p[target_index]));
+                Score_vec[i] = (tmp_score[target_index]);
 
             }
 
-//            P_vec = tmp_p;
             ///////-------------------GET RESULT-------------------////////////////////
             sum_score = 0.0;
             for(int i(0);i<Score_vec.size();++i)
@@ -301,18 +335,20 @@ int main() {
                 sum_score += Score_vec[i];
 
             }
-             for(int i(0);i<Score_vec.size();++i)
+//#pragma omp parallel for
+             for(int i=(0);i<Score_vec.size();++i)
             {
                 Score_vec[i] = Score_vec[i] / sum_score;
             }
 
-            double tmp_x,tmp_y;
-
-            for(int i(0);i<Score_vec.size();++i)
+            double tmp_x(0.0),tmp_y(0.0);
+//#pragma omp parallel for
+            for(int i = 0;i<Score_vec.size();++i)
             {
                 tmp_x += Score_vec[i] * Pose_vec[i](0);
                 tmp_y += Score_vec[i] * Pose_vec[i](1);
             }
+
             fx.push_back(tmp_x);
             fy.push_back(tmp_y);
 
@@ -330,11 +366,46 @@ int main() {
 
     std::cout << "fx fy :" << fx.size() << "  :  " << fy.size() << std::endl;
 
-//    plt::subplot(2,1,1);
-    plt::named_plot("Imu result", imux, imuy, "r+-");
+
+
+    ////////////////////------------------------------------------------//////////////////////////////
+
+    ///////////////////////////*Real path*///////////////////////////////////////////////////////
+    std::vector <double > rx,ry;
+    rx.push_back(0.8);
+    ry.push_back(-5.6);
+
+    rx.push_back(-8.0);
+    ry.push_back(-5.6);
+
+    rx.push_back(-8.0);
+    ry.push_back(-2.4);
+
+    rx.push_back(0.8);
+    ry.push_back(-2.4);
+
+    rx.push_back(0.8);
+    ry.push_back(2.4);
+
+    rx.push_back(-8.0);
+    ry.push_back(2.4);
+
+    rx.push_back(-8.0);
+    ry.push_back(5.6);
+
+    rx.push_back(0.8);
+    ry.push_back(5.6);
+
+    rx.push_back(0.8);
+    ry.push_back(-5.6);
+
+
+    ////////////////////////////////Show result /////////////////////////////////
+    plt::named_plot("Imu result", imux, imuy, "r.");
     plt::named_plot("Fusing result",fx,fy,"b+-");
-    plt::named_plot("Uwb Result",ux,uy,"y+-");
-    plt::legend();
+    plt::named_plot("real path",rx,ry,"g-");
+//    plt::named_plot("Uwb Result",ux,uy,"y+-");
+//    plt::legend();
     plt::title(std::to_string(particle_num)
                +"-"+std::to_string(noise_sigma) +"-"
                + std::to_string(evaluate_sigma) +"-"
@@ -345,9 +416,12 @@ int main() {
               + std::to_string(evaluate_sigma) +"-"
             +std::to_string(TimeStamp::now())+".jpg");
 
-    plt::show();
+//    plt::show();
 
+}
 
+        }
+    }
     return 0;
 
 

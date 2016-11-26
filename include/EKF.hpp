@@ -41,7 +41,60 @@ public:
         K_.resize(9,3);
         K_.setIdentity();
 
+
+
+
     }
+
+    Ekf(const Ekf &orig){
+        para_ = orig.para_;
+//
+        R_ = orig.R_;
+
+        P_ = orig.P_;
+
+        Q_ = orig.Q_;
+
+        H_ = orig.H_;
+
+        x_h_ = orig.x_h_;
+
+        K_ = orig.K_;
+
+        F_ = orig.F_;
+
+        G_ = orig.G_;
+
+        quat_ = orig.quat_;
+//        CopyMatrix(orig.R_,R_);
+//        CopyMatrix(orig.P_,P_);
+//        CopyMatrix(orig.Q_,Q_);
+//        CopyMatrix(orig.H_,H_);
+//        CopyMatrix(orig.K_,K_);
+//        CopyMatrix(orig.F_,F_);
+//        CopyMatrix(orig.G_,G_);
+//
+//        CopyMatrix( orig.x_h_,x_h_);
+//        CopyMatrix( orig.quat_,quat_);
+
+
+    }
+
+    bool CopyMatrix(Eigen::MatrixXd in,Eigen::MatrixXd &out)
+    {
+        out.resize(in.rows(),in.cols());
+
+        for(int i(0);i<in.rows();++i)
+        {
+            for(int j(0);j<in.cols();++j)
+            {
+                out(i,j) = in(i,j);
+            }
+        }
+
+        return true;
+    }
+
 
     bool InitNavEq(Eigen::MatrixXd u) {
 //        MYCHECK(1);

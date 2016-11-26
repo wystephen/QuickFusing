@@ -261,9 +261,10 @@ int main() {
             std::vector<double> tmp_score = Score_vec;
             Score_vec.clear();
 
-            std::uniform_real_distribution<> uniform_distribution(0.0,1.0);
+            std::uniform_real_distribution<> uniform_distribution(0.0,0.999999);
+            std::cout << "uwb index: " << uwb_step << std::endl;
 
-            for(int i(0);i < P_vec.size();++i)
+            for(int i(0);i < tmp_p.size();++i)
             {
                 double val(uniform_distribution(e));
 
@@ -272,17 +273,21 @@ int main() {
                 {
                     val -= tmp_score[target_index];
                     ++ target_index;
+                    if(target_index >= tmp_p.size())
+                    {
+                        target_index = tmp_p.size() - 1;
+                    }
                 }
 
                 P_vec.push_back(Ekf(tmp_p[target_index]));
                 Score_vec.push_back(tmp_score[target_index]);
 
             }
+//            P_vec = tmp_p;
 
 
             ++uwb_step;
         }
-
 
     }
 
@@ -290,15 +295,7 @@ int main() {
     std::cout << " Data total time is :" << UwbData(UwbData.rows()-1,0) - UwbData(0,0) << std::endl;
 
 
-
-
-
-
-
-
-
-
-
+    std::cout << " Uwb data :" << UwbData.rows() << "  :   " << UwbData.cols() << std::endl;
 
 
 //    plt::subplot(2,1,1);

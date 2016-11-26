@@ -60,13 +60,27 @@ int main()
 //    A = A * B;
 //    std::cout << A<< std::endl;
 //}
+//{
+//    Eigen::VectorXd rnd_vec;
+//    rnd_vec.resize(6);
+//
+//    for(int i(0);i<100;++i)
+//    {
+//        rnd_vec.setRandom();
+//        std::cout << rnd_vec.transpose() << std::endl;
+//    }
+//}
+
 {
-    Eigen::VectorXd rnd_vec;
-    rnd_vec.resize(6);
+    Eigen::Matrix4d A;
+    Eigen::MatrixXd B;
+
+    A.setIdentity();
+    B = A;
+
+    std::cout << B << std::endl;
+    A.setRandom();
+    std::cout << B << std::endl;
     
-    for(int i(0);i<100;++i)
-    {
-        rnd_vec.setRandom();
-        std::cout << rnd_vec.transpose() << std::endl;
-    }
+    
 }

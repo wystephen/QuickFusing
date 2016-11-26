@@ -3,7 +3,7 @@
 #include <cmath>
 #include <random>
 
-
+#include <omp.h>
 
 #include <eigen3/Eigen/Dense>
 
@@ -47,6 +47,7 @@ double Pdf(Eigen::Vector2d vecx,Eigen::MatrixXd beaconset,Eigen::VectorXd Range,
         return res;
     }catch (...)
     {
+        std::cout << "ERROR When output likelihood probability distribution function." << std::endl;
         return 1.0;
     }
 
@@ -146,6 +147,16 @@ int main() {
         }
     }
 
+    /////////////-----------------Load UWB RESULT --------------------
+    CSVReader UwbresultReader(dir_name + "UwbResult.data.csv");
+
+    std::vector<double> ux,uy;
+    for(int i(0);i<UwbresultReader.GetMatrix().GetRows();++i)
+    {
+        ux.push_back(*UwbdataReader.GetMatrix()(i,1));
+        uy.push_back(*UwbdataReader.GetMatrix()(i,2));
+    }
+
 
 //   std::cout << beaconset << std::endl;
 //
@@ -157,12 +168,16 @@ int main() {
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 1000;
-    double noise_sigma = 1.0;
+    int particle_num = 3000;
+    double noise_sigma = 0.1;
     double evaluate_sigma = 2.0;
     double filter_btime(TimeStamp::now());
 
+
+    ///////---------------Save result----------------
+
     std::vector<double> fx,fy;
+
 
     /*
      * Random engine and normal distribution
@@ -204,7 +219,7 @@ int main() {
             for(int i(0);i<P_vec.size();++i)
             {
 //                std::cout << " i-u : "<< i << std::endl;
-                P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6).transpose(),Zupt(imu_step));
+                Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step,1,1,6).transpose(),Zupt(imu_step))).block(0,0,2,1);
             }
             ++imu_step;
         }
@@ -216,11 +231,14 @@ int main() {
         if(ImuData(imu_step,0) < UwbData(uwb_step,0))
         {
             ////////---------------------SAMPLE--------------------------///////////////
-            Eigen::VectorXd tx;
-            Eigen::VectorXd noise;
-            noise.resize(6);
-            for(int i(0);i<P_vec.size();++i)
+//            Eigen::VectorXd tx;
+
+
+#pragma omp parallel for
+            for(int i = 0;i<P_vec.size();++i)
             {
+                Eigen::VectorXd noise;
+                noise.resize(6);
                 for(int j(0);j<6;++j)
                 {
                     noise(j) = n_distribution(e);
@@ -242,17 +260,7 @@ int main() {
                 Score_vec[i] = Score_vec[i] / sum_score;
             }
 
-            ///////////-------------------GET RESULT-------------------////////////////////
 
-            double tmp_x,tmp_y;
-
-            for(int i(0);i<Score_vec.size();++i)
-            {
-                tmp_x += Score_vec[i] * Pose_vec[i](0);
-                tmp_y += Score_vec[i] * Pose_vec[i](1);
-            }
-            fx.push_back(tmp_x);
-            fy.push_back(tmp_y);
 
             ////////////-----------------RESAMPLE---------------------/////////////////////////
 
@@ -263,6 +271,7 @@ int main() {
 
             std::uniform_real_distribution<> uniform_distribution(0.0,0.999999);
             std::cout << "uwb index: " << uwb_step << std::endl;
+
 
             for(int i(0);i < tmp_p.size();++i)
             {
@@ -283,7 +292,29 @@ int main() {
                 Score_vec.push_back(tmp_score[target_index]);
 
             }
+
 //            P_vec = tmp_p;
+            ///////-------------------GET RESULT-------------------////////////////////
+            sum_score = 0.0;
+            for(int i(0);i<Score_vec.size();++i)
+            {
+                sum_score += Score_vec[i];
+
+            }
+             for(int i(0);i<Score_vec.size();++i)
+            {
+                Score_vec[i] = Score_vec[i] / sum_score;
+            }
+
+            double tmp_x,tmp_y;
+
+            for(int i(0);i<Score_vec.size();++i)
+            {
+                tmp_x += Score_vec[i] * Pose_vec[i](0);
+                tmp_y += Score_vec[i] * Pose_vec[i](1);
+            }
+            fx.push_back(tmp_x);
+            fy.push_back(tmp_y);
 
 
             ++uwb_step;
@@ -297,18 +328,24 @@ int main() {
 
     std::cout << " Uwb data :" << UwbData.rows() << "  :   " << UwbData.cols() << std::endl;
 
+    std::cout << "fx fy :" << fx.size() << "  :  " << fy.size() << std::endl;
 
 //    plt::subplot(2,1,1);
-    plt::named_plot("result", imux, imuy, "r+-");
+    plt::named_plot("Imu result", imux, imuy, "r+-");
     plt::named_plot("Fusing result",fx,fy,"b+-");
+    plt::named_plot("Uwb Result",ux,uy,"y+-");
+    plt::legend();
+    plt::title(std::to_string(particle_num)
+               +"-"+std::to_string(noise_sigma) +"-"
+               + std::to_string(evaluate_sigma) +"-"
+               +std::to_string(TimeStamp::now()));
+    plt::grid(true);
     plt::save("dir_name-"+std::to_string(particle_num)
               +"-"+std::to_string(noise_sigma) +"-"
-              + std::to_string(evaluate_sigma) +".jpg");
-    plt::grid(true);
+              + std::to_string(evaluate_sigma) +"-"
+            +std::to_string(TimeStamp::now())+".jpg");
+
     plt::show();
-
-
-
 
 
     return 0;

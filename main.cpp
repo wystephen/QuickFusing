@@ -85,6 +85,8 @@ int main(int argc, char *argv[]) {
 //    init_para.init_heading1_ = 0.0;
     init_para.Ts_ = 1.0 / 128.0;
 
+//    init_para.sigma_gyro_ *= 1.3;
+
     /*
      * Initial filter.
      */
@@ -170,7 +172,7 @@ int main(int argc, char *argv[]) {
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 4000;
+    int particle_num = 10000;
     double noise_sigma = 0.1;
     double evaluate_sigma = 1.0;
     double filter_btime(TimeStamp::now());

@@ -51,7 +51,7 @@ double Pdf(Eigen::Vector2d vecx, Eigen::MatrixXd beaconset, Eigen::VectorXd Rang
 }
 
 
-int main(int argc,char * argv[]) {
+int main(int argc, char *argv[]) {
 
 
     /*
@@ -81,8 +81,8 @@ int main(int argc,char * argv[]) {
     SettingPara init_para(true);
 
     init_para.init_pos1_ = Eigen::Vector3d(0.8, -5.6, 0.0);
-    init_para.init_heading1_ = -180 / 180 * M_PI;
-
+//    init_para.init_heading1_ = -180 / 180 * M_PI;
+    init_para.init_heading1_ = 0.0;
     init_para.Ts_ = 1.0 / 128.0;
 
     /*
@@ -158,263 +158,222 @@ int main(int argc,char * argv[]) {
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 400;
+    int particle_num = 4000;
     double noise_sigma = 0.1;
     double evaluate_sigma = 1.0;
     double filter_btime(TimeStamp::now());
 
-    if(argc == 0)
-    {
-        std::cout << "output is zero"<< std::endl;
-    }else{
+    if (argc != 4) {
+        std::cout << "output is zero" << std::endl;
+    } else {
         particle_num = atoi(argv[1]);
         noise_sigma = atof(argv[2]);
         evaluate_sigma = atof(argv[3]);
     }
 
-//    std::vector<int> particle_number_vec;
-//    particle_number_vec.push_back(40);
-//    particle_number_vec.push_back(60);
-//    particle_number_vec.push_back(200);
-//    particle_number_vec.push_back(2000);
-//    particle_number_vec.push_back(4000);
-//    particle_number_vec.push_back(10000);
-//    particle_number_vec.push_back(20000);
-//    particle_number_vec.push_back(6000);
-//
-//
-//    std::vector<double> noise_sigam_vec;
-//    noise_sigam_vec.push_back(0.01);
-//    noise_sigam_vec.push_back(0.04);
-//    noise_sigam_vec.push_back(0.1);
-//    noise_sigam_vec.push_back(0.4);
-//    noise_sigam_vec.push_back(1.0);
-//    noise_sigam_vec.push_back(1.2);
-//    noise_sigam_vec.push_back(1.6);
-//    noise_sigam_vec.push_back(2.2);
-//
-//    std::vector<double> evaluate_sigam_vec;
-//    evaluate_sigam_vec.push_back(1.0);
-//    evaluate_sigam_vec.push_back(3.0);
-//    evaluate_sigam_vec.push_back(6.0);
-//    evaluate_sigam_vec.push_back(0.5);
-//    evaluate_sigam_vec.push_back(2.5);
-//
-//    for (int test_x(0); test_x < particle_number_vec.size(); ++test_x) {
-//        for (int test_y(0); test_y < noise_sigam_vec.size(); ++test_y) {
-//            for (int test_z(0); test_z < evaluate_sigam_vec.size(); ++test_z) {
-//                particle_num = particle_number_vec[test_x];
-//                noise_sigma = noise_sigam_vec[test_y];
-//                evaluate_sigma = evaluate_sigam_vec[test_z];
-//
+    ///////---------------Save result----------------
 
-                ///////---------------Save result----------------
-
-                std::vector<double> fx, fy;
+    std::vector<double> fx, fy;
 
 
-                /*
-                 * Random engine and normal distribution
-                 */
-                std::default_random_engine e;
-                std::normal_distribution<> n_distribution(0, noise_sigma);
+    /*
+     * Random engine and normal distribution
+     */
+    std::default_random_engine e;
+    std::normal_distribution<> n_distribution(0, noise_sigma);
 
 
-                std::vector<Ekf> P_vec;
-                std::vector<Eigen::Vector2d> Pose_vec;
-                std::vector<double> Score_vec;
+    std::vector<Ekf> P_vec;
+    std::vector<Eigen::Vector2d> Pose_vec;
+    std::vector<double> Score_vec;
 
-                Ekf ekf_sample(init_para);
-                ekf_sample.InitNavEq(ImuData.block(0, 1, 20, 6));
+    Ekf ekf_sample(init_para);
+    ekf_sample.InitNavEq(ImuData.block(0, 1, 20, 6));
 
-                for (int i(0); i < particle_num; ++i) {
-                    P_vec.push_back(Ekf(ekf_sample));
+    for (int i(0); i < particle_num; ++i) {
+        P_vec.push_back(Ekf(ekf_sample));
 
-                    Pose_vec.push_back((Eigen::Vector2d(0.0, 0.0)));
+        Pose_vec.push_back((Eigen::Vector2d(0.0, 0.0)));
 
-                    Score_vec.push_back(1.0);
-                }
+        Score_vec.push_back(1.0);
+    }
 
-                int imu_step(0), uwb_step(0);
+    int imu_step(0), uwb_step(0);
 
-                while (true) {
-                    if (imu_step == ImuData.rows() || uwb_step == UwbData.rows()) {
-                        break;
-                    }
+    while (true) {
+        if (imu_step == ImuData.rows() || uwb_step == UwbData.rows()) {
+            break;
+        }
 
-                    if (imu_step == 0) {
-                        Eigen::VectorXd tx;
-                        for (int i(0); i < P_vec.size(); ++i) {
+        if (imu_step == 0) {
+            Eigen::VectorXd tx;
+            for (int i(0); i < P_vec.size(); ++i) {
 //                std::cout << " i-u : "<< i << std::endl;
-                            Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step, 1, 1, 6).transpose(),
-                                                                Zupt(imu_step))).block(0, 0, 2, 1);
-                        }
-                        ++imu_step;
-                    }
-                    if (uwb_step == 0) {
-                        ++uwb_step;
-                    }
+                Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step, 1, 1, 6).transpose(),
+                                                    Zupt(imu_step))).block(0, 0, 2, 1);
+            }
+            ++imu_step;
+        }
+        if (uwb_step == 0) {
+            ++uwb_step;
+        }
 
-                    if (ImuData(imu_step, 0) < UwbData(uwb_step, 0)) {
-                        ////////---------------------SAMPLE--------------------------///////////////
+        if (ImuData(imu_step, 0) < UwbData(uwb_step, 0)) {
+            ////////---------------------SAMPLE--------------------------///////////////
 //            Eigen::VectorXd tx;
 
 
 #pragma omp parallel for
-                        for (int i = 0; i < P_vec.size(); ++i) {
-                            Eigen::VectorXd noise;
-                            noise.resize(6);
-                            for (int j(0); j < 6; ++j) {
-                                noise(j) = n_distribution(e);
-                            }
-                            Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step, 1, 1, 6).transpose() + noise,
-                                                                Zupt(imu_step))).block(0, 0, 2, 1);
-                        }
-                        ++imu_step;
-                    } else {
-                        ////////-------------------------EVALUATE-------------------/////////////////
+            for (int i = 0; i < P_vec.size(); ++i) {
+                Eigen::VectorXd noise;
+                noise.resize(6);
+                for (int j(0); j < 6; ++j) {
+                    noise(j) = n_distribution(e);
+                }
+                Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step, 1, 1, 6).transpose() + noise,
+                                                    Zupt(imu_step))).block(0, 0, 2, 1);
+            }
+            ++imu_step;
+        } else {
+            ////////-------------------------EVALUATE-------------------/////////////////
 
-                        double sum_score(0.0);
+            double sum_score(0.0);
 
-                        for (int i(0); i < Score_vec.size(); ++i) {
-                            Score_vec[i] *= Pdf(Pose_vec[i],
-                                                beaconset,
-                                                UwbData.block(uwb_step, 1, 1, UwbData.cols() - 1).transpose(),
-                                                1.95,
-                                                evaluate_sigma);
-                            sum_score += Score_vec[i];
-                        }
+            for (int i(0); i < Score_vec.size(); ++i) {
+                Score_vec[i] *= Pdf(Pose_vec[i],
+                                    beaconset,
+                                    UwbData.block(uwb_step, 1, 1, UwbData.cols() - 1).transpose(),
+                                    1.95,
+                                    evaluate_sigma);
+                sum_score += Score_vec[i];
+            }
 #pragma omp parallel for
-                        for (int i = (0); i < Score_vec.size(); ++i) {
-                            Score_vec[i] = Score_vec[i] / sum_score;
-                        }
+            for (int i = (0); i < Score_vec.size(); ++i) {
+                Score_vec[i] = Score_vec[i] / sum_score;
+            }
 
 
 
-                        ////////////-----------------RESAMPLE---------------------/////////////////////////
+            ////////////-----------------RESAMPLE---------------------/////////////////////////
 
-                        std::vector<Ekf> tmp_p = P_vec;
+            std::vector<Ekf> tmp_p = P_vec;
 //            P_vec.clear();
-                        std::vector<double> tmp_score = Score_vec;
+            std::vector<double> tmp_score = Score_vec;
 //            Score_vec.clear();
 
-                        std::uniform_real_distribution<> uniform_distribution(0.0, 0.999999);
-                        if (uwb_step % 20 == 0) {
-                            std::cout << "Finished :" << double(uwb_step) / double(UwbData.rows()) * 100.0 << "  % "
-                                      << std::endl;
-                        }
+            std::uniform_real_distribution<> uniform_distribution(0.0, 0.999999);
+            if (uwb_step % 20 == 0) {
+                std::cout << "Finished :" << double(uwb_step) / double(UwbData.rows()) * 100.0 << "  % "
+                          << std::endl;
+            }
 //            std::cout << "uwb index: " << uwb_step << std::endl;
 
 #pragma omp parallel for
-                        for (int i = 0; i < tmp_p.size(); ++i) {
-                            double val(uniform_distribution(e));
+            for (int i = 0; i < tmp_p.size(); ++i) {
+                double val(uniform_distribution(e));
 
-                            int target_index(0);
-                            while (val > 0.0) {
-                                val -= tmp_score[target_index];
-                                ++target_index;
-                                if (target_index >= tmp_p.size()) {
-                                    target_index = tmp_p.size() - 1;
-                                }
-                            }
-
-                            P_vec[i] = (Ekf(tmp_p[target_index]));
-                            Score_vec[i] = (tmp_score[target_index]);
-
-                        }
-
-                        ///////-------------------GET RESULT-------------------////////////////////
-                        sum_score = 0.0;
-                        for (int i(0); i < Score_vec.size(); ++i) {
-                            sum_score += Score_vec[i];
-
-                        }
-//#pragma omp parallel for
-                        for (int i = (0); i < Score_vec.size(); ++i) {
-                            Score_vec[i] = Score_vec[i] / sum_score;
-                        }
-
-                        double tmp_x(0.0), tmp_y(0.0);
-//#pragma omp parallel for
-                        for (int i = 0; i < Score_vec.size(); ++i) {
-                            tmp_x += Score_vec[i] * Pose_vec[i](0);
-                            tmp_y += Score_vec[i] * Pose_vec[i](1);
-                        }
-
-                        fx.push_back(tmp_x);
-                        fy.push_back(tmp_y);
-
-
-                        ++uwb_step;
+                int target_index(0);
+                while (val > 0.0) {
+                    val -= tmp_score[target_index];
+                    ++target_index;
+                    if (target_index >= tmp_p.size()) {
+                        target_index = tmp_p.size() - 1;
                     }
-
                 }
 
-                std::cout << " Filter total time is : " << TimeStamp::now() - filter_btime << std::endl;
-                std::cout << " Data total time is :" << UwbData(UwbData.rows() - 1, 0) - UwbData(0, 0) << std::endl;
+                P_vec[i] = (Ekf(tmp_p[target_index]));
+                Score_vec[i] = (tmp_score[target_index]);
+
+            }
+
+            ///////-------------------GET RESULT-------------------////////////////////
+            sum_score = 0.0;
+            for (int i(0); i < Score_vec.size(); ++i) {
+                sum_score += Score_vec[i];
+
+            }
+//#pragma omp parallel for
+            for (int i = (0); i < Score_vec.size(); ++i) {
+                Score_vec[i] = Score_vec[i] / sum_score;
+            }
+
+            double tmp_x(0.0), tmp_y(0.0);
+//#pragma omp parallel for
+            for (int i = 0; i < Score_vec.size(); ++i) {
+                tmp_x += Score_vec[i] * Pose_vec[i](0);
+                tmp_y += Score_vec[i] * Pose_vec[i](1);
+            }
+
+            fx.push_back(tmp_x);
+            fy.push_back(tmp_y);
 
 
-                std::cout << " Uwb data :" << UwbData.rows() << "  :   " << UwbData.cols() << std::endl;
+            ++uwb_step;
+        }
 
-                std::cout << "fx fy :" << fx.size() << "  :  " << fy.size() << std::endl;
+    }
+
+    std::cout << " Filter total time is : " << TimeStamp::now() - filter_btime << std::endl;
+    std::cout << " Data total time is :" << UwbData(UwbData.rows() - 1, 0) - UwbData(0, 0) << std::endl;
+
+
+    std::cout << " Uwb data :" << UwbData.rows() << "  :   " << UwbData.cols() << std::endl;
+
+    std::cout << "fx fy :" << fx.size() << "  :  " << fy.size() << std::endl;
 
 
 
-                ////////////////////------------------------------------------------//////////////////////////////
+    ////////////////////------------------------------------------------//////////////////////////////
 
-                ///////////////////////////*Real path*///////////////////////////////////////////////////////
-                std::vector<double> rx, ry;
-                rx.push_back(0.8);
-                ry.push_back(-5.6);
+    ///////////////////////////*Real path*///////////////////////////////////////////////////////
+    std::vector<double> rx, ry;
+    rx.push_back(0.8);
+    ry.push_back(-5.6);
 
-                rx.push_back(-8.0);
-                ry.push_back(-5.6);
+    rx.push_back(-8.0);
+    ry.push_back(-5.6);
 
-                rx.push_back(-8.0);
-                ry.push_back(-2.4);
+    rx.push_back(-8.0);
+    ry.push_back(-2.4);
 
-                rx.push_back(0.8);
-                ry.push_back(-2.4);
+    rx.push_back(0.8);
+    ry.push_back(-2.4);
 
-                rx.push_back(0.8);
-                ry.push_back(2.4);
+    rx.push_back(0.8);
+    ry.push_back(2.4);
 
-                rx.push_back(-8.0);
-                ry.push_back(2.4);
+    rx.push_back(-8.0);
+    ry.push_back(2.4);
 
-                rx.push_back(-8.0);
-                ry.push_back(5.6);
+    rx.push_back(-8.0);
+    ry.push_back(5.6);
 
-                rx.push_back(0.8);
-                ry.push_back(5.6);
+    rx.push_back(0.8);
+    ry.push_back(5.6);
 
-                rx.push_back(0.8);
-                ry.push_back(-5.6);
+    rx.push_back(0.8);
+    ry.push_back(-5.6);
 
 
 //                plt::show();
-                ////////////////////////////////Show result /////////////////////////////////
-                plt::named_plot("Imu result", imux, imuy, "r.");
-                plt::named_plot("Fusing result", fx, fy, "b+-");
-                plt::named_plot("real path", rx, ry, "g-");
+    ////////////////////////////////Show result /////////////////////////////////
+    plt::named_plot("Imu result", imux, imuy, "r.");
+    plt::named_plot("Fusing result", fx, fy, "b+-");
+    plt::named_plot("real path", rx, ry, "g-");
 //    plt::named_plot("Uwb Result",ux,uy,"y+-");
 ////    plt::legend();
 //    plt::title(std::to_string(particle_num)
 //               +"-"+std::to_string(noise_sigma) +"-"
 //               + std::to_string(evaluate_sigma) +"-"
 //               +std::to_string(TimeStamp::now()));
-                plt::grid(true);
-                plt::save("dir_name-" + std::to_string(particle_num)
-                          + "-" + std::to_string(noise_sigma) + "-"
-                          + std::to_string(evaluate_sigma) + "-"
-                          + std::to_string(TimeStamp::now()) + ".jpg");
+    plt::grid(true);
+    plt::save("dir_name-" + std::to_string(particle_num)
+              + "-" + std::to_string(noise_sigma) + "-"
+              + std::to_string(evaluate_sigma) + "-"
+              + std::to_string(TimeStamp::now()) + ".jpg");
 
 //    plt::show();
 
-//            }
-//
-//        }
-//    }
     return 0;
 
 

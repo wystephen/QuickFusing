@@ -114,9 +114,38 @@ int main(int argc,char *argv[])
 
     std::vector<double> ux, uy;
     for (int i(0); i < UwbresultReader.GetMatrix().GetRows(); ++i) {
-        ux.push_back(*UwbdataReader.GetMatrix()(i, 1));
-        uy.push_back(*UwbdataReader.GetMatrix()(i, 2));
+        ux.push_back(*UwbresultReader.GetMatrix()(i, 1));
+        uy.push_back(*UwbresultReader.GetMatrix()(i, 2));
     }
+
+    std::vector<double> type_data;
+
+    for(int k(0);k<imux.size();++k)
+    {
+        if(k<10 || imux.size() - k < 10)
+        {
+            type_data.push_back(0.0);
+
+        }else if(std::abs(imux[k] - imux[k-7]) > 0.1 || std::abs(imux[k] - imux[k+7]) > 0.5)
+        {
+            type_data.push_back(2.0);
+
+        } else{
+            type_data.push_back(0.0);
+        }
+    }
+
+//    plt::plot(ux,"r-+");
+//    plt::plot(uy,"b-+");
+
+//    plt::plot(ux,uy,"r+-");
+    plt::plot(imux,"r-+");
+    plt::plot(imuy,"b-+");
+    plt::plot(type_data,"g-+");
+
+
+    plt::show();
+
 
 
     return true;

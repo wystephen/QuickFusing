@@ -81,8 +81,8 @@ int main(int argc, char *argv[]) {
     SettingPara init_para(true);
 
     init_para.init_pos1_ = Eigen::Vector3d(0.8, -5.6, 0.0);
-//    init_para.init_heading1_ = -180 / 180 * M_PI;
-    init_para.init_heading1_ = 0.0;
+    init_para.init_heading1_ = -180 / 180 * M_PI;
+//    init_para.init_heading1_ = 0.0;
     init_para.Ts_ = 1.0 / 128.0;
 
     /*
@@ -155,6 +155,18 @@ int main(int argc, char *argv[]) {
     /*
      * Particle filter
      */
+
+
+    //-----------
+    if(UwbData(0,0) - ImuData(0,0) > 100)
+    {
+//        ImuData.block(0,0,ImuData.rows(),1) = ImuData.block(0,0,ImuData.rows(),1) +
+//                531844067.535;531844066.53
+        for(int k(0);k<ImuData.rows();++k)
+        {
+            ImuData(k,0) = ImuData(k,0) + 531844066.53;
+        }
+    }
 
     /////-------------Filter parameter----------------------
 

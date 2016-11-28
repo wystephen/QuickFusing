@@ -69,9 +69,14 @@ int main(int argc, char *argv[]) {
     ImuData.resize(ImuDataTmp.GetRows(), ImuDataTmp.GetCols());
     Zupt.resize(ZuptTmp.GetRows(), ZuptTmp.GetCols());
 
+    ////////////ADD NOISE TO SOURCE DATA
+    std::default_random_engine ee;
+    std::uniform_real_distribution<double> u(-0.15,0.15);
+    std::normal_distribution<> n(0.0,0.2);
+
     for (int i(0); i < ImuDataTmp.GetRows(); ++i) {
         for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
-            ImuData(i, j) = *ImuDataTmp(i, j);
+            ImuData(i, j) = *ImuDataTmp(i, j)  ;
         }
         Zupt(i, 0) = *ZuptTmp(i, 0);
     }
@@ -161,22 +166,22 @@ int main(int argc, char *argv[]) {
      */
 
 
-    //-----------
-    if(UwbData(0,0) - ImuData(0,0) > 100)
-    {
-//        ImuData.block(0,0,ImuData.rows(),1) = ImuData.block(0,0,ImuData.rows(),1) +
-//                531844067.535;531844066.53
-        for(int k(0);k<ImuData.rows();++k)
-        {
-            ImuData(k,0) = ImuData(k,0) + 531844066.53;
-        }
-    }
+    //-----------  TIME OFFSET______
+//    if(UwbData(0,0) - ImuData(0,0) > 100)
+//    {
+////        ImuData.block(0,0,ImuData.rows(),1) = ImuData.block(0,0,ImuData.rows(),1) +
+////                531844067.535;531844066.53
+//        for(int k(0);k<ImuData.rows();++k)
+//        {
+//            ImuData(k,0) = ImuData(k,0) + 531844066.53;
+//        }
+//    }
 
     /////-------------Filter parameter----------------------
 
     int particle_num = 10000;
-    double noise_sigma = 1.5;
-    double evaluate_sigma = 1.0;
+    double noise_sigma = 2.0;
+    double evaluate_sigma = 1.6;
     double filter_btime(TimeStamp::now());
 
     if (argc != 4) {

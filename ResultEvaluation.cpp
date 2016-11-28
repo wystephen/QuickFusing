@@ -118,30 +118,111 @@ int main(int argc,char *argv[])
         uy.push_back(*UwbresultReader.GetMatrix()(i, 2));
     }
 
-    std::vector<double> type_data;
+    std::ofstream outf("tmp_file_dir/keypoint.csv");
 
-    for(int k(0);k<imux.size();++k)
+    outf << "0.8,-5.6,"<<std::to_string(ImuData(0,0))<<std::endl;
+
+    std::vector<double> rx,ry,rt;
+    rx.push_back(0.8);
+    ry.push_back(-5.6);
+    rt.push_back(ImuData(1086,0));
+
+    rx.push_back(-8.0);
+    ry.push_back(-5.6);
+    rt.push_back(ImuData(2144,0));
+
+    rx.push_back(-8.0);
+    ry.push_back(-2.4);
+    rt.push_back(ImuData(2700,0));
+
+    rx.push_back(0.8);
+    ry.push_back(-2.4);
+    rt.push_back(ImuData(3924,0));
+
+    rx.push_back(0.8);
+    ry.push_back(2.4);
+    rt.push_back(ImuData(4648,0));
+
+    rx.push_back(-8.0);
+    ry.push_back(2.4);
+    rt.push_back(ImuData(6025,0));
+
+    rx.push_back(-8.0);
+    ry.push_back(5.6);
+    rt.push_back(ImuData(6679,0));
+
+    rx.push_back(0.8);
+    ry.push_back(5.6);
+    rt.push_back(ImuData(7806,0));
+
+    rx.push_back(0.8);
+    ry.push_back(-5.6);
+    rt.push_back(ImuData(9614,0));
+
+
+    rx.push_back(-8.0);
+    ry.push_back(-5.6);
+    rt.push_back(ImuData(10811,0));
+
+    rx.push_back(-8.0);
+    ry.push_back(-2.4);
+    rt.push_back(ImuData(11423,0));
+
+    rx.push_back(0.8);
+    ry.push_back(-2.4);
+    rt.push_back(ImuData(12550,0));
+
+    rx.push_back(0.8);
+    ry.push_back(2.4);
+    rt.push_back(ImuData(13468,0));
+
+
+    rx.push_back(-8.0);
+    ry.push_back(2.4);
+    rt.push_back(ImuData(14581,0));
+
+    rx.push_back(-8.0);
+    ry.push_back(5.6);
+    rt.push_back(ImuData(15290,0));
+
+    rx.push_back(0.8);
+    ry.push_back(5.6);
+    rt.push_back(ImuData(16584,0));
+
+    rx.push_back(0.8);
+    ry.push_back(-5.6);
+    rt.push_back(ImuData(18518,0));
+
+
+    for(int i(0);i<rx.size();++i)
     {
-        if(k<10 || imux.size() - k < 10)
-        {
-            type_data.push_back(0.0);
-
-        }else if(std::abs(imux[k] - imux[k-7]) > 0.1 || std::abs(imux[k] - imux[k+7]) > 0.5)
-        {
-            type_data.push_back(2.0);
-
-        } else{
-            type_data.push_back(0.0);
-        }
+        outf << std::to_string(rx[i]) << ","
+                                      <<std::to_string(ry[i])
+                                      << ","
+                                      <<std::to_string(rt[i])
+                                      <<std::endl;
     }
 
-//    plt::plot(ux,"r-+");
-//    plt::plot(uy,"b-+");
+    std::cout << "0.8,-5.6,"<<std::to_string(ImuData(19297,0))<<std::endl;
 
-//    plt::plot(ux,uy,"r+-");
-    plt::plot(imux,"r-+");
-    plt::plot(imuy,"b-+");
-    plt::plot(type_data,"g-+");
+    outf.close();
+
+    std::vector<double> imut;
+    for(int k(0);k<ImuData.rows();++k)
+    {
+        imut.push_back(ImuData(k,0));
+    }
+
+
+//    plt::plot(imux,"r-+");
+//    plt::plot(imuy,"b-+");
+    plt::plot(imut,imux,"r-+");
+    plt::plot(imut,imuy,"b-+");
+//    plt::plot(type_data,"g-+");
+//    plt::plot(rx,ry,"r-+");
+    plt::plot(rt,rx,"y-+");
+    plt::plot(rt,ry,"g-+");
+    plt::grid(true);
 
 
     plt::show();

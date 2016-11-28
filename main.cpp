@@ -14,6 +14,8 @@
 #include "SettingPara.h"
 #include "EKF.hpp"
 
+#include "ResultEvaluation.hpp"
+
 
 namespace plt = matplotlibcpp;
 
@@ -173,7 +175,7 @@ int main(int argc, char *argv[]) {
     /////-------------Filter parameter----------------------
 
     int particle_num = 10000;
-    double noise_sigma = 0.1;
+    double noise_sigma = 1.5;
     double evaluate_sigma = 1.0;
     double filter_btime(TimeStamp::now());
 
@@ -242,7 +244,13 @@ int main(int argc, char *argv[]) {
                 Eigen::VectorXd noise;
                 noise.resize(6);
                 for (int j(0); j < 6; ++j) {
-                    noise(j) = n_distribution(e);
+                    if(j<3)
+                    {
+                        noise(j) = n_distribution(e) * init_para.sigma_acc_(j);
+                    }else{
+                        noise(j) = n_distribution(e) * init_para.sigma_gyro_(j-3);
+                    }
+
                 }
                 Pose_vec[i] = (P_vec[i].GetPosition(ImuData.block(imu_step, 1, 1, 6).transpose() + noise,
                                                     Zupt(imu_step))).block(0, 0, 2, 1);
@@ -369,6 +377,39 @@ int main(int argc, char *argv[]) {
     ry.push_back(-5.6);
 
 
+    //////////////////////----------------COMPUTE ERROR---------------------////
+    std::vector<double> imu_err,fusing_err;
+    double avg_imu(0.0),avg_fusing(0.0);
+
+    ResultEvaluation re(dir_name + "keypoint.csv");
+
+    //imu
+    for(int i(0);i<imux.size();++i)
+    {
+        imu_err.push_back(re.Distance(
+                Eigen::Vector2d(imux[i],imuy[i]),
+                ImuData(i,0)));
+
+    }
+    avg_imu = std::accumulate(imu_err.begin(),imu_err.end(),0.0);
+    avg_imu /= double(imu_err.size());
+
+    //fusing
+    for(int i(0);i<fx.size();++i)
+    {
+        fusing_err.push_back(
+                re.Distance(
+                        Eigen::Vector2d(fx[i],fy[i]),
+                        UwbData(i,0)
+                )
+        );
+    }
+    avg_fusing = std::accumulate(fusing_err.begin(),fusing_err.end(),0.0);
+    avg_fusing /= double(fusing_err.size());
+
+
+
+
 //                plt::show();
     ////////////////////////////////Show result /////////////////////////////////
     plt::named_plot("Imu result", imux, imuy, "r.");
@@ -376,12 +417,14 @@ int main(int argc, char *argv[]) {
     plt::named_plot("real path", rx, ry, "g-");
 //    plt::named_plot("Uwb Result",ux,uy,"y+-");
 ////    plt::legend();
-//    plt::title(std::to_string(particle_num)
-//               +"-"+std::to_string(noise_sigma) +"-"
-//               + std::to_string(evaluate_sigma) +"-"
-//               +std::to_string(TimeStamp::now()));
+    plt::title(std::to_string(particle_num)
+               +"-"+std::to_string(noise_sigma) +"-"
+               + std::to_string(evaluate_sigma) +"-"
+               +"avgimu"+std::to_string(avg_imu) + "-"
+               +"avgfus"+std::to_string(avg_fusing) + "-"
+               +std::to_string(TimeStamp::now()));
     plt::grid(true);
-    plt::save("dir_name-" + std::to_string(particle_num)
+    plt::save(std::to_string(particle_num)
               + "-" + std::to_string(noise_sigma) + "-"
               + std::to_string(evaluate_sigma) + "-"
               + std::to_string(TimeStamp::now()) + ".jpg");

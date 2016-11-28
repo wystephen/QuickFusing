@@ -213,6 +213,19 @@ int main(int argc,char *argv[])
         imut.push_back(ImuData(k,0));
     }
 
+    ResultEvaluation re("tmp_file_dir/keypoint.csv");
+
+    std::vector<double> eval_vec;
+    for(int i(0);i<imux.size();++i)
+    {
+        Eigen::Vector2d tmp(double(imux[i]),double(imuy[i]));
+        eval_vec.push_back(re.Distance(
+                tmp,
+                ImuData(i,0)
+        ));
+    }
+    plt::plot(imut,eval_vec,"y-*");
+
 
 //    plt::plot(imux,"r-+");
 //    plt::plot(imuy,"b-+");
@@ -222,6 +235,7 @@ int main(int argc,char *argv[])
 //    plt::plot(rx,ry,"r-+");
     plt::plot(rt,rx,"y-+");
     plt::plot(rt,ry,"g-+");
+
     plt::grid(true);
 
 

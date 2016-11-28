@@ -105,7 +105,7 @@ public:
         f_v = u.col(1).mean();
         f_w = u.col(2).mean();
 
-        std::cout << "u,v,w:" << f_u << "," << f_v << "," << f_w << std::endl;
+//        std::cout << "u,v,w:" << f_u << "," << f_v << "," << f_w << std::endl;
 
 
         double roll(atan2(-f_v, -f_w)), pitch(atan2(f_u, sqrt(f_v * f_v + f_w * f_w)));

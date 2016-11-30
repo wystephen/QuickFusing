@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
     for (int i(0); i < ImuData.rows(); ++i) {
 
         Eigen::VectorXd vec = ekf.GetPosition(ImuData.block(i, 1, 1, 6).transpose(), Zupt(i));
-        if (isnan(vec(0))) {
+        if (std::isnan(vec(0))) {
             std::cout << "ddd" << std::endl;
             MYERROR("value change to nan")
             break;

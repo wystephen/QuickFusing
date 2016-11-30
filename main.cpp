@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
     /////-------------Filter parameter----------------------
 
     int particle_num = 10000;
-    double noise_sigma = 2.0;
+    double noise_sigma = 1.0;
     double evaluate_sigma = 1.6;
     double filter_btime(TimeStamp::now());
 

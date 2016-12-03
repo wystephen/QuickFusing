@@ -50,7 +50,7 @@ public:
         }
         if(before_index ==0 && after_index == 0)
         {
-            MYERROR("wrong time stamp");
+//            MYERROR("wrong time stamp");
             return 0.0;
         }
 

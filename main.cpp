@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
     //////////////-------------------UWB FILTER------------
     for(int i(0);i<UwbData.cols();++i)
     {
-        SingleValueFilter sf(0.5,0.5);
+        SingleValueFilter sf(0.4,0.4);
         for(int j(0);j<UwbData.rows();++j)
         {
             UwbData(j,i) = sf.filter(UwbData(j,i));

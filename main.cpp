@@ -16,6 +16,10 @@
 
 #include "ResultEvaluation.hpp"
 
+#include "RangeKF.hpp"
+
+/////stamp---------
+
 
 namespace plt = matplotlibcpp;
 
@@ -89,7 +93,7 @@ int main(int argc, char *argv[]) {
 
     init_para.init_pos1_ = Eigen::Vector3d(0.8, -5.6, 0.0);
     init_para.init_heading1_ = -180 / 180 * M_PI;
-//    init_para.init_heading1_ = 0.0;
+//    init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
     init_para.Ts_ = 1.0 / 128.0;
 
 //    init_para.sigma_gyro_ *= 1.3;
@@ -147,6 +151,17 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    //////////////-------------------UWB FILTER------------
+    for(int i(0);i<UwbData.cols();++i)
+    {
+        SingleValueFilter sf(0.5,0.5);
+        for(int j(0);j<UwbData.rows();++j)
+        {
+            UwbData(j,i) = sf.filter(UwbData(j,i));
+        }
+    }
+
+
     /////////////-----------------Load UWB RESULT --------------------
     CSVReader UwbresultReader(dir_name + "UwbResult.data.csv");
 
@@ -179,9 +194,9 @@ int main(int argc, char *argv[]) {
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 10000;
-    double noise_sigma = 1.0;
-    double evaluate_sigma = 1.6;
+    int particle_num = 8000;
+    double noise_sigma = 2.0;
+    double evaluate_sigma = 2.6;
     double filter_btime(TimeStamp::now());
 
     if (argc != 4) {
@@ -411,6 +426,10 @@ int main(int argc, char *argv[]) {
     }
     avg_fusing = std::accumulate(fusing_err.begin(),fusing_err.end(),0.0);
     avg_fusing /= double(fusing_err.size());
+
+
+
+    std::cout << "avg_error of imu:" << avg_imu << " avg_error of fusing: " << avg_fusing << std::endl;
 
 
 

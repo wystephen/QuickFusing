@@ -10,34 +10,35 @@
 #include "MyError.h"
 #include <Eigen/Dense>
 
-template <typename T,int state_num,int observe_num>
-class PFBase{
+template<typename T, int state_num, int observe_num>
+class PFBase {
 public:
     virtual PFBase(double Partical_num);
 
     virtual Eigen::VectorXd GetResult();
 
 
-    virtual bool StateTransmition(Eigen::Vector<double,state_num> input);
+    /*
+     *
+     */
+    virtual bool StateTransmition(Eigen::Vector<double, state_num> input);
 
-    virtual bool Evaluation(Eigen::Vector<double,observe_num> measurement);
+    virtual bool Evaluation(Eigen::Vector<double, observe_num> measurement);
 
-    virtual bool Resample(int MethodType,int resample_num);
+    virtual bool Resample(int MethodType, int resample_num);
 
     //Auxiliary Tools
 
     /*
      * Single value Normal probability distribution function.
      */
-    double ScalarNormalPdf(double x,double miu,double sigma)
-    {
+    double ScalarNormalPdf(double x, double miu, double sigma) {
         try {
             double para1 = (x - miu) * (x - miu) / 2 / sigma / sigma;
             double para2 = (1 / std::sqrt(2 * M_PI) / sigma);
 
             return para2 * std::log(-para1);
-        }catch (...)
-        {
+        } catch (...) {
             //Some error when compute the Single value .
 
             return 0.0;
@@ -45,28 +46,25 @@ public:
 
     }
 
-    double VectorNormalPdf(Eigen::VectorXd x,Eigen::VectorXd miu,
-    Eigen::MatrixXd sigma)
-    {
-        try{
-            if(x.rows() != miu.rows())
-            {
-                throw("x.rows is:"
-                + std::to_string(x.rows())
-                +"miu.rows() is"
-                + std::to_string(miu.rows()));
+    double VectorNormalPdf(Eigen::VectorXd x, Eigen::VectorXd miu,
+                           Eigen::MatrixXd sigma) {
+        try {
+            if (x.rows() != miu.rows()) {
+                throw ("x.rows is:"
+                       + std::to_string(x.rows())
+                       + "miu.rows() is"
+                       + std::to_string(miu.rows()));
             }
 
             //ToDo:VectorNormalPdf
 
-        }catch(std::string &e) {
+        } catch (std::string &e) {
             //Return zero when size of x is not same to miu.
             std::cout << e << std::endl;
             x.setZero();
             return x;
-        }catch (...)
-        {
-           MYERROR("Unexpect and unknow error.");
+        } catch (...) {
+            MYERROR("Unexpect and unknow error.");
             x.setZero();
             return x;
         }
@@ -81,4 +79,5 @@ private:
 
 
 };
+
 #endif //QUICKFUSING_PFBASE_HPP

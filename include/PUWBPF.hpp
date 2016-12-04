@@ -1,0 +1,32 @@
+#pragma once
+//Create by steve in 16-12-4 at 下午6:12
+//
+// Created by steve on 16-12-4.
+//
+
+#include "PFBase.hpp"
+
+#ifndef QUICKFUSING_PUWBPF_HPP
+#define QUICKFUSING_PUWBPF_HPP
+
+template<int uwb_number>
+class PUWBPF:public PFBase<double,2,uwb_number>{
+public:
+    PUWBPF(int particle_num)
+    {
+        PFBase(particle_num);
+        p_state_.setRandom();
+    }
+
+//    bool StateTransmition()
+
+private:
+    Eigen::MatrixXd p_state_;//particle filter
+
+    Eigen::VectorXd probability_;//accumulate probability of each particles.
+
+
+
+};
+
+#endif //QUICKFUSING_PUWBPF_HPP

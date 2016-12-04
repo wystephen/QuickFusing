@@ -7,13 +7,24 @@
 #ifndef QUICKFUSING_PFBASE_HPP
 #define QUICKFUSING_PFBASE_HPP
 
+#include <random>
+
 #include "MyError.h"
+#include "time_stamp.h"
+
 #include <Eigen/Dense>
 
 template<typename T, int state_num, int observe_num>
 class PFBase {
 public:
-    virtual PFBase(double Partical_num);
+    PFBase(int Partical_num) {
+        particle_num_ = Partical_num;
+        e_.seed(TimeStamp::now());
+
+
+
+
+    }
 
     virtual Eigen::VectorXd GetResult();
 
@@ -73,6 +84,9 @@ public:
 
 private:
     double particle_num_ = 1000; //
+
+
+    std::default_random_engine e_;//Global random engine.
 
 //    Eigen::Matrix<double,
 

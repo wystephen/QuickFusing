@@ -32,9 +32,9 @@ public:
     /*
      *
      */
-    virtual bool StateTransmition(Eigen::Vector<double, state_num> input);
+    virtual bool StateTransmition(Eigen::VectorXd input,int method = 0);
 
-    virtual bool Evaluation(Eigen::Vector<double, observe_num> measurement);
+    virtual bool Evaluation(Eigen::VectorXd measurement);
 
     virtual bool Resample(int MethodType, int resample_num);
 

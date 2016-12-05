@@ -21,9 +21,6 @@ public:
         particle_num_ = Partical_num;
         e_.seed(TimeStamp::now());
 
-
-
-
     }
 
     virtual Eigen::VectorXd GetResult();
@@ -82,7 +79,7 @@ public:
     }
 
 
-private:
+//protected:
     double particle_num_ = 1000; //
 
 

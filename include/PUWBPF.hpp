@@ -14,7 +14,7 @@ class PUWBPF:public PFBase<double,2,uwb_number>{
 public:
     PUWBPF(int particle_num)
     {
-        PFBase(particle_num);
+        PFBase<double,2,uwb_number>::PFBase(particle_num);
         p_state_.setZero();
 
         input_noise_sigma_.resize(p_state_.cols());
@@ -27,13 +27,13 @@ public:
             std::vector<std::normal_distribution<>> noise_engine_vector_;
             for(int k(0);k<p_state_.cols();++k)
             {
-                noise_engine_vector_.push_back(std::normal_distribution<>(e_));
+//                noise_engine_vector_.push_back(std::normal_distribution<>(e_));
             }
             for(int i(0);i<p_state_.rows();++i)
             {
                 for(int j(0);j<p_state_.cols();++j)
                 {
-                    
+
                 }
             }
 

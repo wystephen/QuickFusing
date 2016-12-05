@@ -19,11 +19,17 @@ public:
     }
 
 //    bool StateTransmition()
+    bool StateTransmition()
+    {
+        return true;
+    }
 
 private:
     Eigen::MatrixXd p_state_;//particle filter
 
     Eigen::VectorXd probability_;//accumulate probability of each particles.
+
+
 
 
 

@@ -19,6 +19,18 @@ public:
         input_noise_sigma_.resize(p_state_.cols());
     }
 
+    bool SetInputNoiseSigma(double sigma)
+    {
+        Eigen::VectorXd sigma_vector;
+        sigma_vector.resize(input_noise_sigma_.rows());
+
+        for(int i(0);i<sigma_vector.rows();++i)
+        {
+            sigma_vector(i) = sigma;
+        }
+        SetInputNoiseSigma(sigma_vector);
+    }
+
     bool SetInputNoiseSigma(Eigen::VectorXd sigma_vector) {
         try {
             input_noise_sigma_ = sigma_vector;

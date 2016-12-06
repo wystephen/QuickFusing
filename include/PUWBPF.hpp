@@ -48,6 +48,13 @@ public:
         return true;
     }
 
+    bool SetBeaconSet(Eigen::MatrixXd beaconset)
+    {
+        beacon_set_.resizeLike(beaconset);
+        beacon_set_ = beacon_set_;
+        return true;
+    }
+
     bool StateTransmition(Eigen::VectorXd input, int method = 0) {
         if (method == 0)//Method 0:Random move follow the Gaussian distribution(Same sigma).
         {
@@ -57,12 +64,18 @@ public:
 
             for (int i(0); i < p_state_.rows(); ++i) {
                 for (int j(0); j < p_state_.cols(); ++j) {
-
-
+                    p_state_(i,j) += normal_distribution(ee_);
                 }
             }
 
+            return true;
         }
+    }
+
+    bool Evaluation(Eigen::VectorXd measurement)
+    {
+
+        return true;
     }
 
 
@@ -75,6 +88,8 @@ private:
     //Method parameters.
 
     Eigen::VectorXd input_noise_sigma_;
+
+    Eigen::MatrixXd beacon_set_;
 
 
 };

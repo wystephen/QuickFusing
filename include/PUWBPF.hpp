@@ -10,28 +10,41 @@
 #define QUICKFUSING_PUWBPF_HPP
 
 template<int uwb_number>
-class PUWBPF:public PFBase<double,2,uwb_number>{
+class PUWBPF : public PFBase<double, 2, uwb_number> {
 public:
-    PUWBPF(int particle_num)
-    {
-        PFBase<double,2,uwb_number>::PFBase(particle_num);
+    PUWBPF(int particle_num) {
+        PFBase<double, 2, uwb_number>::PFBase(particle_num);
         p_state_.setZero();
 
         input_noise_sigma_.resize(p_state_.cols());
     }
 
-    bool StateTransmition(Eigen::VectorXd input,int method = 0)
-    {
-        if(method == 0)//Method 0:Random move follow the Gaussian distribution.
-        {
-            std::vector<std::normal_distribution<>> noise_engine_vector_;
-            for(int k(0);k<p_state_.cols();++k)
-            {
+    bool SetInputNoiseSigma(Eigen::VectorXd sigma_vector) {
+        try {
+            input_noise_sigma_ = sigma_vector;
+        } catch (const std::runtime_error &e) {
+            std::cout << "RUNTIME ERROR:" << e << std::endl;
+            input_noise_sigma_.setOnes();
+            return false;
+        } catch (...) {
+            if (input_noise_sigma_.size() != sigma_vector.size()) {
+                MYERROR("Error in the code that sigma_vector and input_noise_sigma have different size.")
             }
-            for(int i(0);i<p_state_.rows();++i)
-            {
-                for(int j(0);j<p_state_.cols();++j)
-                {
+            input_noise_sigma_.setOnes();
+            return false;
+        }
+        return true;
+    }
+
+    bool StateTransmition(Eigen::VectorXd input, int method = 0) {
+        if (method == 0)//Method 0:Random move follow the Gaussian distribution(Same sigma).
+        {
+            double sigma = input_noise_sigma_.mean();
+            std::default_random_engine ee_;
+            std::normal_distribution<double> normal_distribution(0, sigma);
+
+            for (int i(0); i < p_state_.rows(); ++i) {
+                for (int j(0); j < p_state_.cols(); ++j) {
 
 
                 }
@@ -50,9 +63,6 @@ private:
     //Method parameters.
 
     Eigen::VectorXd input_noise_sigma_;
-
-
-
 
 
 };

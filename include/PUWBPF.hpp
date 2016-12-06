@@ -27,12 +27,12 @@ public:
             std::vector<std::normal_distribution<>> noise_engine_vector_;
             for(int k(0);k<p_state_.cols();++k)
             {
-//                noise_engine_vector_.push_back(std::normal_distribution<>(e_));
             }
             for(int i(0);i<p_state_.rows();++i)
             {
                 for(int j(0);j<p_state_.cols();++j)
                 {
+
 
                 }
             }

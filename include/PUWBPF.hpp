@@ -128,8 +128,25 @@ public:
 
             std::uniform_real_distribution<double> real_distribution(0,0.9999);
 
+            for(int index(0); index < p_state_.rows();++index)
+            {
+                double score = real_distribution(e_);
 
+                int i(0);
+                while(score > 0.0)
+                {
+                    score -= probability_(i);
+                    ++i;
+                }
+                tmp_vec.push_back(p_state_.block(i,0,1,p_state_.cols()));
+                tmp_score.push_back(probability_(i));
 
+            }
+            for(int index(0);index < probability_.rows();++index)
+            {
+                probability_(index) = tmp_score[index];
+                p_state_.block(index,0,1,p_state_.cols()) = tmp_vec[index];
+            }
         }
     }
 

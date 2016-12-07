@@ -29,11 +29,11 @@ public:
     /*
      *
      */
-    virtual bool StateTransmition(Eigen::VectorXd input,int method = 0);
+    virtual bool StateTransmition(Eigen::VectorXd input, int MethodType= 0);
 
-    virtual  double Evaluation(Eigen::VectorXd state,Eigen::VectorXd measurement);
+    virtual bool Evaluation(Eigen::VectorXd measurement, int MethodType = 0);
 
-    virtual bool Resample(int MethodType, int resample_num);
+    virtual bool Resample(int resample_numint, int MethodType = 0);
 
     //Auxiliary Tools
 

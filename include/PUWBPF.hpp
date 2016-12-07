@@ -19,31 +19,26 @@ public:
         input_noise_sigma_.resize(p_state_.cols());
     }
 
-    bool SetMeasurementSigma(double sigma,int num)
-    {
+    bool SetMeasurementSigma(double sigma, int num) {
         measurement_sigma_.resize(num);
-        for(int i(0);i<measurement_sigma_.rows();++i)
-        {
+        for (int i(0); i < measurement_sigma_.rows(); ++i) {
             measurement_sigma_(i) = sigma;
         }
         return true;
     }
 
 
-    bool SetMeasurementSigma(Eigen::VectorXd sigma_vector)
-    {
+    bool SetMeasurementSigma(Eigen::VectorXd sigma_vector) {
         measurement_sigma_.resize(sigma_vector.rows());
         measurement_sigma_ = sigma_vector;
         return true;
     }
 
-    bool SetInputNoiseSigma(double sigma)
-    {
+    bool SetInputNoiseSigma(double sigma) {
         Eigen::VectorXd sigma_vector;
         sigma_vector.resize(input_noise_sigma_.rows());
 
-        for(int i(0);i<sigma_vector.rows();++i)
-        {
+        for (int i(0); i < sigma_vector.rows(); ++i) {
             sigma_vector(i) = sigma;
         }
         SetInputNoiseSigma(sigma_vector);
@@ -53,7 +48,7 @@ public:
         try {
             input_noise_sigma_ = sigma_vector;
         } catch (const std::runtime_error &e) {
-            std::cout << "RUNTIME ERROR:" << e << std::endl;
+            std::cout << "RUNTIME ERROR:" << e.what() << std::endl;
             input_noise_sigma_.setOnes();
             return false;
         } catch (...) {
@@ -66,8 +61,7 @@ public:
         return true;
     }
 
-    bool SetBeaconSet(Eigen::MatrixXd beaconset)
-    {
+    bool SetBeaconSet(Eigen::MatrixXd beaconset) {
         beacon_set_.resizeLike(beaconset);
         beacon_set_ = beacon_set_;
         return true;
@@ -76,46 +70,59 @@ public:
     /*
      * State transmission equation.
      */
-    bool StateTransmition(Eigen::VectorXd input, int method = 0) {
+    bool StateTransmition(Eigen::VectorXd input, int MethodType = 0) {
         if (method == 0)//Method 0:Random move follow the Gaussian distribution(Same sigma).
         {
             double sigma = input_noise_sigma_.mean();
             std::default_random_engine ee_;
             std::normal_distribution<double> normal_distribution(0, sigma);
-
             for (int i(0); i < p_state_.rows(); ++i) {
                 for (int j(0); j < p_state_.cols(); ++j) {
-                    p_state_(i,j) += normal_distribution(ee_);
+                    p_state_(i, j) += normal_distribution(ee_);
                 }
             }
-
             return true;
         }
     }
 
-    double Evaluation(Eigen::VectorXd state,
-                    Eigen::VectorXd measurement)
-    {
+    /*
+     * Evaluation function.
+     * Input state and measurement data,and compute a score.
+     */
+    bool Evaluation(Eigen::VectorXd measurement, int MethodType = 0) {
+        if (MethodType == 0) {
+            for (int i(0); i < p_state_.rows(); ++i) {
+                probability_(i) = EvaluationSingle(p_state_.block(i, 0, 1, p_state_.cols()),
+                                                   measurement);
+            }
+        }
+        return true;
+
+    }
+
+    double EvaluationSingle(Eigen::VectorXd state,
+                            Eigen::VectorXd measurement) {
         double score(0.0);
-        try{
-            for(int i(0);i<beacon_set_.rows();++i)
-            {
+        try {
+            for (int i(0); i < beacon_set_.rows(); ++i) {
                 double dis(0.0);
-                for(int j(0);j<beacon_set_.cols();++j)
-                {
-                    dis += std::pow(state(j) - beacon_set_(i,j),2.0);
+                for (int j(0); j < beacon_set_.cols(); ++j) {
+                    dis += std::pow(state(j) - beacon_set_(i, j), 2.0);
                 }
                 dis = std::sqrt(dis);
-                score += ScalarNormalPdf(dis,measurement(k),measurement_sigma_(k));
-
+                score += ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i));
             }
-        }catch(...)
-        {
-            return  0.0;
-
+        } catch (...) {
+            return 0.0;
         }
 
         return score;
+    }
+
+    bool Resample(int resample_num, int MethodType = 0) {
+        if (MethodType == 0) {
+
+        }
     }
 
 

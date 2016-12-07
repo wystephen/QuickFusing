@@ -152,14 +152,19 @@ int main(int argc, char *argv[]) {
             UwbData(i, j) = *(UwbdataReader.GetMatrix()(i, j));
         }
     }
+    std::vector<std::vector<double>> range_vec;
+
+
 
     //////////////-------------------UWB FILTER------------
     for(int i(0);i<UwbData.cols();++i)
     {
+        range_vec.push_back(std::vector<double>());
         SingleValueFilter sf(0.4,0.4);
         for(int j(0);j<UwbData.rows();++j)
         {
             UwbData(j,i) = sf.filter(UwbData(j,i));
+            range_vec[i].push_back(double(UwbData(j,i)));
         }
     }
 
@@ -439,6 +444,7 @@ int main(int argc, char *argv[]) {
 
 //                plt::show();
     ////////////////////////////////Show result /////////////////////////////////
+    plt::subplot(2,2,0);
     plt::named_plot("Imu result", imux, imuy, "r.");
     plt::named_plot("Fusing result", fx, fy, "b+-");
     plt::named_plot("real path", rx, ry, "g-");
@@ -451,6 +457,12 @@ int main(int argc, char *argv[]) {
                +"avgfus"+std::to_string(avg_fusing) + "-"
                +std::to_string(TimeStamp::now()));
     plt::grid(true);
+
+    plt::subplot(2,2,1);
+    plt::grid(true);
+
+
+
     plt::save(std::to_string(particle_num)
               + "-" + std::to_string(noise_sigma) + "-"
               + std::to_string(evaluate_sigma) + "-"

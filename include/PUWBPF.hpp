@@ -71,7 +71,7 @@ public:
      * State transmission equation.
      */
     bool StateTransmition(Eigen::VectorXd input, int MethodType = 0) {
-        if (method == 0)//Method 0:Random move follow the Gaussian distribution(Same sigma).
+        if (MethodType == 0)//Method 0:Random move follow the Gaussian distribution(Same sigma).
         {
             double sigma = input_noise_sigma_.mean();
             std::default_random_engine ee_;
@@ -96,6 +96,7 @@ public:
                                                    measurement);
             }
         }
+        probability_ /= probability_.sum();
         return true;
 
     }
@@ -121,6 +122,13 @@ public:
 
     bool Resample(int resample_num, int MethodType = 0) {
         if (MethodType == 0) {
+
+            std::vector<Eigen::VectorXd> tmp_vec;
+            std::vector<double> tmp_score;
+
+            std::uniform_real_distribution<double> real_distribution(0,0.9999);
+
+
 
         }
     }

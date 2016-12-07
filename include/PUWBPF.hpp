@@ -19,6 +19,24 @@ public:
         input_noise_sigma_.resize(p_state_.cols());
     }
 
+    bool SetMeasurementSigma(double sigma,int num)
+    {
+        measurement_sigma_.resize(num);
+        for(int i(0);i<measurement_sigma_.rows();++i)
+        {
+            measurement_sigma_(i) = sigma;
+        }
+        return true;
+    }
+
+
+    bool SetMeasurementSigma(Eigen::VectorXd sigma_vector)
+    {
+        measurement_sigma_.resize(sigma_vector.rows());
+        measurement_sigma_ = sigma_vector;
+        return true;
+    }
+
     bool SetInputNoiseSigma(double sigma)
     {
         Eigen::VectorXd sigma_vector;
@@ -55,6 +73,9 @@ public:
         return true;
     }
 
+    /*
+     * State transmission equation.
+     */
     bool StateTransmition(Eigen::VectorXd input, int method = 0) {
         if (method == 0)//Method 0:Random move follow the Gaussian distribution(Same sigma).
         {
@@ -72,10 +93,29 @@ public:
         }
     }
 
-    bool Evaluation(Eigen::VectorXd measurement)
+    double Evaluation(Eigen::VectorXd state,
+                    Eigen::VectorXd measurement)
     {
+        double score(0.0);
+        try{
+            for(int i(0);i<beacon_set_.rows();++i)
+            {
+                double dis(0.0);
+                for(int j(0);j<beacon_set_.cols();++j)
+                {
+                    dis += std::pow(state(j) - beacon_set_(i,j),2.0);
+                }
+                dis = std::sqrt(dis);
+                score += ScalarNormalPdf(dis,measurement(k),measurement_sigma_(k));
 
-        return true;
+            }
+        }catch(...)
+        {
+            return  0.0;
+
+        }
+
+        return score;
     }
 
 
@@ -90,6 +130,8 @@ private:
     Eigen::VectorXd input_noise_sigma_;
 
     Eigen::MatrixXd beacon_set_;
+
+    Eigen::VectorXd measurement_sigma_;
 
 
 };

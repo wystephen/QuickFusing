@@ -31,7 +31,7 @@ public:
      */
     virtual bool StateTransmition(Eigen::VectorXd input,int method = 0);
 
-    virtual bool Evaluation(Eigen::VectorXd measurement);
+    virtual  double Evaluation(Eigen::VectorXd state,Eigen::VectorXd measurement);
 
     virtual bool Resample(int MethodType, int resample_num);
 

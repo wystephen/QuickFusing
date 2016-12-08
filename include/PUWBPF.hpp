@@ -12,8 +12,8 @@
 template<int uwb_number>
 class PUWBPF : public PFBase<double, 2, uwb_number> {
 public:
-    PUWBPF(int particle_num) {
-        PFBase<double, 2, uwb_number>::PFBase(particle_num);
+    PUWBPF(int particle_num):PFBase(particle_num) {
+//        PFBase(particle_num);
         p_state_.setZero();
 
         input_noise_sigma_.resize(p_state_.cols());
@@ -126,7 +126,7 @@ public:
             std::vector<Eigen::VectorXd> tmp_vec;
             std::vector<double> tmp_score;
 
-            std::uniform_real_distribution<double> real_distribution(0,0.9999);
+            std::uniform_real_distribution<double> real_distribution(0,0.9999999);
 
             for(int index(0); index < p_state_.rows();++index)
             {

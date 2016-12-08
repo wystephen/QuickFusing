@@ -79,7 +79,7 @@ public:
     }
 
 
-protected:
+//protected:
     double particle_num_ = 1000; //
 
 

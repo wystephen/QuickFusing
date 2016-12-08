@@ -12,10 +12,9 @@
 template<int uwb_number>
 class PUWBPF : public PFBase<double, 2, uwb_number> {
 public:
-    PUWBPF(int particle_num):PFBase(particle_num) {
+    PUWBPF(int particle_num):PFBase<double, 2,uwb_number>(particle_num) {
 //        PFBase(particle_num);
         p_state_.setZero();
-
         input_noise_sigma_.resize(p_state_.cols());
     }
 
@@ -117,6 +116,8 @@ public:
             return 0.0;
         }
 
+
+
         return score;
     }
 
@@ -155,6 +156,25 @@ public:
                 probability_(index) = tmp_score[index];
                 p_state_.block(index,0,1,p_state_.cols()) = tmp_vec[index];
             }
+        }
+    }
+
+
+    Eigen::VectorXd GetResult(int MethodType = 0)
+    {
+        if(MethodType == 0)
+        {
+            double x(0.0),y(0.0);
+            if(std::fabs(probability_.sum()-1.0) > 1e-5)
+            {
+                probability_ /= probability_.sum();
+            }
+            for(int i(0);i<p_state_.rows();++i)
+            {
+                x += probability_(i) * p_state_(i,0);
+                y += probability_(i) * p_state_(i,1);
+            }
+            return Eigen::Vector2d(x,y);
         }
     }
 

@@ -192,6 +192,11 @@ int main(int argc, char *argv[]) {
         puwbpf.Evaluation(UwbData.block(i,1,1,UwbData.cols()-1),0);
 
         puwbpf.Resample(-1,0);
+
+        Eigen::VectorXd tmp = puwbpf.GetResult(0);
+
+        ux.push_back(tmp(0));
+        uy.push_back(tmp(1));
     }
 
 

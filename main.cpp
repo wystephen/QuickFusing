@@ -173,11 +173,30 @@ int main(int argc, char *argv[]) {
     CSVReader UwbresultReader(dir_name + "UwbResult.data.csv");
 
     std::vector<double> ux, uy;
-    for (int i(0); i < UwbresultReader.GetMatrix().GetRows(); ++i) {
-        ux.push_back(*UwbdataReader.GetMatrix()(i, 1));
-        uy.push_back(*UwbdataReader.GetMatrix()(i, 2));
-    }
+//    for (int i(0); i < UwbresultReader.GetMatrix().GetRows(); ++i) {
+//        ux.push_back(*UwbdataReader.GetMatrix()(i, 1));
+//        uy.push_back(*UwbdataReader.GetMatrix()(i, 2));
+//    }
     /////////////////////---Compute result only uwb data.
+    PUWBPF<4> puwbpf(1000);
+
+    puwbpf.SetMeasurementSigma(1.0,4);
+    puwbpf.SetInputNoiseSigma(1.0);
+
+    puwbpf.SetBeaconSet(beaconset);
+
+    for(int i(0);i<UwbData.rows();++i)
+    {
+        puwbpf.StateTransmition(Eigen::Vector2d(2,2),0);
+
+        puwbpf.Evaluation(UwbData.block(i,1,1,UwbData.cols()-1),0);
+
+        puwbpf.Resample(-1,0);
+    }
+
+
+
+
 
 
 //   std::cout << beaconset << std::endl;

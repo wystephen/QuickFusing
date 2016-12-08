@@ -19,7 +19,7 @@ public:
         input_noise_sigma_.resize(p_state_.cols());
     }
 
-    bool SetMeasurementSigma(double sigma, int num) {
+    bool SetMeasurementSigma(double sigma, int num=uwb_number) {
         measurement_sigma_.resize(num);
         for (int i(0); i < measurement_sigma_.rows(); ++i) {
             measurement_sigma_(i) = sigma;
@@ -120,6 +120,13 @@ public:
         return score;
     }
 
+    /*
+     * Resample
+     *
+     * MethodType:
+     * 0: Typical resample method.resample_num is not used in this method.
+     * 1: Layer-based resample method.
+     */
     bool Resample(int resample_num, int MethodType = 0) {
         if (MethodType == 0) {
 
@@ -142,6 +149,7 @@ public:
                 tmp_score.push_back(probability_(i));
 
             }
+
             for(int index(0);index < probability_.rows();++index)
             {
                 probability_(index) = tmp_score[index];

@@ -19,21 +19,22 @@ class PFBase {
 public:
     PFBase(int Partical_num) {
         particle_num_ = Partical_num;
+
         e_.seed(TimeStamp::now());
 
     }
 
-    virtual Eigen::VectorXd GetResult();
+//    virtual Eigen::VectorXd GetResult();
 
 
     /*
      *
      */
-    virtual bool StateTransmition(Eigen::VectorXd input, int MethodType= 0);
-
-    virtual bool Evaluation(Eigen::VectorXd measurement, int MethodType = 0);
-
-    virtual bool Resample(int resample_numint, int MethodType = 0);
+//    virtual bool StateTransmition(Eigen::VectorXd input, int MethodType= 0);
+//
+//    virtual bool Evaluation(Eigen::VectorXd measurement, int MethodType = 0);
+//
+//    virtual bool Resample(int resample_numint, int MethodType = 0);
 
     //Auxiliary Tools
 

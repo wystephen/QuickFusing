@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
     /////////////////////---Compute result only uwb data.
     PUWBPF<4> puwbpf(1000);
 
-    puwbpf.SetMeasurementSigma(1.0,4);
+    puwbpf.SetMeasurementSigma(1.0);
     puwbpf.SetInputNoiseSigma(1.0);
 
     puwbpf.SetBeaconSet(beaconset);

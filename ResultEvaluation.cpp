@@ -185,7 +185,7 @@ int main(int argc,char *argv[])
     ry.push_back(5.6);
     rt.push_back(ImuData(15290,0));
 
-    
+
     rx.push_back(0.8);
     ry.push_back(5.6);
     rt.push_back(ImuData(16584,0));

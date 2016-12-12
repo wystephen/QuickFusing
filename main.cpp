@@ -16,6 +16,8 @@
 
 #include "ResultEvaluation.hpp"
 
+/////stamp---------
+
 
 namespace plt = matplotlibcpp;
 
@@ -59,7 +61,7 @@ int main(int argc, char *argv[]) {
     /*
      * Load Imu data.
      */
-    std::string dir_name = "tmp_file_dir/";
+    std::string dir_name = "tmp_file_dir---/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"), ZuptReader(dir_name + "Zupt.data.csv");
 
@@ -88,8 +90,8 @@ int main(int argc, char *argv[]) {
     SettingPara init_para(true);
 
     init_para.init_pos1_ = Eigen::Vector3d(0.8, -5.6, 0.0);
-    init_para.init_heading1_ = -180 / 180 * M_PI;
-//    init_para.init_heading1_ = 0.0;
+//    init_para.init_heading1_ = -180 / 180 * M_PI;
+    init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
     init_para.Ts_ = 1.0 / 128.0;
 
 //    init_para.sigma_gyro_ *= 1.3;
@@ -179,9 +181,9 @@ int main(int argc, char *argv[]) {
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 10000;
-    double noise_sigma = 1.0;
-    double evaluate_sigma = 1.6;
+    int particle_num = 8000;
+    double noise_sigma = 2.0;
+    double evaluate_sigma = 2.6;
     double filter_btime(TimeStamp::now());
 
     if (argc != 4) {

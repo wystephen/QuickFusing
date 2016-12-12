@@ -71,6 +71,19 @@ int main()
 //    }
 //}
 
+//{
+//    Eigen::Matrix4d A;
+//    Eigen::MatrixXd B;
+//
+//    A.setIdentity();
+//    B = A;
+//
+//    std::cout << B << std::endl;
+//    A.setRandom();
+//    std::cout << B << std::endl;
+//    
+//    
+//}
 {
     Eigen::Matrix4d A;
     Eigen::MatrixXd B;
@@ -78,9 +91,10 @@ int main()
     A.setIdentity();
     B = A;
 
-    std::cout << B << std::endl;
-    A.setRandom();
-    std::cout << B << std::endl;
-    
-    
+    for(int i(0);i<100;++i)
+    {
+        B.setRandom();
+        std::cout << B << std::endl;
+    }
 }
+

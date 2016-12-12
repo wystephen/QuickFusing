@@ -18,6 +18,12 @@
 
 /////stamp---------
 
+#include "RangeKF.hpp"
+
+#include "PUWBPF.hpp"
+
+/////stamp---------
+
 
 namespace plt = matplotlibcpp;
 
@@ -61,7 +67,7 @@ int main(int argc, char *argv[]) {
     /*
      * Load Imu data.
      */
-    std::string dir_name = "tmp_file_dir---/";
+    std::string dir_name = "tmp_file_dir/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"), ZuptReader(dir_name + "Zupt.data.csv");
 
@@ -90,8 +96,8 @@ int main(int argc, char *argv[]) {
     SettingPara init_para(true);
 
     init_para.init_pos1_ = Eigen::Vector3d(0.8, -5.6, 0.0);
-//    init_para.init_heading1_ = -180 / 180 * M_PI;
-    init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
+    init_para.init_heading1_ = -180 / 180 * M_PI;
+//    init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
     init_para.Ts_ = 1.0 / 128.0;
 
 //    init_para.sigma_gyro_ *= 1.3;
@@ -148,14 +154,51 @@ int main(int argc, char *argv[]) {
             UwbData(i, j) = *(UwbdataReader.GetMatrix()(i, j));
         }
     }
+    std::vector<std::vector<double>> range_vec;
+
+
+
+    //////////////-------------------UWB FILTER------------
+    for(int i(0);i<UwbData.cols();++i)
+    {
+        range_vec.push_back(std::vector<double>());
+        SingleValueFilter sf(0.4,0.4);
+        for(int j(0);j<UwbData.rows();++j)
+        {
+            UwbData(j,i) = sf.filter(UwbData(j,i));
+            range_vec[i].push_back(double(UwbData(j,i)));
+        }
+    }
+
 
     /////////////-----------------Load UWB RESULT --------------------
     CSVReader UwbresultReader(dir_name + "UwbResult.data.csv");
 
     std::vector<double> ux, uy;
-    for (int i(0); i < UwbresultReader.GetMatrix().GetRows(); ++i) {
-        ux.push_back(*UwbdataReader.GetMatrix()(i, 1));
-        uy.push_back(*UwbdataReader.GetMatrix()(i, 2));
+//    for (int i(0); i < UwbresultReader.GetMatrix().GetRows(); ++i) {
+//        ux.push_back(*UwbdataReader.GetMatrix()(i, 1));
+//        uy.push_back(*UwbdataReader.GetMatrix()(i, 2));
+//    }
+    /////////////////////---Compute result only uwb data.
+    PUWBPF<4> puwbpf(1000);
+
+    puwbpf.SetMeasurementSigma(1.0,4);
+    puwbpf.SetInputNoiseSigma(1.0);
+
+    puwbpf.SetBeaconSet(beaconset);
+
+    for(int i(0);i<UwbData.rows();++i)
+    {
+        puwbpf.StateTransmition(Eigen::Vector2d(2,2),0);
+
+        puwbpf.Evaluation(UwbData.block(i,1,1,UwbData.cols()-1),0);
+
+        puwbpf.Resample(-1,0);
+
+        Eigen::VectorXd tmp = puwbpf.GetResult(0);
+
+        ux.push_back(tmp(0));
+        uy.push_back(tmp(1));
     }
 
 
@@ -416,9 +459,14 @@ int main(int argc, char *argv[]) {
 
 
 
+    std::cout << "avg_error of imu:" << avg_imu << " avg_error of fusing: " << avg_fusing << std::endl;
+
+
+
 
 //                plt::show();
     ////////////////////////////////Show result /////////////////////////////////
+    plt::subplot(2,2,0);
     plt::named_plot("Imu result", imux, imuy, "r.");
     plt::named_plot("Fusing result", fx, fy, "b+-");
     plt::named_plot("real path", rx, ry, "g-");
@@ -431,6 +479,12 @@ int main(int argc, char *argv[]) {
                +"avgfus"+std::to_string(avg_fusing) + "-"
                +std::to_string(TimeStamp::now()));
     plt::grid(true);
+
+    plt::subplot(2,2,1);
+    plt::grid(true);
+
+
+
     plt::save(std::to_string(particle_num)
               + "-" + std::to_string(noise_sigma) + "-"
               + std::to_string(evaluate_sigma) + "-"

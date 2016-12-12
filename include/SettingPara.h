@@ -46,26 +46,13 @@ public:
 
         ComputeGravity();
 
-        // Ts_ = 1/820.0;
 
-//        rang_constraint_ = 1.0;
 
-//        for(int i(0);i<3;++i)
-//        {
-//            init_pos1_(i) = 0.0;
-//            init_pos2_(i) = 0.0;
-//            init_pos_(i) = 0.0;
-//        }
-
-//        init_heading1_ = -1.6857;
-//        init_heading2_ = 1.6620;
 
         init_pos1_ = Eigen::Vector3d(0, 0, 0);
         init_pos2_ = Eigen::Vector3d(0, 0, 0);
 
-        //gravity_ = 9.8173;
 
-        //Ts_ = 0.0012;
 
         sigma_a_ = 0.0350;
         sigma_g_ = 0.0061;
@@ -73,13 +60,6 @@ public:
         sigma_acc_ = Eigen::Vector3d(2.8, 2.8, 2.8);
         sigma_gyro_ = Eigen::Vector3d(0.0698, 0.0698, 0.0698);
         sigma_vel_ = Eigen::Vector3d(0.05, 0.05, 0.05);
-
-//        sigma_a_ = 0.0350  *10;
-//        sigma_g_ = 0.0061*10;
-//
-//        sigma_acc_ = Eigen::Vector3d(2.8, 2.8, 2.8)*10;
-//        sigma_gyro_ = Eigen::Vector3d(0.0698, 0.0698, 0.0698)*10;
-//        sigma_vel_ = Eigen::Vector3d(0.05, 0.05, 0.05)*10;
 
 
     }
@@ -137,7 +117,6 @@ public:
     Eigen::Vector3d sigma_initial_vel2_ = 1e-5 * Eigen::Vector3d(1,1,1);
 
     Eigen::Vector3d sigma_initial_att2_ = (M_PI / 180.0 * Eigen::Vector3d(0.1, 0.1, 0.001));
-
 
 
 

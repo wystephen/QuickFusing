@@ -12,12 +12,10 @@
 #define QUICKFUSING_EKF_HPP
 
 
-
 class Ekf {
 public:
     Ekf(SettingPara para) {
 //        MYCHECK(1);
-
 
         para_ = para;
 
@@ -38,15 +36,12 @@ public:
         x_h_.resize(9, 1);
         x_h_.setZero();
 
-        K_.resize(9,3);
+        K_.resize(9, 3);
         K_.setIdentity();
-
-
-
 
     }
 
-    Ekf(const Ekf &orig){
+    Ekf(const Ekf &orig) {
         para_ = orig.para_;
 //
         R_ = orig.R_;
@@ -66,29 +61,15 @@ public:
         G_ = orig.G_;
 
         quat_ = orig.quat_;
-//        CopyMatrix(orig.R_,R_);
-//        CopyMatrix(orig.P_,P_);
-//        CopyMatrix(orig.Q_,Q_);
-//        CopyMatrix(orig.H_,H_);
-//        CopyMatrix(orig.K_,K_);
-//        CopyMatrix(orig.F_,F_);
-//        CopyMatrix(orig.G_,G_);
-//
-//        CopyMatrix( orig.x_h_,x_h_);
-//        CopyMatrix( orig.quat_,quat_);
-
 
     }
 
-    bool CopyMatrix(Eigen::MatrixXd in,Eigen::MatrixXd &out)
-    {
-        out.resize(in.rows(),in.cols());
+    bool CopyMatrix(Eigen::MatrixXd in, Eigen::MatrixXd &out) {
+        out.resize(in.rows(), in.cols());
 
-        for(int i(0);i<in.rows();++i)
-        {
-            for(int j(0);j<in.cols();++j)
-            {
-                out(i,j) = in(i,j);
+        for (int i(0); i < in.rows(); ++i) {
+            for (int j(0); j < in.cols(); ++j) {
+                out(i, j) = in(i, j);
             }
         }
 
@@ -97,15 +78,12 @@ public:
 
 
     bool InitNavEq(Eigen::MatrixXd u) {
-//        MYCHECK(1);
 
         double f_u(0.0), f_v(0.0), f_w(0.0);
 
         f_u = u.col(0).mean();
         f_v = u.col(1).mean();
         f_w = u.col(2).mean();
-
-//        std::cout << "u,v,w:" << f_u << "," << f_v << "," << f_w << std::endl;
 
 
         double roll(atan2(-f_v, -f_w)), pitch(atan2(f_u, sqrt(f_v * f_v + f_w * f_w)));

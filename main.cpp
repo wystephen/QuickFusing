@@ -316,7 +316,7 @@ int main(int argc, char *argv[]) {
                 Score_vec[i] *= Pdf(Pose_vec[i],
                                     beaconset,
                                     UwbData.block(uwb_step, 1, 1, UwbData.cols() - 1).transpose(),
-                                    1.95,
+                                    2.14,
                                     evaluate_sigma);
                 sum_score += Score_vec[i];
             }
@@ -476,7 +476,7 @@ int main(int argc, char *argv[]) {
 
 //                plt::show();
     ////////////////////////////////Show result /////////////////////////////////
-    plt::subplot(2,2,0);
+//    plt::subplot(2,2,0);
     plt::named_plot("Imu result", imux, imuy, "r.");
     plt::named_plot("Fusing result", fx, fy, "b+-");
     plt::named_plot("real path", rx, ry, "g-");
@@ -490,10 +490,10 @@ int main(int argc, char *argv[]) {
                +std::to_string(TimeStamp::now()));
     plt::grid(true);
 
-    plt::subplot(2,2,1);
-    plt::grid(true);
-    plt::named_plot("IMU Error",imu_err_step,imu_err,"r+-");
-    plt::legend();
+//    plt::subplot(2,2,1);
+//    plt::grid(true);
+//    plt::named_plot("IMU Error",imu_err_step,imu_err,"r+-");
+//    plt::legend();
 
 
 
@@ -503,6 +503,9 @@ int main(int argc, char *argv[]) {
               + std::to_string(TimeStamp::now()) + ".jpg");
 
 //    plt::show();
+
+    std::cout << "beaconset:" << std::endl;
+    std::cout << beaconset << std::endl;
 
     return 0;
 

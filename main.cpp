@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     /*
      * Load Imu data.
      */
-    std::string dir_name = "tmp_file_dir/";
+    std::string dir_name = "tmp_file_dir---/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"), ZuptReader(dir_name + "Zupt.data.csv");
 
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
     SettingPara init_para(true);
 
     init_para.init_pos1_ = Eigen::Vector3d(0.8, -5.6, 0.0);
-    init_para.init_heading1_ = -180 / 180 * M_PI;
-//    init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
+//    init_para.init_heading1_ = -180 / 180 * M_PI;
+    init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
     init_para.Ts_ = 1.0 / 128.0;
 
 //    init_para.sigma_gyro_ *= 1.3;
@@ -175,31 +175,32 @@ int main(int argc, char *argv[]) {
     CSVReader UwbresultReader(dir_name + "UwbResult.data.csv");
 
     std::vector<double> ux, uy;
-//    for (int i(0); i < UwbresultReader.GetMatrix().GetRows(); ++i) {
-//        ux.push_back(*UwbdataReader.GetMatrix()(i, 1));
-//        uy.push_back(*UwbdataReader.GetMatrix()(i, 2));
-//    }
-    /////////////////////---Compute result only uwb data.
-    PUWBPF<4> puwbpf(1000);
-
-    puwbpf.SetMeasurementSigma(1.0);
-    puwbpf.SetInputNoiseSigma(1.0);
-
-    puwbpf.SetBeaconSet(beaconset);
-
-    for(int i(0);i<UwbData.rows();++i)
-    {
-        puwbpf.StateTransmition(Eigen::Vector2d(2,2),0);
-
-        puwbpf.Evaluation(UwbData.block(i,1,1,UwbData.cols()-1),0);
-
-        puwbpf.Resample(-1,0);
-
-        Eigen::VectorXd tmp = puwbpf.GetResult(0);
-
-        ux.push_back(tmp(0));
-        uy.push_back(tmp(1));
+    /////////////////////---direct load uwb result-------
+    for (int i(0); i < UwbresultReader.GetMatrix().GetRows(); ++i) {
+        ux.push_back(*UwbdataReader.GetMatrix()(i, 1));
+        uy.push_back(*UwbdataReader.GetMatrix()(i, 2));
     }
+    /////////////////////---Compute result only uwb data.
+//    PUWBPF<4> puwbpf(1000);
+//
+//    puwbpf.SetMeasurementSigma(1.0);
+//    puwbpf.SetInputNoiseSigma(1.0);
+//
+//    puwbpf.SetBeaconSet(beaconset);
+//
+//    for(int i(0);i<UwbData.rows();++i)
+//    {
+//        puwbpf.StateTransmition(Eigen::Vector2d(2,2),0);
+//
+//        puwbpf.Evaluation(UwbData.block(i,1,1,UwbData.cols()-1),0);
+//
+//        puwbpf.Resample(-1,0);
+//
+//        Eigen::VectorXd tmp = puwbpf.GetResult(0);
+//
+//        ux.push_back(tmp(0));
+//        uy.push_back(tmp(1));
+//    }
 
 
 //   std::cout << beaconset << std::endl;
@@ -224,7 +225,7 @@ int main(int argc, char *argv[]) {
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 8000;
+    int particle_num = 1000;
     double noise_sigma = 2.0;
     double evaluate_sigma = 2.6;
     double filter_btime(TimeStamp::now());
@@ -399,36 +400,44 @@ int main(int argc, char *argv[]) {
 
     ///////////////////////////*Real path*///////////////////////////////////////////////////////
     std::vector<double> rx, ry;
-    rx.push_back(0.8);
-    ry.push_back(-5.6);
+    CSVReader realpath(dir_name+"keypoint.csv");
 
-    rx.push_back(-8.0);
-    ry.push_back(-5.6);
-
-    rx.push_back(-8.0);
-    ry.push_back(-2.4);
-
-    rx.push_back(0.8);
-    ry.push_back(-2.4);
-
-    rx.push_back(0.8);
-    ry.push_back(2.4);
-
-    rx.push_back(-8.0);
-    ry.push_back(2.4);
-
-    rx.push_back(-8.0);
-    ry.push_back(5.6);
-
-    rx.push_back(0.8);
-    ry.push_back(5.6);
-
-    rx.push_back(0.8);
-    ry.push_back(-5.6);
+    for(int i(0);i<realpath.rows_;++i)
+    {
+        rx.push_back(double(*realpath.GetMatrix()(i,0)));
+        ry.push_back(double(*realpath.GetMatrix()(i,1)));
+    }
+//    rx.push_back(0.8);
+//    ry.push_back(-5.6);
+//
+//    rx.push_back(-8.0);
+//    ry.push_back(-5.6);
+//
+//    rx.push_back(-8.0);
+//    ry.push_back(-2.4);
+//
+//    rx.push_back(0.8);
+//    ry.push_back(-2.4);
+//
+//    rx.push_back(0.8);
+//    ry.push_back(2.4);
+//
+//    rx.push_back(-8.0);
+//    ry.push_back(2.4);
+//
+//    rx.push_back(-8.0);
+//    ry.push_back(5.6);
+//
+//    rx.push_back(0.8);
+//    ry.push_back(5.6);
+//
+//    rx.push_back(0.8);
+//    ry.push_back(-5.6);
 
 
     //////////////////////----------------COMPUTE ERROR---------------------////
     std::vector<double> imu_err,fusing_err;
+    std::vector<double> imu_err_step;
     double avg_imu(0.0),avg_fusing(0.0);
 
     ResultEvaluation re(dir_name + "keypoint.csv");
@@ -439,6 +448,7 @@ int main(int argc, char *argv[]) {
         imu_err.push_back(re.Distance(
                 Eigen::Vector2d(imux[i],imuy[i]),
                 ImuData(i,0)));
+        imu_err_step.push_back(i);
 
     }
     avg_imu = std::accumulate(imu_err.begin(),imu_err.end(),0.0);
@@ -482,6 +492,8 @@ int main(int argc, char *argv[]) {
 
     plt::subplot(2,2,1);
     plt::grid(true);
+    plt::named_plot("IMU Error",imu_err_step,imu_err,"r+-");
+    plt::legend();
 
 
 

@@ -95,8 +95,12 @@ int main(int argc, char *argv[]) {
      */
     SettingPara init_para(true);
 
-    init_para.init_pos1_ = Eigen::Vector3d(0.8, -5.6, 0.0);
+    //////////////----For 14- datasets.
+//    init_para.init_pos1_ = Eigen::Vector3d(0.8, -5.6, 0.0);
 //    init_para.init_heading1_ = -180 / 180 * M_PI;
+
+    /////////////---- For 4 datasets.
+    init_para.init_pos1_ = Eigen::Vector3d();
     init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
     init_para.Ts_ = 1.0 / 128.0;
 
@@ -407,33 +411,6 @@ int main(int argc, char *argv[]) {
         rx.push_back(double(*realpath.GetMatrix()(i,0)));
         ry.push_back(double(*realpath.GetMatrix()(i,1)));
     }
-//    rx.push_back(0.8);
-//    ry.push_back(-5.6);
-//
-//    rx.push_back(-8.0);
-//    ry.push_back(-5.6);
-//
-//    rx.push_back(-8.0);
-//    ry.push_back(-2.4);
-//
-//    rx.push_back(0.8);
-//    ry.push_back(-2.4);
-//
-//    rx.push_back(0.8);
-//    ry.push_back(2.4);
-//
-//    rx.push_back(-8.0);
-//    ry.push_back(2.4);
-//
-//    rx.push_back(-8.0);
-//    ry.push_back(5.6);
-//
-//    rx.push_back(0.8);
-//    ry.push_back(5.6);
-//
-//    rx.push_back(0.8);
-//    ry.push_back(-5.6);
-
 
     //////////////////////----------------COMPUTE ERROR---------------------////
     std::vector<double> imu_err,fusing_err;
@@ -476,7 +453,7 @@ int main(int argc, char *argv[]) {
 
 //                plt::show();
     ////////////////////////////////Show result /////////////////////////////////
-//    plt::subplot(2,2,0);
+    plt::subplot(2,2,0);
     plt::named_plot("Imu result", imux, imuy, "r.");
     plt::named_plot("Fusing result", fx, fy, "b+-");
     plt::named_plot("real path", rx, ry, "g-");
@@ -490,11 +467,23 @@ int main(int argc, char *argv[]) {
                +std::to_string(TimeStamp::now()));
     plt::grid(true);
 
-//    plt::subplot(2,2,1);
-//    plt::grid(true);
-//    plt::named_plot("IMU Error",imu_err_step,imu_err,"r+-");
-//    plt::legend();
+    plt::subplot(2,2,1);
+    plt::grid(true);
+    plt::named_plot("IMU Error",imu_err_step,imu_err,"r+-");
+    plt::legend();
 
+    plt::subplot(2,2,2);
+    plt::grid(true);
+
+    for(int i(1);i< UwbData.cols();++i)
+    {
+        std::vector<double> tmp_range;
+        for(int j(0);j<UwbData.rows();++j)
+        {
+            tmp_range.push_back(double(UwbData(j,i)));
+        }
+        plt::plot(tmp_range);
+    }
 
 
     plt::save(std::to_string(particle_num)

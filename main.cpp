@@ -100,8 +100,9 @@ int main(int argc, char *argv[]) {
 //    init_para.init_heading1_ = -180 / 180 * M_PI;
 
     /////////////---- For 4 datasets.
-    init_para.init_pos1_ = Eigen::Vector3d();
+    init_para.init_pos1_ = Eigen::Vector3d(1.45,-6.3,0.0);
     init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
+
     init_para.Ts_ = 1.0 / 128.0;
 
 //    init_para.sigma_gyro_ *= 1.3;
@@ -163,16 +164,16 @@ int main(int argc, char *argv[]) {
 
 
     //////////////-------------------UWB FILTER------------
-    for(int i(0);i<UwbData.cols();++i)
-    {
-        range_vec.push_back(std::vector<double>());
-        SingleValueFilter sf(0.4,0.4);
-        for(int j(0);j<UwbData.rows();++j)
-        {
-            UwbData(j,i) = sf.filter(UwbData(j,i));
-            range_vec[i].push_back(double(UwbData(j,i)));
-        }
-    }
+//    for(int i(0);i<UwbData.cols();++i)
+//    {
+//        range_vec.push_back(std::vector<double>());
+//        SingleValueFilter sf(0.4,0.4);
+//        for(int j(0);j<UwbData.rows();++j)
+//        {
+//            UwbData(j,i) = sf.filter(UwbData(j,i));
+//            range_vec[i].push_back(double(UwbData(j,i)));
+//        }
+//    }
 
 
     /////////////-----------------Load UWB RESULT --------------------
@@ -338,7 +339,7 @@ int main(int argc, char *argv[]) {
             std::vector<double> tmp_score = Score_vec;
 //            Score_vec.clear();
 
-            std::uniform_real_distribution<> uniform_distribution(0.0, 0.999999);
+            std::uniform_real_distribution<> uniform_distribution(0.0, 0.99999999999999);
             if (uwb_step % 20 == 0) {
                 std::cout << "Finished :" << double(uwb_step) / double(UwbData.rows()) * 100.0 << "  % "
                           << std::endl;
@@ -457,7 +458,7 @@ int main(int argc, char *argv[]) {
     plt::named_plot("Imu result", imux, imuy, "r.");
     plt::named_plot("Fusing result", fx, fy, "b+-");
     plt::named_plot("real path", rx, ry, "g-");
-//    plt::named_plot("Uwb Result",ux,uy,"y+-");
+    plt::named_plot("Uwb Result",ux,uy,"y+-");
 ////    plt::legend();
     plt::title(std::to_string(particle_num)
                +"-"+std::to_string(noise_sigma) +"-"

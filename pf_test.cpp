@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     /*
      * Load Imu data.
      */
-    std::string dir_name = "tmp_file_dir---/";
+    std::string dir_name = "tmp_file_dir/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"), ZuptReader(dir_name + "Zupt.data.csv");
 

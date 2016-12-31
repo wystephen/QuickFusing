@@ -72,6 +72,9 @@ double Pdf(Eigen::Vector2d vecx,
 
 int main(int argc, char *argv[]) {
 
+    std::cout.precision(20); //
+
+    double first_t(TimeStamp::now());
 
     /*
      * Load Imu data.
@@ -98,14 +101,15 @@ int main(int argc, char *argv[]) {
         Zupt(i, 0) = *ZuptTmp(i, 0);
     }
 
-    /*
-        * Load uwb data.
-        */
+    /**
+    * Load uwb data.
+    */
 
     CSVReader BeaconsetReader(dir_name + "beaconset.data.csv");
     CSVReader UwbdataReader(dir_name + "UwbData.data.csv");
 
     Eigen::MatrixXd beaconset, UwbData;
+
 
     beaconset.resize(BeaconsetReader.GetMatrix().GetRows(), BeaconsetReader.GetMatrix().GetCols());
     for (int i(0); i < beaconset.rows(); ++i) {
@@ -124,8 +128,10 @@ int main(int argc, char *argv[]) {
 
 
     //Fusing result.
-    std::vector<double> fx,fy;
-    std::vector<double> ux,uy;
+    std::vector<double> fx, fy;
+    std::vector<double> ux, uy;
+
+    std::cout << TimeStamp::now() - first_t << std::endl;
 
 
 }

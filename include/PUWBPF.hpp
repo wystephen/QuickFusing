@@ -58,6 +58,11 @@ public:
         SetInputNoiseSigma(sigma_vector);
     }
 
+    /**
+     *
+     * @param sigma_vector
+     * @return
+     */
     bool SetInputNoiseSigma(Eigen::VectorXd sigma_vector) {
         MYCHECK(ISDEBUG);
         try {

@@ -20,6 +20,7 @@ public:
     PFBase(int Partical_num) {
         particle_num_ = Partical_num;
 
+
         e_.seed(TimeStamp::now());
 
     }
@@ -46,11 +47,11 @@ public:
             double para1 = (x - miu) * (x - miu) / 2 / sigma / sigma;
             double para2 = (1 / std::sqrt(2 * M_PI) / sigma);
 
-            return para2 * std::log(-para1);
+            return para2 * std::exp(-para1);
         } catch (...) {
             //Some error when compute the Single value .
 
-            return 0.0;
+            return 0.000000001;
         }
 
     }

@@ -90,6 +90,8 @@ public:
         MYCHECK(ISDEBUG);
         beacon_set_.resizeLike(beaconset);
         beacon_set_ = beaconset;
+        std::cout << "beaconset:" << std::endl;
+        std::cout << beacon_set_ << std::endl;
         return true;
     }
 
@@ -101,6 +103,7 @@ public:
         if (MethodType == 0)//Method 0:Random move follow the Gaussian distribution(Same sigma).
         {
             double sigma = input_noise_sigma_.mean();
+
 //            try{
 //                std::cout << input.size() << std::endl;
 //
@@ -137,8 +140,8 @@ public:
 //                std::cout << p_state_.block(i, 0, 1, p_state_.cols())<< " here   " << std::endl;
 //                std::cout << measurement << "here 2 " << std::endl;
 
-                probability_(i) = EvaluationSingle(
-                        Eigen::Vector2d(p_state_(i, 0), p_state_(i, 1)),//p_state_.block(i, 0, 1, p_state_.cols()),
+                probability_(i) *= EvaluationSingle(
+                       p_state_.block(i, 0, 1, p_state_.cols()).transpose(),
                         measurement);
             }
         }
@@ -159,7 +162,7 @@ public:
     double EvaluationSingle(Eigen::VectorXd state,
                             Eigen::VectorXd measurement) {
         MYCHECK(ISDEBUG);
-        double score(0.0);
+        double score(1.0);
 //        std::cout << beacon_set_.rows()<<" : " << beacon_set_.cols() << std::endl;
 //        std::cout << state.rows() <<" :     :"<<state.cols() << std::endl;
         try {
@@ -168,10 +171,10 @@ public:
                 for (int j(0); j < beacon_set_.cols() - 1; ++j) {
                     dis += std::pow(state(j) - beacon_set_(i, j), 2.0);
                 }
-                dis += 0.8;//TODO: Change this one.
+//                dis += 0.8;//TODO: Change this one.
                 dis = std::sqrt(dis);
                 MYCHECK(ISDEBUG);
-                score += this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i));
+                score *= this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i));
 //                std::cout << score << ";:::" <<
 //                          dis << " :"
 //                          << measurement(i) << ":" << measurement_sigma_(i) << "dddd" << std::endl;
@@ -218,6 +221,7 @@ public:
                 if(i>=p_state_.rows())
                 {
                     i=p_state_.rows()-1;
+                    MYERROR("i is out of range,in resample method 1.");
                 }
                 MYCHECK(ISDEBUG);
 //                std::cout << p_state_.block(i,0,1,p_state_.cols());
@@ -232,6 +236,11 @@ public:
                 probability_(index) = tmp_score[index];
                 p_state_.block(index, 0, 1, p_state_.cols()) = tmp_vec[index].transpose();
             }
+            if(isnan(probability_.sum()))
+            {
+                probability_.setOnes();
+            }
+//            probability_.setOnes();
             probability_ = probability_ / probability_.sum();
         }
     }

@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     /*
      * Load Imu data.
      */
-    std::string dir_name = "tmp_file_dir/";
+    std::string dir_name = "tmp_file_dir---/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"), ZuptReader(dir_name + "Zupt.data.csv");
 
@@ -135,18 +135,18 @@ int main(int argc, char *argv[]) {
 
     PUWBPF<4> puwbpf(10000);
 
-    puwbpf.SetMeasurementSigma(2.0);
-    puwbpf.SetInputNoiseSigma(2.0);
+    puwbpf.SetMeasurementSigma(1.0,4);
+    puwbpf.SetInputNoiseSigma(0.2);
 
     puwbpf.SetBeaconSet(beaconset);
     std::cout << "result:"<<puwbpf.GetResult(0) << std::endl;
 
     for (int i(0); i < UwbData.rows(); ++i) {
         puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);
-//        std::cout << UwbData.block(i, 1, 1, UwbData.cols() - 1) << std::endl;
-//        puwbpf.Evaluation(UwbData.block(i, 1, 1, UwbData.cols() - 1), 0);
-        puwbpf.Evaluation(Eigen::Vector4d(UwbData(i,1),UwbData(i,2)
-        ,UwbData(i,3),UwbData(i,4)).transpose(),0);
+        std::cout << UwbData.block(i, 1, 1, UwbData.cols() - 1) << std::endl;
+        puwbpf.Evaluation(UwbData.block(i, 1, 1, UwbData.cols() - 1).transpose(), 0);
+//        puwbpf.Evaluation(Eigen::Vector4d(UwbData(i,1),UwbData(i,2)
+//        ,UwbData(i,3),UwbData(i,4)).transpose(),0);
 
         puwbpf.Resample(-1, 0);
 
@@ -158,12 +158,12 @@ int main(int argc, char *argv[]) {
     }
 
 
-
+    std::cout <<"end time:" <<  TimeStamp::now() - first_t << std::endl;
 
     /**
      * Show result.
      */
-    plt::named_plot("ux,uy", ux, uy);
+    plt::named_plot("ux,uy", ux, uy,"r-+");
 
 //    plt::named_plot("ux1", ux, ux);
     plt::grid(true);

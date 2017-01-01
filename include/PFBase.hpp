@@ -67,6 +67,10 @@ public:
             }
 
             //ToDo:VectorNormalPdf
+            for(int i(0);i<x.rows();++i)
+            {
+
+            }
 
         } catch (std::string &e) {
             //Return zero when size of x is not same to miu.

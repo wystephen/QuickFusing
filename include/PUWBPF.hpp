@@ -171,10 +171,10 @@ public:
                 for (int j(0); j < beacon_set_.cols() - 1; ++j) {
                     dis += std::pow(state(j) - beacon_set_(i, j), 2.0);
                 }
-//                dis += 0.8;//TODO: Change this one.
+                dis += std::pow(2.14-beacon_set_(i,2),2.0);//TODO: Change this one.
                 dis = std::sqrt(dis);
                 MYCHECK(ISDEBUG);
-                score *= this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i));
+                score *= (this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i))+1e-50);
 //                std::cout << score << ";:::" <<
 //                          dis << " :"
 //                          << measurement(i) << ":" << measurement_sigma_(i) << "dddd" << std::endl;

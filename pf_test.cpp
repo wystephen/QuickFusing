@@ -145,13 +145,14 @@ int main(int argc, char *argv[]) {
         puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);
         std::cout << UwbData.block(i, 1, 1, UwbData.cols() - 1) << std::endl;
         puwbpf.Evaluation(UwbData.block(i, 1, 1, UwbData.cols() - 1).transpose(), 0);
+//        std::cout << puwbpf.GetResult(0).transpose() << std::endl;
 //        puwbpf.Evaluation(Eigen::Vector4d(UwbData(i,1),UwbData(i,2)
 //        ,UwbData(i,3),UwbData(i,4)).transpose(),0);
-
+        Eigen::VectorXd tmp = puwbpf.GetResult(0);
         puwbpf.Resample(-1, 0);
 
-        Eigen::VectorXd tmp = puwbpf.GetResult(0);
-        std::cout << tmp.transpose() << std::endl;
+
+//        std::cout << tmp.transpose() << std::endl;
 
         ux.push_back(tmp(0));
         uy.push_back(tmp(1));

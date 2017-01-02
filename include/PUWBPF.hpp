@@ -208,21 +208,26 @@ public:
 
             probability_ = probability_/probability_.sum();
 
+
             std::uniform_real_distribution<double> real_distribution(0, 0.9999999);
             MYCHECK(ISDEBUG);
             for (int index(0); index < p_state_.rows(); ++index) {
                 double score = real_distribution(this->e_);
+                double tmp_s(score);
 
-                int i(0);
+                int i(-1);//TODO: Test it.
+
                 MYCHECK(ISDEBUG);
-                while (score > 0.0) {
+                while (score > 1e-10) {
                     score -= probability_(i);
                     ++i;
                 }
                 if(i>=p_state_.rows())
                 {
                     i=p_state_.rows()-1;
-                    MYERROR("i is out of range,in resample method 1.");
+                    std::cout << probability_.sum() << " is the sum of probability_." ;
+                    std::cout << tmp_s << "is score" << std::endl;
+//                    MYERROR("i is out of range,in resample method 1.");
                 }
                 MYCHECK(ISDEBUG);
 //                std::cout << p_state_.block(i,0,1,p_state_.cols());

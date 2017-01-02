@@ -174,6 +174,7 @@ public:
                 dis += std::pow(2.14-beacon_set_(i,2),2.0);//TODO: Change this one.
                 dis = std::sqrt(dis);
                 MYCHECK(ISDEBUG);
+
                 score *= (this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i))+1e-50);
 //                std::cout << score << ";:::" <<
 //                          dis << " :"

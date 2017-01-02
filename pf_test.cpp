@@ -133,10 +133,10 @@ int main(int argc, char *argv[]) {
 
     std::cout << TimeStamp::now() - first_t << std::endl;
 
-    PUWBPF<4> puwbpf(10000);
+    PUWBPF<4> puwbpf(1000);
 
     puwbpf.SetMeasurementSigma(1.0,4);
-    puwbpf.SetInputNoiseSigma(0.2);
+    puwbpf.SetInputNoiseSigma(0.1);
 
     puwbpf.SetBeaconSet(beaconset);
     std::cout << "result:"<<puwbpf.GetResult(0) << std::endl;

@@ -181,31 +181,33 @@ int main(int argc, char *argv[]) {
 
     std::vector<double> ux, uy;
     /////////////////////---direct load uwb result-------
-    for (int i(0); i < UwbresultReader.GetMatrix().GetRows(); ++i) {
-        ux.push_back(*UwbdataReader.GetMatrix()(i, 1));
-        uy.push_back(*UwbdataReader.GetMatrix()(i, 2));
-    }
-    /////////////////////---Compute result only uwb data.
-//    PUWBPF<4> puwbpf(1000);
-//
-//    puwbpf.SetMeasurementSigma(1.0);
-//    puwbpf.SetInputNoiseSigma(1.0);
-//
-//    puwbpf.SetBeaconSet(beaconset);
-//
-//    for(int i(0);i<UwbData.rows();++i)
-//    {
-//        puwbpf.StateTransmition(Eigen::Vector2d(2,2),0);
-//
-//        puwbpf.Evaluation(UwbData.block(i,1,1,UwbData.cols()-1),0);
-//
-//        puwbpf.Resample(-1,0);
-//
-//        Eigen::VectorXd tmp = puwbpf.GetResult(0);
-//
-//        ux.push_back(tmp(0));
-//        uy.push_back(tmp(1));
+//    for (int i(0); i < UwbresultReader.GetMatrix().GetRows(); ++i) {
+//        ux.push_back(*UwbdataReader.GetMatrix()(i, 1));
+//        uy.push_back(*UwbdataReader.GetMatrix()(i, 2));
 //    }
+    /////////////////////---Compute result only uwb data.
+    PUWBPF<4> puwbpf(10000);
+
+    puwbpf.SetMeasurementSigma(2.0,4);
+    puwbpf.SetInputNoiseSigma(0.5);
+
+    puwbpf.SetBeaconSet(beaconset);
+    puwbpf.OptimateInitial(UwbData.block(0,1,1,UwbData.cols()-1).transpose(),0);
+
+    for(int i(0);i<UwbData.rows();++i)
+    {
+        puwbpf.StateTransmition(Eigen::Vector2d(2,2),0);
+
+        puwbpf.Evaluation(UwbData.block(i, 1, 1, UwbData.cols() - 1).transpose(),
+                          0);
+        Eigen::VectorXd tmp = puwbpf.GetResult(0);
+        puwbpf.Resample(-1,0);
+
+
+
+        ux.push_back(tmp(0));
+        uy.push_back(tmp(1));
+    }
 
 
 //   std::cout << beaconset << std::endl;
@@ -217,22 +219,22 @@ int main(int argc, char *argv[]) {
      */
 
 
-    //-----------  TIME OFFSET______
-//    if(UwbData(0,0) - ImuData(0,0) > 100)
-//    {
-////        ImuData.block(0,0,ImuData.rows(),1) = ImuData.block(0,0,ImuData.rows(),1) +
-////                531844067.535;531844066.53
-//        for(int k(0);k<ImuData.rows();++k)
-//        {
-//            ImuData(k,0) = ImuData(k,0) + 531844066.53;
-//        }
-//    }
+    //----------- TIME OFFSET______
+    if(UwbData(0,0) - ImuData(0,0) > 100)
+    {
+//        ImuData.block(0,0,ImuData.rows(),1) = ImuData.block(0,0,ImuData.rows(),1) +
+//                531844067.535;531844066.53
+        for(int k(0);k<ImuData.rows();++k)
+        {
+            ImuData(k,0) = ImuData(k,0) + 531844066.53;
+        }
+    }
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 1000;
-    double noise_sigma = 2.0;
-    double evaluate_sigma = 2.6;
+    int particle_num = 10000;
+    double noise_sigma = 3.0;
+    double evaluate_sigma = 3.0;
     double filter_btime(TimeStamp::now());
 
     if (argc != 4) {
@@ -350,15 +352,16 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < tmp_p.size(); ++i) {
                 double val(uniform_distribution(e));
 
-                int target_index(0);
+                int target_index(-1);
                 while (val > 0.0) {
-                    val -= tmp_score[target_index];
                     ++target_index;
-                    if (target_index >= tmp_p.size()) {
-                        target_index = tmp_p.size() - 1;
-                    }
-                }
+                    val -= tmp_score[target_index];
 
+
+                }
+                if (target_index >= tmp_p.size()) {
+                    target_index = tmp_p.size() - 1;
+                }
                 P_vec[i] = (Ekf(tmp_p[target_index]));
                 Score_vec[i] = (tmp_score[target_index]);
 
@@ -454,7 +457,7 @@ int main(int argc, char *argv[]) {
 
 //                plt::show();
     ////////////////////////////////Show result /////////////////////////////////
-    plt::subplot(2,2,0);
+//    plt::subplot(2,2,0);
     plt::named_plot("Imu result", imux, imuy, "r.");
     plt::named_plot("Fusing result", fx, fy, "b+-");
     plt::named_plot("real path", rx, ry, "g-");
@@ -468,23 +471,23 @@ int main(int argc, char *argv[]) {
                +std::to_string(TimeStamp::now()));
     plt::grid(true);
 
-    plt::subplot(2,2,1);
-    plt::grid(true);
-    plt::named_plot("IMU Error",imu_err_step,imu_err,"r+-");
-    plt::legend();
+//    plt::subplot(2,2,1);
+//    plt::grid(true);
+//    plt::named_plot("IMU Error",imu_err_step,imu_err,"r+-");
+//    plt::legend();
 
-    plt::subplot(2,2,2);
-    plt::grid(true);
-
-    for(int i(1);i< UwbData.cols();++i)
-    {
-        std::vector<double> tmp_range;
-        for(int j(0);j<UwbData.rows();++j)
-        {
-            tmp_range.push_back(double(UwbData(j,i)));
-        }
-        plt::plot(tmp_range);
-    }
+//    plt::subplot(2,2,2);
+//    plt::grid(true);
+//
+//    for(int i(1);i< UwbData.cols();++i)
+//    {
+//        std::vector<double> tmp_range;
+//        for(int j(0);j<UwbData.rows();++j)
+//        {
+//            tmp_range.push_back(double(UwbData(j,i)));
+//        }
+//        plt::plot(tmp_range);
+//    }
 
 
     plt::save(std::to_string(particle_num)

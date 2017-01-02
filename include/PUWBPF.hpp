@@ -215,6 +215,7 @@ public:
                 double score = real_distribution(this->e_);
                 double tmp_s(score);
 
+                // TODO: Problem is here, but why....?
                 int i(-1);//TODO: Test it.
 
                 MYCHECK(ISDEBUG);
@@ -272,6 +273,35 @@ public:
             }
             return Eigen::Vector2d(x, y);
         }
+    }
+
+
+    bool OptimateInitial(Eigen::VectorXd state,
+    int MethodType = 0)
+    {
+        Eigen::VectorXd last_res,res;
+        last_res.resize(p_state_.cols());
+        res.resize(p_state_.cols());
+        last_res.setZero();
+        res.setZero();
+        int times(0);
+        while(times <5 || (res-last_res).norm()>0.1)
+        {
+            std::cout << "TIMES:"<<times << std::endl;
+            last_res = res;
+            StateTransmition(Eigen::Vector2d(0,0),0);
+            Evaluation(state,0);
+            res = GetResult(0);
+            Resample(-1,0);
+            times++;
+            if(times>100)
+            {
+                return false;
+            }
+        }
+        std::cout <<"result is :" << res.transpose() << std::endl;
+        return true;
+
     }
 
 

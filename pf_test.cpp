@@ -133,10 +133,10 @@ int main(int argc, char *argv[]) {
 
     std::cout << TimeStamp::now() - first_t << std::endl;
 
-    PUWBPF<4> puwbpf(1000);
+    PUWBPF<4> puwbpf(10000);
 
-    puwbpf.SetMeasurementSigma(1.0,4);
-    puwbpf.SetInputNoiseSigma(0.1);
+    puwbpf.SetMeasurementSigma(2.0,4);
+    puwbpf.SetInputNoiseSigma(0.5);
 
     puwbpf.SetBeaconSet(beaconset);
     std::cout << "result:"<<puwbpf.GetResult(0) << std::endl;
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
 
         puwbpf.Resample(-1, 0);
 
-//        std::cout << tmp.transpose() << std::endl;
+        std::cout << tmp.transpose() << std::endl;
 
         ux.push_back(tmp(0));
         uy.push_back(tmp(1));

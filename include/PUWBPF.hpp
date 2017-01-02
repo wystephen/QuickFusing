@@ -218,9 +218,10 @@ public:
                 int i(-1);//TODO: Test it.
 
                 MYCHECK(ISDEBUG);
-                while (score > 1e-10) {
+                while (score > 0) {
+                    i++;
                     score -= probability_(i);
-                    ++i;
+
                 }
                 if(i>=p_state_.rows())
                 {

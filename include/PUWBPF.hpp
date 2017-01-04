@@ -17,13 +17,13 @@ public:
     PUWBPF(int particle_num) : PFBase<double, 2, uwb_number>(particle_num) {
 //        PFBase(particle_num);
         try {
-            p_state_.resize(particle_num, 2);
+            this->p_state_.resize(particle_num, 2);
 
-            p_state_.setZero();
-            probability_.resize(particle_num);
-            probability_.setOnes();
-            probability_ = probability_ / probability_.sum();
-            input_noise_sigma_.resize(p_state_.cols());
+            this->p_state_.setZero();
+            this->probability_.resize(particle_num);
+            this->probability_.setOnes();
+            this->probability_ = this->probability_ / this->probability_.sum();
+            input_noise_sigma_.resize(this->p_state_.cols());
         } catch (...) {
             MYERROR("PUWBPF initial error.");
         }
@@ -95,8 +95,12 @@ public:
         return true;
     }
 
-    /*
-     * State transmission equation.
+    /**
+     * State transmition function.
+     *
+     * @param input :
+     * @param MethodType
+     * @return
      */
     bool StateTransmition(Eigen::VectorXd input, int MethodType = 0) {
         MYCHECK(ISDEBUG);
@@ -115,9 +119,9 @@ public:
             std::default_random_engine ee_;
             std::normal_distribution<double> normal_distribution(0, sigma);
             MYCHECK(ISDEBUG);
-            for (int i(0); i < p_state_.rows(); ++i) {
-                for (int j(0); j < p_state_.cols(); ++j) {
-                    p_state_(i, j) += normal_distribution(ee_);
+            for (int i(0); i < this->p_state_.rows(); ++i) {
+                for (int j(0); j < this->p_state_.cols(); ++j) {
+                    this->p_state_(i, j) += normal_distribution(ee_);
 //                    MYCHECK(ISDEBUG);
                 }
             }
@@ -128,26 +132,31 @@ public:
         }
     }
 
-    /*
-     * Evaluation function.
-     * Input state and measurement data,and compute a score.
-     */
+      /**
+      *
+      * Evaluation function.
+      * Input state and measurement data,and compute a score.
+      *
+      * @param measurement
+      * @param MethodType
+      * @return
+      */
     bool Evaluation(Eigen::VectorXd measurement, int MethodType = 0) {
         MYCHECK(ISDEBUG);
         if (MethodType == 0) {
-            for (int i(0); i < p_state_.rows(); ++i) {
+            for (int i(0); i < this->p_state_.rows(); ++i) {
 //                std::cout << "endl:" << std::endl;
 //                std::cout << p_state_.block(i, 0, 1, p_state_.cols())<< " here   " << std::endl;
 //                std::cout << measurement << "here 2 " << std::endl;
 
-                probability_(i) *= EvaluationSingle(
-                       p_state_.block(i, 0, 1, p_state_.cols()).transpose(),
+                this->probability_(i) *= EvaluationSingle(
+                        this->p_state_.block(i, 0, 1, this->p_state_.cols()).transpose(),
                         measurement);
             }
         }
 
         ///normalize probability.
-        probability_ /= probability_.sum();
+        this->probability_ /= this->probability_.sum();
         return true;
 
     }
@@ -171,11 +180,11 @@ public:
                 for (int j(0); j < beacon_set_.cols() - 1; ++j) {
                     dis += std::pow(state(j) - beacon_set_(i, j), 2.0);
                 }
-                dis += std::pow(2.14-beacon_set_(i,2),2.0);//TODO: Change this one.
+                dis += std::pow(2.14 - beacon_set_(i, 2), 2.0);//TODO: Change this->one.
                 dis = std::sqrt(dis);
                 MYCHECK(ISDEBUG);
 
-                score *= (this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i))+1e-50);
+                score *= (this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i)) + 1e-50);
 //                std::cout << score << ";:::" <<
 //                          dis << " :"
 //                          << measurement(i) << ":" << measurement_sigma_(i) << "dddd" << std::endl;
@@ -193,12 +202,13 @@ public:
     * Resample
     *
     * MethodType:
-    * 0: Typical resample method.resample_num is not used in this method.
+    * 0: Typical resample method.resample_num is not used in this->method.
     * 1: Layer-based resample method.
-     * @param resample_num
+     * @param resample_num the number of particles generate after resample step.
      * @param MethodType
      * @return
      */
+//     bool Resample(int resample_num,int MethodType = 0);
     bool Resample(int resample_num, int MethodType = 0) {
         MYCHECK(ISDEBUG);
         if (MethodType == 0) {
@@ -206,50 +216,46 @@ public:
             std::vector<Eigen::VectorXd> tmp_vec;
             std::vector<double> tmp_score;
 
-            probability_ = probability_/probability_.sum();
+            this->probability_ = this->probability_ / this->probability_.sum();
 
 
             std::uniform_real_distribution<double> real_distribution(0, 0.9999999);
             MYCHECK(ISDEBUG);
-            for (int index(0); index < p_state_.rows(); ++index) {
+            for (int index(0); index < this->p_state_.rows(); ++index) {
                 double score = real_distribution(this->e_);
                 double tmp_s(score);
 
-                // TODO: Problem is here, but why....?
-                int i(-1);//TODO: Test it.
+                // TOD: Problem is here, but why....?  I know the reason now.
+                int i(-1);//TOD: Test it.
 
                 MYCHECK(ISDEBUG);
                 while (score > 0) {
                     i++;
-                    score -= probability_(i);
-
+                    score -= this->probability_(i);
                 }
-                if(i>=p_state_.rows())
-                {
-                    i=p_state_.rows()-1;
-                    std::cout << probability_.sum() << " is the sum of probability_." ;
+                if (i >= this->p_state_.rows()) {
+                    i = this->p_state_.rows() - 1;
+                    std::cout << this->probability_.sum() << " is the sum of probability_.";
                     std::cout << tmp_s << "is score" << std::endl;
-//                    MYERROR("i is out of range,in resample method 1.");
                 }
                 MYCHECK(ISDEBUG);
 //                std::cout << p_state_.block(i,0,1,p_state_.cols());
-                tmp_vec.push_back(p_state_.block(i, 0, 1, p_state_.cols()).transpose());
+                tmp_vec.push_back(this->p_state_.block(i, 0, 1, this->p_state_.cols()).transpose());
                 MYCHECK(ISDEBUG);
-                tmp_score.push_back(probability_(i));
+                tmp_score.push_back(this->probability_(i));
 
             }
             MYCHECK(ISDEBUG);
 
-            for (int index(0); index < probability_.rows(); ++index) {
-                probability_(index) = tmp_score[index];
-                p_state_.block(index, 0, 1, p_state_.cols()) = tmp_vec[index].transpose();
+            for (int index(0); index < this->probability_.rows(); ++index) {
+                this->probability_(index) = tmp_score[index];
+                this->p_state_.block(index, 0, 1, this->p_state_.cols()) = tmp_vec[index].transpose();
             }
-            if(isnan(probability_.sum()))
-            {
-                probability_.setOnes();
+            if (isnan(this->probability_.sum())) {
+                this->probability_.setOnes();
             }
 //            probability_.setOnes();
-            probability_ = probability_ / probability_.sum();
+            this->probability_ = this->probability_ / this->probability_.sum();
         }
     }
 
@@ -264,12 +270,12 @@ public:
 //        std::cout << p_state_.transpose() << std::endl;
         if (MethodType == 0) {
             double x(0.0), y(0.0);
-            if (std::fabs(probability_.sum() - 1.0) > 1e-5) {
-                probability_ /= probability_.sum();
+            if (std::fabs(this->probability_.sum() - 1.0) > 1e-5) {
+                this->probability_ /= this->probability_.sum();
             }
-            for (int i(0); i < p_state_.rows(); ++i) {
-                x += probability_(i) * p_state_(i, 0);
-                y += probability_(i) * p_state_(i, 1);
+            for (int i(0); i < this->p_state_.rows(); ++i) {
+                x += this->probability_(i) * this->p_state_(i, 0);
+                y += this->probability_(i) * this->p_state_(i, 1);
             }
             return Eigen::Vector2d(x, y);
         }
@@ -277,38 +283,35 @@ public:
 
 
     bool OptimateInitial(Eigen::VectorXd state,
-    int MethodType = 0)
-    {
-        Eigen::VectorXd last_res,res;
-        last_res.resize(p_state_.cols());
-        res.resize(p_state_.cols());
+                         int MethodType = 0) {
+        Eigen::VectorXd last_res, res;
+        last_res.resize(this->p_state_.cols());
+        res.resize(this->p_state_.cols());
         last_res.setZero();
         res.setZero();
         int times(0);
-        while(times <5 || (res-last_res).norm()>0.1)
-        {
-            std::cout << "TIMES:"<<times << std::endl;
+        while (times < 5 || (res - last_res).norm() > 0.1) {
+            std::cout << "TIMES:" << times << std::endl;
             last_res = res;
-            StateTransmition(Eigen::Vector2d(0,0),0);
-            Evaluation(state,0);
+            StateTransmition(Eigen::Vector2d(0, 0), 0);
+            Evaluation(state, 0);
             res = GetResult(0);
-            Resample(-1,0);
+            Resample(-1, 0);
             times++;
-            if(times>100)
-            {
+            if (times > 100) {
                 return false;
             }
         }
-        std::cout <<"result is :" << res.transpose() << std::endl;
+        std::cout << "result is :" << res.transpose() << std::endl;
         return true;
 
     }
 
 
 private:
-    Eigen::MatrixXd p_state_;//particle filter
+//    Eigen::MatrixXd p_state_;//particle filter
 
-    Eigen::VectorXd probability_;//accumulate probability of each particles.
+//    Eigen::VectorXd probability_;//accumulate probability of each particles.
 
 
     //Method parameters.

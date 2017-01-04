@@ -83,10 +83,66 @@ public:
             return x;
         }
     }
+    /**
+    * Resample
+    *
+    * MethodType:
+    * 0: Typical resample method.resample_num is not used in this method.
+    * 1: Layer-based resample method.
+     * @param resample_num the number of particles generate after resample step.
+     * @param MethodType
+     * @return
+     */
+    virtual bool Resample(int resample_num, int MethodType = 0) {
+        if (MethodType == 0) {
+
+            std::vector<Eigen::VectorXd> tmp_vec;
+            std::vector<double> tmp_score;
+
+            probability_ = probability_ / probability_.sum();
 
 
-//protected:
+            std::uniform_real_distribution<double> real_distribution(0, 0.9999999);
+            for (int index(0); index < p_state_.rows(); ++index) {
+                double score = real_distribution(this->e_);
+                double tmp_s(score);
+
+                // TOD: Problem is here, but why....?  I know the reason now.
+                int i(-1);//TOD: Test it.
+
+                while (score > 0) {
+                    i++;
+                    score -= probability_(i);
+                }
+                if (i >= p_state_.rows()) {
+                    i = p_state_.rows() - 1;
+                    std::cout << probability_.sum() << " is the sum of probability_.";
+                    std::cout << tmp_s << "is score" << std::endl;
+                }
+//                std::cout << p_state_.block(i,0,1,p_state_.cols());
+                tmp_vec.push_back(p_state_.block(i, 0, 1, p_state_.cols()).transpose());
+                tmp_score.push_back(probability_(i));
+
+            }
+
+            for (int index(0); index < probability_.rows(); ++index) {
+                probability_(index) = tmp_score[index];
+                p_state_.block(index, 0, 1, p_state_.cols()) = tmp_vec[index].transpose();
+            }
+            if (isnan(probability_.sum())) {
+                probability_.setOnes();
+            }
+//            probability_.setOnes();
+            probability_ = probability_ / probability_.sum();
+        }
+    }
+
+protected:
     double particle_num_ = 1000; //
+
+    Eigen::MatrixXd p_state_;//particle filter
+
+    Eigen::VectorXd probability_;//accumulate probability of each particles.
 
 
     std::default_random_engine e_;//Global random engine.
@@ -96,5 +152,8 @@ public:
 
 
 };
+
+
+//PFBase<double,2,4>;
 
 #endif //QUICKFUSING_PFBASE_HPP

@@ -16,14 +16,15 @@
 template<int uwb_number>
 class EXUWBPF : public PFBase<double, 6, uwb_number> {
 public:
-    EXUWBPF(int particle_num) : PFBase<double, 2, uwb_number>(particle_num) {
+    EXUWBPF(int particle_num) : PFBase<double, 6, uwb_number>(particle_num) {
         try {
             this->p_state_.resize(particle_num, 6);
-
             this->p_state_.setZero();
             this->probability_.resize(particle_num);
             this->probability_.setOnes();
             this->probability_ = this->probability_ / this->probability_.sum();
+
+            input_noise_sigma_.resize(this->p_state_.cols());
         } catch (...) {
             MYERROR("EXUWBPF initial error.");
         }
@@ -99,14 +100,33 @@ public:
     bool StateTransmition(Eigen::VectorXd input, int MethodType = 0) {
         if(MethodType == 0)
         {
+            MYCHECK(ISDEBUG)
             double sigma = input_noise_sigma_.mean();
 
+            MYCHECK(ISDEBUG)
+
             std::normal_distribution<double> normal_distribution(0,sigma);
+            MYCHECK(ISDEBUG)
 
             for(int i(0);i<this->p_state_.rows();++i)
             {
-                for(int j())
+
+                this->p_state_(i,4) += normal_distribution(this->e_);
+
+                this->p_state_(i,0) += this->p_state_(i,2);
+                this->p_state_(i,0) += 0.5 * this->p_state_(i,4);
+
+                this->p_state_(i,2) += this->p_state_(i,4);
+
+
+                this->p_state_(i,5) += normal_distribution(this->e_);
+
+                this->p_state_(i,1) += this->p_state_(i,3);
+                this->p_state_(i,1) += 0.5 * this->p_state_(i,5);
+
+                this->p_state_(i,3) += this->p_state_(i,5);
             }
+            MYCHECK(ISDEBUG)
         }
 
 
@@ -245,8 +265,8 @@ public:
      */
     Eigen::VectorXd GetResult(int MethodType = 0) {
         MYCHECK(ISDEBUG);
-//        std::cout << probability_.transpose() << std::endl;
-//        std::cout << p_state_.transpose() << std::endl;
+//        std::cout << this->probability_.transpose() << std::endl;
+//        std::cout << this->p_state_.transpose() << std::endl;
         if (MethodType == 0) {
             double x(0.0), y(0.0);
             if (std::fabs(this->probability_.sum() - 1.0) > 1e-5) {
@@ -256,6 +276,7 @@ public:
                 x += this->probability_(i) * this->p_state_(i, 0);
                 y += this->probability_(i) * this->p_state_(i, 1);
             }
+            MYCHECK(ISDEBUG)
             return Eigen::Vector2d(x, y);
         }
     }

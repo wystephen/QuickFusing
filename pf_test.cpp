@@ -27,6 +27,8 @@
 
 #include "PUWBPF.hpp"
 
+#include "EXUWBPF.hpp"
+
 /////stamp---------
 namespace plt = matplotlibcpp;
 
@@ -133,30 +135,37 @@ int main(int argc, char *argv[]) {
 
     std::cout << TimeStamp::now() - first_t << std::endl;
 
-    PUWBPF<4> puwbpf(1000);
+//    PUWBPF<4> puwbpf(1000);
+    EXUWBPF<4> puwbpf(20000);
 
-    puwbpf.SetMeasurementSigma(2.0,4);
-    puwbpf.SetInputNoiseSigma(0.5);
+
+    puwbpf.SetMeasurementSigma(2.5,4);
+    puwbpf.SetInputNoiseSigma(0.45);
 
     puwbpf.SetBeaconSet(beaconset);
     std::cout << "result:"<<puwbpf.GetResult(0) << std::endl;
 
-    puwbpf.OptimateInitial(UwbData.block(0,1,1,UwbData.cols()-1).transpose(),0);
+//    puwbpf.OptimateInitial(UwbData.block(10,1,1,UwbData.cols()-1).transpose(),0);
 
 
     for (int i(0); i < UwbData.rows(); ++i) {
+        std::cout << "1.1\n";
+
         puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);
 //        std::cout << UwbData.block(i, 1, 1, UwbData.cols() - 1) << std::endl;
 
 
+        std::cout << "1.2\n";
         puwbpf.Evaluation(UwbData.block(i, 1, 1, UwbData.cols() - 1).transpose(),
                           0);
 //        std::cout << puwbpf.GetResult(0).transpose() << std::endl;
 //        puwbpf.Evaluation(Eigen::Vector4d(UwbData(i,1),UwbData(i,2)
 //        ,UwbData(i,3),UwbData(i,4)).transpose(),0);
+        std::cout << "1.3\n";
         Eigen::VectorXd tmp = puwbpf.GetResult(0);
 
 
+        std::cout << "1.4\n";
         puwbpf.Resample(-1, 0);
 
 //        std::cout << tmp.transpose() << std::endl;

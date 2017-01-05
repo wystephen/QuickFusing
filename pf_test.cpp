@@ -139,20 +139,20 @@ int main(int argc, char *argv[]) {
     EXUWBPF<4> puwbpf(20000);
 
 
-    puwbpf.SetMeasurementSigma(2.5,4);
-    puwbpf.SetInputNoiseSigma(0.45);
+    puwbpf.SetMeasurementSigma(3,4);
+    puwbpf.SetInputNoiseSigma(0.25);
 
     puwbpf.SetBeaconSet(beaconset);
     std::cout << "result:"<<puwbpf.GetResult(0) << std::endl;
 
-//    puwbpf.OptimateInitial(UwbData.block(10,1,1,UwbData.cols()-1).transpose(),0);
+    puwbpf.OptimateInitial(UwbData.block(10,1,1,UwbData.cols()-1).transpose(),0);
 
 
     for (int i(0); i < UwbData.rows(); ++i) {
 //        std::cout << "1.1\n";
-        if((i/UwbData.rows())%10 == 0)
+        if((i/UwbData.rows()*100)%10 == 0)
         {
-            std::cout << "finished :" << double(i)/double(UwbData.rows())/100.0 << "  %.\n";
+            std::cout << "finished :" << double(i)/double(UwbData.rows())*100.0 << "  %.\n";
         }
 
         puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);

@@ -1,34 +1,34 @@
 #pragma once
-//Create by steve in 16-12-4 at 下午6:12
+//Create by steve in 17-1-5 at 上午9:21
 //
-// Created by steve on 16-12-4.
+// Created by steve on 17-1-5.
 //
+
+#ifndef QUICKFUSING_EXUWBPF_HPP
+#define QUICKFUSING_EXUWBPF_HPP
 
 #include "PFBase.hpp"
 
-#ifndef QUICKFUSING_PUWBPF_HPP
-#define QUICKFUSING_PUWBPF_HPP
 
 #define ISDEBUG false
 
+
 template<int uwb_number>
-class PUWBPF : public PFBase<double, 2, uwb_number> {
+class EXUWBPF : public PFBase<double, 6, uwb_number> {
 public:
-    PUWBPF(int particle_num) : PFBase<double, 2, uwb_number>(particle_num) {
-//        PFBase(particle_num);
+    EXUWBPF(int particle_num) : PFBase<double, 2, uwb_number>(particle_num) {
         try {
-            this->p_state_.resize(particle_num, 2);
+            this->p_state_.resize(particle_num, 6);
 
             this->p_state_.setZero();
             this->probability_.resize(particle_num);
             this->probability_.setOnes();
             this->probability_ = this->probability_ / this->probability_.sum();
-            input_noise_sigma_.resize(this->p_state_.cols());
         } catch (...) {
-            MYERROR("PUWBPF initial error.");
+            MYERROR("EXUWBPF initial error.");
         }
-
     }
+
 
     bool SetMeasurementSigma(double sigma, int num = uwb_number) {
         try {
@@ -95,52 +95,33 @@ public:
         return true;
     }
 
-    /**
-     * State transmition function.
-     *
-     * @param input :
-     * @param MethodType
-     * @return
-     */
+
     bool StateTransmition(Eigen::VectorXd input, int MethodType = 0) {
-        MYCHECK(ISDEBUG);
-        if (MethodType == 0)//Method 0:Random move follow the Gaussian distribution(Same sigma).
+        if(MethodType == 0)
         {
             double sigma = input_noise_sigma_.mean();
 
-//            try{
-//                std::cout << input.size() << std::endl;
-//
-//            }catch (std::exception &e)
-//            {
-//                std::cout << e.what() << std::endl;
-//            }
-            MYCHECK(ISDEBUG);
-            std::default_random_engine ee_;
-            std::normal_distribution<double> normal_distribution(0, sigma);
-            MYCHECK(ISDEBUG);
-            for (int i(0); i < this->p_state_.rows(); ++i) {
-                for (int j(0); j < this->p_state_.cols(); ++j) {
-                    this->p_state_(i, j) += normal_distribution(ee_);
-//                    MYCHECK(ISDEBUG);
-                }
+            std::normal_distribution<double> normal_distribution(0,sigma);
+
+            for(int i(0);i<this->p_state_.rows();++i)
+            {
+                for(int j())
             }
-            MYCHECK(ISDEBUG);
-//            std::cout << p_state_<<std::endl;
-//            std::cout << "a" << std::endl;
-            return true;
         }
+
+
     }
 
-      /**
-      *
-      * Evaluation function.
-      * Input state and measurement data,and compute a score.
-      *
-      * @param measurement
-      * @param MethodType
-      * @return
-      */
+
+    /**
+ *
+ * Evaluation function.
+ * Input state and measurement data,and compute a score.
+ *
+ * @param measurement
+ * @param MethodType
+ * @return
+ */
     bool Evaluation(Eigen::VectorXd measurement, int MethodType = 0) {
         MYCHECK(ISDEBUG);
         if (MethodType == 0) {
@@ -196,7 +177,6 @@ public:
 
         return score;
     }
-
 
     /**
     * Resample
@@ -306,22 +286,16 @@ public:
 
     }
 
+protected:
+
 
 private:
-//    Eigen::MatrixXd p_state_;//particle filter
-
-//    Eigen::VectorXd probability_;//accumulate probability of each particles.
-
-
-    //Method parameters.
-
     Eigen::VectorXd input_noise_sigma_;
 
     Eigen::MatrixXd beacon_set_;
 
     Eigen::VectorXd measurement_sigma_;
 
-
 };
 
-#endif //QUICKFUSING_PUWBPF_HPP
+#endif //QUICKFUSING_EXUWBPF_HPP

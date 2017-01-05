@@ -149,23 +149,27 @@ int main(int argc, char *argv[]) {
 
 
     for (int i(0); i < UwbData.rows(); ++i) {
-        std::cout << "1.1\n";
+//        std::cout << "1.1\n";
+        if((i/UwbData.rows())%10 == 0)
+        {
+            std::cout << "finished :" << double(i)/double(UwbData.rows())/100.0 << "  %.\n";
+        }
 
         puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);
 //        std::cout << UwbData.block(i, 1, 1, UwbData.cols() - 1) << std::endl;
 
 
-        std::cout << "1.2\n";
+//        std::cout << "1.2\n";
         puwbpf.Evaluation(UwbData.block(i, 1, 1, UwbData.cols() - 1).transpose(),
                           0);
 //        std::cout << puwbpf.GetResult(0).transpose() << std::endl;
 //        puwbpf.Evaluation(Eigen::Vector4d(UwbData(i,1),UwbData(i,2)
 //        ,UwbData(i,3),UwbData(i,4)).transpose(),0);
-        std::cout << "1.3\n";
+//        std::cout << "1.3\n";
         Eigen::VectorXd tmp = puwbpf.GetResult(0);
 
 
-        std::cout << "1.4\n";
+//        std::cout << "1.4\n";
         puwbpf.Resample(-1, 0);
 
 //        std::cout << tmp.transpose() << std::endl;

@@ -136,7 +136,7 @@ public:
             double sigma = input_noise_sigma_.mean();
 
             std::normal_distribution<double> vel_distribution(0,sigma);
-            std::normal_distribution<double> ori_distribution(0,sigma);
+            std::normal_distribution<double> ori_distribution(0,sigma/5*M_PI);
 
             /**
              * x,y,theta,v,w,a.

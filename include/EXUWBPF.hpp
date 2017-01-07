@@ -142,6 +142,7 @@ public:
              * x,y,theta,v,w,a.
              * w in [-pi,pi].
              * a in [-inf,inf]----([-5,5]);
+             *
              */
              for(int i(0);i<this->p_state_.rows();++i)
              {
@@ -166,7 +167,6 @@ public:
 
 
     }
-
 
     bool StateTransmitionWithTimeStep(Eigen::VectorXd input, double time_step) {
         double sigma = input_noise_sigma_.mean();

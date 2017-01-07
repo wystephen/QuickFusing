@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
     /*
      * Load Imu data.
      */
-    std::string dir_name = "tmp_file_dir/";
+    std::string dir_name = "tmp_file_dir---/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"), ZuptReader(dir_name + "Zupt.data.csv");
 
@@ -139,8 +139,8 @@ int main(int argc, char *argv[]) {
     EXUWBPF<4> puwbpf(20000);
 
 
-    puwbpf.SetMeasurementSigma(3, 4);
-    puwbpf.SetInputNoiseSigma(0.25);
+    puwbpf.SetMeasurementSigma(5.0, 4);
+    puwbpf.SetInputNoiseSigma(0.20);
 
     puwbpf.SetBeaconSet(beaconset);
     std::cout << "result:" << puwbpf.GetResult(0) << std::endl;

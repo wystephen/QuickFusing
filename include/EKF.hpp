@@ -450,38 +450,14 @@ public:
         StateMatrix(quat_, u, para_.Ts_);
 //        MYCHECK(1);
 
-//        std::cout << "F_:" << F_ << std::endl;
-//        std::cout << "FPF" << F_ * P_ * F_.transpose().eval() << std::endl;
-//        std::cout << "G_:" << G_ << std::endl;
-//        std::cout << "GQG'" << G_*Q_ * G_.transpose().eval() << std::endl;
-//        std::cout << " P_ FIRST"<< P_ << std::endl;
         P_ = (F_ * (P_)) * (F_.transpose().eval()) +
              (G_ * Q_ * G_.transpose().eval());
-//        std::cout << "P_ second:" << P_ << std::endl;
-//        if(isnan(P_(2,2)) || true) {
-//            std::cout << "F_:" << F_ << std::endl;
-//            std::cout << "G_:" << G_ << std::endl;
-//            std::cout << "Q_:" << Q_ << std::endl;
-//            std::cout << "R_:" << R_ << std::endl;
-//            std::cout << "H_" << H_ << std::endl;
-//            std::cout <<"---------------" << std::endl;
-//        }
-//        MYCHECK(1);
         if (zupt1 > 0.5) {
             Eigen::Vector3d z(-x_h_.block(3, 0, 3, 1));
 
 
             Eigen::MatrixXd K;
             K = P_ * H_.transpose().eval() * (H_ * P_ * H_.transpose().eval() + R_).inverse();
-//            std::cout <<"K:" <<std::endl <<  K << std::endl;
-//            std::cout << " HPH' + R:" << H_*P_*H_.transpose().eval() + R_ << std::endl;
-//            std::cout << "cout inverse : " << (H_*P_*H_.transpose().eval() + R_).inverse() << std::endl;
-//            if(isnan(K(1,1)))
-//            {
-//                K = K_;
-//            }else{
-//                K_ = K;
-//            }
 
             Eigen::VectorXd dx = K * z;
 
@@ -493,18 +469,8 @@ public:
 
             x_h_ = ComputeInternalState(x_h_, dx, quat_);
         }
-//        MYCHECK(1);
-//        if (isnan(P_(1, 1)))
-//            MYERROR("P_ is nan.")
-//        std::cout << "before:" << P_ << std::endl;
         P_ = (P_.eval() * 0.5 + P_.transpose().eval() * 0.5);
-//        P_ = P_ * 1.0;
-//        std::cout << "after:" << P_ << std::endl;
 
-//        if (isnan(P_(1, 1)))
-//            MYERROR("P_ is nan.")
-//        MYCHECK(1);
-//        MYCHECK(1);
         return x_h_;
     }
 

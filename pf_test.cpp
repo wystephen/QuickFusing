@@ -139,23 +139,32 @@ int main(int argc, char *argv[]) {
     EXUWBPF<4> puwbpf(20000);
 
 
-    puwbpf.SetMeasurementSigma(3,4);
+    puwbpf.SetMeasurementSigma(3, 4);
     puwbpf.SetInputNoiseSigma(0.25);
 
     puwbpf.SetBeaconSet(beaconset);
-    std::cout << "result:"<<puwbpf.GetResult(0) << std::endl;
+    std::cout << "result:" << puwbpf.GetResult(0) << std::endl;
 
-    puwbpf.OptimateInitial(UwbData.block(10,1,1,UwbData.cols()-1).transpose(),0);
+    puwbpf.OptimateInitial(UwbData.block(10, 1, 1, UwbData.cols() - 1).transpose(), 0);
 
 
     for (int i(0); i < UwbData.rows(); ++i) {
 //        std::cout << "1.1\n";
-        if((i/UwbData.rows()*100)%10 == 0)
-        {
-            std::cout << "finished :" << double(i)/double(UwbData.rows())*100.0 << "  %.\n";
+        if ((i / UwbData.rows() * 100) % 10 == 0) {
+            std::cout << "finished :" << double(i) / double(UwbData.rows()) * 100.0 << "  %.\n";
         }
 
-        puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);
+        puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 1);
+
+//        if (i == 0) {
+//
+//            puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);
+//        } else {
+//
+//            puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);
+////            puwbpf.StateTransmitionWithTimeStep(Eigen::Vector2d(2, 2), UwbData(i, 0) - UwbData(i - 1, 0));
+//        }
+
 //        std::cout << UwbData.block(i, 1, 1, UwbData.cols() - 1) << std::endl;
 
 
@@ -179,12 +188,12 @@ int main(int argc, char *argv[]) {
     }
 
 
-    std::cout <<"end time:" <<  TimeStamp::now() - first_t << std::endl;
+    std::cout << "end time:" << TimeStamp::now() - first_t << std::endl;
 
     /**
      * Show result.
      */
-    plt::named_plot("ux,uy", ux, uy,"r-+");
+    plt::named_plot("ux,uy", ux, uy, "r-+");
 
 //    plt::named_plot("ux1", ux, ux);
     plt::grid(true);

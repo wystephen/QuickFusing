@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
     std::cout << TimeStamp::now() - first_t << std::endl;
 
 //    PUWBPF<4> puwbpf(1000);
-    EXUWBPF<4> puwbpf(20000);
+    EXUWBPF<4> puwbpf(40000);
 
 
     puwbpf.SetMeasurementSigma(5.0, 4);

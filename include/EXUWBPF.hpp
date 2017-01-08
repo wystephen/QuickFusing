@@ -311,7 +311,7 @@ public:
                 this->probability_(index) = tmp_score[index];
                 this->p_state_.block(index, 0, 1, this->p_state_.cols()) = tmp_vec[index].transpose();
             }
-            if (isnan(this->probability_.sum())) {
+            if (std::isnan(this->probability_.sum())) {
                 this->probability_.setOnes();
             }
 //            probability_.setOnes();

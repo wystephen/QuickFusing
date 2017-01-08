@@ -129,7 +129,7 @@ public:
                 probability_(index) = tmp_score[index];
                 p_state_.block(index, 0, 1, p_state_.cols()) = tmp_vec[index].transpose();
             }
-            if (isnan(probability_.sum())) {
+            if (std::isnan(probability_.sum())) {
                 probability_.setOnes();
             }
 //            probability_.setOnes();

@@ -7,6 +7,8 @@
 #define QUICKFUSING_IMUINTEGRATE_H
 
 #include <Eigen/Dense>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 #include <iostream>
 #include <thread>
@@ -23,6 +25,13 @@ public:
 
     Eigen::VectorXd IntegratingState(Eigen::VectorXd u, double t) {
         time_step_ = t;
+
+        Eigen::Affine3d T;
+
+        Eigen::Matrix3d R;
+        Eigen::Vector3d t_v;
+        
+
 
 
 

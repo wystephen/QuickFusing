@@ -13,7 +13,7 @@ set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3  -lpython2.7")
 #include(FindCUDA)
 find_package(Eigen3 REQUIRED)
 
-#find_package(PythonLibs 3.5 REQUIRED)
+#find_package(PythonLibs 3.0 REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
 
 find_package(OpenMP)

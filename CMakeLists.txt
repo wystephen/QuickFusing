@@ -16,6 +16,8 @@ find_package(Eigen3 REQUIRED)
 #find_package(PythonLibs 3.0 REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
 
+find_package(Sophus REQUIRED)
+
 find_package(OpenMP)
 
 if(OPENMP_FOUND)
@@ -31,6 +33,7 @@ include_directories(
         ${PYTHON_INDCLUDE_PATH}
         /usr/include
         /usr/local/include
+        ${Sophus_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -61,7 +64,8 @@ add_executable(pf_test pf_test.cpp)
 target_link_libraries(pf_test ${PYTHON_LIBRARIES})
 
 
-
+add_executable(SophusTest SophusTest.cpp)
+target_link_libraries(SophusTest ${Sophus_LIBRARIES})
 
 ###CUDA SETTING
 

@@ -103,6 +103,16 @@ int main(int argc, char *argv[]) {
         Zupt(i, 0) = *ZuptTmp(i, 0);
     }
 
+
+   /**
+    * ImuIntegrate
+    */
+    std::vector<double> ix,iy;
+
+
+
+
+
     /**
     * Load uwb data.
     */
@@ -136,7 +146,7 @@ int main(int argc, char *argv[]) {
     std::cout << TimeStamp::now() - first_t << std::endl;
 
 //    PUWBPF<4> puwbpf(1000);
-    EXUWBPF<4> puwbpf(4000);
+    EXUWBPF<4> puwbpf(400);
 
 
     puwbpf.SetMeasurementSigma(5.0, 4);
@@ -194,6 +204,8 @@ int main(int argc, char *argv[]) {
      * Show result.
      */
     plt::named_plot("ux,uy", ux, uy, "r-+");
+    plt::named_plot("ix,iy",ix,iy,"b-+");
+    plt::legend();
 
 //    plt::named_plot("ux1", ux, ux);
     plt::grid(true);

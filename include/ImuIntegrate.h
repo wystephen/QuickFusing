@@ -71,7 +71,13 @@ public:
 //        SO3_R = SO3_R * Sophus::SO3::exp(wv*t);
 
 //        SO3_R = SO3_R * SO3_increase;
-        SO3_R = SO3_increase.inverse() * SO3_R;
+//        SO3_R = SO3_increase.inverse() * SO3_R;
+
+//        rotation_matrix = SO3_R.matrix();
+
+        SO3_R = (SO3_R.inverse()) * Sophus::SO3::exp(wv*t);
+
+        SO3_R = SO3_R.inverse();
 
         rotation_matrix = SO3_R.matrix();
 
@@ -83,7 +89,7 @@ public:
 
 
         for (int i(0); i < 3; ++i) {
-            state_(i) += state_(i + 3) * t;
+            state_(i) += state_(i + 3) * t + 0.5 * aworld(i) * t * t;
             state_(i + 3) += aworld(i) * t;
         }
 

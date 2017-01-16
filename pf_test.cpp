@@ -11,6 +11,7 @@
 #include <omp.h>
 
 #include <eigen3/Eigen/Dense>
+#include <ImuIntegrate.h>
 
 #include "CSVReader.h"
 #include "matplotlib_interface.h"
@@ -108,6 +109,22 @@ int main(int argc, char *argv[]) {
     * ImuIntegrate
     */
     std::vector<double> ix,iy;
+
+    ImuIntegrate imuinteg(1.0);
+
+    for(int i(1);i<ImuData.rows();++i)
+    {
+        Eigen::VectorXd tmp;
+        tmp = imuinteg.IntegratingState(ImuData.block(i,1,1,ImuData.cols()-2).transpose(),
+                                        ImuData(i,0)-ImuData(i-1,0));
+        std::cout << " imu integrate : "
+                  << i << "  :  "
+                  << tmp.transpose() << std::endl;
+        ix.push_back(double(tmp(0)));
+        iy.push_back(double(tmp(1)));
+    }
+
+
 
 
 

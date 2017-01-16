@@ -17,26 +17,29 @@
 
 class ImuIntegrate {
 public:
-    ImuIntegrate() {
+    ImuIntegrate(double error) {
         state_.resize(9);
         state_.setZero();
         time_step_ = 1e-10;
     }
 
+    /**
+     * Simple integration.
+     * @param u
+     * @param t
+     * @return
+     */
     Eigen::VectorXd IntegratingState(Eigen::VectorXd u, double t) {
         time_step_ = t;
+        Eigen::VectorXd out;
+        out.resize(6);
 
         Eigen::Affine3d T;
 
         Eigen::Matrix3d R;
         Eigen::Vector3d t_v;
 
-
-        
-
-
-
-
+        return out;
 
     }
 

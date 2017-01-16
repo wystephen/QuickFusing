@@ -61,7 +61,7 @@ target_link_libraries(resultevaluation ${PYTHON_LIBRARIES})
 
 
 add_executable(pf_test pf_test.cpp)
-target_link_libraries(pf_test ${PYTHON_LIBRARIES})
+target_link_libraries(pf_test ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES})
 
 
 add_executable(SophusTest SophusTest.cpp)

@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
     std::cout << TimeStamp::now() - first_t << std::endl;
 
 //    PUWBPF<4> puwbpf(1000);
-    EXUWBPF<4> puwbpf(400);
+    EXUWBPF<4> puwbpf(1000);
 
 
     puwbpf.SetMeasurementSigma(5.0, 4);
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
     for (int i(0); i < UwbData.rows(); ++i) {
 //        std::cout << "1.1\n";
         if ((i / UwbData.rows() * 100) % 10 == 0) {
-            std::cout << "finished :" << double(i) / double(UwbData.rows()) * 100.0 << "  %.\n";
+//            std::cout << "finished :" << double(i) / double(UwbData.rows()) * 100.0 << "  %.\n";
         }
 
         puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 1);

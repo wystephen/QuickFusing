@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     /*
      * Load Imu data.
      */
-    std::string dir_name = "tmp_file_dir/";
+    std::string dir_name = "tmp_file_dir---/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"), ZuptReader(dir_name + "Zupt.data.csv");
 
@@ -117,6 +117,7 @@ int main(int argc, char *argv[]) {
         Eigen::VectorXd tmp;
         tmp = imuinteg.IntegratingState(ImuData.block(i,1,1,ImuData.cols()-2).transpose(),
                                         ImuData(i,0)-ImuData(i-1,0));
+//                                        1.0);
         std::cout << " imu integrate : "
                   << i << "  :  "
                   << tmp.transpose() << std::endl;

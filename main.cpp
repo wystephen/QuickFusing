@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
 //        uy.push_back(*UwbdataReader.GetMatrix()(i, 2));
 //    }
     /////////////////////---Compute result only uwb data.
-    PUWBPF<4> puwbpf(1000);
+    PUWBPF<4> puwbpf(100);
 
     puwbpf.SetMeasurementSigma(2.0,4);
     puwbpf.SetInputNoiseSigma(0.5);

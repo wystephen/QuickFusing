@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
         for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
             ImuData(i, j) = *ImuDataTmp(i, j);
         }
-        Zupt(i, 0) = *ZuptTmp(i, 0);
+        Zupt(i, 0) = int(*ZuptTmp(i, 0)) ;
     }
 
 

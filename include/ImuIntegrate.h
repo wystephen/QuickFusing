@@ -109,7 +109,7 @@ public:
             }
         }
         Eigen::VectorXd aworld = rotation_matrix * a;
-        aworld(2) += 9.81;
+        aworld(2) += 9.8173;
 
         for (int i(0); i < 3; ++i) {
             state_(i) += state_(i + 3) * t + 0.5 * aworld(i) * t * t;

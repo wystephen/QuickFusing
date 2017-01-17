@@ -18,7 +18,7 @@
 #include "time_stamp.h"
 
 #include "SettingPara.h"
-#include "EKF.hpp"
+//#include "EKF.hpp"
 
 #include "ResultEvaluation.hpp"
 
@@ -29,6 +29,9 @@
 #include "PUWBPF.hpp"
 
 #include "EXUWBPF.hpp"
+
+
+#include "MYEKF.h"
 
 /////stamp---------
 namespace plt = matplotlibcpp;
@@ -97,7 +100,7 @@ int main(int argc, char *argv[]) {
     std::uniform_real_distribution<double> u(-0.15, 0.15);
     std::normal_distribution<> n(0.0, 0.2);
 
-    for (int i(0); i < ImuDataTmp.GetRows(); ++i) {
+    for (int i(0); i < 5000; ++i) {
         for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
             ImuData(i, j) = *ImuDataTmp(i, j);
         }
@@ -112,17 +115,47 @@ int main(int argc, char *argv[]) {
 
     ImuIntegrate imuinteg(1.0);
 
-    for(int i(1);i<ImuData.rows();++i)
+    for(int i(1);i<ImuData.rows()/100.0*3;++i)
     {
         Eigen::VectorXd tmp;
         tmp = imuinteg.IntegratingState(ImuData.block(i,1,1,ImuData.cols()-2).transpose(),
-                                        ImuData(i,0)-ImuData(i-1,0));
+                                        1.0/128.0);
 //                                        1.0);
         std::cout << " imu integrate : "
                   << i << "  :  "
                   << tmp.transpose() << std::endl;
         ix.push_back(double(tmp(0)));
         iy.push_back(double(tmp(1)));
+    }
+
+    std::cout << "total time:"<< ImuData.rows() /100.0 * 3 /128.0
+              << std::endl;
+
+
+    /**
+     * MyEkf
+     */
+
+    std::vector<double> mx,my;
+
+    SettingPara init_para(true);
+
+    init_para.init_pos1_ = Eigen::Vector3d(1.45,-6.3,0.0);
+    init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
+
+    init_para.Ts_ = 1.0 / 128.0;
+
+    MyEkf  myekf(init_para);
+
+    myekf.InitNavEq(ImuData.block(0,1,20,6));
+
+    for(int i(0);i<ImuData.cols();++i)
+    {
+        Eigen::VectorXd vec = myekf.GetPosition(
+                ImuData.block(i,1,1,6).transpose(),
+                Zupt(i));
+        mx.push_back(vec(0));
+        my.push_back(vec(1));
     }
 
 
@@ -223,6 +256,7 @@ int main(int argc, char *argv[]) {
      */
     plt::named_plot("ux,uy", ux, uy, "r-+");
     plt::named_plot("ix,iy",ix,iy,"b-+");
+    plt::named_plot("mx,my",mx,my,"y-+");
     plt::legend();
 
 //    plt::named_plot("ux1", ux, ux);

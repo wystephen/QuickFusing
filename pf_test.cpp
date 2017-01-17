@@ -18,7 +18,7 @@
 #include "time_stamp.h"
 
 #include "SettingPara.h"
-//#include "EKF.hpp"
+#include "EKF.hpp"
 
 #include "ResultEvaluation.hpp"
 
@@ -87,7 +87,8 @@ int main(int argc, char *argv[]) {
      */
     std::string dir_name = "tmp_file_dir---/";
 
-    CSVReader ImuDataReader(dir_name + "ImuData.data.csv"), ZuptReader(dir_name + "Zupt.data.csv");
+    CSVReader ImuDataReader(dir_name + "ImuData.data.csv"),
+            ZuptReader(dir_name + "Zupt.data.csv");
 
     auto ImuDataTmp(ImuDataReader.GetMatrix()), ZuptTmp(ZuptReader.GetMatrix());
 
@@ -95,7 +96,7 @@ int main(int argc, char *argv[]) {
     ImuData.resize(ImuDataTmp.GetRows(), ImuDataTmp.GetCols());
     Zupt.resize(ZuptTmp.GetRows(), ZuptTmp.GetCols());
 
-    ////////////ADD NOISE TO SOURCE DATA
+    //////////ADD NOISE TO SOURCE DATA
     std::default_random_engine ee;
     std::uniform_real_distribution<double> u(-0.15, 0.15);
     std::normal_distribution<> n(0.0, 0.2);
@@ -111,6 +112,8 @@ int main(int argc, char *argv[]) {
    /**
     * ImuIntegrate
     */
+
+    /*
     std::vector<double> ix,iy;
 
     ImuIntegrate imuinteg(1.0);
@@ -131,6 +134,8 @@ int main(int argc, char *argv[]) {
     std::cout << "total time:"<< ImuData.rows() /100.0 * 3 /128.0
               << std::endl;
 
+              */
+
 
     /**
      * MyEkf
@@ -145,18 +150,29 @@ int main(int argc, char *argv[]) {
 
     init_para.Ts_ = 1.0 / 128.0;
 
-    MyEkf  myekf(init_para);
+    Ekf  myekf(init_para);
 
     myekf.InitNavEq(ImuData.block(0,1,20,6));
 
-    for(int i(0);i<ImuData.cols();++i)
+
+    std::cout << "IMU rows :" << ImuData.rows() << std::endl;
+
+    for(int i(0);i<ImuData.rows();++i)
     {
         Eigen::VectorXd vec = myekf.GetPosition(
                 ImuData.block(i,1,1,6).transpose(),
-                Zupt(i));
+                Zupt(i,0));
+
+        std::cout << Zupt(i,0) << std::endl;
+
+
+
         mx.push_back(vec(0));
         my.push_back(vec(1));
     }
+
+    std::cout << " zupt sum : " << Zupt.sum() << " size : " << Zupt.size()
+                                                            <<std::endl;
 
 
 
@@ -255,7 +271,7 @@ int main(int argc, char *argv[]) {
      * Show result.
      */
     plt::named_plot("ux,uy", ux, uy, "r-+");
-    plt::named_plot("ix,iy",ix,iy,"b-+");
+//    plt::named_plot("ix,iy",ix,iy,"b-+");
     plt::named_plot("mx,my",mx,my,"y-+");
     plt::legend();
 

@@ -101,11 +101,12 @@ int main(int argc, char *argv[]) {
     std::uniform_real_distribution<double> u(-0.15, 0.15);
     std::normal_distribution<> n(0.0, 0.2);
 
-    for (int i(0); i < 5000; ++i) {
+    for (int i(0); i < ImuDataTmp.GetRows(); ++i) {
         for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
             ImuData(i, j) = *ImuDataTmp(i, j);
         }
         Zupt(i, 0) = int(*ZuptTmp(i, 0)) ;
+        std::cout << i << " :  " << *ZuptTmp(i,0) << std::endl;
     }
 
 
@@ -163,7 +164,7 @@ int main(int argc, char *argv[]) {
                 ImuData.block(i,1,1,6).transpose(),
                 Zupt(i,0));
 
-        std::cout << Zupt(i,0) << std::endl;
+//        std::cout << Zupt(i) << std::endl;
 
 
 
@@ -213,7 +214,7 @@ int main(int argc, char *argv[]) {
     std::cout << TimeStamp::now() - first_t << std::endl;
 
 //    PUWBPF<4> puwbpf(1000);
-    EXUWBPF<4> puwbpf(1000);
+    EXUWBPF<4> puwbpf(10000);
 
 
     puwbpf.SetMeasurementSigma(5.0, 4);

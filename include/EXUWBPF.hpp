@@ -181,9 +181,9 @@ public:
             for(int i(0);i<this->p_state_.rows();++i)
             {
                 //// w
-                this->p_state_(i,4) += ori_distribution(this->e_);
+                this->p_state_(i,4) = ori_distribution(this->e_);
 
-                this->p_state_(i,5) += vel_distribution(this->e_);
+                this->p_state_(i,5) = vel_distribution(this->e_);
 
                 /////theta v
                 this->p_state_(i,2) += this->p_state_(i,4);

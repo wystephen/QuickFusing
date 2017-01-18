@@ -253,9 +253,9 @@ int main(int argc, char *argv[]) {
 
     int uwb_index(0), imu_index(0);
 
-    EXUWBPF<4> muwbpf(5000);
+    EXUWBPF<4> muwbpf(15000);
     muwbpf.SetMeasurementSigma(5.0, 4);
-    muwbpf.SetInputNoiseSigma(0.020);
+    muwbpf.SetInputNoiseSigma(0.120);
     muwbpf.SetBeaconSet(beaconset);
 //    std::cout << "herererererere" << std::endl;
 //    std::cout <<  UwbData.block(10,1,1,UwbData.cols()-1) << std::endl;
@@ -279,9 +279,10 @@ int main(int argc, char *argv[]) {
                       << " ori : "
                       << mixekf.getOriente() << std::endl;
 
-            muwbpf.StateTransmition(Eigen::Vector2d(mixekf.getVelocity(),
-                                                    mixekf.getOriente() / 180.0 * M_PI),
-                                    1);
+            muwbpf.StateTransmition(Eigen::Vector2d(mixekf.getVelocity()/2.0,
+                                                    mixekf.getOriente() / 180.0 * M_PI
+                                                    ),
+                                    2);
 
             muwbpf.Evaluation(UwbData.block(uwb_index, 1, 1, UwbData.cols() - 1).transpose(),
                               0);

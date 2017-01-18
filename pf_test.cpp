@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
             ImuData(i, j) = *ImuDataTmp(i, j);
         }
         Zupt(i, 0) = int(*ZuptTmp(i, 0)) ;
-        std::cout << i << " :  " << *ZuptTmp(i,0) << std::endl;
+//        std::cout << i << " :  " << *ZuptTmp(i,0) << std::endl;
     }
 
 
@@ -114,7 +114,6 @@ int main(int argc, char *argv[]) {
     * ImuIntegrate
     */
 
-    /*
     std::vector<double> ix,iy;
 
     ImuIntegrate imuinteg(1.0);
@@ -135,7 +134,6 @@ int main(int argc, char *argv[]) {
     std::cout << "total time:"<< ImuData.rows() /100.0 * 3 /128.0
               << std::endl;
 
-              */
 
 
     /**
@@ -158,6 +156,8 @@ int main(int argc, char *argv[]) {
 
     std::cout << "IMU rows :" << ImuData.rows() << std::endl;
 
+    std::vector<double> w1,w2,w3;
+
     for(int i(0);i<ImuData.rows();++i)
     {
         Eigen::VectorXd vec = myekf.GetPosition(
@@ -165,6 +165,10 @@ int main(int argc, char *argv[]) {
                 Zupt(i,0));
 
 //        std::cout << Zupt(i) << std::endl;
+        std::cout << vec.transpose() << std::endl;
+        w1.push_back(vec(6));
+        w2.push_back(vec(7));
+        w3.push_back(vec(8));
 
 
 
@@ -271,9 +275,12 @@ int main(int argc, char *argv[]) {
     /**
      * Show result.
      */
-    plt::named_plot("ux,uy", ux, uy, "r-+");
+//    plt::named_plot("ux,uy", ux, uy, "r-+");
 //    plt::named_plot("ix,iy",ix,iy,"b-+");
-    plt::named_plot("mx,my",mx,my,"y-+");
+//    plt::named_plot("mx,my",mx,my,"y-+");
+    plt::plot(w1,"r-+");
+    plt::plot(w2,"g-+");
+    plt::plot(w3,"b-+");
     plt::legend();
 
 //    plt::named_plot("ux1", ux, ux);

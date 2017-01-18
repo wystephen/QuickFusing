@@ -616,6 +616,12 @@ public:
      * @return
      */
     double getDeltaVelocity(){
+
+        if(velocity_deque_.size()>5)
+        {
+            return velocity_deque_.at(3);
+        }
+
        return 0.0;
     }
 

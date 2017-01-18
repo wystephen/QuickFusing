@@ -286,7 +286,7 @@ int main(int argc, char *argv[]) {
                       << mixekf.getOriente() << std::endl;
 
             muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity()-last_v) ,
-                                                    (mixekf.getOriente()-last_ori )*0.8/ 180.0 * M_PI
+                                                    (mixekf.getOriente()-last_ori )/ 180.0 * M_PI
                                                     ),
                                     2);
             last_v = mixekf.getVelocity();

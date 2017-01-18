@@ -10,7 +10,7 @@
 #include "PFBase.hpp"
 
 
-#define ISDEBUG true
+#define ISDEBUG false
 
 
 template<int uwb_number>
@@ -169,7 +169,7 @@ public:
             double sigma = input_noise_sigma_.mean();
 
             std::normal_distribution<double> vel_distribution(input(0),sigma);
-            std::normal_distribution<double> ori_distribution(input(1),sigma/5*M_PI);
+            std::normal_distribution<double> ori_distribution(input(1),sigma/5.0*M_PI);
 
 
             /**
@@ -287,6 +287,7 @@ public:
 //                          << measurement(i) << ":" << measurement_sigma_(i) << "dddd" << std::endl;
             }
         } catch (...) {
+            std::cout << "evaluation error " << std::endl;
             return 0.0;
         }
 
@@ -380,9 +381,13 @@ public:
 
     bool OptimateInitial(Eigen::VectorXd state,
                          int MethodType = 0) {
+        MYCHECK(ISDEBUG);
         Eigen::VectorXd last_res, res;
+        MYCHECK(ISDEBUG);
         last_res.resize(this->p_state_.cols());
         res.resize(this->p_state_.cols());
+        MYCHECK(ISDEBUG);
+
         last_res.setZero();
         res.setZero();
         int times(0);

@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
     std::cout << TimeStamp::now() - first_t << std::endl;
 
 //    PUWBPF<4> puwbpf(1000);
-    EXUWBPF<4> puwbpf(100);
+    EXUWBPF<4> puwbpf(12100);
 
 
     puwbpf.SetMeasurementSigma(5.0, 4);
@@ -247,23 +247,25 @@ int main(int argc, char *argv[]) {
 
         puwbpf.Resample(-1, 0);
 
-        ux.push_back(tmp(0));
-        uy.push_back(tmp(1));
+        ux.push_back(double(tmp(0)));
+        uy.push_back(double(tmp(1)));
     }
 
     int uwb_index(0), imu_index(0);
 
-    EXUWBPF<4> muwbpf(100);
-    muwbpf.SetMeasurementSigma(5.0, 4.0);
-    muwbpf.SetInputNoiseSigma(0.20);
+    EXUWBPF<4> muwbpf(5000);
+    muwbpf.SetMeasurementSigma(5.0, 4);
+    muwbpf.SetInputNoiseSigma(0.020);
     muwbpf.SetBeaconSet(beaconset);
-    muwbpf.OptimateInitial(UwbData.block(20, 1, 1, UwbData.cols() - 1), 0);
+//    std::cout << "herererererere" << std::endl;
+//    std::cout <<  UwbData.block(10,1,1,UwbData.cols()-1) << std::endl;
+    muwbpf.OptimateInitial(UwbData.block(10, 1, 1, UwbData.cols() - 1).transpose(), 0);
 
     MyEkf mixekf(init_para);
     mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
 
     while (1) {
-        if (uwb_index >= UwbData.rows() && imu_index >= ImuData.rows()) {
+        if (uwb_index >= UwbData.rows() || imu_index >= ImuData.rows()) {
             break;
         }
 
@@ -272,10 +274,14 @@ int main(int argc, char *argv[]) {
              * update Uwb data
              */
 
+            std::cout << "ekf velocity :"
+                      << mixekf.getVelocity()
+                      << " ori : "
+                      << mixekf.getOriente() << std::endl;
 
             muwbpf.StateTransmition(Eigen::Vector2d(mixekf.getVelocity(),
                                                     mixekf.getOriente() / 180.0 * M_PI),
-                                    2);
+                                    1);
 
             muwbpf.Evaluation(UwbData.block(uwb_index, 1, 1, UwbData.cols() - 1).transpose(),
                               0);
@@ -285,8 +291,6 @@ int main(int argc, char *argv[]) {
 
             fx.push_back(tmp(0));
             fy.push_back(tmp(1));
-
-
             uwb_index++;
         } else {
             /*
@@ -297,11 +301,9 @@ int main(int argc, char *argv[]) {
 
             imu_index++;
         }
-
-
     }
 
-//    std::cout << "end time:" << TimeStamp::now() - first_t << std::endl;
+    std::cout << "end time:" << TimeStamp::now() - first_t << std::endl;
 
     /**
      * Show result.

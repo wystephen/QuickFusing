@@ -105,24 +105,23 @@ int main(int argc, char *argv[]) {
         for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
             ImuData(i, j) = *ImuDataTmp(i, j);
         }
-        Zupt(i, 0) = int(*ZuptTmp(i, 0)) ;
+        Zupt(i, 0) = int(*ZuptTmp(i, 0));
 //        std::cout << i << " :  " << *ZuptTmp(i,0) << std::endl;
     }
 
 
-   /**
-    * ImuIntegrate
-    */
+    /**
+     * ImuIntegrate
+     */
 
-    std::vector<double> ix,iy;
+    std::vector<double> ix, iy;
 
     ImuIntegrate imuinteg(1.0);
 
-    for(int i(1);i<ImuData.rows()/100.0*3;++i)
-    {
+    for (int i(1); i < ImuData.rows() / 100.0 * 3; ++i) {
         Eigen::VectorXd tmp;
-        tmp = imuinteg.IntegratingState(ImuData.block(i,1,1,ImuData.cols()-2).transpose(),
-                                        1.0/128.0);
+        tmp = imuinteg.IntegratingState(ImuData.block(i, 1, 1, ImuData.cols() - 2).transpose(),
+                                        1.0 / 128.0);
 //                                        1.0);
         std::cout << " imu integrate : "
                   << i << "  :  "
@@ -131,7 +130,7 @@ int main(int argc, char *argv[]) {
         iy.push_back(double(tmp(1)));
     }
 
-    std::cout << "total time:"<< ImuData.rows() /100.0 * 3 /128.0
+    std::cout << "total time:" << ImuData.rows() / 100.0 * 3 / 128.0
               << std::endl;
 
 
@@ -140,29 +139,28 @@ int main(int argc, char *argv[]) {
      * MyEkf
      */
 
-    std::vector<double> mx,my;
+    std::vector<double> mx, my;
 
     SettingPara init_para(true);
 
-    init_para.init_pos1_ = Eigen::Vector3d(1.45,-6.3,0.0);
-    init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
+    init_para.init_pos1_ = Eigen::Vector3d(1.45, -6.3, 0.0);
+    init_para.init_heading1_ = 0.0 + 20 / 180.0 * M_PI;
 
     init_para.Ts_ = 1.0 / 128.0;
 
-    MyEkf  myekf(init_para);
+    MyEkf myekf(init_para);
 
-    myekf.InitNavEq(ImuData.block(0,1,20,6));
+    myekf.InitNavEq(ImuData.block(0, 1, 20, 6));
 
 
     std::cout << "IMU rows :" << ImuData.rows() << std::endl;
 
-    std::vector<double> wi,w1,w2,w3;
+    std::vector<double> wi, w1, w2, w3;
 
-    for(int i(0);i<ImuData.rows();++i)
-    {
+    for (int i(0); i < ImuData.rows(); ++i) {
         Eigen::VectorXd vec = myekf.GetPosition(
-                ImuData.block(i,1,1,6).transpose(),
-                Zupt(i,0));
+                ImuData.block(i, 1, 1, 6).transpose(),
+                Zupt(i, 0));
 
 //        std::cout << Zupt(i) << std::endl;
 //        std::cout << vec.transpose() << std::endl;
@@ -170,6 +168,8 @@ int main(int argc, char *argv[]) {
 
         wi.push_back(double(i));
         w1.push_back(myekf.getOriente());
+        w2.push_back(myekf.getVelocity());
+        std::cout << myekf.getVelocity() << std::endl;
 //        w2.push_back(vec(4));
 //        w3.push_back(vec(5));
 
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::cout << " zupt sum : " << Zupt.sum() << " size : " << Zupt.size()
-                                                            <<std::endl;
+              << std::endl;
 
 
 
@@ -241,50 +241,79 @@ int main(int argc, char *argv[]) {
 
         puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 1);
 
-//        if (i == 0) {
-//
-//            puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);
-//        } else {
-//
-//            puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);
-////            puwbpf.StateTransmitionWithTimeStep(Eigen::Vector2d(2, 2), UwbData(i, 0) - UwbData(i - 1, 0));
-//        }
-
-//        std::cout << UwbData.block(i, 1, 1, UwbData.cols() - 1) << std::endl;
-
-
-//        std::cout << "1.2\n";
         puwbpf.Evaluation(UwbData.block(i, 1, 1, UwbData.cols() - 1).transpose(),
                           0);
-//        std::cout << puwbpf.GetResult(0).transpose() << std::endl;
-//        puwbpf.Evaluation(Eigen::Vector4d(UwbData(i,1),UwbData(i,2)
-//        ,UwbData(i,3),UwbData(i,4)).transpose(),0);
-//        std::cout << "1.3\n";
         Eigen::VectorXd tmp = puwbpf.GetResult(0);
 
-
-//        std::cout << "1.4\n";
         puwbpf.Resample(-1, 0);
-
-//        std::cout << tmp.transpose() << std::endl;
 
         ux.push_back(tmp(0));
         uy.push_back(tmp(1));
     }
 
+    int uwb_index(0), imu_index(0);
 
-    std::cout << "end time:" << TimeStamp::now() - first_t << std::endl;
+    EXUWBPF<4> muwbpf(10000);
+    muwbpf.SetMeasurementSigma(5.0, 4.0);
+    muwbpf.SetInputNoiseSigma(0.20);
+    muwbpf.SetBeaconSet(beaconset);
+    muwbpf.OptimateInitial(UwbData.block(20, 1, 1, UwbData.cols() - 1), 0);
+
+    MyEkf mixekf(init_para);
+    mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
+
+    while (1) {
+        if (uwb_index >= UwbData.rows() && imu_index >= ImuData.rows()) {
+            break;
+        }
+
+        if (UwbData(uwb_index, 0) < ImuData(imu_index, 0)) {
+            /*
+             * update Uwb data
+             */
+
+
+            muwbpf.StateTransmition(Eigen::Vector2d(mixekf.getVelocity(),
+                                                    mixekf.getOriente() / 180.0 * M_PI), 2);
+
+            muwbpf.Evaluation(UwbData.block(uwb_index, 1, 1, UwbData.cols() - 1).transpose(),
+                              0);
+
+            Eigen::VectorXd tmp = muwbpf.GetResult(0);
+            muwbpf.Resample(-1, 0);
+
+
+            fx.push_back(tmp(0));
+            fy.push_back(tmp(1));
+
+
+            uwb_index++;
+        } else {
+            /*
+             * update imu data
+             */
+            mixekf.GetPosition(ImuData.block(imu_index, 1, 1, 6).transpose(),
+                               Zupt(imu_index, 0));
+
+            imu_index++;
+        }
+
+
+    }
+
+//    std::cout << "end time:" << TimeStamp::now() - first_t << std::endl;
 
     /**
      * Show result.
      */
-//    plt::named_plot("ux,uy", ux, uy, "r-+");
-//    plt::named_plot("ix,iy",ix,iy,"b-+");
-//    plt::named_plot("mx,my",mx,my,"y-+");
-    plt::plot(w1,"r-+");
+    plt::named_plot("ux,uy", ux, uy, "r-+");
+    plt::named_plot("ix,iy", ix, iy, "b-+");
+    plt::named_plot("mx,my", mx, my, "y-+");
+    plt::named_plot("fx,fy", fx, fy, "g-+");
+//    plt::plot(w1,"r-+");
 //    plt::plot(w2,"g-+");
 //    plt::plot(w3,"b-+");
-//    plt::legend();
+    plt::legend();
 
 //    plt::named_plot("ux1", ux, ux);
     plt::grid(true);

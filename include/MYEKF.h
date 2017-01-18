@@ -535,7 +535,7 @@ public:
 
         double normal = std::sqrt(xaxis(0) * xaxis(0) + xaxis(1) * xaxis(1));
         heading_vec_deque_.push_back(Eigen::Vector2d(xaxis(0) / normal, xaxis(1) / normal));
-        while (heading_vec_deque_.size() > 30) {
+        while (heading_vec_deque_.size() > 40) {
             heading_vec_deque_.pop_front();
         }
 
@@ -543,6 +543,7 @@ public:
             last_chage_state_ = x_h_;
             count_move_times_ = 0;
         }
+        count_move_times_ ++;
 
         if (zupt1 > 0.5 && last_zupt_ == false) {
             Eigen::VectorXd deltax = x_h_ - last_chage_state_;
@@ -555,7 +556,7 @@ public:
 
             velocity_deque_.push_back(velocity_lastest);
 
-            while (velocity_deque_.size() > 10) {
+            while (velocity_deque_.size() > 20) {
                 velocity_deque_.pop_front();
             }
 
@@ -592,6 +593,17 @@ public:
 
         return theta  * 180.0 / M_PI;
 
+    }
+
+
+    double getVelocity(){
+        if(velocity_deque_.size() == 0) return 0.0;
+        double avg_velocity(0.0);
+        for(int i(0);i<velocity_deque_.size();++i)
+        {
+            avg_velocity += velocity_deque_.at(i);
+        }
+        return avg_velocity / double(velocity_deque_.size());
     }
 
 

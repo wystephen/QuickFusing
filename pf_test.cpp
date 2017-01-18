@@ -260,8 +260,8 @@ int main(int argc, char *argv[]) {
 
     double last_v(0),last_ori(0);
 
-    EXUWBPF<4> muwbpf(30000);
-    muwbpf.SetMeasurementSigma(2.0, 4);
+    EXUWBPF<4> muwbpf(31000);
+    muwbpf.SetMeasurementSigma(3.0, 4);
     muwbpf.SetInputNoiseSigma(0.30);
     muwbpf.SetBeaconSet(beaconset);
 //    std::cout << "herererererere" << std::endl;
@@ -323,10 +323,10 @@ int main(int argc, char *argv[]) {
     /**
      * Show result.
      */
-    plt::named_plot("ux,uy", ux, uy, "r-+");
-    plt::named_plot("ix,iy", ix, iy, "b-+");
-    plt::named_plot("mx,my", mx, my, "y-+");
-    plt::named_plot("fx,fy", fx, fy, "g-+");
+    plt::named_plot("u", ux, uy, "r-+");
+    plt::named_plot("i", ix, iy, "b-+");
+    plt::named_plot("m", mx, my, "y-+");
+    plt::named_plot("f", fx, fy, "g-+");
 //    plt::plot(w1,"r-+");
 //    plt::plot(w2,"g-+");
 //    plt::plot(w3,"b-+");

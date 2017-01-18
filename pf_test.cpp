@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
 
     EXUWBPF<4> muwbpf(15000);
     muwbpf.SetMeasurementSigma(4.0, 4);
-    muwbpf.SetInputNoiseSigma(0.10);
+    muwbpf.SetInputNoiseSigma(0.30);
     muwbpf.SetBeaconSet(beaconset);
 //    std::cout << "herererererere" << std::endl;
 //    std::cout <<  UwbData.block(10,1,1,UwbData.cols()-1) << std::endl;
@@ -286,7 +286,7 @@ int main(int argc, char *argv[]) {
                       << mixekf.getOriente() << std::endl;
 
             muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity()-last_v) ,
-                                                    (mixekf.getOriente()-last_ori )*0.4/ 180.0 * M_PI
+                                                    (mixekf.getOriente()-last_ori )*0.8/ 180.0 * M_PI
                                                     ),
                                     2);
             last_v = mixekf.getVelocity();

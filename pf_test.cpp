@@ -126,8 +126,8 @@ int main(int argc, char *argv[]) {
         std::cout << " imu integrate : "
                   << i << "  :  "
                   << tmp.transpose() << std::endl;
-        ix.push_back(double(tmp(0)));
-        iy.push_back(double(tmp(1)));
+//        ix.push_back(double(tmp(0)));
+//        iy.push_back(double(tmp(1)));
     }
 
     std::cout << "total time:" << ImuData.rows() / 100.0 * 3 / 128.0
@@ -251,13 +251,17 @@ int main(int argc, char *argv[]) {
         uy.push_back(double(tmp(1)));
     }
 
+    /**
+     * Fusing....
+     */
+
     int uwb_index(0), imu_index(0);
 
     double last_v,last_ori;
 
     EXUWBPF<4> muwbpf(15000);
-    muwbpf.SetMeasurementSigma(5.0, 4);
-    muwbpf.SetInputNoiseSigma(0.120);
+    muwbpf.SetMeasurementSigma(2.0, 4);
+    muwbpf.SetInputNoiseSigma(0.180);
     muwbpf.SetBeaconSet(beaconset);
 //    std::cout << "herererererere" << std::endl;
 //    std::cout <<  UwbData.block(10,1,1,UwbData.cols()-1) << std::endl;
@@ -281,8 +285,8 @@ int main(int argc, char *argv[]) {
                       << " ori : "
                       << mixekf.getOriente() << std::endl;
 
-            muwbpf.StateTransmition(Eigen::Vector2d(mixekf.getVelocity()-last_v,
-                                                    (mixekf.getOriente()-last_ori )/ 180.0 * M_PI
+            muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity()-last_v) * 0.8,
+                                                    (mixekf.getOriente()-last_ori )*0.8/ 180.0 * M_PI
                                                     ),
                                     2);
             last_v = mixekf.getVelocity();

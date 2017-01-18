@@ -308,9 +308,9 @@ int main(int argc, char *argv[]) {
                                                     ),
                                     2);
 
-            w1.push_back(mixekf.getVelocity()-last_v);// red
+//            w1.push_back(mixekf.getVelocity()-last_v);// red
 //            w2.push_back((mixekf.getOriente()-last_ori )/ 180.0 * M_PI);//green
-            w2.push_back(delta_ori);
+//            w2.push_back(delta_ori);
 
             last_v = mixekf.getVelocity();
             last_ori = mixekf.getOriente();

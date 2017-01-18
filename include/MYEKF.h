@@ -599,7 +599,7 @@ public:
 
     /**
      *
-     * @return
+     * @return This velocity equal to the velocity of head times 2.0 .
      */
     double getVelocity(){
         if(velocity_deque_.size() == 0) return 0.0;

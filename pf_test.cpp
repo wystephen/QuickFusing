@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
     double last_v(0),last_ori(0);
 
     EXUWBPF<4> muwbpf(30000);
-    muwbpf.SetMeasurementSigma(4.0, 4);
+    muwbpf.SetMeasurementSigma(2.0, 4);
     muwbpf.SetInputNoiseSigma(0.30);
     muwbpf.SetBeaconSet(beaconset);
 //    std::cout << "herererererere" << std::endl;
@@ -275,6 +275,7 @@ int main(int argc, char *argv[]) {
 
     while (true) {
         if (uwb_index >= UwbData.rows() || imu_index >= ImuData.rows()) {
+
             break;
         }
 
@@ -315,7 +316,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    std::cout << "end time:" << TimeStamp::now() - fusing_start_time << std::endl;
+    std::cout << "fusing used time:" << TimeStamp::now() - fusing_start_time
+              << "data total time :" << UwbData(UwbData.rows()-1,0)-UwbData(0,0)
+              << std::endl;
 
     /**
      * Show result.

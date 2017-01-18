@@ -585,6 +585,7 @@ public:
         }
         avg_vec /= double(heading_vec_deque_.size());
 
+        avg_vec /= avg_vec.norm();
 
         double theta =  std::acos(avg_vec(0));
         if(avg_vec(1) < 0){
@@ -596,6 +597,10 @@ public:
     }
 
 
+    /**
+     *
+     * @return
+     */
     double getVelocity(){
         if(velocity_deque_.size() == 0) return 0.0;
         double avg_velocity(0.0);
@@ -604,6 +609,14 @@ public:
             avg_velocity += velocity_deque_.at(i);
         }
         return avg_velocity / double(velocity_deque_.size());
+    }
+
+    /**
+     *
+     * @return
+     */
+    double getDeltaVelocity(){
+       return 0.0;
     }
 
 

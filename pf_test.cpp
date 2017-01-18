@@ -149,14 +149,14 @@ int main(int argc, char *argv[]) {
 
     init_para.Ts_ = 1.0 / 128.0;
 
-    Ekf  myekf(init_para);
+    MyEkf  myekf(init_para);
 
     myekf.InitNavEq(ImuData.block(0,1,20,6));
 
 
     std::cout << "IMU rows :" << ImuData.rows() << std::endl;
 
-    std::vector<double> w1,w2,w3;
+    std::vector<double> wi,w1,w2,w3;
 
     for(int i(0);i<ImuData.rows();++i)
     {
@@ -165,10 +165,13 @@ int main(int argc, char *argv[]) {
                 Zupt(i,0));
 
 //        std::cout << Zupt(i) << std::endl;
-        std::cout << vec.transpose() << std::endl;
-        w1.push_back(vec(6));
-        w2.push_back(vec(7));
-        w3.push_back(vec(8));
+//        std::cout << vec.transpose() << std::endl;
+        myekf.ComputeHeading();
+
+        wi.push_back(i);
+        w1.push_back(vec(3));
+        w2.push_back(vec(4));
+        w3.push_back(vec(5));
 
 
 
@@ -281,7 +284,7 @@ int main(int argc, char *argv[]) {
     plt::plot(w1,"r-+");
     plt::plot(w2,"g-+");
     plt::plot(w3,"b-+");
-    plt::legend();
+//    plt::legend();
 
 //    plt::named_plot("ux1", ux, ux);
     plt::grid(true);

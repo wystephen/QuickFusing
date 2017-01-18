@@ -62,6 +62,21 @@ public:
 
     }
 
+    /**
+    * compute the heading orietation of imu
+    * @return
+    */
+    double ComputeHeading()
+    {
+        Eigen::Matrix3d rotation_matrix;
+        rotation_matrix = q2dcm(quat_);
+        Eigen::Vector3d xori(1.0,0.0,0.0);
+        xori = rotation_matrix * xori;
+        std::cout << xori.transpose() << std::endl;
+        return xori(0);
+    }
+
+
     bool CopyMatrix(Eigen::MatrixXd in, Eigen::MatrixXd &out) {
         out.resize(in.rows(), in.cols());
 
@@ -405,6 +420,7 @@ public:
         return true;
 
     }
+
 
     Eigen::VectorXd ComputeInternalState(Eigen::VectorXd x_in,
                                          Eigen::VectorXd dx,

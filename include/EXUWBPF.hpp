@@ -9,7 +9,7 @@
 
 #include "PFBase.hpp"
 
-#include "omp.h"
+//#include "omp.h"
 
 
 #define ISDEBUG false
@@ -179,7 +179,7 @@ public:
             * a in [-inf,inf]----([-5,5]);
             *
             */
-#pragma omp parallel for
+//#pragma omp parallel for
             for (int i = 0; i < this->p_state_.rows(); ++i) {
                 //// w
                 this->p_state_(i, 4) = ori_distribution(this->e_);

@@ -221,6 +221,10 @@ int main(int argc, char *argv[]) {
 
     std::cout << TimeStamp::now() - first_t << std::endl;
 
+
+    /**
+     * PF with only uwb.
+     */
 //    PUWBPF<4> puwbpf(1000);
     EXUWBPF<4> puwbpf(12100);
 
@@ -262,7 +266,7 @@ int main(int argc, char *argv[]) {
 
     EXUWBPF<4> muwbpf(31000);
     muwbpf.SetMeasurementSigma(3.0, 4);
-    muwbpf.SetInputNoiseSigma(0.10);
+    muwbpf.SetInputNoiseSigma(0.20);
     muwbpf.SetBeaconSet(beaconset);
 //    std::cout << "herererererere" << std::endl;
 //    std::cout <<  UwbData.block(10,1,1,UwbData.cols()-1) << std::endl;
@@ -284,15 +288,19 @@ int main(int argc, char *argv[]) {
              * update Uwb data
              */
 
-            std::cout << "ekf velocity :"
-                      << mixekf.getVelocity()
-                      << " ori : "
-                      << mixekf.getOriente() << std::endl;
+//            std::cout << "ekf velocity :"
+//                      << mixekf.getVelocity()
+//                      << " ori : "
+//                      << mixekf.getOriente() << std::endl;
 
             muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity()-last_v) ,
                                                     (mixekf.getOriente()-last_ori )/ 180.0 * M_PI
                                                     ),
                                     2);
+
+            w1.push_back(mixekf.getVelocity()-last_v);
+            w2.push_back((mixekf.getOriente()-last_ori )/ 180.0 * M_PI);
+            
             last_v = mixekf.getVelocity();
             last_ori = mixekf.getOriente();
 
@@ -327,8 +335,8 @@ int main(int argc, char *argv[]) {
     plt::named_plot("i", ix, iy, "b-+");
     plt::named_plot("m", mx, my, "y-+");
     plt::named_plot("f", fx, fy, "g-+");
-//    plt::plot(w1,"r-+");
-//    plt::plot(w2,"g-+");
+    plt::plot(w1,"r-+");
+    plt::plot(w2,"g-+");
 //    plt::plot(w3,"b-+");
     plt::legend();
 

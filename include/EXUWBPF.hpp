@@ -9,6 +9,8 @@
 
 #include "PFBase.hpp"
 
+#include "omp.h"
+
 
 #define ISDEBUG false
 
@@ -177,7 +179,8 @@ public:
             * a in [-inf,inf]----([-5,5]);
             *
             */
-            for (int i(0); i < this->p_state_.rows(); ++i) {
+#pragma omp parallel for
+            for (int i = 0; i < this->p_state_.rows(); ++i) {
                 //// w
                 this->p_state_(i, 4) = ori_distribution(this->e_);
 
@@ -318,7 +321,9 @@ public:
 
             std::uniform_real_distribution<double> real_distribution(0, 0.9999999);
             MYCHECK(ISDEBUG);
-            for (int index(0); index < this->p_state_.rows(); ++index) {
+
+#pragma omp parallel for
+            for (int index = 0; index < this->p_state_.rows(); ++index) {
                 double score = real_distribution(this->e_);
                 double tmp_s(score);
 

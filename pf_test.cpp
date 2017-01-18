@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
 
     EXUWBPF<4> muwbpf(31000);
     muwbpf.SetMeasurementSigma(3.0, 4);
-    muwbpf.SetInputNoiseSigma(0.30);
+    muwbpf.SetInputNoiseSigma(0.10);
     muwbpf.SetBeaconSet(beaconset);
 //    std::cout << "herererererere" << std::endl;
 //    std::cout <<  UwbData.block(10,1,1,UwbData.cols()-1) << std::endl;

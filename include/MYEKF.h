@@ -73,7 +73,16 @@ public:
         Eigen::Vector3d xori(1.0,0.0,0.0);
         xori = rotation_matrix * xori;
         std::cout << xori.transpose() << std::endl;
-        return xori(0);
+        double theta = std::acos(vec(0));
+        theta = theta / M_PI * 180.0;
+
+        if(vec(1) < 0)
+        {
+            theta *= -1.0;
+        }
+
+        return theta;
+//        return xori(0);
     }
 
 

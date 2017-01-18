@@ -166,17 +166,17 @@ int main(int argc, char *argv[]) {
 
 //        std::cout << Zupt(i) << std::endl;
 //        std::cout << vec.transpose() << std::endl;
-        myekf.ComputeHeading();
+//        myekf.ComputeHeading();
 
-        wi.push_back(i);
-        w1.push_back(vec(3));
-        w2.push_back(vec(4));
-        w3.push_back(vec(5));
+        wi.push_back(double(i));
+        w1.push_back(myekf.ComputeHeading());
+//        w2.push_back(vec(4));
+//        w3.push_back(vec(5));
 
 
 
-        mx.push_back(vec(0));
-        my.push_back(vec(1));
+        mx.push_back(double(vec(0)));
+        my.push_back(double(vec(1)));
     }
 
     std::cout << " zupt sum : " << Zupt.sum() << " size : " << Zupt.size()
@@ -282,8 +282,8 @@ int main(int argc, char *argv[]) {
 //    plt::named_plot("ix,iy",ix,iy,"b-+");
 //    plt::named_plot("mx,my",mx,my,"y-+");
     plt::plot(w1,"r-+");
-    plt::plot(w2,"g-+");
-    plt::plot(w3,"b-+");
+//    plt::plot(w2,"g-+");
+//    plt::plot(w3,"b-+");
 //    plt::legend();
 
 //    plt::named_plot("ux1", ux, ux);

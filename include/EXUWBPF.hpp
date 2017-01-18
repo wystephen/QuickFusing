@@ -163,6 +163,40 @@ public:
                  this->p_state_(i,0) += std::sin(this->p_state_(i,2)) * move;
                  this->p_state_(i,1) += std::cos(this->p_state_(i,2)) * move;
              }
+        }else if(MethodType == 2)
+        {
+            double sigma = input_noise_sigma_.mean();
+
+            std::normal_distribution<double> vel_distribution(input(0),sigma);
+            std::normal_distribution<double> ori_distribution(input(1),sigma/5*M_PI);
+
+
+            /**
+            * x,y,theta,v,w,a.
+            * w in [-pi,pi].
+            * a in [-inf,inf]----([-5,5]);
+            *
+            */
+            for(int i(0);i<this->p_state_.rows();++i)
+            {
+                //// w
+                this->p_state_(i,4) += ori_distribution(this->e_);
+
+                this->p_state_(i,5) += vel_distribution(this->e_);
+
+                /////theta v
+                this->p_state_(i,2) += this->p_state_(i,4);
+
+                this->p_state_(i,3) += this->p_state_(i,5);
+
+                ////
+                double move(this->p_state_(i,3)+0.5 * this->p_state_(i,5));
+
+
+                this->p_state_(i,0) += std::sin(this->p_state_(i,2)) * move;
+                this->p_state_(i,1) += std::cos(this->p_state_(i,2)) * move;
+            }
+
         }
 
 

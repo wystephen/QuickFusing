@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
         wi.push_back(double(i));
         w1.push_back(myekf.getOriente());
         w2.push_back(myekf.getVelocity());
-        std::cout << myekf.getVelocity() << std::endl;
+//        std::cout << myekf.getVelocity() << std::endl;
 //        w2.push_back(vec(4));
 //        w3.push_back(vec(5));
 
@@ -276,12 +276,16 @@ int main(int argc, char *argv[]) {
             muwbpf.StateTransmition(Eigen::Vector2d(mixekf.getVelocity(),
                                                     mixekf.getOriente() / 180.0 * M_PI), 2);
 
+            MYCHECK(ISDEBUG);
             muwbpf.Evaluation(UwbData.block(uwb_index, 1, 1, UwbData.cols() - 1).transpose(),
                               0);
 
+            MYCHECK(ISDEBUG);
             Eigen::VectorXd tmp = muwbpf.GetResult(0);
+            MYCHECK(ISDEBUG);
             muwbpf.Resample(-1, 0);
 
+            MYCHECK(ISDEBUG);
 
             fx.push_back(tmp(0));
             fy.push_back(tmp(1));

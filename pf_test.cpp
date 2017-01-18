@@ -85,6 +85,7 @@ int main(int argc, char *argv[]) {
     /*
      * Load Imu data.
      */
+
     std::string dir_name = "tmp_file_dir---/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"),
@@ -259,7 +260,7 @@ int main(int argc, char *argv[]) {
 
     double last_v(0),last_ori(0);
 
-    EXUWBPF<4> muwbpf(15000);
+    EXUWBPF<4> muwbpf(30000);
     muwbpf.SetMeasurementSigma(4.0, 4);
     muwbpf.SetInputNoiseSigma(0.30);
     muwbpf.SetBeaconSet(beaconset);
@@ -269,6 +270,8 @@ int main(int argc, char *argv[]) {
 
     MyEkf mixekf(init_para);
     mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
+
+    double fusing_start_time(TimeStamp::now());
 
     while (true) {
         if (uwb_index >= UwbData.rows() || imu_index >= ImuData.rows()) {
@@ -312,7 +315,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    std::cout << "end time:" << TimeStamp::now() - first_t << std::endl;
+    std::cout << "end time:" << TimeStamp::now() - fusing_start_time << std::endl;
 
     /**
      * Show result.

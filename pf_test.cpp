@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
     std::cout << TimeStamp::now() - first_t << std::endl;
 
 //    PUWBPF<4> puwbpf(1000);
-    EXUWBPF<4> puwbpf(10000);
+    EXUWBPF<4> puwbpf(100);
 
 
     puwbpf.SetMeasurementSigma(5.0, 4);
@@ -253,7 +253,7 @@ int main(int argc, char *argv[]) {
 
     int uwb_index(0), imu_index(0);
 
-    EXUWBPF<4> muwbpf(10000);
+    EXUWBPF<4> muwbpf(100);
     muwbpf.SetMeasurementSigma(5.0, 4.0);
     muwbpf.SetInputNoiseSigma(0.20);
     muwbpf.SetBeaconSet(beaconset);
@@ -274,18 +274,14 @@ int main(int argc, char *argv[]) {
 
 
             muwbpf.StateTransmition(Eigen::Vector2d(mixekf.getVelocity(),
-                                                    mixekf.getOriente() / 180.0 * M_PI), 2);
+                                                    mixekf.getOriente() / 180.0 * M_PI),
+                                    2);
 
-            MYCHECK(ISDEBUG);
             muwbpf.Evaluation(UwbData.block(uwb_index, 1, 1, UwbData.cols() - 1).transpose(),
                               0);
 
-            MYCHECK(ISDEBUG);
             Eigen::VectorXd tmp = muwbpf.GetResult(0);
-            MYCHECK(ISDEBUG);
             muwbpf.Resample(-1, 0);
-
-            MYCHECK(ISDEBUG);
 
             fx.push_back(tmp(0));
             fy.push_back(tmp(1));

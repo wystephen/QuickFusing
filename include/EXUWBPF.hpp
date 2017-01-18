@@ -10,7 +10,7 @@
 #include "PFBase.hpp"
 
 
-#define ISDEBUG false
+#define ISDEBUG true
 
 
 template<int uwb_number>
@@ -93,6 +93,7 @@ public:
         beacon_set_ = beaconset;
         std::cout << "beaconset:" << std::endl;
         std::cout << beacon_set_ << std::endl;
+        MYCHECK(ISDEBUG);
         return true;
     }
 

@@ -10,6 +10,9 @@
 //#include "Sophus/SO3.h"
 #include "SettingPara.h"
 
+
+#include <deque>
+
 class MyEkf {
 public:
     MyEkf(SettingPara para) {
@@ -72,13 +75,24 @@ public:
         rotation_matrix = q2dcm(quat_);
         Eigen::Vector3d xori(1.0,0.0,0.0);
         xori = rotation_matrix * xori;
-        std::cout << xori.transpose() << std::endl;
-        double theta = std::acos(vec(0));
+//        std::cout << xori.transpose() << std::endl;
+        double norm = xori(0) * xori(0) + xori(1) * xori(1);
+
+        norm = std::sqrt(norm);
+        xori = xori / norm;
+
+        double theta = std::acos(xori(0));
         theta = theta / M_PI * 180.0;
 
-        if(vec(1) < 0)
+        if(xori(1) < 0)
         {
             theta *= -1.0;
+        }
+//        std::partial_sum()
+
+        if(theta < 0.0)
+        {
+            theta = 360 + theta;
         }
 
         return theta;
@@ -86,6 +100,12 @@ public:
     }
 
 
+    /**
+     * Deep copy from in to out.
+     * @param in  source
+     * @param out target
+     * @return
+     */
     bool CopyMatrix(Eigen::MatrixXd in, Eigen::MatrixXd &out) {
         out.resize(in.rows(), in.cols());
 
@@ -99,6 +119,11 @@ public:
     }
 
 
+    /**
+     * Initial parameters in navigation equation.
+     * @param u
+     * @return
+     */
     bool InitNavEq(Eigen::MatrixXd u) {
 
         double f_u(0.0), f_v(0.0), f_w(0.0);
@@ -124,6 +149,10 @@ public:
         return true;
     }
 
+    /**
+     * Initial Filter .(only run in construct function.)
+     * @return
+     */
     bool InitialFilter() {
 //        MYCHECK("1");
         for (int i(0); i < 3; ++i) {
@@ -146,8 +175,10 @@ public:
 
 //protected:
 
-    /*
-     * Euler to Rotation Matrix.
+    /**
+     * eular angle
+     * @param ang
+     * @return rotation matrix.
      */
     Eigen::MatrixXd Rt2b(Eigen::Vector3d ang) {
         double cr(cos(ang[0])), sr(sin(ang[0]));
@@ -172,8 +203,11 @@ public:
     }
 
 
-    /*
-     * Rotation matrix to quanternions.
+
+    /**
+     *  Rotation matrix to quanternions
+     * @param R rotation matrix
+     * @return quanternions
      */
     Eigen::Vector4d dcm2q(Eigen::Matrix3d R) {
 //        MYCHECK(1);
@@ -234,8 +268,11 @@ public:
     }
 
 
-    /*
-     *Quanternions to rotation matrix.
+
+    /**
+     * Quternon to rotation matrix
+     * @param q quternion
+     * @return  rotation matrix
      */
     Eigen::Matrix3d q2dcm(Eigen::Vector4d q) {
 //        MYCHECK(1);
@@ -520,6 +557,10 @@ private:
 
 
     Eigen::Vector4d quat_;
+
+
+    std::deque<Eigen::Vector2d> heading_vec_deque_;
+    std::deque<double> velocity_deque_;
 
 
 };

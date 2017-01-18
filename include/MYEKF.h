@@ -596,6 +596,15 @@ public:
 
     }
 
+   /**
+    * Get Delta of Orientation;
+    * @return
+    */
+    double getDeltaOrientation()
+    {
+
+    }
+
 
     /**
      *
@@ -615,15 +624,15 @@ public:
      *
      * @return
      */
-    double getDeltaVelocity(){
-
-        if(velocity_deque_.size()>5)
-        {
-            return velocity_deque_.at(3);
-        }
-
-       return 0.0;
-    }
+//    double getDeltaVelocity(){
+//
+//        if(velocity_deque_.size()>5)
+//        {
+//
+//        }
+//
+//       return 0.0;
+//    }
 
 
 private:

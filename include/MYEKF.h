@@ -69,11 +69,10 @@ public:
     * compute the heading orietation of imu
     * @return
     */
-    double ComputeHeading()
-    {
+    double ComputeHeading() {
         Eigen::Matrix3d rotation_matrix;
         rotation_matrix = q2dcm(quat_);
-        Eigen::Vector3d xori(1.0,0.0,0.0);
+        Eigen::Vector3d xori(1.0, 0.0, 0.0);
         xori = rotation_matrix * xori;
 //        std::cout << xori.transpose() << std::endl;
         double norm = xori(0) * xori(0) + xori(1) * xori(1);
@@ -84,14 +83,12 @@ public:
         double theta = std::acos(xori(0));
         theta = theta / M_PI * 180.0;
 
-        if(xori(1) < 0)
-        {
+        if (xori(1) < 0) {
             theta *= -1.0;
         }
 //        std::partial_sum()
 
-        if(theta < 0.0)
-        {
+        if (theta < 0.0) {
             theta = 360 + theta;
         }
 
@@ -203,7 +200,6 @@ public:
     }
 
 
-
     /**
      *  Rotation matrix to quanternions
      * @param R rotation matrix
@@ -266,7 +262,6 @@ public:
             return Eigen::Vector4d(0, 0, 0, 1.0);
         }
     }
-
 
 
     /**
@@ -531,7 +526,72 @@ public:
         }
         P_ = (P_.eval() * 0.5 + P_.transpose().eval() * 0.5);
 
+
+        /**
+         * Plugin module....
+         */
+        Eigen::Vector3d xaxis(1.0, 0.0, 0.0);
+        xaxis = q2dcm(quat_) * xaxis;
+
+        double normal = std::sqrt(xaxis(0) * xaxis(0) + xaxis(1) * xaxis(1));
+        heading_vec_deque_.push_back(Eigen::Vector2d(xaxis(0) / normal, xaxis(1) / normal));
+        while (heading_vec_deque_.size() > 30) {
+            heading_vec_deque_.pop_front();
+        }
+
+        if (zupt1 < 0.5 && last_zupt_ == true) {
+            last_chage_state_ = x_h_;
+            count_move_times_ = 0;
+        }
+
+        if (zupt1 > 0.5 && last_zupt_ == false) {
+            Eigen::VectorXd deltax = x_h_ - last_chage_state_;
+
+            double move_time = (double(count_move_times_) * para_.Ts_);
+
+            double velocity_lastest = std::sqrt(deltax(0) * deltax(0) + deltax(1) * deltax(1));
+
+            velocity_lastest = velocity_lastest / move_time;
+
+            velocity_deque_.push_back(velocity_lastest);
+
+            while (velocity_deque_.size() > 10) {
+                velocity_deque_.pop_front();
+            }
+
+        }
+
+        if (zupt1 > 0.5) {
+            last_zupt_ = true;
+        } else {
+            last_zupt_ = false;
+        }
+
+
         return x_h_;
+    }
+
+    double getOriente() {
+//        Eigen::Vector2d avg_vec = std::partial_sum(heading_vec_deque_.begin(),
+//                                                   heading_vec_deque_.end(),
+//                                                   Eigen::Vector2d( 0, 0));
+
+//        avg_vec /= double(heading_vec_deque_.size());
+        Eigen::Vector2d avg_vec(0,0);
+        for(int i(0);i<heading_vec_deque_.size();++i)
+        {
+            avg_vec += heading_vec_deque_.at(i);
+        }
+        avg_vec /= double(heading_vec_deque_.size());
+
+
+        double theta =  std::acos(avg_vec(0));
+        if(avg_vec(1) < 0){
+            theta *= -1.0;
+        }
+
+        return theta  * 180.0 / M_PI;
+
     }
 
 
@@ -561,12 +621,12 @@ private:
 
     std::deque<Eigen::Vector2d> heading_vec_deque_;
     std::deque<double> velocity_deque_;
+    int count_move_times_ = 0;
 
 
     Eigen::VectorXd last_chage_state_;
 
-
-
+    bool last_zupt_ = true;
 
 
 };

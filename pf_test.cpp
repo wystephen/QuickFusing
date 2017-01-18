@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
 //        myekf.ComputeHeading();
 
         wi.push_back(double(i));
-        w1.push_back(myekf.ComputeHeading());
+        w1.push_back(myekf.getOriente());
 //        w2.push_back(vec(4));
 //        w3.push_back(vec(5));
 

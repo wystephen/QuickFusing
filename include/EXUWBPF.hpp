@@ -322,7 +322,7 @@ public:
             std::uniform_real_distribution<double> real_distribution(0, 0.9999999);
             MYCHECK(ISDEBUG);
 
-#pragma omp parallel for
+//#pragma omp parallel for
             for (int index = 0; index < this->p_state_.rows(); ++index) {
                 double score = real_distribution(this->e_);
                 double tmp_s(score);

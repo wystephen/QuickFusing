@@ -168,8 +168,8 @@ int main(int argc, char *argv[]) {
 //        myekf.ComputeHeading();
 
         wi.push_back(double(i));
-        w1.push_back(myekf.getOriente());
-        w2.push_back(myekf.getVelocity());
+//        w1.push_back(myekf.getOriente());
+//        w2.push_back(myekf.getVelocity());
 //        std::cout << myekf.getVelocity() << std::endl;
 //        w2.push_back(vec(4));
 //        w3.push_back(vec(5));
@@ -293,13 +293,24 @@ int main(int argc, char *argv[]) {
 //                      << " ori : "
 //                      << mixekf.getOriente() << std::endl;
 
+            double delta_ori(mixekf.getOriente()-last_ori);
+            delta_ori  = delta_ori / 180.0 * M_PI;
+
+            if(delta_ori > M_PI)
+            {
+                delta_ori -= (2*M_PI);
+            }else if(delta_ori < -M_PI){
+                delta_ori += (2.0 * M_PI);
+            }
+
             muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity()-last_v) ,
-                                                    (mixekf.getOriente()-last_ori )/ 180.0 * M_PI
+                                                    delta_ori//(mixekf.getOriente()-last_ori )/ 180.0 * M_PI
                                                     ),
                                     2);
 
-//            w1.push_back(mixekf.getVelocity()-last_v);
-//            w2.push_back((mixekf.getOriente()-last_ori )/ 180.0 * M_PI);
+            w1.push_back(mixekf.getVelocity()-last_v);// red
+//            w2.push_back((mixekf.getOriente()-last_ori )/ 180.0 * M_PI);//green
+            w2.push_back(delta_ori);
 
             last_v = mixekf.getVelocity();
             last_ori = mixekf.getOriente();

@@ -563,6 +563,12 @@ private:
     std::deque<double> velocity_deque_;
 
 
+    Eigen::VectorXd last_chage_state_;
+
+
+
+
+
 };
 
 #endif //QUICKFUSING_MYEKF_H

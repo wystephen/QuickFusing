@@ -253,6 +253,8 @@ int main(int argc, char *argv[]) {
 
     int uwb_index(0), imu_index(0);
 
+    double last_v,last_ori;
+
     EXUWBPF<4> muwbpf(15000);
     muwbpf.SetMeasurementSigma(5.0, 4);
     muwbpf.SetInputNoiseSigma(0.120);
@@ -279,10 +281,12 @@ int main(int argc, char *argv[]) {
                       << " ori : "
                       << mixekf.getOriente() << std::endl;
 
-            muwbpf.StateTransmition(Eigen::Vector2d(mixekf.getVelocity()/2.0,
-                                                    mixekf.getOriente() / 180.0 * M_PI
+            muwbpf.StateTransmition(Eigen::Vector2d(mixekf.getVelocity()-last_v,
+                                                    (mixekf.getOriente()-last_ori )/ 180.0 * M_PI
                                                     ),
                                     2);
+            last_v = mixekf.getVelocity();
+            last_ori = mixekf.getOriente();
 
             muwbpf.Evaluation(UwbData.block(uwb_index, 1, 1, UwbData.cols() - 1).transpose(),
                               0);

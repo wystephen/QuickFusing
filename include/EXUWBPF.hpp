@@ -189,6 +189,9 @@ public:
                 this->p_state_(i,2) += this->p_state_(i,4);
 
                 this->p_state_(i,3) += this->p_state_(i,5);
+//                this->p_state_(i,2) = ori_distribution(this->e_);
+
+//                this->p_state_(i,3) = vel_distribution(this->e_);
 
                 ////
                 double move(this->p_state_(i,3)+0.5 * this->p_state_(i,5));

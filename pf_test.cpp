@@ -89,7 +89,8 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "tmp_file_dir---/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"),
-            ZuptReader(dir_name + "Zupt.data.csv");
+            ZuptReader(dir_name + "Zupt.data.csv"),
+    UwbResultReader(dir_name + "UwbResult.data.csv");
 
     auto ImuDataTmp(ImuDataReader.GetMatrix()), ZuptTmp(ZuptReader.GetMatrix());
 
@@ -109,6 +110,18 @@ int main(int argc, char *argv[]) {
         Zupt(i, 0) = int(*ZuptTmp(i, 0));
 //        std::cout << i << " :  " << *ZuptTmp(i,0) << std::endl;
     }
+
+    /**
+     * sim uwb result
+     */
+     std::vector<double> spx,spy;
+    for(int i(0);i<UwbResultReader.rows_;++i)
+    {
+        spx.push_back(double(*UwbResultReader.GetMatrix()(i,1)));
+        spy.push_back(double(*UwbResultReader.GetMatrix()(i,2)));
+    }
+
+
 
 
     /**
@@ -343,11 +356,12 @@ int main(int argc, char *argv[]) {
      * Show result.
      */
     plt::named_plot("u", ux, uy, "r-+");
-    plt::named_plot("i", ix, iy, "b-+");
+//    plt::named_plot("i", ix, iy, "b-+");
     plt::named_plot("m", mx, my, "y-+");
     plt::named_plot("f", fx, fy, "g-+");
-    plt::plot(w1,"r-+");
-    plt::plot(w2,"g-+");
+    plt::named_plot("sp",spx,spy,"b-+");
+//    plt::plot(w1,"r-+");
+//    plt::plot(w2,"g-+");
 //    plt::plot(w3,"b-+");
     plt::legend();
 

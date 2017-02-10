@@ -407,50 +407,50 @@ int main(int argc, char *argv[]) {
     ////////////////////------------------------------------------------//////////////////////////////
 
     ///////////////////////////*Real path*///////////////////////////////////////////////////////
-    std::vector<double> rx, ry;
-    CSVReader realpath(dir_name+"keypoint.csv");
-
-    for(int i(0);i<realpath.rows_;++i)
-    {
-        rx.push_back(double(*realpath.GetMatrix()(i,0)));
-        ry.push_back(double(*realpath.GetMatrix()(i,1)));
-    }
-
-    //////////////////////----------------COMPUTE ERROR---------------------////
-    std::vector<double> imu_err,fusing_err;
-    std::vector<double> imu_err_step;
-    double avg_imu(0.0),avg_fusing(0.0);
-
-    ResultEvaluation re(dir_name + "keypoint.csv");
-
-    //imu
-    for(int i(0);i<imux.size();++i)
-    {
-        imu_err.push_back(re.Distance(
-                Eigen::Vector2d(imux[i],imuy[i]),
-                ImuData(i,0)));
-        imu_err_step.push_back(i);
-
-    }
-    avg_imu = std::accumulate(imu_err.begin(),imu_err.end(),0.0);
-    avg_imu /= double(imu_err.size());
-
-    //fusing
-    for(int i(0);i<fx.size();++i)
-    {
-        fusing_err.push_back(
-                re.Distance(
-                        Eigen::Vector2d(fx[i],fy[i]),
-                        UwbData(i,0)
-                )
-        );
-    }
-    avg_fusing = std::accumulate(fusing_err.begin(),fusing_err.end(),0.0);
-    avg_fusing /= double(fusing_err.size());
-
-
-
-    std::cout << "avg_error of imu:" << avg_imu << " avg_error of fusing: " << avg_fusing << std::endl;
+//    std::vector<double> rx, ry;
+//    CSVReader realpath(dir_name+"keypoint.csv");
+//
+//    for(int i(0);i<realpath.rows_;++i)
+//    {
+//        rx.push_back(double(*realpath.GetMatrix()(i,0)));
+//        ry.push_back(double(*realpath.GetMatrix()(i,1)));
+//    }
+//
+//    //////////////////////----------------COMPUTE ERROR---------------------////
+//    std::vector<double> imu_err,fusing_err;
+//    std::vector<double> imu_err_step;
+//    double avg_imu(0.0),avg_fusing(0.0);
+//
+//    ResultEvaluation re(dir_name + "keypoint.csv");
+//
+//    //imu
+//    for(int i(0);i<imux.size();++i)
+//    {
+//        imu_err.push_back(re.Distance(
+//                Eigen::Vector2d(imux[i],imuy[i]),
+//                ImuData(i,0)));
+//        imu_err_step.push_back(i);
+//
+//    }
+//    avg_imu = std::accumulate(imu_err.begin(),imu_err.end(),0.0);
+//    avg_imu /= double(imu_err.size());
+//
+//    //fusing
+//    for(int i(0);i<fx.size();++i)
+//    {
+//        fusing_err.push_back(
+//                re.Distance(
+//                        Eigen::Vector2d(fx[i],fy[i]),
+//                        UwbData(i,0)
+//                )
+//        );
+//    }
+//    avg_fusing = std::accumulate(fusing_err.begin(),fusing_err.end(),0.0);
+//    avg_fusing /= double(fusing_err.size());
+//
+//
+//
+//    std::cout << "avg_error of imu:" << avg_imu << " avg_error of fusing: " << avg_fusing << std::endl;
 
 
 
@@ -460,14 +460,14 @@ int main(int argc, char *argv[]) {
 //    plt::subplot(2,2,0);
     plt::named_plot("Imu result", imux, imuy, "r.");
     plt::named_plot("Fusing result", fx, fy, "b+-");
-    plt::named_plot("real path", rx, ry, "g-");
+//    plt::named_plot("real path", rx, ry, "g-");
     plt::named_plot("Uwb Result",ux,uy,"y+-");
 ////    plt::legend();
     plt::title(std::to_string(particle_num)
                +"-"+std::to_string(noise_sigma) +"-"
                + std::to_string(evaluate_sigma) +"-"
-               +"avgimu"+std::to_string(avg_imu) + "-"
-               +"avgfus"+std::to_string(avg_fusing) + "-"
+//               +"avgimu"+std::to_string(avg_imu) + "-"
+//               +"avgfus"+std::to_string(avg_fusing) + "-"
                +std::to_string(TimeStamp::now()));
     plt::grid(true);
 

@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     /*
      * Load Imu data.
      */
-    std::string dir_name = "tmp_file_dir/";
+    std::string dir_name = "tmp_file_dir+/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"), ZuptReader(dir_name + "Zupt.data.csv");
 
@@ -100,8 +100,12 @@ int main(int argc, char *argv[]) {
 //    init_para.init_heading1_ = -180 / 180 * M_PI;
 
     /////////////---- For 4 datasets.
+    // // for other data.
     init_para.init_pos1_ = Eigen::Vector3d(1.45,-6.3,0.0);
     init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
+// // for tmp_file_dir+/
+//    init_para.init_heading1_ = -M_PI;
+//    init_para.init_pos1_ = Eigen::Vector3d(0.0,6.0,0.0);
 
     init_para.Ts_ = 1.0 / 128.0;
 
@@ -232,7 +236,7 @@ int main(int argc, char *argv[]) {
 
     /////-------------Filter parameter----------------------
 
-    int particle_num = 10000;
+    int particle_num = 15000;
     double noise_sigma = 3.0;
     double evaluate_sigma = 3.0;
     double filter_btime(TimeStamp::now());
@@ -457,6 +461,7 @@ int main(int argc, char *argv[]) {
 
 //                plt::show();
     ////////////////////////////////Show result /////////////////////////////////
+    std::cout << "Begin plot" << std::endl;
 //    plt::subplot(2,2,0);
     plt::named_plot("Imu result", imux, imuy, "r.");
     plt::named_plot("Fusing result", fx, fy, "b+-");
@@ -495,7 +500,7 @@ int main(int argc, char *argv[]) {
               + std::to_string(evaluate_sigma) + "-"
               + std::to_string(TimeStamp::now()) + ".jpg");
 
-//    plt::show();
+    plt::show();
 
     std::cout << "beaconset:" << std::endl;
     std::cout << beaconset << std::endl;

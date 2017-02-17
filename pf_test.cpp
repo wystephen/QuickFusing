@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
      * PF with only uwb.
      */
 //    PUWBPF<4> puwbpf(1000);
-    EXUWBPF<4> puwbpf(12100);
+    EXUWBPF<4> puwbpf(6100);
 
 
     puwbpf.SetMeasurementSigma(5.0, 4);
@@ -277,7 +277,7 @@ int main(int argc, char *argv[]) {
 
     double last_v(0),last_ori(0);
 
-    EXUWBPF<4> muwbpf(31000);
+    EXUWBPF<4> muwbpf(11000);
     muwbpf.SetMeasurementSigma(3.0, 4);
     muwbpf.SetInputNoiseSigma(0.20);
     muwbpf.SetBeaconSet(beaconset);

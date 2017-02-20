@@ -79,12 +79,12 @@ int main(int argc, char *argv[]) {
 
     ////////////ADD NOISE TO SOURCE DATA
     std::default_random_engine ee;
-    std::uniform_real_distribution<double> u(-0.15,0.15);
-    std::normal_distribution<> n(0.0,0.2);
+    std::uniform_real_distribution<double> u(-0.15, 0.15);
+    std::normal_distribution<> n(0.0, 0.2);
 
     for (int i(0); i < ImuDataTmp.GetRows(); ++i) {
         for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
-            ImuData(i, j) = *ImuDataTmp(i, j)  ;
+            ImuData(i, j) = *ImuDataTmp(i, j);
         }
         Zupt(i, 0) = *ZuptTmp(i, 0);
     }
@@ -101,8 +101,8 @@ int main(int argc, char *argv[]) {
 
     /////////////---- For 4 datasets.
     // // for other data.
-    init_para.init_pos1_ = Eigen::Vector3d(1.45,-6.3,0.0);
-    init_para.init_heading1_ = 0.0 + 20 / 180.0 *M_PI;
+    init_para.init_pos1_ = Eigen::Vector3d(1.45, -6.3, 0.0);
+    init_para.init_heading1_ = 0.0 + 20 / 180.0 * M_PI;
 // // for tmp_file_dir+/
 //    init_para.init_heading1_ = -M_PI;
 //    init_para.init_pos1_ = Eigen::Vector3d(0.0,6.0,0.0);
@@ -192,21 +192,19 @@ int main(int argc, char *argv[]) {
     /////////////////////---Compute result only uwb data.
     PUWBPF<4> puwbpf(100);
 
-    puwbpf.SetMeasurementSigma(2.0,4);
+    puwbpf.SetMeasurementSigma(2.0, 4);
     puwbpf.SetInputNoiseSigma(0.5);
 
     puwbpf.SetBeaconSet(beaconset);
-    puwbpf.OptimateInitial(UwbData.block(0,1,1,UwbData.cols()-1).transpose(),0);
+    puwbpf.OptimateInitial(UwbData.block(0, 1, 1, UwbData.cols() - 1).transpose(), 0);
 
-    for(int i(0);i<UwbData.rows();++i)
-    {
-        puwbpf.StateTransmition(Eigen::Vector2d(2,2),0);
+    for (int i(0); i < UwbData.rows(); ++i) {
+        puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 0);
 
         puwbpf.Evaluation(UwbData.block(i, 1, 1, UwbData.cols() - 1).transpose(),
                           0);
         Eigen::VectorXd tmp = puwbpf.GetResult(0);
-        puwbpf.Resample(-1,0);
-
+        puwbpf.Resample(-1, 0);
 
 
         ux.push_back(tmp(0));
@@ -224,13 +222,11 @@ int main(int argc, char *argv[]) {
 
 
     //----------- TIME OFFSET______
-    if(UwbData(0,0) - ImuData(0,0) > 100)
-    {
+    if (UwbData(0, 0) - ImuData(0, 0) > 100) {
 //        ImuData.block(0,0,ImuData.rows(),1) = ImuData.block(0,0,ImuData.rows(),1) +
 //                531844067.535;531844066.53
-        for(int k(0);k<ImuData.rows();++k)
-        {
-            ImuData(k,0) = ImuData(k,0) + 531844066.53;
+        for (int k(0); k < ImuData.rows(); ++k) {
+            ImuData(k, 0) = ImuData(k, 0) + 531844066.53;
         }
     }
 
@@ -306,11 +302,10 @@ int main(int argc, char *argv[]) {
                 Eigen::VectorXd noise;
                 noise.resize(6);
                 for (int j(0); j < 6; ++j) {
-                    if(j<3)
-                    {
+                    if (j < 3) {
                         noise(j) = n_distribution(e) * init_para.sigma_acc_(j);
-                    }else{
-                        noise(j) = n_distribution(e) * init_para.sigma_gyro_(j-3);
+                    } else {
+                        noise(j) = n_distribution(e) * init_para.sigma_gyro_(j - 3);
                     }
 
                 }
@@ -466,14 +461,14 @@ int main(int argc, char *argv[]) {
     plt::named_plot("Imu result", imux, imuy, "r.");
     plt::named_plot("Fusing result", fx, fy, "b+-");
 //    plt::named_plot("real path", rx, ry, "g-");
-    plt::named_plot("Uwb Result",ux,uy,"y+-");
+    plt::named_plot("Uwb Result", ux, uy, "y+-");
 ////    plt::legend();
     plt::title(std::to_string(particle_num)
-               +"-"+std::to_string(noise_sigma) +"-"
-               + std::to_string(evaluate_sigma) +"-"
-//               +"avgimu"+std::to_string(avg_imu) + "-"
-//               +"avgfus"+std::to_string(avg_fusing) + "-"
-               +std::to_string(TimeStamp::now()));
+               + "-" + std::to_string(noise_sigma) + "-"
+               + std::to_string(evaluate_sigma) + "-"
+               //               +"avgimu"+std::to_string(avg_imu) + "-"
+               //               +"avgfus"+std::to_string(avg_fusing) + "-"
+               + std::to_string(TimeStamp::now()));
     plt::grid(true);
 
 //    plt::subplot(2,2,1);

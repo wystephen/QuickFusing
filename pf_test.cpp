@@ -86,11 +86,11 @@ int main(int argc, char *argv[]) {
      * Load Imu data.
      */
 
-    std::string dir_name = "tmp_file_dir/";
+    std::string dir_name = "tmp_file_dir---/";
 
     CSVReader ImuDataReader(dir_name + "ImuData.data.csv"),
             ZuptReader(dir_name + "Zupt.data.csv"),
-    UwbResultReader(dir_name + "UwbResult.data.csv");
+            UwbResultReader(dir_name + "UwbResult.data.csv");
 
     auto ImuDataTmp(ImuDataReader.GetMatrix()), ZuptTmp(ZuptReader.GetMatrix());
 
@@ -114,11 +114,10 @@ int main(int argc, char *argv[]) {
     /**
      * sim uwb result
      */
-     std::vector<double> spx,spy;
-    for(int i(0);i<UwbResultReader.rows_;++i)
-    {
-        spx.push_back(double(*UwbResultReader.GetMatrix()(i,1)));
-        spy.push_back(double(*UwbResultReader.GetMatrix()(i,2)));
+    std::vector<double> spx, spy;
+    for (int i(0); i < UwbResultReader.rows_; ++i) {
+        spx.push_back(double(*UwbResultReader.GetMatrix()(i, 1)));
+        spy.push_back(double(*UwbResultReader.GetMatrix()(i, 2)));
     }
 
 
@@ -275,7 +274,7 @@ int main(int argc, char *argv[]) {
 
     int uwb_index(0), imu_index(0);
 
-    double last_v(0),last_ori(0);
+    double last_v(0), last_ori(0);
 
     EXUWBPF<4> muwbpf(21000);
     muwbpf.SetMeasurementSigma(3.0, 4);
@@ -306,19 +305,18 @@ int main(int argc, char *argv[]) {
 //                      << " ori : "
 //                      << mixekf.getOriente() << std::endl;
 
-            double delta_ori(mixekf.getOriente()-last_ori);
-            delta_ori  = delta_ori / 180.0 * M_PI;
+            double delta_ori(mixekf.getOriente() - last_ori);
+            delta_ori = delta_ori / 180.0 * M_PI;
 
-            if(delta_ori > M_PI)
-            {
-                delta_ori -= (2*M_PI);
-            }else if(delta_ori < -M_PI){
+            if (delta_ori > M_PI) {
+                delta_ori -= (2 * M_PI);
+            } else if (delta_ori < -M_PI) {
                 delta_ori += (2.0 * M_PI);
             }
 
-            muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity()-last_v) ,
+            muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity() - last_v),
                                                     delta_ori//(mixekf.getOriente()-last_ori )/ 180.0 * M_PI
-                                                    ),
+                                    ),
                                     2);
 
 //            w1.push_back(mixekf.getVelocity()-last_v);// red
@@ -349,17 +347,17 @@ int main(int argc, char *argv[]) {
     }
 
     std::cout << "fusing used time:" << TimeStamp::now() - fusing_start_time
-              << "data total time :" << UwbData(UwbData.rows()-1,0)-UwbData(0,0)
+              << "data total time :" << UwbData(UwbData.rows() - 1, 0) - UwbData(0, 0)
               << std::endl;
 
     /**
      * Show result.
      */
-    plt::named_plot("u", ux, uy, "r-+");
+    plt::named_plot("uwb_only", ux, uy, "r-+");
 //    plt::named_plot("i", ix, iy, "b-+");
-    plt::named_plot("m", mx, my, "y-+");
-    plt::named_plot("f", fx, fy, "g-+");
-    plt::named_plot("sp",spx,spy,"b-+");
+    plt::named_plot("mix_ekf", mx, my, "y-+");
+    plt::named_plot("fusing", fx, fy, "g-+");
+    plt::named_plot("uwb_only_python", spx, spy, "b-+");
 //    plt::plot(w1,"r-+");
 //    plt::plot(w2,"g-+");
 //    plt::plot(w3,"b-+");

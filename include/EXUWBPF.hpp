@@ -401,7 +401,7 @@ public:
         res.setZero();
         int times(0);
         while (times < 5 || (res - last_res).norm() > 0.1) {
-            std::cout << "TIMES:" << times << std::endl;
+            std::cout << "Initial TIMES:" << times << std::endl;
             last_res = res;
             StateTransmition(Eigen::Vector2d(0, 0), 0);
             Evaluation(state, 0);

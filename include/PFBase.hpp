@@ -14,6 +14,8 @@
 
 #include <Eigen/Dense>
 
+#include <omp.h>
+
 template<typename T, int state_num, int observe_num>
 class PFBase {
 public:

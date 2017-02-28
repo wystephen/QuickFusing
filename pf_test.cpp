@@ -277,7 +277,7 @@ int main(int argc, char *argv[]) {
 
     double last_v(0), last_ori(0);
 
-    EXUWBPF<4> muwbpf(21000);
+    EXUWBPF<4> muwbpf(41000);
     muwbpf.SetMeasurementSigma(3.0, 4);
     muwbpf.SetInputNoiseSigma(0.20);
     muwbpf.SetBeaconSet(beaconset);

@@ -245,7 +245,8 @@ public:
     bool Evaluation(Eigen::VectorXd measurement, int MethodType = 0) {
         MYCHECK(ISDEBUG);
         if (MethodType == 0) {
-            for (int i(0); i < this->p_state_.rows(); ++i) {
+#pragma omp parallel for
+            for (int i=(0); i < this->p_state_.rows(); ++i) {
 //                std::cout << "endl:" << std::endl;
 //                std::cout << p_state_.block(i, 0, 1, p_state_.cols())<< " here   " << std::endl;
 //                std::cout << measurement << "here 2 " << std::endl;
@@ -313,16 +314,19 @@ public:
         MYCHECK(ISDEBUG);
         if (MethodType == 0) {
 
-            std::vector<Eigen::VectorXd> tmp_vec;
-            std::vector<double> tmp_score;
-
+//            std::vector<Eigen::VectorXd> tmp_vec;
+//            std::vector<double> tmp_score;
+            Eigen::MatrixXd tmp_vec;
+            Eigen::VectorXd tmp_score;
+            tmp_vec.resizeLike(this->p_state_);
+            tmp_score.resizeLike(this->probability_);
             this->probability_ = this->probability_ / this->probability_.sum();
 
 
             std::uniform_real_distribution<double> real_distribution(0, 0.9999999);
             MYCHECK(ISDEBUG);
 
-//#pragma omp parallel for
+#pragma omp parallel for
             for (int index = 0; index < this->p_state_.rows(); ++index) {
                 double score = real_distribution(this->e_);
                 double tmp_s(score);
@@ -342,24 +346,29 @@ public:
                 }
                 MYCHECK(ISDEBUG);
 //                std::cout << p_state_.block(i,0,1,p_state_.cols());
-                tmp_vec.push_back(this->p_state_.block(i, 0, 1, this->p_state_.cols()).transpose());
-                MYCHECK(ISDEBUG);
-                tmp_score.push_back(this->probability_(i));
-
+//                tmp_vec.push_back(this->p_state_.block(i, 0, 1, this->p_state_.cols()).transpose());
+//                MYCHECK(ISDEBUG);
+//                tmp_score.push_back(this->probability_(i));
+                for (int k(0); k < tmp_vec.cols(); ++k) {
+                    tmp_vec(index, k) = this->p_state_(i, k);
+                }
+                tmp_score(index) = this->probability_(i);
             }
             MYCHECK(ISDEBUG);
 
-            for (int index(0); index < this->probability_.rows(); ++index) {
-                this->probability_(index) = tmp_score[index];
-                this->p_state_.block(index, 0, 1, this->p_state_.cols()) = tmp_vec[index].transpose();
-            }
+//            for (int index(0); index < this->probability_.rows(); ++index) {
+//                this->probability_(index) = tmp_score[index];
+//                this->p_state_.block(index, 0, 1, this->p_state_.cols()) = tmp_vec[index].transpose();
+//            }
+            this->probability_ = tmp_score;
+            this->p_state_ = tmp_vec;
             if (std::isnan(this->probability_.sum())) {
                 this->probability_.setOnes();
             }
+
 //            probability_.setOnes();
             this->probability_ = this->probability_ / this->probability_.sum();
-        }else if(MethodType == 1)
-        {
+        } else if (MethodType == 1) {
 
         }
     }
@@ -401,7 +410,7 @@ public:
         res.setZero();
         int times(0);
         while (times < 5 || (res - last_res).norm() > 0.1) {
-            std::cout << "Initial TIMES:" << times << std::endl;
+//            std::cout << "Initial TIMES:" << times << std::endl;
             last_res = res;
             StateTransmition(Eigen::Vector2d(0, 0), 0);
             Evaluation(state, 0);

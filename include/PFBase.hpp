@@ -98,14 +98,19 @@ public:
     virtual bool Resample(int resample_num, int MethodType = 0) {
         if (MethodType == 0) {
 
-            std::vector<Eigen::VectorXd> tmp_vec;
-            std::vector<double> tmp_score;
+//            std::vector<Eigen::VectorXd> tmp_vec;
+//            std::vector<double> tmp_score;
+            Eigen::MatrixXd tmp_vec;
+            Eigen::VectorXd tmp_score;
+            tmp_vec.resizeLike(p_state_);
+            tmp_score.resizeLike(probability_);
 
             probability_ = probability_ / probability_.sum();
 
 
             std::uniform_real_distribution<double> real_distribution(0, 0.9999999);
-            for (int index(0); index < p_state_.rows(); ++index) {
+#pragma omp parallel for
+            for (int index=(0); index < p_state_.rows(); ++index) {
                 double score = real_distribution(this->e_);
                 double tmp_s(score);
 
@@ -122,15 +127,22 @@ public:
                     std::cout << tmp_s << "is score" << std::endl;
                 }
 //                std::cout << p_state_.block(i,0,1,p_state_.cols());
-                tmp_vec.push_back(p_state_.block(i, 0, 1, p_state_.cols()).transpose());
-                tmp_score.push_back(probability_(i));
+//                tmp_vec.push_back(p_state_.block(i, 0, 1, p_state_.cols()).transpose());
+//                tmp_score.push_back(probability_(i));
+                for(int k(0);k<tmp_vec.cols();++k)
+                {
+                    tmp_vec(index,k) = p_state_(i,k);
+                }
+                tmp_score(index) =  probability_(i);
 
             }
 
-            for (int index(0); index < probability_.rows(); ++index) {
-                probability_(index) = tmp_score[index];
-                p_state_.block(index, 0, 1, p_state_.cols()) = tmp_vec[index].transpose();
-            }
+//            for (int index(0); index < probability_.rows(); ++index) {
+//                probability_(index) = tmp_score[index];
+//                p_state_.block(index, 0, 1, p_state_.cols()) =tmp_vec.block();
+//            }
+            probability_ = tmp_score;
+            p_state_ = tmp_vec;
             if (std::isnan(probability_.sum())) {
                 probability_.setOnes();
             }

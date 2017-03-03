@@ -524,6 +524,8 @@ public:
 
             x_h_ = ComputeInternalState(x_h_, dx, quat_);
         }
+
+
         P_ = (P_.eval() * 0.5 + P_.transpose().eval() * 0.5);
 
 

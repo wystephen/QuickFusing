@@ -288,6 +288,8 @@ int main(int argc, char *argv[]) {
     MyEkf mixekf(init_para);
     mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
 
+    
+
 
 
     while (true) {

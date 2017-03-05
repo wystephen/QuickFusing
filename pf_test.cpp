@@ -9,7 +9,8 @@
 #include <random>
 
 #include <omp.h>
-
+#define EIGEN_USE_BLAS
+#define EIGEN_USE_LAPACKE
 #include <eigen3/Eigen/Dense>
 #include <ImuIntegrate.h>
 
@@ -277,7 +278,7 @@ int main(int argc, char *argv[]) {
 
     double last_v(0), last_ori(0);
 
-    EXUWBPF<4> muwbpf(41000);
+    EXUWBPF<4> muwbpf(31000);
     muwbpf.SetMeasurementSigma(3.0, 4);
     muwbpf.SetInputNoiseSigma(0.20);
     muwbpf.SetBeaconSet(beaconset);
@@ -287,8 +288,6 @@ int main(int argc, char *argv[]) {
 
     MyEkf mixekf(init_para);
     mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
-
-    
 
 
 
@@ -318,7 +317,7 @@ int main(int argc, char *argv[]) {
             }
 
             muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity() - last_v),
-                                                    delta_ori//(mixekf.getOriente()-last_ori )/ 180.0 * M_PI
+                                                    delta_ori//(mixekf.getOriente()-lasori )/ 180.0 * M_PI
                                     ),
                                     2);
 

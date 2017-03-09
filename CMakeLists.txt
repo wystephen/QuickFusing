@@ -74,6 +74,9 @@ target_link_libraries(pf_test ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES} ${BLAS_LIB
 add_executable(SophusTest SophusTest.cpp)
 target_link_libraries(SophusTest ${Sophus_LIBRARIES})
 
+add_executable(pdr_pf_test pdr_pf_test.cpp)
+target_link_libraries(pdr_pf_test ${PPYTHON_LIBRARIES} ${Sophus_LIBRARIES} ${BLAS_LIBRARIES})
+
 ###CUDA SETTING
 
 #cuda_add_executable(cuda_test cuda_test.cu)

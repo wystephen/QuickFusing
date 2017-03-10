@@ -11,8 +11,7 @@
 #include <Eigen/Dense>
 
 
-int main()
-{
+int main() {
     std::cout.precision(20); //
 
     double first_t(TimeStamp::now());

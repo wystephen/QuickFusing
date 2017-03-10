@@ -361,6 +361,8 @@ public:
             OMEGA(3, 1) = -Q;
             OMEGA(3, 2) = -R;
 
+
+            //TODO: Try to use rotation matrix?
             quat_ = (cos(v / 2.0) * Eigen::Matrix4d::Identity() +
                      2.0 / v * sin(v / 2.0) * OMEGA) * (q);
 

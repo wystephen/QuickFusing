@@ -9,8 +9,10 @@
 #include <random>
 
 #include <omp.h>
+
 #define EIGEN_USE_BLAS
 #define EIGEN_USE_LAPACKE
+
 #include <eigen3/Eigen/Dense>
 #include <ImuIntegrate.h>
 
@@ -188,7 +190,6 @@ int main(int argc, char *argv[]) {
 //        w3.push_back(vec(5));
 
 
-
         mx.push_back(double(vec(0)));
         my.push_back(double(vec(1)));
     }
@@ -272,8 +273,8 @@ int main(int argc, char *argv[]) {
     /**
      * Fusing....
      */
-    double fusing_start_time=(TimeStamp::now());
-    std::cout << " fusing start time :"<< fusing_start_time << std::endl;
+    double fusing_start_time = (TimeStamp::now());
+    std::cout << " fusing start time :" << fusing_start_time << std::endl;
     int uwb_index(0), imu_index(0);
 
     double last_v(0), last_ori(0);
@@ -288,7 +289,6 @@ int main(int argc, char *argv[]) {
 
     MyEkf mixekf(init_para);
     mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
-
 
 
     while (true) {

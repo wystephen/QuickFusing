@@ -140,7 +140,7 @@ public:
             double sigma = input_noise_sigma_.mean();
 
             std::normal_distribution<double> vel_distribution(0, sigma);
-            std::normal_distribution<double> ori_distribution(0, sigma / 5 * M_PI);
+            std::normal_distribution<double> ori_distribution(0, sigma / 10 * M_PI);
 
             /**
              * x,y,theta,v,w,a.
@@ -149,7 +149,7 @@ public:
              *
              */
             for (int i(0); i < this->p_state_.rows(); ++i) {
-                //// w
+                //// w a
                 this->p_state_(i, 4) += ori_distribution(this->e_);
 
                 this->p_state_(i, 5) += vel_distribution(this->e_);
@@ -179,7 +179,7 @@ public:
             * a in [-inf,inf]----([-5,5]);
             *
             */
-//#pragma omp parallel for
+#pragma omp parallel for
             for (int i = 0; i < this->p_state_.rows(); ++i) {
                 //// w
                 this->p_state_(i, 4) = ori_distribution(this->e_);
@@ -200,7 +200,27 @@ public:
 
                 this->p_state_(i, 0) += std::sin(this->p_state_(i, 2)) * move;
                 this->p_state_(i, 1) += std::cos(this->p_state_(i, 2)) * move;
+
+//                if(std::isnan(this->p_state_.sum()))
+//                {
+//                    std::cout << "ERRORO  in isnan " << std::endl;
+//                }else{
+//                    std::cout << "Not nana " << std::endl;
+//                }
             }
+
+        } else if (MethodType == 3) {
+            
+            double sigma = input_noise_sigma_.mean();
+            std::normal_distribution<double> state_distribution(input(0), sigma);
+#pragma omp parallel for
+
+            for (int i = 0;i<this->p_state_.rows();++i)
+            {
+                this->p_state_(i,0) += state_distribution(this->e_);
+                this->p_state_(i,1) += state_distribution(this->e_);
+            }
+
 
         }
 
@@ -396,6 +416,18 @@ public:
         }
     }
 
+    bool Initial(Eigen::VectorXd State) {
+        for (int i(0); i < this->p_state_.rows(); ++i) {
+            for (int j(0); j < this->p_state_.cols(); ++j) {
+                if (j >= State.rows()) {
+                    this->p_state_(i, j) = 0.0;
+                } else {
+                    this->p_state_(i, j) = State(j);
+                }
+            }
+        }
+    }
+
 
     bool OptimateInitial(Eigen::VectorXd state,
                          int MethodType = 0) {
@@ -415,6 +447,7 @@ public:
             StateTransmition(Eigen::Vector2d(0, 0), 0);
             Evaluation(state, 0);
             res = GetResult(0);
+            std::cout << "res :" << res.transpose() << std::endl;
             Resample(-1, 0);
             times++;
             if (times > 100) {

@@ -3,7 +3,9 @@ import numpy as np
 import os
 
 if __name__ == '__main__':
-    while True:
+    index = 0
+    while index < 100000:
+        index += 1
 
         os.system("../cmake-build-debug/pf_test {0} {1} {2} {3} {4} {5} {6}".format(
             3,

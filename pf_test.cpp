@@ -82,11 +82,11 @@ double Pdf(Eigen::Vector2d vecx,
 int main(int argc, char *argv[]) {
 // 3 300 0.2 5.0 10000 0.2 5.0 5
     int only_method = 3;
-    int only_particle_num = 5000;
+    int only_particle_num = 50;
     double only_transpose_sigma = 0.3;
     double only_eval_sigma = 10.0;
 
-    int fus_particle_num = 50000;
+    int fus_particle_num = 50;
     double fus_transpose_sigma = 0.3;
     double fus_eval_sigma = 10.0;
 
@@ -109,17 +109,17 @@ int main(int argc, char *argv[]) {
      * ## which data
      * 1. data_number 1-5
      */
-    if (argc == 8 || argc == 7) {
-        int only_method = atoi(argv[1]);
-        int only_particle_num = atoi(argv[2]);
-        double only_transpose_sigma = atof(argv[3]);
-        double only_eval_sigma = atof(argv[4]);
+    if (argc == 9 || argc == 7) {
+        only_method = atoi(argv[1]);
+        only_particle_num = atoi(argv[2]);
+        only_transpose_sigma = atof(argv[3]);
+        only_eval_sigma = atof(argv[4]);
 
-        int fus_particle_num = atoi(argv[5]);
-        double fus_transpose_sigma = atof(argv[6]);
-        double fus_eval_sigma = atof(argv[7]);
+        fus_particle_num = atoi(argv[5]);
+         fus_transpose_sigma = atof(argv[6]);
+         fus_eval_sigma = atof(argv[7]);
 
-        int data_num = atoi(argv[8]);
+        data_num = atoi(argv[8]);
     }
 
 
@@ -475,6 +475,7 @@ int main(int argc, char *argv[]) {
 //    plt::plot(w2,"g-+");
 //    plt::plot(w3,"b-+");
     plt::legend();
+    plt::grid(true);
 
 //    plt::named_plot("ux1", ux, ux);
     plt::save(dir_name+std::to_string(TimeStamp::now())+".svg");
@@ -490,9 +491,10 @@ int main(int argc, char *argv[]) {
              "fus trans sigma :" << fus_transpose_sigma <<
              " data nu :" << data_num << std::endl;
     log_file.close();
+    std::cout << "argc :" << argc << argv[0] << argv[1] << std::endl;
 
     plt::grid(true);
-    plt::show();
+//    plt::show();
 
 
 }

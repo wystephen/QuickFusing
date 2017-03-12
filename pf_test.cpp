@@ -80,7 +80,7 @@ double Pdf(Eigen::Vector2d vecx,
 
 
 int main(int argc, char *argv[]) {
-
+// 3 300 0.2 5.0 10000 0.2 5.0 5
     int only_method = 3;
     int only_particle_num = 5000;
     double only_transpose_sigma = 0.3;

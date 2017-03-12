@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
      * ## which data
      * 1. data_number 1-5
      */
-    if (argc == 7) {
+    if (argc == 8 || argc == 7) {
         int only_method = atoi(argv[0]);
         int only_particle_num = atoi(argv[1]);
         double only_transpose_sigma = atof(argv[2]);

@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
      */
 
 //    std::string dir_name = "tmp_file_dir---/";
-    std::string dir_name = "/home/steve/locate/3";
+    std::string dir_name = "/home/steve/locate/5";
 
     // Load real pose
     CSVReader ImuRealPose(dir_name+"ImuRealPose.data.csv"),
@@ -308,8 +308,8 @@ int main(int argc, char *argv[]) {
     double last_v(0), last_ori(0);
 
     EXUWBPF<4> muwbpf(51000);
-    muwbpf.SetMeasurementSigma(6.0, 4);
-    muwbpf.SetInputNoiseSigma(0.50);
+    muwbpf.SetMeasurementSigma(10.0, 4);
+    muwbpf.SetInputNoiseSigma(0.40);
     muwbpf.SetBeaconSet(beaconset);
 //    std::cout << "herererererere" << std::endl;
 //    std::cout <<  UwbData.block(10,1,1,UwbData.cols()-1) << std::endl;

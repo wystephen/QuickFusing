@@ -283,7 +283,7 @@ int main(int argc, char *argv[]) {
 //            std::cout << "finished :" << double(i) / double(UwbData.rows()) * 100.0 << "  %.\n";
         }
 
-        puwbpf.StateTransmition(Eigen::Vector2d(2, 2), 3);
+        puwbpf.StateTransmition(Eigen::Vector2d(0, 0), 3);
 
         puwbpf.Evaluation(UwbData.block(i, 1, 1, UwbData.cols() - 1).transpose(),
                           0);

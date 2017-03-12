@@ -81,6 +81,49 @@ double Pdf(Eigen::Vector2d vecx,
 
 int main(int argc, char *argv[]) {
 
+    int only_method = 3;
+    int only_particle_num = 5000;
+    double only_transpose_sigma = 0.3;
+    double only_eval_sigma = 10.0;
+
+    int fus_particle_num = 50000;
+    double fus_transpose_sigma = 0.3;
+    double fus_eval_sigma = 10.0;
+
+    int data_num = 5;
+
+    /**
+     * Parameters:
+     * ## pf only uwb
+     * 1. only uwb methond 0-with x y a w 3- only x y
+     * 2. particle_num
+     * 3. transpose sigma
+     * 4. evaluation sigma
+     *
+     * ## pf uwb and imu
+     *
+     * 1. particle num
+     * 2. transpose sigma
+     * 3. evaluation sigma
+     *
+     * ## which data
+     * 1. data_number 1-5
+     */
+    if (argc == 7) {
+        int only_method = atoi(argv[0]);
+        int only_particle_num = atoi(argv[1]);
+        double only_transpose_sigma = atof(argv[2]);
+        double only_eval_sigma = atof(argv[3]);
+
+        int fus_particle_num = atoi(argv[4]);
+        double fus_transpose_sigma = atof(argv[5]);
+        double fus_eval_sigma = atof(argv[6]);
+
+        int data_num = atoi(argv[7]);
+    }
+
+
+
     std::cout.precision(20); //
 
     double first_t(TimeStamp::now());
@@ -90,7 +133,8 @@ int main(int argc, char *argv[]) {
      */
 
 //    std::string dir_name = "tmp_file_dir---/";
-    std::string dir_name = "/home/steve/locate/3";
+    std::string dir_name = "/home/steve/locate/";
+    dir_name = dir_name + std::to_string(data_num);
 
     // Load real pose
     CSVReader ImuRealPose(dir_name+"ImuRealPose.data.csv"),
@@ -222,11 +266,6 @@ int main(int argc, char *argv[]) {
               << std::endl;
 
 
-
-
-
-
-
     /**
     * Load uwb data.
     */
@@ -237,7 +276,8 @@ int main(int argc, char *argv[]) {
     Eigen::MatrixXd beaconset, UwbData;
 
 
-    beaconset.resize(BeaconsetReader.GetMatrix().GetRows(), BeaconsetReader.GetMatrix().GetCols());
+    beaconset.resize(BeaconsetReader.GetMatrix().GetRows(),
+                     BeaconsetReader.GetMatrix().GetCols());
     for (int i(0); i < beaconset.rows(); ++i) {
         for (int j(0); j < beaconset.cols(); ++j) {
             beaconset(i, j) = *BeaconsetReader.GetMatrix()(i, j);
@@ -264,11 +304,11 @@ int main(int argc, char *argv[]) {
      * PF with only uwb.
      */
 //    PUWBPF<4> puwbpf(1000);
-    EXUWBPF<4> puwbpf(6100);
+    EXUWBPF<4> puwbpf(only_particle_num);
 
 
-    puwbpf.SetMeasurementSigma(5.0, 4);
-    puwbpf.SetInputNoiseSigma(0.20);
+    puwbpf.SetMeasurementSigma(only_eval_sigma, 4);
+    puwbpf.SetInputNoiseSigma(only_transpose_sigma);
 
     puwbpf.SetBeaconSet(beaconset);
     std::cout << "result:" << puwbpf.GetResult(0) << std::endl;
@@ -283,7 +323,7 @@ int main(int argc, char *argv[]) {
 //            std::cout << "finished :" << double(i) / double(UwbData.rows()) * 100.0 << "  %.\n";
         }
 
-        puwbpf.StateTransmition(Eigen::Vector2d(0, 0), 3);
+        puwbpf.StateTransmition(Eigen::Vector2d(0, 0), only_method);
 
         puwbpf.Evaluation(UwbData.block(i, 1, 1, UwbData.cols() - 1).transpose(),
                           0);
@@ -307,9 +347,9 @@ int main(int argc, char *argv[]) {
 
     double last_v(0), last_ori(0);
 
-    EXUWBPF<4> muwbpf(51000);
-    muwbpf.SetMeasurementSigma(6.0, 4);
-    muwbpf.SetInputNoiseSigma(0.50);
+    EXUWBPF<4> muwbpf(fus_particle_num);
+    muwbpf.SetMeasurementSigma(fus_eval_sigma, 4);
+    muwbpf.SetInputNoiseSigma(fus_transpose_sigma);
     muwbpf.SetBeaconSet(beaconset);
 //    std::cout << "herererererere" << std::endl;
 //    std::cout <<  UwbData.block(10,1,1,UwbData.cols()-1) << std::endl;
@@ -438,6 +478,19 @@ int main(int argc, char *argv[]) {
 
 //    plt::named_plot("ux1", ux, ux);
     plt::save(dir_name+std::to_string(TimeStamp::now())+".eps");
+    std::ofstream log_file(dir_name + "log.txt", std::ios::app);
+    log_file.precision(20);
+    log_file << " time :" << TimeStamp::now()
+             << " only methond:" << only_method <<
+             " only particle num :" << only_particle_num <<
+             " only t sigma :" << only_transpose_sigma <<
+             " only eval sigma :" << only_eval_sigma <<
+             " fus pa num :" << fus_particle_num <<
+             " fus eval si:" << fus_eval_sigma <<
+             "fus trans sigma :" << fus_transpose_sigma <<
+             " data nu :" << data_num << std::endl;
+    log_file.close();
+
     plt::grid(true);
     plt::show();
 

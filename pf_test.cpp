@@ -477,7 +477,7 @@ int main(int argc, char *argv[]) {
     plt::legend();
 
 //    plt::named_plot("ux1", ux, ux);
-    plt::save(dir_name+std::to_string(TimeStamp::now())+".eps");
+    plt::save(dir_name+std::to_string(TimeStamp::now())+".svg");
     std::ofstream log_file(dir_name + "log.txt", std::ios::app);
     log_file.precision(20);
     log_file << " time :" << TimeStamp::now()

@@ -437,7 +437,7 @@ int main(int argc, char *argv[]) {
     plt::legend();
 
 //    plt::named_plot("ux1", ux, ux);
-    plt::save(dir_name+std::to_string(TimeStamp::now())+".eps");
+    plt::save(dir_name+std::to_string(TimeStamp::now())+".svg");
     plt::grid(true);
     plt::show();
 

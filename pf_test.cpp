@@ -110,16 +110,16 @@ int main(int argc, char *argv[]) {
      * 1. data_number 1-5
      */
     if (argc == 8 || argc == 7) {
-        int only_method = atoi(argv[0]);
-        int only_particle_num = atoi(argv[1]);
-        double only_transpose_sigma = atof(argv[2]);
-        double only_eval_sigma = atof(argv[3]);
+        int only_method = atoi(argv[1]);
+        int only_particle_num = atoi(argv[2]);
+        double only_transpose_sigma = atof(argv[3]);
+        double only_eval_sigma = atof(argv[4]);
 
-        int fus_particle_num = atoi(argv[4]);
-        double fus_transpose_sigma = atof(argv[5]);
-        double fus_eval_sigma = atof(argv[6]);
+        int fus_particle_num = atoi(argv[5]);
+        double fus_transpose_sigma = atof(argv[6]);
+        double fus_eval_sigma = atof(argv[7]);
 
-        int data_num = atoi(argv[7]);
+        int data_num = atoi(argv[8]);
     }
 
 

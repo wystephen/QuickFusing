@@ -19,6 +19,8 @@ find_package(PythonLibs 2.7 REQUIRED)
 find_package(Sophus REQUIRED)
 
 find_package(OpenMP)
+find_package(BLAS)
+find_package(LAPACK)
 
 if(OPENMP_FOUND)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -27,6 +29,7 @@ endif()
 
 include_directories(
         ${EIGEN3_INCLUDE_DIR}
+
         ./include
         /usr/local/cuda/include
         /home/steve/Cpp_Extent/Cpp_Extent
@@ -34,12 +37,15 @@ include_directories(
         /usr/include
         /usr/local/include
         ${Sophus_INCLUDE_DIRS}
+        ${BLAS_INCLUDE_DIRS}
 )
 
 link_directories(
         /usr/local/lib
         /usr/lib
         /usr/lib/x86_64-linux-gnu
+        ${BLAS_LIBRARIES}
+        ${LAPACK_LIBRARIES}
 )
 
 #FILE(GLOB SOURCES "*.cu" "*.cpp" "*.c" "*.h")
@@ -62,11 +68,14 @@ target_link_libraries(resultevaluation ${PYTHON_LIBRARIES})
 
 add_executable(pf_test pf_test.cpp)
 #target_link_libraries(pf_test ${PYTHON_LIBRARIES})
-target_link_libraries(pf_test ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES})
+target_link_libraries(pf_test ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 #
 #
 add_executable(SophusTest SophusTest.cpp)
 target_link_libraries(SophusTest ${Sophus_LIBRARIES})
+
+add_executable(pdr_pf_test pdr_pf_test.cpp)
+target_link_libraries(pdr_pf_test ${PPYTHON_LIBRARIES} ${Sophus_LIBRARIES} ${BLAS_LIBRARIES})
 
 ###CUDA SETTING
 

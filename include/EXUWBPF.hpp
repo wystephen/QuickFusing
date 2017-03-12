@@ -117,8 +117,8 @@ public:
 
             std::normal_distribution<double> normal_distribution(0, sigma);
             MYCHECK(ISDEBUG)
-
-            for (int i(0); i < this->p_state_.rows(); ++i) {
+#pragma omp parallel for
+            for (int i=(0); i < this->p_state_.rows(); ++i) {
 
                 this->p_state_(i, 4) += normal_distribution(this->e_);
 
@@ -148,8 +148,9 @@ public:
              * a in [-inf,inf]----([-5,5]);
              *
              */
-            for (int i(0); i < this->p_state_.rows(); ++i) {
-                //// w a
+#pragma omp parallel for
+            for (int i=(0); i < this->p_state_.rows(); ++i) {
+                //// w
                 this->p_state_(i, 4) += ori_distribution(this->e_);
 
                 this->p_state_(i, 5) += vel_distribution(this->e_);
@@ -210,7 +211,7 @@ public:
             }
 
         } else if (MethodType == 3) {
-            
+
             double sigma = input_noise_sigma_.mean();
             std::normal_distribution<double> state_distribution(input(0), sigma);
 #pragma omp parallel for

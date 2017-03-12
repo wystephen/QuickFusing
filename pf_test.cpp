@@ -10,6 +10,9 @@
 
 #include <omp.h>
 
+#define EIGEN_USE_BLAS
+#define EIGEN_USE_LAPACKE
+
 #include <eigen3/Eigen/Dense>
 #include <ImuIntegrate.h>
 
@@ -320,6 +323,7 @@ int main(int argc, char *argv[]) {
 
     while (true) {
         if (uwb_index >= UwbData.rows() || imu_index >= ImuData.rows()) {
+
             break;
         }
 

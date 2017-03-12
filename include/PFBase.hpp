@@ -69,8 +69,7 @@ public:
             }
 
             //ToDo:VectorNormalPdf
-            for(int i(0);i<x.rows();++i)
-            {
+            for (int i(0); i < x.rows(); ++i) {
 
             }
 
@@ -85,6 +84,7 @@ public:
             return x;
         }
     }
+
     /**
     * Resample
     *
@@ -110,7 +110,7 @@ public:
 
             std::uniform_real_distribution<double> real_distribution(0, 0.9999999);
 #pragma omp parallel for
-            for (int index=(0); index < p_state_.rows(); ++index) {
+            for (int index = (0); index < p_state_.rows(); ++index) {
                 double score = real_distribution(this->e_);
                 double tmp_s(score);
 
@@ -129,11 +129,10 @@ public:
 //                std::cout << p_state_.block(i,0,1,p_state_.cols());
 //                tmp_vec.push_back(p_state_.block(i, 0, 1, p_state_.cols()).transpose());
 //                tmp_score.push_back(probability_(i));
-                for(int k(0);k<tmp_vec.cols();++k)
-                {
-                    tmp_vec(index,k) = p_state_(i,k);
+                for (int k(0); k < tmp_vec.cols(); ++k) {
+                    tmp_vec(index, k) = p_state_(i, k);
                 }
-                tmp_score(index) =  probability_(i);
+                tmp_score(index) = probability_(i);
 
             }
 

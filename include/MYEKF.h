@@ -329,6 +329,7 @@ public:
 
 //        MYCHECK(1);
 
+
         Eigen::VectorXd y;
         y.resize(9);
 
@@ -361,6 +362,8 @@ public:
             OMEGA(3, 1) = -Q;
             OMEGA(3, 2) = -R;
 
+
+            //TODO: Try to use rotation matrix?
             quat_ = (cos(v / 2.0) * Eigen::Matrix4d::Identity() +
                      2.0 / v * sin(v / 2.0) * OMEGA) * (q);
 
@@ -524,6 +527,8 @@ public:
 
             x_h_ = ComputeInternalState(x_h_, dx, quat_);
         }
+
+
         P_ = (P_.eval() * 0.5 + P_.transpose().eval() * 0.5);
 
 
@@ -543,7 +548,7 @@ public:
             last_chage_state_ = x_h_;
             count_move_times_ = 0;
         }
-        count_move_times_ ++;
+        count_move_times_++;
 
         if (zupt1 > 0.5 && last_zupt_ == false) {
             Eigen::VectorXd deltax = x_h_ - last_chage_state_;
@@ -578,30 +583,28 @@ public:
 //                                                   Eigen::Vector2d( 0, 0));
 
 //        avg_vec /= double(heading_vec_deque_.size());
-        Eigen::Vector2d avg_vec(0,0);
-        for(int i(0);i<heading_vec_deque_.size();++i)
-        {
+        Eigen::Vector2d avg_vec(0, 0);
+        for (int i(0); i < heading_vec_deque_.size(); ++i) {
             avg_vec += heading_vec_deque_.at(i);
         }
         avg_vec /= double(heading_vec_deque_.size());
 
         avg_vec /= avg_vec.norm();
 
-        double theta =  std::acos(avg_vec(0));
-        if(avg_vec(1) < 0){
+        double theta = std::acos(avg_vec(0));
+        if (avg_vec(1) < 0) {
             theta *= -1.0;
         }
 
-        return theta  * 180.0 / M_PI;
+        return theta * 180.0 / M_PI;
 
     }
 
-   /**
-    * Get Delta of Orientation;
-    * @return
-    */
-    double getDeltaOrientation()
-    {
+    /**
+     * Get Delta of Orientation;
+     * @return
+     */
+    double getDeltaOrientation() {
 
     }
 
@@ -610,11 +613,10 @@ public:
      *
      * @return This velocity equal to the velocity of head times 2.0 .
      */
-    double getVelocity(){
-        if(velocity_deque_.size() == 0) return 0.0;
+    double getVelocity() {
+        if (velocity_deque_.size() == 0) return 0.0;
         double avg_velocity(0.0);
-        for(int i(0);i<velocity_deque_.size();++i)
-        {
+        for (int i(0); i < velocity_deque_.size(); ++i) {
             avg_velocity += velocity_deque_.at(i);
         }
         return avg_velocity / double(velocity_deque_.size());

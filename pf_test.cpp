@@ -477,8 +477,29 @@ int main(int argc, char *argv[]) {
     plt::legend();
     plt::grid(true);
 
+
+// Compute precision
+
+//    std::vector<double> only_dis_each,fus_dis_each;
+    double only_dis(0.0),fus_dis(0.0);
+    for(int i=0;i<urx.size();++i)
+    {
+        double fus_tmp(std::sqrt((urx[i]-fx[i])*(urx[i]-fx[i])+(ury[i]-fy[i])*(ury[i]-fy[i])));
+
+        double only_tmp(std::sqrt((urx[i]-ux[i])*(urx[i]-ux[i])+(ury[i]-uy[i])*(ury[i]-uy[i])));
+        std::cout << "fus and only :" << fus_tmp << " "<<only_tmp << std::endl;
+        if(fus_tmp > 100.0) fus_tmp=100.0;
+        if(only_tmp>100.0) only_tmp=100.0;
+        only_dis += only_tmp;
+        fus_dis += fus_tmp;
+    }
+    only_dis /= double(urx.size());
+    fus_dis /= double(urx.size());
+
 //    plt::named_plot("ux1", ux, ux);
-    plt::save(dir_name+std::to_string(TimeStamp::now())+".eps");
+    plt::save(dir_name+std::to_string(TimeStamp::now())+"-"+
+                      std::to_string(only_dis)+"-"
+            +std::to_string(fus_dis)+".eps");
     std::ofstream log_file(dir_name + "log.txt", std::ios::app);
     log_file.precision(20);
     log_file << " time :" << TimeStamp::now()
@@ -489,7 +510,9 @@ int main(int argc, char *argv[]) {
              " fus pa num :" << fus_particle_num <<
              " fus eval si:" << fus_eval_sigma <<
              "fus trans sigma :" << fus_transpose_sigma <<
-             " data nu :" << data_num << std::endl;
+             " data nu :" << data_num <<
+             "puwb error:"<<only_dis<<
+             "fus error:" <<fus_dis << std::endl;
     log_file.close();
     std::cout << "argc :" << argc << argv[0] << argv[1] << std::endl;
 

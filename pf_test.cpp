@@ -447,7 +447,7 @@ int main(int argc, char *argv[]) {
     plt::named_plot("mix_ekf", mx, my, "y-+");
     plt::named_plot("fusing", fx, fy, "g-+");
 
-    plt::named_plot("Real pose",irx,iry,"m-");
+    plt::named_plot("Real pose",urx,ury,"m-");
 
     std::cout << urx.size() << ";;;;;;;;;" << irx.size() << std::endl;
 //    plt::named_plot("uwb_only_python", spx, spy, "r-+");
@@ -493,8 +493,8 @@ int main(int argc, char *argv[]) {
         only_dis += only_tmp;
         fus_dis += fus_tmp;
     }
-    only_dis /= double(urx.size());
-    fus_dis /= double(urx.size());
+    only_dis = only_dis/double(urx.size());
+    fus_dis =fus_dis/ double(urx.size());
 
 //    plt::named_plot("ux1", ux, ux);
     plt::save(dir_name+std::to_string(TimeStamp::now())+"-"+

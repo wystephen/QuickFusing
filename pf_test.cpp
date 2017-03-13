@@ -482,20 +482,28 @@ int main(int argc, char *argv[]) {
 
 //    std::vector<double> only_dis_each,fus_dis_each;
     double only_dis(0.0),fus_dis(0.0);
+    int only_effect_counter(urx.size()),fus_effect_counter(urx.size());
     for(int i=0;i<urx.size();++i)
     {
         double fus_tmp(std::sqrt((urx[i]-fx[i])*(urx[i]-fx[i])+(ury[i]-fy[i])*(ury[i]-fy[i])));
 
         double only_tmp(std::sqrt((urx[i]-ux[i])*(urx[i]-ux[i])+(ury[i]-uy[i])*(ury[i]-uy[i])));
         std::cout << "fus and only :" << fus_tmp << " "<<only_tmp << std::endl;
-        if(fus_tmp > 100.0||std::isinf(fus_tmp)||std::isnan(fus_tmp)) fus_tmp=100.0;
-        if(only_tmp>100.0||std::isinf(only_tmp)||std::isnan(only_tmp)) only_tmp=100.0;
+        if(fus_tmp > 100.0||std::isinf(fus_tmp)||std::isnan(fus_tmp)){
+           fus_effect_counter--;
+        }else{
 
-        only_dis += only_tmp;
-        fus_dis += fus_tmp;
+            fus_dis += fus_tmp;
+        }
+        if(only_tmp>100.0||std::isinf(only_tmp)||std::isnan(only_tmp)){
+            only_effect_counter--;
+        }else{
+
+            only_dis += only_tmp;
+        }
     }
-    only_dis = only_dis/double(urx.size());
-    fus_dis =fus_dis/ double(urx.size());
+    only_dis = only_dis/double(only_effect_counter);
+    fus_dis =fus_dis/ double(fus_effect_counter);
 
 //    plt::named_plot("ux1", ux, ux);
     plt::save(dir_name+std::to_string(TimeStamp::now())+"-"+

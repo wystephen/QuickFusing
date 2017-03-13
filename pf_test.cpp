@@ -488,8 +488,9 @@ int main(int argc, char *argv[]) {
 
         double only_tmp(std::sqrt((urx[i]-ux[i])*(urx[i]-ux[i])+(ury[i]-uy[i])*(ury[i]-uy[i])));
         std::cout << "fus and only :" << fus_tmp << " "<<only_tmp << std::endl;
-        if(fus_tmp > 100.0) fus_tmp=100.0;
-        if(only_tmp>100.0) only_tmp=100.0;
+        if(fus_tmp > 100.0||std::isinf(fus_tmp)||std::isnan(fus_tmp)) fus_tmp=100.0;
+        if(only_tmp>100.0||std::isinf(only_tmp)||std::isnan(only_tmp)) only_tmp=100.0;
+
         only_dis += only_tmp;
         fus_dis += fus_tmp;
     }

@@ -82,13 +82,13 @@ double Pdf(Eigen::Vector2d vecx,
 int main(int argc, char *argv[]) {
 // 3 300 0.2 5.0 10000 0.2 5.0 5
     int only_method = 3;
-    int only_particle_num = 50;
+    int only_particle_num = 1150;
     double only_transpose_sigma = 0.3;
-    double only_eval_sigma = 10.0;
+    double only_eval_sigma = 5.0;
 
-    int fus_particle_num = 50;
+    int fus_particle_num = 30000;
     double fus_transpose_sigma = 0.3;
-    double fus_eval_sigma = 10.0;
+    double fus_eval_sigma = 2.0;
 
     int data_num = 5;
 
@@ -489,6 +489,7 @@ int main(int argc, char *argv[]) {
 
         double only_tmp(std::sqrt((urx[i]-ux[i])*(urx[i]-ux[i])+(ury[i]-uy[i])*(ury[i]-uy[i])));
         std::cout << "fus and only :" << fus_tmp << " "<<only_tmp << std::endl;
+        std::cout << "urx ury:"<<urx[i]<<"  "<<ury[i] << std::endl;
         if(fus_tmp > 100.0||std::isinf(fus_tmp)||std::isnan(fus_tmp)){
            fus_effect_counter--;
         }else{

@@ -87,8 +87,8 @@ int main(int argc, char *argv[]) {
     double only_eval_sigma = 5.0;
 
     int fus_particle_num = 30000;
-    double fus_transpose_sigma = 0.3;
-    double fus_eval_sigma = 2.0;
+    double fus_transpose_sigma = 1.3;
+    double fus_eval_sigma = 1.0;
 
     int data_num = 5;
 
@@ -301,6 +301,7 @@ int main(int argc, char *argv[]) {
     //Fusing result.
     std::vector<double> fx, fy;
     std::vector<double> ux, uy;
+    std::vector<double> sfx,sfy;
 
     std::cout << TimeStamp::now() - first_t << std::endl;
 
@@ -480,6 +481,33 @@ int main(int argc, char *argv[]) {
         beacon_y.push_back(beaconset(i,1));
     }
     plt::named_plot("beaconset",beacon_x,beacon_y,"D");
+
+    /**
+     * Output result.
+     */
+    std::ofstream pwubf(dir_name+"uwb.txt");
+    std::ofstream imuf(dir_name+"imu.txt");
+    std::ofstream fusf(dir_name+"fus.txt");
+    pwubf.precision(10);
+    imuf.precision(10);
+    fusf.precision(10);
+    // uwb and fusing
+    for(int i(0);i<ux.size();++i)
+    {
+//        pwubf << ux[i] << " "<<uy[i]<<std::endl;
+//        fusf << fx[i] << " "<<fy[i] << std::endl;
+
+    }
+    for(int i(0);i<mx.size();++i)
+    {
+        imuf << mx[i] << " " << my[i] << std::endl;
+    }
+    pwubf.close();
+    imuf.close();
+    fusf.close();
+
+
+
 //    plt::plot(w1,"r-+");
 //    plt::plot(w2,"g-+");
 //    plt::plot(w3,"b-+");
@@ -512,8 +540,6 @@ int main(int argc, char *argv[]) {
                 only_dis += only_tmp;
             }
         }
-
-    }
     only_dis = only_dis/double(only_effect_counter);
     fus_dis =fus_dis/ double(fus_effect_counter);
 

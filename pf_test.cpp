@@ -87,8 +87,8 @@ int main(int argc, char *argv[]) {
     double only_eval_sigma = 5.0;
 
     int fus_particle_num = 30000;
-    double fus_transpose_sigma = 0.3;
-    double fus_eval_sigma = 2.0;
+    double fus_transpose_sigma = 1.3;
+    double fus_eval_sigma = 1.0;
 
     int data_num = 5;
 
@@ -296,6 +296,7 @@ int main(int argc, char *argv[]) {
     //Fusing result.
     std::vector<double> fx, fy;
     std::vector<double> ux, uy;
+    std::vector<double> sfx,sfy;
 
     std::cout << TimeStamp::now() - first_t << std::endl;
 
@@ -363,7 +364,6 @@ int main(int argc, char *argv[]) {
 
     while (true) {
         if (uwb_index >= UwbData.rows() || imu_index >= ImuData.rows()) {
-
             break;
         }
 
@@ -405,7 +405,6 @@ int main(int argc, char *argv[]) {
                                     2);
 
             }
-
 //            w1.push_back(mixekf.getVelocity()-last_v);// red
 //            w2.push_back((mixekf.getOriente()-last_ori )/ 180.0 * M_PI);//green
 //            w2.push_back(delta_ori);
@@ -457,7 +456,7 @@ int main(int argc, char *argv[]) {
     std::ofstream out_fusing_result("fusing result.log");
     for(int i(0);i<fx.size();++i)
     {
-        out_fusing_result << fx[i]<< ","<<fy[i] << std::endl;
+//        out_fusing_result << fx[i]<< ","<<fy[i] << std::endl;
     }
     out_fusing_result.close();
 
@@ -471,6 +470,33 @@ int main(int argc, char *argv[]) {
         beacon_y.push_back(beaconset(i,1));
     }
     plt::named_plot("beaconset",beacon_x,beacon_y,"D");
+
+    /**
+     * Output result.
+     */
+    std::ofstream pwubf(dir_name+"uwb.txt");
+    std::ofstream imuf(dir_name+"imu.txt");
+    std::ofstream fusf(dir_name+"fus.txt");
+    pwubf.precision(10);
+    imuf.precision(10);
+    fusf.precision(10);
+    // uwb and fusing
+    for(int i(0);i<ux.size();++i)
+    {
+//        pwubf << ux[i] << " "<<uy[i]<<std::endl;
+//        fusf << fx[i] << " "<<fy[i] << std::endl;
+
+    }
+    for(int i(0);i<mx.size();++i)
+    {
+        imuf << mx[i] << " " << my[i] << std::endl;
+    }
+    pwubf.close();
+    imuf.close();
+    fusf.close();
+
+
+
 //    plt::plot(w1,"r-+");
 //    plt::plot(w2,"g-+");
 //    plt::plot(w3,"b-+");
@@ -483,27 +509,27 @@ int main(int argc, char *argv[]) {
 //    std::vector<double> only_dis_each,fus_dis_each;
     double only_dis(0.0),fus_dis(0.0);
     int only_effect_counter(urx.size()),fus_effect_counter(urx.size());
-    for(int i=0;i<urx.size();++i)
-    {
-        double fus_tmp(std::sqrt((urx[i]-fx[i])*(urx[i]-fx[i])+(ury[i]-fy[i])*(ury[i]-fy[i])));
+    for(int i=0;i<urx.size();++i) {
+        double fus_tmp(std::sqrt((urx[i] - fx[i]) * (urx[i] - fx[i]) + (ury[i] - fy[i]) * (ury[i] - fy[i])));
 
-        double only_tmp(std::sqrt((urx[i]-ux[i])*(urx[i]-ux[i])+(ury[i]-uy[i])*(ury[i]-uy[i])));
-        std::cout << "fus and only :" << fus_tmp << " "<<only_tmp << std::endl;
-        std::cout << "urx ury:"<<urx[i]<<"  "<<ury[i] << std::endl;
+        double only_tmp(std::sqrt((urx[i] - ux[i]) * (urx[i] - ux[i]) + (ury[i] - uy[i]) * (ury[i] - uy[i])));
+        std::cout << "fus and only :" << fus_tmp << " " << only_tmp << std::endl;
+        std::cout << "urx ury:" << urx[i] << "  " << ury[i] << std::endl;
         if (fus_tmp > 5.0 || std::isinf(fus_tmp) || std::isnan(fus_tmp)) {
-            if(fus_tmp > 100.0 || std::isinf(fus_tmp) || std::isnan(fus_tmp)){
+            if (fus_tmp > 100.0 || std::isinf(fus_tmp) || std::isnan(fus_tmp)) {
                 fus_effect_counter--;
-            }else{
+            } else {
 
                 fus_dis += fus_tmp;
             }
             if (only_tmp > 5.0 || std::isinf(only_tmp) || std::isnan(only_tmp)) {
                 only_effect_counter--;
-            }else{
+            } else {
 
                 only_dis += only_tmp;
             }
         }
+    }
     only_dis = only_dis/double(only_effect_counter);
     fus_dis =fus_dis/ double(fus_effect_counter);
 

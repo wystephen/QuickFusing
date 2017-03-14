@@ -92,8 +92,9 @@ int main(int argc, char *argv[]) {
 
     int data_num = 5;
 
-    std::string dir_name = "./";
-
+    std::string out_dir_name = "./";
+    std::string dir_name = "/home/steve/locate/";
+    dir_name = dir_name + std::to_string(data_num);
     /**
      * Parameters:
      * ## pf only uwb
@@ -113,7 +114,7 @@ int main(int argc, char *argv[]) {
      *
      * ## dir_name
      */
-    if (argc == 10) {
+    if (argc == 10 || argc == 9) {
         only_method = atoi(argv[1]);
         only_particle_num = atoi(argv[2]);
         only_transpose_sigma = atof(argv[3]);
@@ -124,7 +125,11 @@ int main(int argc, char *argv[]) {
          fus_eval_sigma = atof(argv[7]);
 
         data_num = atoi(argv[8]);
-        dir_name = std::string(argv[9]);
+        if (argc == 10) {
+            out_dir_name = std::string(argv[9]);
+        } else {
+            out_dir_name = dir_name;
+        }
     }
 
 
@@ -138,8 +143,7 @@ int main(int argc, char *argv[]) {
      */
 
 //    std::string dir_name = "tmp_file_dir---/";
-    std::string dir_name = "/home/steve/locate/";
-    dir_name = dir_name + std::to_string(data_num);
+
 
     // Load real pose
     CSVReader ImuRealPose(dir_name+"ImuRealPose.data.csv"),
@@ -336,13 +340,13 @@ int main(int argc, char *argv[]) {
                           0);
         Eigen::VectorXd tmp = puwbpf.GetResult(0);
 
-        std::cout << " pwub tmp :" << tmp.transpose() << std::endl;
+//        std::cout << " pwub tmp :" << tmp.transpose() << std::endl;
         puwbpf.Resample(-1, 0);
 
         ux.push_back(double(tmp(0)));
         uy.push_back(double(tmp(1)));
     }
-    double puwb_time = TimeStamp::now() - puwb_start_time;
+    double puwb_time_use = TimeStamp::now() - puwb_start_time;
 
 
     std::cout <<"Uwb time :" << UwbData(UwbData.rows()-1,0)-UwbData(0,0) << std::endl;
@@ -394,7 +398,7 @@ int main(int argc, char *argv[]) {
             } else if (delta_ori < -M_PI) {
                 delta_ori += (2.0 * M_PI);
             }
-            std::cout << "delta ori:" << delta_ori << std::endl;
+//            std::cout << "delta ori:" << delta_ori << std::endl;
             if(isnan(delta_ori))
             {
                 delta_ori = 0.0;
@@ -485,23 +489,31 @@ int main(int argc, char *argv[]) {
     /**
      * Output result.
      */
-    std::ofstream pwubf(dir_name+"uwb.txt");
-    std::ofstream imuf(dir_name+"imu.txt");
-    std::ofstream fusf(dir_name+"fus.txt");
+    std::ofstream pwubf(out_dir_name + "uwb.txt");
+    std::ofstream imuf(out_dir_name + "imu.txt");
+    std::ofstream fusf(out_dir_name + "fus.txt");
+    std::ofstream fustimef(out_dir_name + "fustime.txt");
+    std::ofstream puwbtime(out_dir_name + "puwbtime.txt");
     pwubf.precision(10);
     imuf.precision(10);
     fusf.precision(10);
     // uwb and fusing
     for(int i(0);i<ux.size();++i)
     {
-//        pwubf << ux[i] << " "<<uy[i]<<std::endl;
-//        fusf << fx[i] << " "<<fy[i] << std::endl;
+        pwubf << ux[i] << " " << uy[i] << std::endl;
+        fusf << fx[i] << " " << fy[i] << std::endl;
 
     }
     for(int i(0);i<mx.size();++i)
     {
         imuf << mx[i] << " " << my[i] << std::endl;
     }
+    fustimef << fus_use_time << std::endl;
+    fustimef.close();
+
+    puwbtime << puwb_time_use << std::endl;
+    puwbtime.close();
+
     pwubf.close();
     imuf.close();
     fusf.close();
@@ -540,6 +552,7 @@ int main(int argc, char *argv[]) {
                 only_dis += only_tmp;
             }
         }
+    }
     only_dis = only_dis/double(only_effect_counter);
     fus_dis =fus_dis/ double(fus_effect_counter);
 
@@ -560,7 +573,7 @@ int main(int argc, char *argv[]) {
              " data nu :" << data_num <<
              "puwb error:" << only_dis <<
              "fus error:" << fus_dis <<
-             "dir name :" << dir_name << std::endl;
+             "dir name :" << out_dir_name << std::endl;
     log_file.close();
     std::cout << "argc :" << argc << argv[0] << argv[1] << std::endl;
 

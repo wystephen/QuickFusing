@@ -4,7 +4,7 @@ import os
 
 if __name__ == '__main__':
     index = 0
-    while index < 1000:
+    while index < 100000:
         index += 1
         print("../cmake-build-debug/pf_test {0} {1} {2} {3} {4} {5} {6} {7}".format(
             3,
@@ -25,7 +25,7 @@ if __name__ == '__main__':
             int(np.random.uniform(3000,80000)),
             float(np.random.uniform(0.1,3.0)),
             float(np.random.uniform(0.5,20.0)),
-            5
+            3
         ))
 
         print("next ...")

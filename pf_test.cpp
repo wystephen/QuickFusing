@@ -412,8 +412,8 @@ int main(int argc, char *argv[]) {
                                     2);
 
             }else{
-                muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity() - last_v)*(UwbData(uwb_index,0)-UwbData(uwb_index-1,0)),
-                                                    delta_ori*(UwbData(uwb_index,0)-UwbData(uwb_index-1,0))//(mixekf.getOriente()-last_ori )/ 180.0 * M_PI
+                muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity() - last_v),//*(UwbData(uwb_index,0)-UwbData(uwb_index-1,0)),
+                                                    delta_ori
                                     ),
                                     2);
 

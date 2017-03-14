@@ -171,7 +171,7 @@ public:
             double sigma = input_noise_sigma_.mean();
 
             std::normal_distribution<double> vel_distribution(input(0), sigma);
-            std::normal_distribution<double> ori_distribution(input(1), sigma / 5.0 * M_PI);
+            std::normal_distribution<double> ori_distribution(input(1), sigma  / M_PI);
 
 
             /**
@@ -213,7 +213,7 @@ public:
         } else if (MethodType == 3) {
 
             double sigma = input_noise_sigma_.mean();
-            std::normal_distribution<double> state_distribution(input(0), sigma);
+            std::normal_distribution<double> state_distribution(input(0), sigma*0.1);
 #pragma omp parallel for
 
             for (int i = 0;i<this->p_state_.rows();++i)

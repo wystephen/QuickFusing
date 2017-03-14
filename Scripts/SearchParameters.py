@@ -25,7 +25,7 @@ if __name__ == '__main__':
             int(np.random.uniform(3000,80000)),
             float(np.random.uniform(0.1,3.0)),
             float(np.random.uniform(0.5,20.0)),
-            3
+            5
         ))
 
         print("next ...")

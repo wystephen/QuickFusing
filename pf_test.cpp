@@ -92,6 +92,8 @@ int main(int argc, char *argv[]) {
 
     int data_num = 5;
 
+    std::string dir_name = "./";
+
     /**
      * Parameters:
      * ## pf only uwb
@@ -108,8 +110,10 @@ int main(int argc, char *argv[]) {
      *
      * ## which data
      * 1. data_number 1-5
+     *
+     * ## dir_name
      */
-    if (argc == 9 || argc == 7) {
+    if (argc == 10) {
         only_method = atoi(argv[1]);
         only_particle_num = atoi(argv[2]);
         only_transpose_sigma = atof(argv[3]);
@@ -120,6 +124,7 @@ int main(int argc, char *argv[]) {
          fus_eval_sigma = atof(argv[7]);
 
         data_num = atoi(argv[8]);
+        dir_name = std::string(argv[9]);
     }
 
 
@@ -317,6 +322,7 @@ int main(int argc, char *argv[]) {
     puwbpf.Initial(Eigen::VectorXd(Eigen::Vector4d(urx[0],ury[0],0.0,0.0)));
 
 
+    double puwb_start_time(TimeStamp::now());
     for (int i(0); i < UwbData.rows(); ++i) {
 //        std::cout << "1.1\n";
         if ((i / UwbData.rows() * 100) % 10 == 0) {
@@ -335,6 +341,8 @@ int main(int argc, char *argv[]) {
         ux.push_back(double(tmp(0)));
         uy.push_back(double(tmp(1)));
     }
+    double puwb_time = TimeStamp::now() - puwb_start_time;
+
 
     std::cout <<"Uwb time :" << UwbData(UwbData.rows()-1,0)-UwbData(0,0) << std::endl;
 
@@ -342,7 +350,7 @@ int main(int argc, char *argv[]) {
      * Fusing....
      */
     double fusing_start_time=(TimeStamp::now());
-    std::cout << " fusing start time :"<< fusing_start_time << std::endl;
+//    std::cout << " fusing start time :"<< fusing_start_time << std::endl;
     int uwb_index(0), imu_index(0);
 
     double last_v(0), last_ori(0);
@@ -419,7 +427,7 @@ int main(int argc, char *argv[]) {
             Eigen::VectorXd tmp = muwbpf.GetResult(0);
             muwbpf.Resample(-1, 0);
 
-            std::cout<< "fusing tmp :" << tmp.transpose() << std::endl;
+//            std::cout<< "fusing tmp :" << tmp.transpose() << std::endl;
             fx.push_back(double(tmp(0)));
             fy.push_back(double(tmp(1)));
             uwb_index++;
@@ -433,6 +441,7 @@ int main(int argc, char *argv[]) {
             imu_index++;
         }
     }
+    double fus_use_time = TimeStamp::now() - fusing_start_time;
 
     std::cout << "fusing used time:  " << TimeStamp::now() - fusing_start_time
               << "  data total time :" << UwbData(UwbData.rows() - 1, 0) - UwbData(0, 0)
@@ -449,17 +458,17 @@ int main(int argc, char *argv[]) {
 
     plt::named_plot("Real pose",urx,ury,"m-");
 
-    std::cout << urx.size() << ";;;;;;;;;" << irx.size() << std::endl;
+//    std::cout << urx.size() << ";;;;;;;;;" << irx.size() << std::endl;
 //    plt::named_plot("uwb_only_python", spx, spy, "r-+");
 
-    std::cout << " fx size :" << fx.size() <<"Uwb data :" << UwbData.rows()<< std::endl;
+//    std::cout << " fx size :" << fx.size() <<"Uwb data :" << UwbData.rows()<< std::endl;
 
-    std::ofstream out_fusing_result("fusing result.log");
-    for(int i(0);i<fx.size();++i)
-    {
-        out_fusing_result << fx[i]<< ","<<fy[i] << std::endl;
-    }
-    out_fusing_result.close();
+//    std::ofstream out_fusing_result("fusing result.log");
+//    for(int i(0);i<fx.size();++i)
+//    {
+//        out_fusing_result << fx[i]<< ","<<fy[i] << std::endl;
+//    }
+//    out_fusing_result.close();
 
     /*
      * Plot beaconsets
@@ -483,27 +492,28 @@ int main(int argc, char *argv[]) {
 //    std::vector<double> only_dis_each,fus_dis_each;
     double only_dis(0.0),fus_dis(0.0);
     int only_effect_counter(urx.size()),fus_effect_counter(urx.size());
-    for(int i=0;i<urx.size();++i)
-    {
-        double fus_tmp(std::sqrt((urx[i]-fx[i])*(urx[i]-fx[i])+(ury[i]-fy[i])*(ury[i]-fy[i])));
+    for (int i = 0; i < urx.size(); ++i) {
+        double fus_tmp(std::sqrt((urx[i] - fx[i]) * (urx[i] - fx[i]) + (ury[i] - fy[i]) * (ury[i] - fy[i])));
 
-        double only_tmp(std::sqrt((urx[i]-ux[i])*(urx[i]-ux[i])+(ury[i]-uy[i])*(ury[i]-uy[i])));
-        std::cout << "fus and only :" << fus_tmp << " "<<only_tmp << std::endl;
-        std::cout << "urx ury:"<<urx[i]<<"  "<<ury[i] << std::endl;
+        double only_tmp(std::sqrt((urx[i] - ux[i]) * (urx[i] - ux[i]) + (ury[i] - uy[i]) * (ury[i] - uy[i])));
+        std::cout << "fus and only :" << fus_tmp << " " << only_tmp << std::endl;
+        std::cout << "urx ury:" << urx[i] << "  " << ury[i] << std::endl;
         if (fus_tmp > 5.0 || std::isinf(fus_tmp) || std::isnan(fus_tmp)) {
-            if(fus_tmp > 100.0 || std::isinf(fus_tmp) || std::isnan(fus_tmp)){
+            if (fus_tmp > 100.0 || std::isinf(fus_tmp) || std::isnan(fus_tmp)) {
                 fus_effect_counter--;
-            }else{
+            } else {
 
                 fus_dis += fus_tmp;
             }
             if (only_tmp > 5.0 || std::isinf(only_tmp) || std::isnan(only_tmp)) {
                 only_effect_counter--;
-            }else{
+            } else {
 
                 only_dis += only_tmp;
             }
         }
+
+    }
     only_dis = only_dis/double(only_effect_counter);
     fus_dis =fus_dis/ double(fus_effect_counter);
 
@@ -522,8 +532,9 @@ int main(int argc, char *argv[]) {
              " fus eval si:" << fus_eval_sigma <<
              "fus trans sigma :" << fus_transpose_sigma <<
              " data nu :" << data_num <<
-             "puwb error:"<<only_dis<<
-             "fus error:" <<fus_dis << std::endl;
+             "puwb error:" << only_dis <<
+             "fus error:" << fus_dis <<
+             "dir name :" << dir_name << std::endl;
     log_file.close();
     std::cout << "argc :" << argc << argv[0] << argv[1] << std::endl;
 

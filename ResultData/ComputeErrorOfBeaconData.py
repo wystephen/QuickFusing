@@ -39,13 +39,27 @@ if __name__ == '__main__':
 
     uwb_range = np.frombuffer(range_array,dtype=np.float).reshape(-1,4)
     real_range = np.frombuffer(dis_array,dtype=np.float).reshape(-1,4)
+    # offset = 18
+    # real_range[:-offset,:] = real_range[offset:,:]
+
+
+    # reshape and sort
+
+    uwb_range = uwb_range.reshape(-1)
+    real_range = real_range.reshape(-1)
+    sort_list = np.argsort(real_range)
+    real_range  = real_range[sort_list]
+    uwb_range = uwb_range[sort_list]
 
     print(uwb_range.shape,real_range.shape)
+    np.savetxt(dir_name+"real_range",real_range)
+    np.savetxt(dir_name+"uwb_range",uwb_range)
 
     plt.figure(0)
-    plt.plot(uwb_range[:,2],'r')
-    plt.plot(real_range[:,2],'b')
-    plt.plot((uwb_range-real_range)[:,2],'g')
+    plt.plot(uwb_range[:],'r',label='UwbRange')
+    plt.plot(real_range[:],'b',label = 'real range')
+    plt.plot((uwb_range-real_range)[:],'g',label = 'offset')
+    plt.legend()
     plt.grid(True)
     plt.show()
 

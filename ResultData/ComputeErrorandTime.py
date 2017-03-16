@@ -8,6 +8,7 @@ from array import array
 
 if __name__ == '__main__':
     dir_name = '/home/steve/locate/RunResult/'
+    all_result_array = array('d')
     # print(os.listdir(dir_name))
     for d1 in os.listdir(dir_name):
         if len(d1) == 1:
@@ -67,8 +68,21 @@ if __name__ == '__main__':
                             # print(tmp_time)
                             continue
                 print("para:", particle_num, t_sigma, eval_sigma, "uwb err:", np.mean(uwb_err), "fuse err:",
-                      np.mean(fus_err),
-                      "uwb time:", np.mean(uwb_time), 'fus time :', np.mean(fus_time))
+                      np.mean(fus_err), "fuse std:", np.std(fus_err),
+                      "uwb time:", np.mean(uwb_time), 'fus time :', np.mean(fus_time), 'fus time std:',
+                      np.std(fus_time))
+                all_result_array.append(particle_num)
+                all_result_array.append(t_sigma)
+                all_result_array.append(eval_sigma)
+                all_result_array.append(np.mean(uwb_err))
+                all_result_array.append(np.mean(fus_err))
+                all_result_array.append(np.std(fus_err))
+                all_result_array.append(np.mean(uwb_time))
+                all_result_array.append(np.mean(fus_time))
+                all_result_array.append(np.std(fus_time))
+
+                all_result_np = np.frombuffer(all_result_array, dtype=np.float).reshape(-1, 9)
+                np.savetxt('all_result.data', all_result_np)
 
 
 

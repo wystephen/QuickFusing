@@ -50,8 +50,8 @@ if __name__ == '__main__':
                         if 'fus.txt' in file_name:
 
                             tmp_uwb = np.loadtxt(this_dir + file_name)
-                            plt.plot(tmp_uwb[:, 0], tmp_uwb[:, 1])
-                            plt.show()
+                            # plt.plot(tmp_uwb[:, 0], tmp_uwb[:, 1])
+                            # plt.show()
                             fus_err[index - 1, :] = np.sum((tmp_uwb - uwb_real_pose[:, 0:2]) ** 2.0, 1) ** 0.5
                             continue
                         if 'uwb.txt' in file_name:

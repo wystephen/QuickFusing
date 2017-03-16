@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     all_result = np.loadtxt("5all_result.data")
 
-    print(all_result)
+
     sort_order = np.argsort(all_result[:, 0])
     all_result = all_result[sort_order, :]
-
+    print(all_result)
     select_list = list()
     for i in range(all_result.shape[0]):
         # if np.abs(all_result[i, 1] - 2.0) < 1e-5 and np.abs(all_result[i, 2] - 1.0) < 1e-5:

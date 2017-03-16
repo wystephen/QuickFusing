@@ -48,7 +48,10 @@ if __name__ == '__main__':
                         index = int(file_name.split('-')[0])
                         # print('index :',index-1)
                         if 'fus.txt' in file_name:
+
                             tmp_uwb = np.loadtxt(this_dir + file_name)
+                            plt.plot(tmp_uwb[:, 0], tmp_uwb[:, 1])
+                            plt.show()
                             fus_err[index - 1, :] = np.sum((tmp_uwb - uwb_real_pose[:, 0:2]) ** 2.0, 1) ** 0.5
                             continue
                         if 'uwb.txt' in file_name:
@@ -61,6 +64,7 @@ if __name__ == '__main__':
                             # if particle_num > 10000:
                             #     print(tmp_uwb)
                             #     print(fus_time)
+                            # plt.plot()
                             continue
                         if 'uwbtime.txt' in file_name:
                             tmp_time = np.loadtxt(this_dir + file_name)
@@ -82,7 +86,7 @@ if __name__ == '__main__':
                 all_result_array.append(np.std(fus_time))
 
                 all_result_np = np.frombuffer(all_result_array, dtype=np.float).reshape(-1, 9)
-                np.savetxt('all_result.data', all_result_np)
+                np.savetxt(d1 + 'all_result.data', all_result_np)
 
 
 

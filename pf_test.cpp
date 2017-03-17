@@ -194,8 +194,8 @@ int main(int argc, char *argv[]) {
      */
     std::vector<double> spx, spy;
     for (int i(0); i < UwbResultReader.rows_; ++i) {
-        spx.push_back(double(*UwbResultReader.GetMatrix()(i, 1)));
-        spy.push_back(double(*UwbResultReader.GetMatrix()(i, 2)));
+        spx.push_back(double(*UwbResultReader.GetMatrix()(i, 0)));
+        spy.push_back(double(*UwbResultReader.GetMatrix()(i, 1)));
     }
 
 
@@ -214,15 +214,15 @@ int main(int argc, char *argv[]) {
         tmp = imuinteg.IntegratingState(ImuData.block(i, 1, 1, ImuData.cols() - 2).transpose(),
                                         1.0 / 128.0);
 //                                        1.0);
-        std::cout << " imu integrate : "
-                  << i << "  :  "
-                  << tmp.transpose() << std::endl;
+//        std::cout << " imu integrate : "
+//                  << i << "  :  "
+//                  << tmp.transpose() << std::endl;
 //        ix.push_back(double(tmp(0)));
 //        iy.push_back(double(tmp(1)));
     }
 
-    std::cout << "total time:" << ImuData.rows() / 100.0 * 3 / 128.0
-              << std::endl;
+//    std::cout << "total time:" << ImuData.rows() / 100.0 * 3 / 128.0
+//              << std::endl;
 
 
 
@@ -245,7 +245,7 @@ int main(int argc, char *argv[]) {
     myekf.InitNavEq(ImuData.block(0, 1, 20, 6));
 
 
-    std::cout << "IMU rows :" << ImuData.rows() << std::endl;
+//    std::cout << "IMU rows :" << ImuData.rows() << std::endl;
 
     std::vector<double> wi, w1, w2, w3;
 
@@ -271,8 +271,8 @@ int main(int argc, char *argv[]) {
         my.push_back(double(vec(1)));
     }
 
-    std::cout << " zupt sum : " << Zupt.sum() << " size : " << Zupt.size()
-              << std::endl;
+//    std::cout << " zupt sum : " << Zupt.sum() << " size : " << Zupt.size()
+//              << std::endl;
 
 
     /**
@@ -321,7 +321,7 @@ int main(int argc, char *argv[]) {
     puwbpf.SetInputNoiseSigma(only_transpose_sigma);
 
     puwbpf.SetBeaconSet(beaconset);
-    std::cout << "result:" << puwbpf.GetResult(0) << std::endl;
+//    std::cout << "result:" << puwbpf.GetResult(0) << std::endl;
 
 //    puwbpf.OptimateInitial(UwbData.block(10, 1, 1, UwbData.cols() - 1).transpose(), 0);
     puwbpf.Initial(Eigen::VectorXd(Eigen::Vector4d(urx[0],ury[0],0.0,0.0)));
@@ -349,7 +349,7 @@ int main(int argc, char *argv[]) {
     double puwb_time_use = TimeStamp::now() - puwb_start_time;
 
 
-    std::cout <<"Uwb time :" << UwbData(UwbData.rows()-1,0)-UwbData(0,0) << std::endl;
+//    std::cout <<"Uwb time :" << UwbData(UwbData.rows()-1,0)-UwbData(0,0) << std::endl;
 
     /**
      * Fusing....
@@ -448,9 +448,9 @@ int main(int argc, char *argv[]) {
     }
     double fus_use_time = TimeStamp::now() - fusing_start_time;
 
-    std::cout << "fusing used time:  " << TimeStamp::now() - fusing_start_time
-              << "  data total time :" << UwbData(UwbData.rows() - 1, 0) - UwbData(0, 0)
-              << std::endl;
+//    std::cout << "fusing used time:  " << TimeStamp::now() - fusing_start_time
+//              << "  data total time :" << UwbData(UwbData.rows() - 1, 0) - UwbData(0, 0)
+//              << std::endl;
 
     /**
      * Show result.
@@ -536,8 +536,8 @@ int main(int argc, char *argv[]) {
         double fus_tmp(std::sqrt((urx[i] - fx[i]) * (urx[i] - fx[i]) + (ury[i] - fy[i]) * (ury[i] - fy[i])));
 
         double only_tmp(std::sqrt((urx[i] - ux[i]) * (urx[i] - ux[i]) + (ury[i] - uy[i]) * (ury[i] - uy[i])));
-        std::cout << "fus and only :" << fus_tmp << " " << only_tmp << std::endl;
-        std::cout << "urx ury:" << urx[i] << "  " << ury[i] << std::endl;
+//        std::cout << "fus and only :" << fus_tmp << " " << only_tmp << std::endl;
+//        std::cout << "urx ury:" << urx[i] << "  " << ury[i] << std::endl;
         if (fus_tmp > 5.0 || std::isinf(fus_tmp) || std::isnan(fus_tmp)) {
             if (fus_tmp > 100.0 || std::isinf(fus_tmp) || std::isnan(fus_tmp)) {
                 fus_effect_counter--;
@@ -574,9 +574,21 @@ int main(int argc, char *argv[]) {
              "puwb error:" << only_dis <<
              "fus error:" << fus_dis <<
              "dir name :" << out_dir_name << std::endl;
+
     log_file.close();
     std::cout << "argc :" << argc << argv[0] << argv[1] << std::endl;
-
+    std::cout << " time :" << TimeStamp::now()
+              << " only methond:" << only_method <<
+              " only particle num :" << only_particle_num <<
+              " only t sigma :" << only_transpose_sigma <<
+              " only eval sigma :" << only_eval_sigma <<
+              " fus pa num :" << fus_particle_num <<
+              " fus eval si:" << fus_eval_sigma <<
+              "fus trans sigma :" << fus_transpose_sigma <<
+              " data nu :" << data_num <<
+              "puwb error:" << only_dis <<
+              "fus error:" << fus_dis <<
+              "dir name :" << out_dir_name << std::endl;
     plt::grid(true);
 //    plt::show();
 

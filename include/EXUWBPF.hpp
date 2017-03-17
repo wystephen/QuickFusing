@@ -93,8 +93,8 @@ public:
         MYCHECK(ISDEBUG);
         beacon_set_.resizeLike(beaconset);
         beacon_set_ = beaconset;
-        std::cout << "beaconset:" << std::endl;
-        std::cout << beacon_set_ << std::endl;
+//        std::cout << "beaconset:" << std::endl;
+//        std::cout << beacon_set_ << std::endl;
         MYCHECK(ISDEBUG);
         return true;
     }

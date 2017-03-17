@@ -49,8 +49,8 @@ public:
         Eigen::VectorXd a = u.block(0, 0, 3, 1);
 
 
-        std::cout << "a is: " << a.transpose() << std::endl;
-        std::cout << "w v is : " << wv.transpose() << std::endl;
+//        std::cout << "a is: " << a.transpose() << std::endl;
+//        std::cout << "w v is : " << wv.transpose() << std::endl;
 
 
         Eigen::Matrix3d rotation_matrix;

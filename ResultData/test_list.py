@@ -5,7 +5,7 @@ if __name__ == '__main__':
     # for exam_id,particle_num,t_sigma,eval_sigma in ([3,5],[1,2,3,4],[0.1,0.3,0.5],[0.1,0.5,10]):
     #     print(exam_id,particle_num,t_sigma,eval_sigma)
     for exam_id in [5, 3]:
-        for particle_num in [100, 500, 1000, 2000, 2500, 3000, 5000, 8000, 10000, 15000, 20000, 30000, 40000, 50000,
+        for particle_num in [20, 100, 500, 1000, 2000, 2500, 3000, 5000, 8000, 10000, 15000, 20000, 30000, 40000, 50000,
                              60000]:
             for t_sigma in [0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 10.0]:
                 for eval_sigma in [1.0, 2.0, 3.0, 4.0, 5.0, 10.0]:

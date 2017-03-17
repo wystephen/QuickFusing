@@ -17,6 +17,8 @@ if __name__ == '__main__':
         if 'UwbData.data.csv' in name:
             print(int(name[0]))
             id_name = int(name[0])
+            if not id_name==5:
+                continue
             beacon_set = dir_name+'{0}beaconset.data'.format(id_name)
             real_pose = dir_name +'{0}UwbRealPose.data.csv'.format(id_name)
             uwb_data = dir_name +'{0}UwbData.data'.format(id_name)
@@ -45,11 +47,11 @@ if __name__ == '__main__':
 
     # reshape and sort
 
-    uwb_range = uwb_range.reshape(-1)
-    real_range = real_range.reshape(-1)
-    sort_list = np.argsort(real_range)
-    real_range  = real_range[sort_list]
-    uwb_range = uwb_range[sort_list]
+    # uwb_range = uwb_range.reshape(-1)
+    # real_range = real_range.reshape(-1)
+    # sort_list = np.argsort(real_range)
+    # real_range  = real_range[sort_list]
+    # uwb_range = uwb_range[sort_list]
 
     print(uwb_range.shape,real_range.shape)
     np.savetxt(dir_name+"real_range",real_range)

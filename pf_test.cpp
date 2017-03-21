@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 
     std::string out_dir_name = "./";
     std::string dir_name = "/home/steve/locate/";
-    dir_name = dir_name + std::to_string(data_num);
+
     /**
      * Parameters:
      * ## pf only uwb
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
+    dir_name = dir_name + std::to_string(data_num);
 
     std::cout.precision(20); //
 

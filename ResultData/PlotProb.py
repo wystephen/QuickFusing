@@ -12,8 +12,8 @@ def NormalPdf(x,miu,sigma):
     return para1 * np.exp(para2)
 
 def EvaluationFunction(pose,uwb_data,beaconset,sigma,z_offset,save_file_name):
-    the_range = 3*sigma
-    r_k = 10.0
+    the_range = 40*sigma
+    r_k = 15.0
     plot_pose = [the_range*r_k,the_range*r_k]
 
 
@@ -26,9 +26,10 @@ def EvaluationFunction(pose,uwb_data,beaconset,sigma,z_offset,save_file_name):
 
             score = 1.0
             for k in range(beaconset.shape[0]):
+                # print("k:",k)
                 dist = np.linalg.norm([tx,ty,z_offset]-beaconset[k,:])
-                score *= (NormalPdf(uwb_data[k],dist,sigma)+1e-5)
-            out_matrix[i,j] = score
+                score *= (NormalPdf(dist,uwb_data[k],sigma)+1e-5)
+            out_matrix[i,j] = np.log(score)
 
     plt.figure(2)
     plt.contourf(out_matrix)
@@ -62,7 +63,7 @@ if __name__ == '__main__':
         EvaluationFunction(real_pose[i,:2],
                            uwbdata[i,:],
                            beaconset,
-                           2.0,
+                           0.5,
                            z_offset,
                            save_dir+"/{0}.jpg".format(i))
 

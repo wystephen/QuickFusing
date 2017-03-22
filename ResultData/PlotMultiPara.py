@@ -40,9 +40,10 @@ if __name__ == '__main__':
                 plt.clf()
                 plt.grid(True)
 
+                # select_list = select_list[0:11]
                 plt.plot(all_result[select_list, 0], all_result[select_list, 4], 'r.-', label='fuse err')
-                # plt.plot(all_result[select_list,0],all_result[select_list,4]+all_result[select_list,5],'r-.')
-                # plt.plot(all_result[select_list,0],all_result[select_list,4]-all_result[select_list,5],'r-.')
+                plt.plot(all_result[select_list, 0], all_result[select_list, 4] + all_result[select_list, 5], 'r-.')
+                plt.plot(all_result[select_list, 0], all_result[select_list, 4] - all_result[select_list, 5], 'r-.')
 
                 # plt.plot(all_result[select_list,0],all_result[select_list,5],'r',label = 'fus std')
                 plt.plot(all_result[select_list, 0], all_result[select_list, 3], 'b-', label='uwb err')
@@ -55,7 +56,7 @@ if __name__ == '__main__':
                 plt.plot(all_result[select_list, 0], all_result[select_list, 7], 'r.-', label='fuse time')
                 plt.plot(all_result[select_list, 0], all_result[select_list, 7] + all_result[select_list, 8], 'r-.')
                 plt.plot(all_result[select_list, 0], all_result[select_list, 7] - all_result[select_list, 8], 'r-.')
-                # plt.plot(all_result[select_list,0],all_result[select_list,8],'b-.',label='fuse time std')
+                plt.plot(all_result[select_list, 0], all_result[select_list, 8], 'b-.', label='fuse time std')
                 plt.legend()
 
                 plt.savefig("{0}-{1}-2.jpg".format(t_t, t_e))

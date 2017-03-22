@@ -133,6 +133,9 @@ int main(int argc, char *argv[]) {
     }
 
     dir_name = dir_name + std::to_string(data_num);
+    if (argc != 10) {
+        out_dir_name = dir_name;
+    }
 
     std::cout.precision(20); //
 
@@ -229,6 +232,7 @@ int main(int argc, char *argv[]) {
     /**
      * MyEkf
      */
+    double imu_start_time(TimeStamp::now());
 
     std::vector<double> mx, my;
 
@@ -270,7 +274,7 @@ int main(int argc, char *argv[]) {
         mx.push_back(double(vec(0)));
         my.push_back(double(vec(1)));
     }
-
+    std::cout << "IMU waste time :" << TimeStamp::now() - imu_start_time << std::endl;
 //    std::cout << " zupt sum : " << Zupt.sum() << " size : " << Zupt.size()
 //              << std::endl;
 
@@ -349,7 +353,7 @@ int main(int argc, char *argv[]) {
     double puwb_time_use = TimeStamp::now() - puwb_start_time;
 
 
-//    std::cout <<"Uwb time :" << UwbData(UwbData.rows()-1,0)-UwbData(0,0) << std::endl;
+    std::cout << "Uwb time :" << puwb_time_use << std::endl;
 
     /**
      * Fusing....
@@ -448,9 +452,9 @@ int main(int argc, char *argv[]) {
     }
     double fus_use_time = TimeStamp::now() - fusing_start_time;
 
-//    std::cout << "fusing used time:  " << TimeStamp::now() - fusing_start_time
-//              << "  data total time :" << UwbData(UwbData.rows() - 1, 0) - UwbData(0, 0)
-//              << std::endl;
+    std::cout << "fusing used time:  " << TimeStamp::now() - fusing_start_time
+              << "  data total time :" << UwbData(UwbData.rows() - 1, 0) - UwbData(0, 0)
+              << std::endl;
 
     /**
      * Show result.

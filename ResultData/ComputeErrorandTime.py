@@ -27,7 +27,7 @@ if __name__ == '__main__':
                 for file_name in os.listdir(dir_name + d1 + '/' + para + '/'):
 
                     if 'txt' in file_name:
-                        # print(file_name)
+                        print(file_name)
                         if int(file_name.split('-')[0]) > max_index:
                             max_index = int(file_name.split('-')[0])
                     if 'uwb.txt' in file_name:
@@ -50,6 +50,7 @@ if __name__ == '__main__':
                         if 'fus.txt' in file_name:
 
                             tmp_uwb = np.loadtxt(this_dir + file_name)
+
                             # plt.plot(tmp_uwb[:, 0], tmp_uwb[:, 1])
                             # plt.show()
                             fus_err[index - 1, :] = np.sum((tmp_uwb - uwb_real_pose[:, 0:2]) ** 2.0, 1) ** 0.5

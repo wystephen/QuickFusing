@@ -48,7 +48,6 @@ if __name__ == '__main__':
                         index = int(file_name.split('-')[0])
                         # print('index :',index-1)
                         if 'fus.txt' in file_name:
-
                             tmp_uwb = np.loadtxt(this_dir + file_name)
 
                             # plt.plot(tmp_uwb[:, 0], tmp_uwb[:, 1])

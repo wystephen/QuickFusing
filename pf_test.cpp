@@ -121,8 +121,8 @@ int main(int argc, char *argv[]) {
         only_eval_sigma = atof(argv[4]);
 
         fus_particle_num = atoi(argv[5]);
-         fus_transpose_sigma = atof(argv[6]);
-         fus_eval_sigma = atof(argv[7]);
+        fus_transpose_sigma = atof(argv[6]);
+        fus_eval_sigma = atof(argv[7]);
 
         data_num = atoi(argv[8]);
         if (argc == 10) {
@@ -149,23 +149,21 @@ int main(int argc, char *argv[]) {
 
 
     // Load real pose
-    CSVReader ImuRealPose(dir_name+"ImuRealPose.data.csv"),
-        UwbRealPose(dir_name+"ImuRealPose.data.csv");
+    CSVReader ImuRealPose(dir_name + "ImuRealPose.data.csv"),
+            UwbRealPose(dir_name + "ImuRealPose.data.csv");
 
-    std::vector<double> irx,iry,urx,ury;
+    std::vector<double> irx, iry, urx, ury;
     auto ImuRP(ImuRealPose.GetMatrix());
     auto UwbRP(UwbRealPose.GetMatrix());
 
-    for(int i(0);i<ImuRP.GetRows();++i)
-    {
-        std::cout << *(ImuRP(i,0)) << ":" << *ImuRP(i,1) << std::endl;
-        irx.push_back(*(ImuRP(i,0)));
-        iry.push_back(*(ImuRP(i,1)));
+    for (int i(0); i < ImuRP.GetRows(); ++i) {
+        std::cout << *(ImuRP(i, 0)) << ":" << *ImuRP(i, 1) << std::endl;
+        irx.push_back(*(ImuRP(i, 0)));
+        iry.push_back(*(ImuRP(i, 1)));
     }
-    for(int i(0);i<UwbRP.GetRows();++i)
-    {
-        urx.push_back(*(UwbRP(i,0)));
-        ury.push_back(*(UwbRP(i,1)));
+    for (int i(0); i < UwbRP.GetRows(); ++i) {
+        urx.push_back(*(UwbRP(i, 0)));
+        ury.push_back(*(UwbRP(i, 1)));
     }
 
 
@@ -238,9 +236,9 @@ int main(int argc, char *argv[]) {
 
     SettingPara init_para(true);
 
-    init_para.init_pos1_ = Eigen::Vector3d(irx[0],iry[0], 0.0);
+    init_para.init_pos1_ = Eigen::Vector3d(irx[0], iry[0], 0.0);
 //    init_para.init_heading1_ = 0.0 + 20 / 180.0 * M_PI;
-    init_para.init_heading1_ = M_PI/2.0;
+    init_para.init_heading1_ = M_PI / 2.0;
 
     init_para.Ts_ = 1.0 / 128.0;
 
@@ -309,7 +307,7 @@ int main(int argc, char *argv[]) {
     //Fusing result.
     std::vector<double> fx, fy;
     std::vector<double> ux, uy;
-    std::vector<double> sfx,sfy;
+    std::vector<double> sfx, sfy;
 
     std::cout << TimeStamp::now() - first_t << std::endl;
 
@@ -328,7 +326,7 @@ int main(int argc, char *argv[]) {
 //    std::cout << "result:" << puwbpf.GetResult(0) << std::endl;
 
 //    puwbpf.OptimateInitial(UwbData.block(10, 1, 1, UwbData.cols() - 1).transpose(), 0);
-    puwbpf.Initial(Eigen::VectorXd(Eigen::Vector4d(urx[0],ury[0],0.0,0.0)));
+    puwbpf.Initial(Eigen::VectorXd(Eigen::Vector4d(urx[0], ury[0], 0.0, 0.0)));
 
 
     double puwb_start_time(TimeStamp::now());
@@ -358,7 +356,7 @@ int main(int argc, char *argv[]) {
     /**
      * Fusing....
      */
-    double fusing_start_time=(TimeStamp::now());
+    double fusing_start_time = (TimeStamp::now());
 //    std::cout << " fusing start time :"<< fusing_start_time << std::endl;
     int uwb_index(0), imu_index(0);
 
@@ -371,11 +369,10 @@ int main(int argc, char *argv[]) {
 //    std::cout << "herererererere" << std::endl;
 //    std::cout <<  UwbData.block(10,1,1,UwbData.cols()-1) << std::endl;
 //    muwbpf.OptimateInitial(UwbData.block(10, 1, 1, UwbData.cols() - 1).transpose(), 0);
-    muwbpf.Initial(Eigen::VectorXd(Eigen::Vector4d(urx[0],ury[0],0.0,0.0)));
+    muwbpf.Initial(Eigen::VectorXd(Eigen::Vector4d(urx[0], ury[0], 0.0, 0.0)));
 
     MyEkf mixekf(init_para);
     mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
-
 
 
     while (true) {
@@ -403,23 +400,23 @@ int main(int argc, char *argv[]) {
                 delta_ori += (2.0 * M_PI);
             }
 //            std::cout << "delta ori:" << delta_ori << std::endl;
-            if(isnan(delta_ori))
-            {
+            if (isnan(delta_ori)) {
                 delta_ori = 0.0;
             }
 
 
-            if(uwb_index == 0){
-            muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity() - last_v),
-                                                    delta_ori//(mixekf.getOriente()-last_ori )/ 180.0 * M_PI
-                                    ),
-                                    2);
+            if (uwb_index == 0) {
+                muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity() - last_v),
+                                                        delta_ori//(mixekf.getOriente()-last_ori )/ 180.0 * M_PI
+                                        ),
+                                        2);
 
-            }else{
-                muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity() - last_v),//*(UwbData(uwb_index,0)-UwbData(uwb_index-1,0)),
-                                                    delta_ori
-                                    ),
-                                    2);
+            } else {
+                muwbpf.StateTransmition(Eigen::Vector2d(
+                        (mixekf.getVelocity() - last_v),//*(UwbData(uwb_index,0)-UwbData(uwb_index-1,0)),
+                        delta_ori
+                                        ),
+                                        2);
 
             }
 
@@ -459,13 +456,13 @@ int main(int argc, char *argv[]) {
     /**
      * Show result.
      */
-     plt::title(dir_name);
+    plt::title(dir_name);
     plt::named_plot("uwb_only", ux, uy, "r-+");
     plt::named_plot("i", ix, iy, "b-+");
     plt::named_plot("mix_ekf", mx, my, "y-+");
     plt::named_plot("fusing", fx, fy, "g-+");
 
-    plt::named_plot("Real pose",urx,ury,"m-");
+    plt::named_plot("Real pose", urx, ury, "m-");
 
 //    std::cout << urx.size() << ";;;;;;;;;" << irx.size() << std::endl;
 //    plt::named_plot("uwb_only_python", spx, spy, "r-+");
@@ -482,13 +479,12 @@ int main(int argc, char *argv[]) {
     /*
      * Plot beaconsets
      */
-    std::vector<double> beacon_x,beacon_y;
-    for(int i(0);i<beaconset.rows();++i)
-    {
-        beacon_x.push_back(beaconset(i,0));
-        beacon_y.push_back(beaconset(i,1));
+    std::vector<double> beacon_x, beacon_y;
+    for (int i(0); i < beaconset.rows(); ++i) {
+        beacon_x.push_back(beaconset(i, 0));
+        beacon_y.push_back(beaconset(i, 1));
     }
-    plt::named_plot("beaconset",beacon_x,beacon_y,"D");
+    plt::named_plot("beaconset", beacon_x, beacon_y, "D");
 
     /**
      * Output result.
@@ -502,14 +498,12 @@ int main(int argc, char *argv[]) {
     imuf.precision(10);
     fusf.precision(10);
     // uwb and fusing
-    for(int i(0);i<ux.size();++i)
-    {
+    for (int i(0); i < ux.size(); ++i) {
         pwubf << ux[i] << " " << uy[i] << std::endl;
         fusf << fx[i] << " " << fy[i] << std::endl;
 
     }
-    for(int i(0);i<mx.size();++i)
-    {
+    for (int i(0); i < mx.size(); ++i) {
         imuf << mx[i] << " " << my[i] << std::endl;
     }
     fustimef << fus_use_time << std::endl;
@@ -534,8 +528,8 @@ int main(int argc, char *argv[]) {
 // Compute precision
 
 //    std::vector<double> only_dis_each,fus_dis_each;
-    double only_dis(0.0),fus_dis(0.0);
-    int only_effect_counter(urx.size()),fus_effect_counter(urx.size());
+    double only_dis(0.0), fus_dis(0.0);
+    int only_effect_counter(urx.size()), fus_effect_counter(urx.size());
     for (int i = 0; i < urx.size(); ++i) {
         double fus_tmp(std::sqrt((urx[i] - fx[i]) * (urx[i] - fx[i]) + (ury[i] - fy[i]) * (ury[i] - fy[i])));
 
@@ -557,13 +551,13 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    only_dis = only_dis/double(only_effect_counter);
-    fus_dis =fus_dis/ double(fus_effect_counter);
+    only_dis = only_dis / double(only_effect_counter);
+    fus_dis = fus_dis / double(fus_effect_counter);
 
 //    plt::named_plot("ux1", ux, ux);
-    plt::save(dir_name+std::to_string(TimeStamp::now())+"-"+
-                      std::to_string(only_dis)+"-"
-            +std::to_string(fus_dis)+".eps");
+    plt::save(dir_name + std::to_string(TimeStamp::now()) + "-" +
+              std::to_string(only_dis) + "-"
+              + std::to_string(fus_dis) + ".eps");
     std::ofstream log_file(dir_name + "log.txt", std::ios::app);
     log_file.precision(20);
     log_file << " time :" << TimeStamp::now()

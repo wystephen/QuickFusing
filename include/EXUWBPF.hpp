@@ -316,8 +316,22 @@ public:
                 dis += std::pow(2.14 - beacon_set_(i, 2), 2.0);//TODO: Change this->one.
                 dis = std::sqrt(dis);
                 MYCHECK(ISDEBUG);
+                /**
+                 * General model:
+     f(x) = x+exp(a*x)+b
+Coefficients (with 95% confidence bounds):
+       a =     -0.2945  (-0.3434, -0.2457)
+       b =    -0.04628  (-0.0827, -0.009854)
+
+Goodness of fit:
+  SSE: 1615
+  R-square: 0.9805
+  Adjusted R-square: 0.9805
+  RMSE: 0.595
+                 */
 
                 score *= (this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i)) + 1e-50);
+//                score *= (this->ScalarNormalPdf(dis+std::exp(-0.2945*dis)-0.04628, measurement(i), measurement_sigma_(i)) + 1e-50);
 //                std::cout << score << ";:::" <<
 //                          dis << " :"
 //                          << measurement(i) << ":" << measurement_sigma_(i) << "dddd" << std::endl;

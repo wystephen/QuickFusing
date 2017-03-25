@@ -118,7 +118,7 @@ public:
             std::normal_distribution<double> normal_distribution(0, sigma);
             MYCHECK(ISDEBUG)
 #pragma omp parallel for
-            for (int i=(0); i < this->p_state_.rows(); ++i) {
+            for (int i = (0); i < this->p_state_.rows(); ++i) {
 
                 this->p_state_(i, 4) += normal_distribution(this->e_);
 
@@ -149,7 +149,7 @@ public:
              *
              */
 #pragma omp parallel for
-            for (int i=(0); i < this->p_state_.rows(); ++i) {
+            for (int i = (0); i < this->p_state_.rows(); ++i) {
                 //// w
                 this->p_state_(i, 4) += ori_distribution(this->e_);
 
@@ -171,7 +171,7 @@ public:
             double sigma = input_noise_sigma_.mean();
 
             std::normal_distribution<double> vel_distribution(input(0), sigma);
-            std::normal_distribution<double> ori_distribution(input(1), sigma  / M_PI);
+            std::normal_distribution<double> ori_distribution(input(1), sigma / M_PI);
 
 
             /**
@@ -184,11 +184,22 @@ public:
             for (int i = 0; i < this->p_state_.rows(); ++i) {
                 //// w
                 this->p_state_(i, 4) = ori_distribution(this->e_);
+                if (this->p_state_(i, 4) > M_PI) {
+                    this->p_state_(i, 4) -= (2 * M_PI);
+                } else if (this->p_state_(i, 4) < -M_PI) {
+                    this->p_state_(i, 4) += (2.0 * M_PI);
+                }
 
                 this->p_state_(i, 5) = vel_distribution(this->e_);
 
                 /////theta v
                 this->p_state_(i, 2) += this->p_state_(i, 4);
+
+                if (this->p_state_(i, 2) > M_PI) {
+                    this->p_state_(i, 2) -= (2 * M_PI);
+                } else if (this->p_state_(i, 2) < -M_PI) {
+                    this->p_state_(i, 2) += (2.0 * M_PI);
+                }
 
                 this->p_state_(i, 3) += this->p_state_(i, 5);
 //                this->p_state_(i,2) = ori_distribution(this->e_);
@@ -213,13 +224,12 @@ public:
         } else if (MethodType == 3) {
 
             double sigma = input_noise_sigma_.mean();
-            std::normal_distribution<double> state_distribution(input(0), sigma*0.1);
+            std::normal_distribution<double> state_distribution(input(0), sigma * 0.1);
 #pragma omp parallel for
 
-            for (int i = 0;i<this->p_state_.rows();++i)
-            {
-                this->p_state_(i,0) += state_distribution(this->e_);
-                this->p_state_(i,1) += state_distribution(this->e_);
+            for (int i = 0; i < this->p_state_.rows(); ++i) {
+                this->p_state_(i, 0) += state_distribution(this->e_);
+                this->p_state_(i, 1) += state_distribution(this->e_);
             }
 
 
@@ -267,7 +277,7 @@ public:
         MYCHECK(ISDEBUG);
         if (MethodType == 0) {
 #pragma omp parallel for
-            for (int i=(0); i < this->p_state_.rows(); ++i) {
+            for (int i = (0); i < this->p_state_.rows(); ++i) {
 //                std::cout << "endl:" << std::endl;
 //                std::cout << p_state_.block(i, 0, 1, p_state_.cols())<< " here   " << std::endl;
 //                std::cout << measurement << "here 2 " << std::endl;

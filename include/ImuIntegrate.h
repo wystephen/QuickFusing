@@ -61,14 +61,12 @@ public:
         }
 
 
-
         Eigen::Vector4d q = dcm2q(rotation_matrix);
 
         Eigen::Vector3d w_tb(wv);
         double dt = t;
-        double v (w_tb.norm() * dt);
-        if(std::fabs(v) > 1e-8)
-        {
+        double v(w_tb.norm() * dt);
+        if (std::fabs(v) > 1e-8) {
             double P(w_tb(0) * dt * 0.5);
             double Q(w_tb(1) * dt * 0.5);
             double R(w_tb(2) * dt * 0.5);
@@ -93,14 +91,13 @@ public:
             OMEGA(3, 1) = -Q;
             OMEGA(3, 2) = -R;
 
-            q = (std::cos(v/2.0) * Eigen::Matrix4d::Identity() +
-                2.0 / v * sin( v/ 2.0 ) * OMEGA) * q;
+            q = (std::cos(v / 2.0) * Eigen::Matrix4d::Identity() +
+                 2.0 / v * sin(v / 2.0) * OMEGA) * q;
 
             q /= q.norm();
         }
 
         rotation_matrix = q2dcm(q);
-
 
 
         for (int i(0); i < 3; ++i) {

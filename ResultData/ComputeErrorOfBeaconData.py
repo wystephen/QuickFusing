@@ -20,7 +20,7 @@ if __name__ == '__main__':
             if not id_name==5:
                 continue
             beacon_set = dir_name+'{0}beaconset.data'.format(id_name)
-            real_pose = dir_name +'{0}UwbRealPose.data.csv'.format(id_name)
+            real_pose = dir_name + '{0}RealPose.csv'.format(id_name)
             uwb_data = dir_name +'{0}UwbData.data'.format(id_name)
 
             beacon_set = np.loadtxt(beacon_set)
@@ -54,8 +54,8 @@ if __name__ == '__main__':
     # uwb_range = uwb_range[sort_list]
 
     print(uwb_range.shape,real_range.shape)
-    np.savetxt(dir_name+"real_range",real_range)
-    np.savetxt(dir_name+"uwb_range",uwb_range)
+    np.savetxt(dir_name + "real_range.txt", real_range)
+    np.savetxt(dir_name + "uwb_range.txt", uwb_range)
 
     plt.figure(0)
     plt.plot(uwb_range[:],'r',label='UwbRange')

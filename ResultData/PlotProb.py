@@ -12,8 +12,8 @@ def NormalPdf(x,miu,sigma):
     return para1 * np.exp(para2)
 
 def EvaluationFunction(pose,uwb_data,beaconset,sigma,z_offset,save_file_name):
-    the_range = 40*sigma
-    r_k = 15.0
+    the_range = 20 * sigma
+    r_k = 5.0
     plot_pose = [the_range*r_k,the_range*r_k]
 
 
@@ -35,6 +35,14 @@ def EvaluationFunction(pose,uwb_data,beaconset,sigma,z_offset,save_file_name):
     plt.contourf(out_matrix)
     plt.plot(plot_pose[0],plot_pose[1],'Dr')
     # plt.xlim(-)
+    # plt.xticks([-20*sigma,20*sigma],[r'%f',r'%f'])
+    # plt.xticks([])
+    show_offset = out_matrix.shape[0] / 4
+    sigma = sigma
+    plt.xticks([0, show_offset, show_offset * 2, show_offset * 3, show_offset * 4],
+               [str(-sigma * 20), str(-sigma * 10.0), 0.0, str(sigma * 10.0), str(sigma * 20.0)])
+    plt.yticks([0, show_offset, show_offset * 2, show_offset * 3, show_offset * 4],
+               [str(-sigma * 20), str(-sigma * 10.0), 0.0, str(sigma * 10.0), str(sigma * 20.0)])
     plt.savefig(save_file_name)
     # plt.show()
     # plt.plot()
@@ -53,12 +61,15 @@ if __name__ == '__main__':
     save_dir = '/home/steve/locate/SaveProb'
     # if not os.listdir(save_dir):
     #     print("error")
-    os.mkdir(save_dir)
+    # if(os.ch)
+    # os.mkdir(save_dir)
 
     print(real_pose.shape,uwbdata.shape)
 
     # plot_index = 227
     # m = EvaluationFunction(real_pose[plot_index,:],uwbdata[plot_index,:],beaconset,2.0,z_offset)
+    print(beaconset.shape)
+    print(beaconset)
     for i in range(uwbdata.shape[0]):
         EvaluationFunction(real_pose[i,:2],
                            uwbdata[i,:],

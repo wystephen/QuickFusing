@@ -331,6 +331,7 @@ Goodness of fit:
                  */
 
                 score *= (this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i)) + 1e-50);
+                
 //                score *= (this->ScalarNormalPdf(dis+std::exp(-0.2945*dis)-0.04628, measurement(i), measurement_sigma_(i)) + 1e-50);
 //                std::cout << score << ";:::" <<
 //                          dis << " :"

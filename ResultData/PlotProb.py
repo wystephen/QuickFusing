@@ -32,13 +32,15 @@ def EvaluationFunction(pose,uwb_data,beaconset,sigma,z_offset,save_file_name):
             out_matrix[i,j] = np.log(score)
 
     plt.figure(2)
-    plt.contourf(out_matrix)
+    plt.contourf(out_matrix.transpose())
     plt.plot(plot_pose[0],plot_pose[1],'Dr')
     # plt.xlim(-)
     # plt.xticks([-20*sigma,20*sigma],[r'%f',r'%f'])
     # plt.xticks([])
+    plt.xlabel('X/m')
+    plt.ylabel('Y/m')
     show_offset = out_matrix.shape[0] / 4
-    sigma = sigma
+    sigma = sigma / 4.0
     plt.xticks([0, show_offset, show_offset * 2, show_offset * 3, show_offset * 4],
                [str(-sigma * 20), str(-sigma * 10.0), 0.0, str(sigma * 10.0), str(sigma * 20.0)])
     plt.yticks([0, show_offset, show_offset * 2, show_offset * 3, show_offset * 4],

@@ -435,18 +435,21 @@ int main(int argc, char *argv[]) {
 
 
     /// 4. plot result
-
+    std::ofstream out_result("./ResultData/test.txt");
     std::vector<double> gx,gy;
     for(int vid(0);vid<trace_id;++vid)
     {
         double data[10] = {0};
         globalOptimizer.vertex(vid)->getEstimateData(data);
-        gx.push_back(data[2]);
+        gx.push_back(data[0]);
         gy.push_back(data[1]);
+        out_result << data[0] << " " << data[1] << std::endl;
     }
+    out_result.close();
 
 
-    std::ofstream out_result("")
+
+
 
     plt::plot(gx,gy,"r-+");
 

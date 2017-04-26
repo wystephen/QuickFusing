@@ -526,7 +526,7 @@ int main(int argc, char *argv[]) {
 
     /// 3. Solve the problem
     globalOptimizer.initializeOptimization();
-    globalOptimizer.setVerbose(true);
+//    globalOptimizer.setVerbose(true);
     globalOptimizer.optimize(max_optimize_times);
 
 
@@ -569,7 +569,26 @@ int main(int argc, char *argv[]) {
     plt::plot(irx,iry,"b-");
     plt::grid(true);
 
-    plt::show();
+
+    std::ofstream out_para_res("./ResultData/para_err.txt",std::ios::app);
+
+    out_para_res.precision(10);
+
+    out_para_res << "first_info:"<<first_info
+                 << "second_info:"<<second_info
+                 << "distance_info:"<<distance_info
+                 <<"distance_sigma:"<<distance_sigma
+                 <<"z_offset:"<<z_offset
+                 <<"turn_threshold:"<<turn_threshold
+                 <<"corner_ratio:"<<corner_ratio
+                 <<"max_iterate:"<<max_optimize_times
+                 <<"time_offset:"<<time_offset
+                                 <<std::endl;
+
+
+//    plt::title("")
+//
+//    plt::show();
 
 
 

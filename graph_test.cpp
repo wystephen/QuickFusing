@@ -40,23 +40,23 @@
 #include "g2o/core/robust_kernel_factory.h"
 
 
-#include "g2o/types/slam3d_addons/vertex_line3d.h"
-#include "g2o/types/slam3d_addons/edge_se3_line.h"
+//#include "g2o/types/slam3d_addons/vertex_line3d.h"
+//#include "g2o/types/slam3d_addons/edge_se3_line.h"
 
-#include "OwnEdge/ZoEdge.h"
-#include "OwnEdge/ZoEdge.cpp"
+//#include "OwnEdge/ZoEdge.h"
+//#include "OwnEdge/ZoEdge.cpp"
 #include "OwnEdge/DistanceEdge.h"
 #include "OwnEdge/DistanceEdge.cpp"
 
-#include "OwnEdge/Line2D.h"
-#include "OwnEdge/Line2D.cpp"
-#include "OwnEdge/Point2Line2D.h"
-#include "OwnEdge/Point2Line2D.cpp"
+//#include "OwnEdge/Line2D.h"
+//#include "OwnEdge/Line2D.cpp"
+//#include "OwnEdge/Point2Line2D.h"
+//#include "OwnEdge/Point2Line2D.cpp"
 
-#include "OwnEdge/DistanceSE3Line3D.h"
-#include "OwnEdge/DistanceSE3Line3D.cpp"
+//#include "OwnEdge/DistanceSE3Line3D.h"
+//#include "OwnEdge/DistanceSE3Line3D.cpp"
 //#include "g2o_types_slam3d_addons_api.h"
-#include "g2o/types/slam3d_addons/line3d.h"
+//#include "g2o/types/slam3d_addons/line3d.h"
 G2O_USE_TYPE_GROUP(slam3d)
 
 
@@ -92,8 +92,12 @@ int main(int argc, char *argv[]) {
 
     int max_optimize_times = 4000;
 
+    double time_offset = 0.0;
 
-    if(argc == 9)
+
+
+
+    if(argc == 10)
     {
         std::cout << "set para meter s" << std::endl;
         first_info = std::stod(argv[1]);
@@ -109,7 +113,7 @@ int main(int argc, char *argv[]) {
 
         max_optimize_times = std::stoi(argv[8]);
 
-
+        time_offset = std::stod(argv[9]);
     }
 
 
@@ -323,6 +327,12 @@ int main(int argc, char *argv[]) {
      */
 
 
+    ///////// try to add time offset to uwb data
+    for(int i(0);i<UwbData.rows();++i)
+    {
+        UwbData(i,0) += time_offset;
+    }
+
     /// 0. prepare some class
     double graph_start_time(TimeStamp::now());
     int uwb_index(0);
@@ -420,6 +430,10 @@ int main(int argc, char *argv[]) {
                 }
 
                 latest_theta = the_theta;
+
+
+                std::cout << trace_id << " "<<delta_ori  <<"   "<<is_corner
+                          <<is_corner<<is_corner<<is_corner <<std::endl;
 
 
                 ///add transform edge
@@ -524,9 +538,6 @@ int main(int argc, char *argv[]) {
         out_result << data[0] << " " << data[1] <<" "<< data[2]<< std::endl;
     }
     out_result.close();
-
-
-
 
 
 

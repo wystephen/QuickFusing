@@ -22,6 +22,17 @@ find_package(OpenMP)
 find_package(BLAS)
 find_package(LAPACK)
 
+
+LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
+
+# G2O
+SET(G2O_ROOT /usr/local/include/g2o)
+FIND_PACKAGE(G2O)
+FIND_PACKAGE(CSparse)
+
+
+
+
 if(OPENMP_FOUND)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
@@ -47,6 +58,16 @@ link_directories(
         ${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
 )
+
+
+SET(G2O_LIBS g2o_cli g2o_ext_freeglut_minimal g2o_simulator
+        g2o_solver_slam2d_linear g2o_types_icp g2o_types_slam2d
+        g2o_core g2o_interface g2o_solver_csparse g2o_solver_structure_only
+        g2o_types_sba g2o_types_slam3d g2o_csparse_extension g2o_opengl_helper
+        g2o_solver_dense g2o_stuff g2o_types_sclam2d g2o_parser g2o_solver_pcg
+        g2o_types_data g2o_types_sim3 cxsparse
+        g2o_types_slam3d_addons)
+
 
 #FILE(GLOB SOURCES "*.cu" "*.cpp" "*.c" "*.h")
 
@@ -76,6 +97,10 @@ target_link_libraries(SophusTest ${Sophus_LIBRARIES})
 
 add_executable(pdr_pf_test pdr_pf_test.cpp)
 target_link_libraries(pdr_pf_test ${PPYTHON_LIBRARIES} ${Sophus_LIBRARIES} ${BLAS_LIBRARIES})
+
+
+add_executable(graph_test graph_test.cpp)
+target_link_libraries(graph_test ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
 
 ###CUDA SETTING
 

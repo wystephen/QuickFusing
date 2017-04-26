@@ -37,6 +37,9 @@
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 
 #include "g2o/core/robust_kernel.h"
+#include "g2o/core/robust_kernel_impl.h"
+
+#include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
 
 
@@ -497,6 +500,7 @@ int main(int argc, char *argv[]) {
 
                         dist_edge->setInformation(information);
                         dist_edge->setSigma(distance_sigma);
+                        dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
 
                         globalOptimizer.addEdge(dist_edge);
                     }

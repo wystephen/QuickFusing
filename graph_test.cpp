@@ -398,8 +398,7 @@ int main(int argc, char *argv[]) {
              */
 
 
-            if(imu_index == 0|| (Zupt(imu_index,0)>0.5 && Zupt(imu_index-1,0) < 0.5))
-            {
+            if (imu_index == 0 || (Zupt(imu_index, 0) > 0.5 && Zupt(imu_index - 1, 0) < 0.5)) {
                 auto the_transform = gekf.getTransformation();
 
                 /// add vertex
@@ -411,7 +410,7 @@ int main(int argc, char *argv[]) {
 
                 /// get delta theta
                 double the_theta(gekf.getOriente());
-                double delta_ori = the_theta-latest_theta;
+                double delta_ori = the_theta - latest_theta;
 
                 if (delta_ori > M_PI) {
                     delta_ori -= (2 * M_PI);
@@ -424,25 +423,23 @@ int main(int argc, char *argv[]) {
 //                gekf.getDeltaOrientation();
                 bool is_corner(false);
 //                if(std::abs(the_theta-))
-                if(std::abs(delta_ori)> turn_threshold)
-                {
+                if (std::abs(delta_ori) > turn_threshold) {
                     is_corner = true;
                 }
 
                 latest_theta = the_theta;
 
 
-                std::cout << trace_id << " "<<delta_ori  <<"   "<<is_corner
-                          <<is_corner<<is_corner<<is_corner <<std::endl;
+                std::cout << trace_id << " " << delta_ori << "   " << is_corner
+                          << is_corner << is_corner << is_corner << std::endl;
 
 
                 ///add transform edge
 
-                if(trace_id > 0)
-                {
+                if (trace_id > 0) {
                     auto *edge_se3 = new g2o::EdgeSE3();
 
-                    edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+                    edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
                     edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
 
                     Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
@@ -451,15 +448,14 @@ int main(int argc, char *argv[]) {
                     information(0, 0) = information(1, 1) = information(2, 2) = first_info;
                     information(3, 3) = information(4, 4) = information(5, 5) = second_info;
 
-                    if(is_corner)
-                    {
-                        information(0, 0) = information(1, 1) = information(2, 2) = first_info/corner_ratio;
-                        information(3, 3) = information(4, 4) = information(5, 5) = second_info/corner_ratio;
+                    if (is_corner) {
+                        information(0, 0) = information(1, 1) = information(2, 2) = first_info / corner_ratio;
+                        information(3, 3) = information(4, 4) = information(5, 5) = second_info / corner_ratio;
                     }
 
                     edge_se3->setInformation(information);
 
-                    edge_se3->setMeasurement(latest_transform.inverse()*the_transform);
+                    edge_se3->setMeasurement(latest_transform.inverse() * the_transform);
 
                     globalOptimizer.addEdge(edge_se3);
 
@@ -469,41 +465,42 @@ int main(int argc, char *argv[]) {
                 /// add range edge
 
                 //  get measurement
+                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 1.0) {
 
-                Eigen::VectorXd uwb_measure;
+                    Eigen::VectorXd uwb_measure;
 
-                uwb_measure.resize(UwbData.cols()-1);
-                uwb_measure.setZero();
+                    uwb_measure.resize(UwbData.cols() - 1);
+                    uwb_measure.setZero();
 
 //                std::cout << "uwb measurement ros and cols :" << uwb_measure.rows() <<  " " << uwb_measure.cols() << std::endl;
 
-                if(uwb_index==0 || uwb_index > UwbData.rows()-3)
-                {
-                    uwb_measure = UwbData.block(uwb_index,1,1,uwb_measure.rows()).transpose();
-                }else{
-                    uwb_measure += UwbData.block(uwb_index,1,1,uwb_measure.rows()).transpose();
-                    uwb_measure += UwbData.block(uwb_index+1,1,1,uwb_measure.rows()).transpose();
+                    if (uwb_index == 0 || uwb_index > UwbData.rows() - 3) {
+                        uwb_measure = UwbData.block(uwb_index, 1, 1, uwb_measure.rows()).transpose();
+                    } else {
+                        uwb_measure += UwbData.block(uwb_index, 1, 1, uwb_measure.rows()).transpose();
+                        uwb_measure += UwbData.block(uwb_index + 1, 1, 1, uwb_measure.rows()).transpose();
 
-                    uwb_measure /= 2.0;
-                }
+                        uwb_measure /= 2.0;
+                    }
 
-                // build and add edge
+                    // build and add edge
 
-                for(int bi(0);bi<uwb_measure.rows();++bi)
-                {
-                   auto *dist_edge = new DistanceEdge();
-                    dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id+bi);
-                    dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+                    for (int bi(0); bi < uwb_measure.rows(); ++bi) {
+                        auto *dist_edge = new DistanceEdge();
+                        dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id + bi);
+                        dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                    dist_edge->setMeasurement(std::sqrt(uwb_measure(bi)*uwb_measure(bi)-z_offset*z_offset));
+                        dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
 
-                    Eigen::Matrix<double,1,1> information;
-                    information(0,0) = distance_info;
+                        Eigen::Matrix<double, 1, 1> information;
+                        information(0, 0) = distance_info;
 
-                    dist_edge->setInformation(information);
-                    dist_edge->setSigma(distance_sigma);
+                        dist_edge->setInformation(information);
+                        dist_edge->setSigma(distance_sigma);
 
-                    globalOptimizer.addEdge(dist_edge);
+                        globalOptimizer.addEdge(dist_edge);
+                    }
+
                 }
 
                 /// updata transform matrix

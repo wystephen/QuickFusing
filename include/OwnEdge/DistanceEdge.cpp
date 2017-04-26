@@ -37,6 +37,10 @@ void DistanceEdge::computeError() {
                            (p1[2] - p2[2]) * (p1[2] - p2[2]));
 //    _error(0, 0) = std::pow(dis - (_measurement), 2.0);//*_information(0,0);
     _error(0,0) = std::log(NormalPdf(dis,_measurement,sigma_));
+    if(_error(0,0)>sigma_*2.0)
+    {
+        _error(0,0) = 0.0;
+    }
 
 }
 

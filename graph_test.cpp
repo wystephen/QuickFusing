@@ -7,15 +7,25 @@
 
 #include "CSVReader.h"
 #include "matplotlib_interface.h"
+#include "time_stamp.h"
 
 #include "SettingPara.h"
+#include "EKF.hpp"
+
+#include "ResultEvaluation.hpp"
 
 /////stamp---------
 
+#include "RangeKF.hpp"
+
 #include "PUWBPF.hpp"
+
+#include "EXUWBPF.hpp"
 
 
 #include "MYEKF.h"
+#include<Eigen/Dense>
+#include <Eigen/Geometry>
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
@@ -26,14 +36,27 @@
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 
+#include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
 
 
+#include "g2o/types/slam3d_addons/vertex_line3d.h"
+#include "g2o/types/slam3d_addons/edge_se3_line.h"
+
+#include "OwnEdge/ZoEdge.h"
+#include "OwnEdge/ZoEdge.cpp"
 #include "OwnEdge/DistanceEdge.h"
+#include "OwnEdge/DistanceEdge.cpp"
 
 #include "OwnEdge/Line2D.h"
+#include "OwnEdge/Line2D.cpp"
+#include "OwnEdge/Point2Line2D.h"
+#include "OwnEdge/Point2Line2D.cpp"
 
+#include "OwnEdge/DistanceSE3Line3D.h"
+#include "OwnEdge/DistanceSE3Line3D.cpp"
 //#include "g2o_types_slam3d_addons_api.h"
+#include "g2o/types/slam3d_addons/line3d.h"
 G2O_USE_TYPE_GROUP(slam3d)
 
 
@@ -75,11 +98,15 @@ int main(int argc, char *argv[]) {
         std::cout << "set para meter s" << std::endl;
         first_info = std::stod(argv[1]);
         second_info=std::stod(argv[2]);
+
         distance_info=std::stod(argv[3]);
         distance_sigma=std::stod(argv[4]);
+
         z_offset = std::stod(argv[5]);
+
         turn_threshold = std::stod(argv[6]);
         corner_ratio = std::stod(argv[7]);
+
         max_optimize_times = std::stoi(argv[8]);
 
 
@@ -329,7 +356,7 @@ int main(int argc, char *argv[]) {
         {
             p[j] = beaconset(i,j);
         }
-        std::cout << " beacon " << i << " : " << p[0]<< " " <<p[1]<< " " << p[2] << std::endl;
+        std::cout << " beacon " << i << " : " << p[0]<< " " <<p[1]<< " "<<p[2] << std::endl;
         v->setEstimateData(p);
         v->setFixed(true);
         v->setId(beacon_id+i);
@@ -504,6 +531,7 @@ int main(int argc, char *argv[]) {
 
 
     plt::plot(gx,gy,"r-+");
+    plt::plot(urx,ury,"b-+");
     plt::grid(true);
 
     plt::show();

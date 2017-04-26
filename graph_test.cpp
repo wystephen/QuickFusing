@@ -329,6 +329,9 @@ int main(int argc, char *argv[]) {
      * Graph optimizer build
      */
 
+    //// for output data
+    std::vector<int> vertex_index;
+
 
     ///////// try to add time offset to uwb data
     for(int i(0);i<UwbData.rows();++i)
@@ -403,6 +406,8 @@ int main(int argc, char *argv[]) {
 
             if (imu_index == 0 || (Zupt(imu_index, 0) > 0.5 && Zupt(imu_index - 1, 0) < 0.5)) {
                 auto the_transform = gekf.getTransformation();
+
+                vertex_index.push_back(imu_index);
 
                 /// add vertex
                 auto *v = new g2o::VertexSE3();
@@ -514,8 +519,6 @@ int main(int argc, char *argv[]) {
                 trace_id ++;
             }
 
-
-
             imu_index++;
         }
     }
@@ -539,6 +542,22 @@ int main(int argc, char *argv[]) {
         out_result << data[0] << " " << data[1] <<" "<< data[2]<< std::endl;
     }
     out_result.close();
+
+    //// 5.compute error
+    std::ofstream out_err("./ResultData/err.txt");
+    std::vector<double> error_vec;
+    out_err.precision(10);
+    for(int i(0);i<vertex_index.size();++i)
+    {
+        int index = vertex_index.at(i);
+
+        error_vec.push_back(std::sqrt(std::pow(gx[i]-irx[index],2.0)+
+        std::pow(gy[i]-iry[index],2.0)));
+        out_err<< error_vec.at(i) << std::endl;
+    }
+
+    std::cout << "average error is :" << double(std::accumulate(error_vec.begin(),
+    error_vec.end(),0))/double(error_vec.size()) << std::endl;
 
 
 

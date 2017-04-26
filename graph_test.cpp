@@ -7,25 +7,15 @@
 
 #include "CSVReader.h"
 #include "matplotlib_interface.h"
-#include "time_stamp.h"
 
 #include "SettingPara.h"
-#include "EKF.hpp"
-
-#include "ResultEvaluation.hpp"
 
 /////stamp---------
 
-#include "RangeKF.hpp"
-
 #include "PUWBPF.hpp"
-
-#include "EXUWBPF.hpp"
 
 
 #include "MYEKF.h"
-#include<Eigen/Dense>
-#include <Eigen/Geometry>
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
@@ -36,27 +26,14 @@
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 
-#include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
 
 
-#include "g2o/types/slam3d_addons/vertex_line3d.h"
-#include "g2o/types/slam3d_addons/edge_se3_line.h"
-
-#include "OwnEdge/ZoEdge.h"
-#include "OwnEdge/ZoEdge.cpp"
 #include "OwnEdge/DistanceEdge.h"
-#include "OwnEdge/DistanceEdge.cpp"
 
 #include "OwnEdge/Line2D.h"
-#include "OwnEdge/Line2D.cpp"
-#include "OwnEdge/Point2Line2D.h"
-#include "OwnEdge/Point2Line2D.cpp"
 
-#include "OwnEdge/DistanceSE3Line3D.h"
-#include "OwnEdge/DistanceSE3Line3D.cpp"
 //#include "g2o_types_slam3d_addons_api.h"
-#include "g2o/types/slam3d_addons/line3d.h"
 G2O_USE_TYPE_GROUP(slam3d)
 
 
@@ -352,6 +329,7 @@ int main(int argc, char *argv[]) {
         {
             p[j] = beaconset(i,j);
         }
+        std::cout << " beacon " << i << " : " << p[0]<< " " <<p[1]<< " " << p[2] << std::endl;
         v->setEstimateData(p);
         v->setFixed(true);
         v->setId(beacon_id+i);

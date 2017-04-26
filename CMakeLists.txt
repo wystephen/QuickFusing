@@ -79,37 +79,26 @@ SET(G2O_LIBS g2o_cli g2o_ext_freeglut_minimal g2o_simulator
 
 #FILE(GLOB SOURCES "*.cu" "*.cpp" "*.c" "*.h")
 
-set(SOURCE_FILES main.cpp include/EKF.hpp)
-add_executable(QuickFusing ${SOURCE_FILES} )
+#set(SOURCE_FILES main.cpp include/EKF.hpp)
+#add_executable(QuickFusing ${SOURCE_FILES} )
+#target_link_libraries(QuickFusing ${PYTHON_LIBRARIES})
 
-target_link_libraries(QuickFusing ${PYTHON_LIBRARIES})
-
-
+add_executable(gt graph_test.cpp)
+target_link_libraries(gt ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
 # For test
 
 add_executable(fun_test func_test.cpp)
 target_link_libraries(fun_test ${PYTHON_LIBRARIES})
 
-
-add_executable(resultevaluation ResultEvaluation.cpp)
-target_link_libraries(resultevaluation ${PYTHON_LIBRARIES})
-
+#
+#add_executable(resultevaluation ResultEvaluation.cpp)
+#target_link_libraries(resultevaluation ${PYTHON_LIBRARIES})
 
 add_executable(pf_test pf_test.cpp)
-#target_link_libraries(pf_test ${PYTHON_LIBRARIES})
 target_link_libraries(pf_test ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
-#
 #
 add_executable(SophusTest SophusTest.cpp)
 target_link_libraries(SophusTest ${Sophus_LIBRARIES})
 
 add_executable(pdr_pf_test pdr_pf_test.cpp)
 target_link_libraries(pdr_pf_test ${PPYTHON_LIBRARIES} ${Sophus_LIBRARIES} ${BLAS_LIBRARIES})
-
-
-add_executable(graph_test graph_test.cpp)
-target_link_libraries(graph_test ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
-
-###CUDA SETTING
-
-#cuda_add_executable(cuda_test cuda_test.cu)

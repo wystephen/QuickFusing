@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
      */
 
     int trace_id(0);
-    int beacon_id(0);
+    int beacon_id(100000);
 
 
 
@@ -385,24 +385,35 @@ int main(int argc, char *argv[]) {
                 uwb_measure.resize(UwbData.cols()-1);
                 uwb_measure.setZero();
 
-                std::cout << "uwb measurement ros and cols :" << uwb_measure.rows() <<  " " << uwb_measure.cols() << std::endl;
+//                std::cout << "uwb measurement ros and cols :" << uwb_measure.rows() <<  " " << uwb_measure.cols() << std::endl;
 
                 if(uwb_index==0 || uwb_index > UwbData.rows()-3)
                 {
-                    uwb_measure = UwbData.block(uwb_index,1,1,uwb_measure.rows());
+                    uwb_measure = UwbData.block(uwb_index,1,1,uwb_measure.rows()).transpose();
                 }else{
-                    uwb_measure += UwbData.block(uwb_index,1,1,uwb_measure.rows());
-                    uwb_measure += UwbData.block(uwb_index+1,1,1,uwb_measure.rows());
+                    uwb_measure += UwbData.block(uwb_index,1,1,uwb_measure.rows()).transpose();
+                    uwb_measure += UwbData.block(uwb_index+1,1,1,uwb_measure.rows()).transpose();
 
                     uwb_measure /= 2.0;
                 }
 
                 // build and add edge
 
-                for(int bi(0);bi<uwb_measure.cols();++bi)
+                for(int bi(0);bi<uwb_measure.rows();++bi)
+                {
+                   auto *dist_edge = new DistanceEdge();
+                    dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id+bi);
+                    dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
+                    dist_edge->setMeasurement(uwb_measure(bi));
 
+                    Eigen::Matrix<double,1,1> information;
+                    information(0,0) = 1.0;
 
+                    dist_edge->setInformation(information);
+
+                    globalOptimizer.addEdge(dist_edge);
+                }
 
                 /// updata transform matrix
                 latest_transform = the_transform;
@@ -419,7 +430,27 @@ int main(int argc, char *argv[]) {
 
 
     /// 3. Solve the problem
+    globalOptimizer.initializeOptimization();
+    globalOptimizer.optimize(1000);
 
+
+    /// 4. plot result
+
+    std::vector<double> gx,gy;
+    for(int vid(0);vid<trace_id;++vid)
+    {
+        double data[10] = {0};
+        globalOptimizer.vertex(vid)->getEstimateData(data);
+        gx.push_back(data[2]);
+        gy.push_back(data[1]);
+    }
+
+
+    std::ofstream out_result("")
+
+    plt::plot(gx,gy,"r-+");
+
+    plt::show();
 
 
 

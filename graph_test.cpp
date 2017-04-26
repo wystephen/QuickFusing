@@ -77,15 +77,18 @@ int main(int argc, char *argv[]) {
 
     /// g2o parameter
 
-    double first_info = 100.0;
-    double second_info = 100.0;
+    double first_info = 1000.0;
+    double second_info = 1000.0;
 
 
-    double distance_info = 10.0;
-    double distance_sigma = 5.0;
+    double distance_info = 100.0;
+    double distance_sigma = 2.0;
 
 
     double z_offset = 1.90-1.12;
+
+    double turn_threshold  = 1.0;
+    double corner_ratio = 10.0;
 
 
     int data_num = 5;
@@ -308,6 +311,8 @@ int main(int argc, char *argv[]) {
 
     Eigen::Isometry3d latest_transform = (Eigen::Isometry3d::Identity());
 
+    double latest_theta = 0.0;
+
 
     /**
      * Spacial preprocess !!!!
@@ -371,6 +376,29 @@ int main(int argc, char *argv[]) {
 
                 globalOptimizer.addVertex(v);
 
+                /// get delta theta
+                double the_theta(gekf.getOriente());
+                double delta_ori = the_theta-latest_theta;
+
+                if (delta_ori > M_PI) {
+                    delta_ori -= (2 * M_PI);
+                } else if (delta_ori < -M_PI) {
+                    delta_ori += (2.0 * M_PI);
+                }
+                if (isnan(delta_ori)) {
+                    delta_ori = 0.0;
+                }
+//                gekf.getDeltaOrientation();
+                bool is_corner(false);
+//                if(std::abs(the_theta-))
+                if(std::abs(delta_ori)> turn_threshold)
+                {
+                    is_corner = true;
+                }
+
+                latest_theta = the_theta;
+
+
                 ///add transform edge
 
                 if(trace_id > 0)
@@ -385,6 +413,12 @@ int main(int argc, char *argv[]) {
 
                     information(0, 0) = information(1, 1) = information(2, 2) = first_info;
                     information(3, 3) = information(4, 4) = information(5, 5) = second_info;
+
+                    if(is_corner)
+                    {
+                     information(0, 0) = information(1, 1) = information(2, 2) = first_info/corner_ratio;
+                    information(3, 3) = information(4, 4) = information(5, 5) = second_info/corner_ratio;
+                    }
 
                     edge_se3->setInformation(information);
 

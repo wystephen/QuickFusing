@@ -443,7 +443,7 @@ int main(int argc, char *argv[]) {
         globalOptimizer.vertex(vid)->getEstimateData(data);
         gx.push_back(data[0]);
         gy.push_back(data[1]);
-        out_result << data[0] << " " << data[1] << std::endl;
+        out_result << data[0] << " " << data[1] <<" "<< data[2]<< std::endl;
     }
     out_result.close();
 
@@ -451,7 +451,9 @@ int main(int argc, char *argv[]) {
 
 
 
+
     plt::plot(gx,gy,"r-+");
+    plt::grid(true);
 
     plt::show();
 

@@ -90,6 +90,24 @@ int main(int argc, char *argv[]) {
     double turn_threshold  = 1.0;
     double corner_ratio = 10.0;
 
+    int max_optimize_times = 4000;
+
+
+    if(argc == 9)
+    {
+        std::cout << "set para meter s" << std::endl;
+        first_info = std::stod(argv[1]);
+        second_info=std::stod(argv[2]);
+        distance_info=std::stod(argv[3]);
+        distance_sigma=std::stod(argv[4]);
+        z_offset = std::stod(argv[5]);
+        turn_threshold = std::stod(argv[6]);
+        corner_ratio = std::stod(argv[7]);
+        max_optimize_times = std::stoi(argv[8]);
+
+
+    }
+
 
     int data_num = 5;
 
@@ -115,23 +133,23 @@ int main(int argc, char *argv[]) {
      *
      * ## dir_name
      */
-    if (argc == 10 || argc == 9) {
-        only_method = atoi(argv[1]);
-        only_particle_num = atoi(argv[2]);
-        only_transpose_sigma = atof(argv[3]);
-        only_eval_sigma = atof(argv[4]);
-
-        fus_particle_num = atoi(argv[5]);
-        fus_transpose_sigma = atof(argv[6]);
-        fus_eval_sigma = atof(argv[7]);
-
-        data_num = atoi(argv[8]);
-        if (argc == 10) {
-            out_dir_name = std::string(argv[9]);
-        } else {
-            out_dir_name = dir_name;
-        }
-    }
+//    if (argc == 10 || argc == 9) {
+//        only_method = atoi(argv[1]);
+//        only_particle_num = atoi(argv[2]);
+//        only_transpose_sigma = atof(argv[3]);
+//        only_eval_sigma = atof(argv[4]);
+//
+//        fus_particle_num = atoi(argv[5]);
+//        fus_transpose_sigma = atof(argv[6]);
+//        fus_eval_sigma = atof(argv[7]);
+//
+//        data_num = atoi(argv[8]);
+//        if (argc == 10) {
+//            out_dir_name = std::string(argv[9]);
+//        } else {
+//            out_dir_name = dir_name;
+//        }
+//    }
 
     dir_name = dir_name + std::to_string(data_num);
     if (argc != 10) {
@@ -184,7 +202,7 @@ int main(int argc, char *argv[]) {
     auto UwbRP(UwbRealPose.GetMatrix());
 
     for (int i(0); i < ImuRP.GetRows(); ++i) {
-        std::cout << *(ImuRP(i, 0)) << ":" << *ImuRP(i, 1) << std::endl;
+//        std::cout << *(ImuRP(i, 0)) << ":" << *ImuRP(i, 1) << std::endl;
         irx.push_back(*(ImuRP(i, 0)));
         iry.push_back(*(ImuRP(i, 1)));
     }
@@ -416,8 +434,8 @@ int main(int argc, char *argv[]) {
 
                     if(is_corner)
                     {
-                     information(0, 0) = information(1, 1) = information(2, 2) = first_info/corner_ratio;
-                    information(3, 3) = information(4, 4) = information(5, 5) = second_info/corner_ratio;
+                        information(0, 0) = information(1, 1) = information(2, 2) = first_info/corner_ratio;
+                        information(3, 3) = information(4, 4) = information(5, 5) = second_info/corner_ratio;
                     }
 
                     edge_se3->setInformation(information);
@@ -486,7 +504,7 @@ int main(int argc, char *argv[]) {
     /// 3. Solve the problem
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(1000);
+    globalOptimizer.optimize(max_optimize_times);
 
 
     /// 4. plot result

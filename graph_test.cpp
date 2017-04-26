@@ -531,7 +531,7 @@ int main(int argc, char *argv[]) {
 
 
     plt::plot(gx,gy,"r-+");
-    plt::plot(urx,ury,"b-+");
+    plt::plot(urx,ury,"b-");
     plt::grid(true);
 
     plt::show();

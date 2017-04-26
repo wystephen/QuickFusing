@@ -547,6 +547,7 @@ int main(int argc, char *argv[]) {
     std::ofstream out_err("./ResultData/err.txt");
     std::vector<double> error_vec;
     out_err.precision(10);
+    double err_sum(0.0);
     for(int i(0);i<vertex_index.size();++i)
     {
         int index = vertex_index.at(i);
@@ -554,10 +555,13 @@ int main(int argc, char *argv[]) {
         error_vec.push_back(std::sqrt(std::pow(gx[i]-irx[index],2.0)+
         std::pow(gy[i]-iry[index],2.0)));
         out_err<< error_vec.at(i) << std::endl;
+        err_sum+=std::sqrt(std::pow(gx[i]-irx[index],2.0)+
+                           std::pow(gy[i]-iry[index],2.0));
     }
+    std::cout << "average error is :" << err_sum/double(error_vec.size()) << std::endl;
 
-    std::cout << "average error is :" << double(std::accumulate(error_vec.begin(),
-    error_vec.end(),0))/double(error_vec.size()) << std::endl;
+//    std::cout << "average error is :" << double(std::accumulate(error_vec.begin(),
+//    error_vec.end(),0))/double(error_vec.size()) << std::endl;
 
 
 

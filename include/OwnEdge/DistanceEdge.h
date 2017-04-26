@@ -64,6 +64,33 @@ public:
                                  g2o::OptimizableGraph::Vertex *to);
 
 
+    double sigma_ = 1.0;
+
+    bool setSigma(double sigma)
+    {
+        if(sigma>0)
+        {
+            sigma_ = sigma;
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+    double getSigma()
+    {
+        return sigma_;
+    }
+
+    inline double NormalPdf(double x,
+                     double miu,
+                     double sigma) {
+//    std::cout << "dis :" << x << " range:" << miu << std::endl;
+        double para1((x - miu) * (x - miu) / 2 / sigma / sigma);
+        double para2(1 / std::sqrt(2 * sigma * sigma * M_PI));
+        return para2 * std::exp(-para1);
+    }
 };
 
 

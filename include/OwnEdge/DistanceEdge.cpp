@@ -35,7 +35,8 @@ void DistanceEdge::computeError() {
     double dis = std::sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) +
                            (p1[1] - p2[1]) * (p1[1] - p2[1]) +
                            (p1[2] - p2[2]) * (p1[2] - p2[2]));
-    _error(0, 0) = std::pow(dis - (_measurement), 2.0);//*_information(0,0);
+//    _error(0, 0) = std::pow(dis - (_measurement), 2.0);//*_information(0,0);
+    _error(0,0) = NormalPdf(dis,_measurement,sigma_);
 }
 
 bool DistanceEdge::setMeasurementFromState() {

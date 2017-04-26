@@ -77,8 +77,15 @@ int main(int argc, char *argv[]) {
 
     /// g2o parameter
 
-    double first_info = 1000.0;
-    double second_info = 1000.0;
+    double first_info = 100.0;
+    double second_info = 100.0;
+
+
+    double distance_info = 10.0;
+    double distance_sigma = 5.0;
+
+
+    double z_offset = 1.90-1.12;
 
 
     int data_num = 5;
@@ -301,6 +308,18 @@ int main(int argc, char *argv[]) {
 
     Eigen::Isometry3d latest_transform = (Eigen::Isometry3d::Identity());
 
+
+    /**
+     * Spacial preprocess !!!!
+     * set z of beaconset to zero
+     */
+    for(int i(0);i<beaconset.rows();++i)
+    {
+        beaconset(i,2) = 0.0;
+    }
+
+
+
     /// 1. add beacon vertex
     for(int i(0);i<beaconset.rows();++i)
     {
@@ -405,12 +424,13 @@ int main(int argc, char *argv[]) {
                     dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id+bi);
                     dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                    dist_edge->setMeasurement(uwb_measure(bi));
+                    dist_edge->setMeasurement(std::sqrt(uwb_measure(bi)*uwb_measure(bi)-z_offset*z_offset));
 
                     Eigen::Matrix<double,1,1> information;
-                    information(0,0) = 1.0;
+                    information(0,0) = distance_info;
 
                     dist_edge->setInformation(information);
+                    dist_edge->setSigma(distance_sigma);
 
                     globalOptimizer.addEdge(dist_edge);
                 }
@@ -431,6 +451,7 @@ int main(int argc, char *argv[]) {
 
     /// 3. Solve the problem
     globalOptimizer.initializeOptimization();
+    globalOptimizer.setVerbose(true);
     globalOptimizer.optimize(1000);
 
 

@@ -635,6 +635,32 @@ public:
 //
 //       return 0.0;
 //    }
+    Eigen::Isometry3d getTransformation()
+    {
+        Eigen::Isometry3d transform = (Eigen::Isometry3d::Identity());
+
+        Eigen::Quaterniond the_quat;
+        the_quat.x() = quat_(0);
+        the_quat.y() = quat_(1);
+        the_quat.z() = quat_(2);
+        the_quat.w() = quat_(3);
+
+        Eigen::Vector3d offset(x_h_(0),x_h_(1),x_h_(2));
+
+        Eigen::Matrix3d rotation_matrix = the_quat.toRotationMatrix();
+
+        for (int ix(0); ix < 3; ++ix) {
+            for (int iy(0); iy < 3; ++iy) {
+                transform(ix, iy) = rotation_matrix(ix, iy);
+            }
+        }
+
+        for (int ix(0); ix < 3; ++ix) {
+            transform(ix, 3) = offset(ix);
+        }
+
+        return transform;
+    }
 
 
 private:

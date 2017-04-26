@@ -15,6 +15,7 @@
 #include <MyError.h>
 #include <time_stamp.h>
 
+#include <vector>
 
 //#include "sophus/so3.h"
 //#include "sophus/se3.h"

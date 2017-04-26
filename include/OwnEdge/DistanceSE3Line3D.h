@@ -15,7 +15,7 @@
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 
 
-#include "Extent/MyError.h"
+#include "MyError.h"
 
 class DistanceSE3Line3D :
         public g2o::BaseBinaryEdge<1, double, g2o::VertexSE3, g2o::VertexLine3D> {

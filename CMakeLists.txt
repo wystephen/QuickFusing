@@ -4,7 +4,7 @@ project(QuickFusing)
 #set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_BUILD_TOOL Release)
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3  -lpython2.7")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O4 -msse2 -msse3 -msse4 -lopencv_aruco -lpthread ")
 #set(CUDA_NVCC_FLAGSS ${CUDA_NVCC_FLAGS} --gpu-architecture sm_20)
 
 
@@ -31,12 +31,16 @@ FIND_PACKAGE(G2O)
 FIND_PACKAGE(CSparse)
 
 
+if (OPENMP_FOUND)
+        message("OPENMP FOUND")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif ()
 
-
-if(OPENMP_FOUND)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
+SET(G2O_ROOT /usr/local/include/g2o)
+FIND_PACKAGE(G2O)
+FIND_PACKAGE(CSparse)
 
 include_directories(
         ${EIGEN3_INCLUDE_DIR}
@@ -49,6 +53,9 @@ include_directories(
         /usr/local/include
         ${Sophus_INCLUDE_DIRS}
         ${BLAS_INCLUDE_DIRS}
+        /usr/local/include
+        ${CSPARSE_INCLUDE_DIR}
+        ${G2O_INCLUDE_DIR}
 )
 
 link_directories(
@@ -57,6 +64,7 @@ link_directories(
         /usr/lib/x86_64-linux-gnu
         ${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
+        ./include
 )
 
 

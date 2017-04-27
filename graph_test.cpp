@@ -60,10 +60,28 @@
 //#include "OwnEdge/DistanceSE3Line3D.cpp"
 //#include "g2o_types_slam3d_addons_api.h"
 //#include "g2o/types/slam3d_addons/line3d.h"
+
+
+
 G2O_USE_TYPE_GROUP(slam3d)
 
 
 namespace plt = matplotlibcpp;
+
+
+
+
+Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
+Eigen::Quaterniond q){
+    Eigen::Isometry3d T;
+    T.setIdentity();
+    T.rotate(q.toRotationMatrix());
+    T(0,3) = offset(0);
+    T(1,3) = offset(1);
+    T(2,3) = offset(2);
+    return T;
+}
+
 
 int main(int argc, char *argv[]) {
 // 3 300 0.2 5.0 10000 0.2 5.0 5
@@ -353,6 +371,12 @@ int main(int argc, char *argv[]) {
     //// for output data
     std::vector<int> vertex_index;
 
+    std::vector <Eigen::Isometry3d> edge_vector;
+
+
+    std::ofstream out_v_before("./ResultData/" + std::to_string(data_num)+ "out_v_before.txt");
+    std::ofstream out_v_after("./ResultData/" + std::to_string(data_num)+ "out_v_after.txt");
+
 
     ///////// try to add time offset to uwb data
     for(int i(0);i<UwbData.rows();++i)
@@ -486,6 +510,19 @@ int main(int argc, char *argv[]) {
 
                     edge_se3->setMeasurement(latest_transform.inverse() * the_transform);
 
+                    edge_vector.push_back(latest_transform.inverse()*the_transform);
+
+
+//                    double tmp_data[10]={0};
+//                    edge_se3->getMeasurementData(tmp_data);
+//                    for(int ti(0);ti<7;++ti)
+//                    {
+//                        out_v_before<< tmp_data[ti] << " ";
+//                    }
+//                    out_v_before << std::endl;
+
+                    out_v_before<< delta_ori/180.0*M_PI <<std::endl;
+
                     globalOptimizer.addEdge(edge_se3);
 
 
@@ -501,7 +538,7 @@ int main(int argc, char *argv[]) {
                     uwb_measure.resize(UwbData.cols() - 1);
                     uwb_measure.setZero();
 
-//                std::cout << "uwb measurement ros and cols :" << uwb_measure.rows() <<  " " << uwb_measure.cols() << std::endl;
+
 
                     if (uwb_index == 0 || uwb_index > UwbData.rows() - 3) {
                         uwb_measure = UwbData.block(uwb_index, 1, 1, uwb_measure.rows()).transpose();
@@ -516,8 +553,8 @@ int main(int argc, char *argv[]) {
 
                     for (int bi(0); bi < uwb_measure.rows(); ++bi) {
                         if( bi == 10
-                                || bi == 3
-                                || trace_id%2 == 0)
+
+                                )
                         {
                             break;
                         }
@@ -566,7 +603,7 @@ int main(int argc, char *argv[]) {
 
 
     /// 4. plot result
-    std::ofstream out_result("./ResultData/test.txt");
+    std::ofstream out_result("./ResultData/" + std::to_string(data_num)+ "test.txt");
     std::vector<double> gx,gy;
     for(int vid(0);vid<trace_id;++vid)
     {
@@ -579,13 +616,20 @@ int main(int argc, char *argv[]) {
     out_result.close();
 
     //// 5.compute error
-    std::ofstream out_err("./ResultData/err.txt");
+    std::ofstream out_err("./ResultData/" + std::to_string(data_num)+ "err.txt");
     std::vector<double> error_vec;
     out_err.precision(10);
     double err_sum(0.0);
     std::vector<double> rix,riy;
+
+    std::ofstream("./ResultData/"+std::to_string(data_num)+"real_pose_ir.txt");
+
     for(int i(0);i<vertex_index.size();++i)
     {
+
+//        / OUT PUT RESULT OF VERTEX;
+//        double tmp_data[10]={0};
+//        globalOptimizer.vertex(i).getEstimateData()
         int index = vertex_index.at(i);
 
 //        int offset = 9;
@@ -607,6 +651,52 @@ int main(int argc, char *argv[]) {
 
         plt::plot(tmpx,tmpy,"y-");
     }
+
+
+    for(int i(1);i<vertex_index.size();++i)
+    {
+//        globalOptimizer.vertex(i)->edges().size();
+        double tmp_data[10] = {0};
+
+        globalOptimizer.vertex(i-1)->getEstimateData(tmp_data);
+
+        Eigen::Quaterniond tq1(tmp_data[6],tmp_data[3],tmp_data[4],tmp_data[5]);
+
+        auto T1 = tq2Transform(Eigen::Vector3d(tmp_data[0],tmp_data[1],tmp_data[2]),
+        tq1);
+
+
+        globalOptimizer.vertex(i)->getEstimateData(tmp_data);
+
+        Eigen::Quaterniond tq2(tmp_data[6],tmp_data[3],tmp_data[4],tmp_data[5]);
+
+        auto T2 = tq2Transform(Eigen::Vector3d(tmp_data[0],tmp_data[1],tmp_data[2]),
+        tq2);
+
+        auto TT = T1.inverse()*T2;
+
+            out_v_after << ((TT.inverse() * edge_vector.at(i-1)).matrix() - Eigen::Isometry3d::Identity().matrix()).norm() << std::endl;
+//        TT.rotation().
+//        Eigen::Quaterniond tq(TT.matrix().block(0,0,3,3));
+//
+//        for(int j(0);j<3;j++)
+//        {
+//            out_v_after << TT(j,3) << " ";
+//        }
+//
+//        out_v_after << tq.x() << " "<< tq.y() <<" "<< tq.z() << " " << tq.w() ;
+
+
+
+
+//        for(int j(0);j<3;j++)
+//        {
+//            out_v_after << tv(j) << " " ;
+//        }
+//        out_v_after << std::acos(std::abs(tv(0))/std::sqrt(tv(0)*tv(0)+tv(1)*tv(1)));
+        out_v_after<<std::endl;
+    }
+    out_v_after.close();
     std::cout << "average error is :" << err_sum/double(error_vec.size()) << std::endl;
 
 //    std::cout << "average error is :" << double(std::accumulate(error_vec.begin(),

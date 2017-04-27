@@ -21,6 +21,9 @@ int main()
     Sophus::SO3 SO3_R(R);
     Sophus::SO3 SO3_v(0,0,M_PI/2);
 
+//    Sophus::SO3 SO3()
+//    Sophus::SE3 se3()
+
     std::cout << "SO3_R:" << SO3_R << std::endl;
     std::cout << "SO3_V:" << SO3_v << std::endl;
 }

@@ -393,7 +393,7 @@ int main(int argc, char *argv[]) {
         {
             p[j] = beaconset(i,j);
         }
-        std::cout << " beacon " << i << " : " << p[0]<< " " <<p[1]<< " "<<p[2] << std::endl;
+//        std::cout << " beacon " << i << " : " << p[0]<< " " <<p[1]<< " "<<p[2] << std::endl;
         v->setEstimateData(p);
         v->setFixed(true);
         v->setId(beacon_id+i);
@@ -459,8 +459,8 @@ int main(int argc, char *argv[]) {
                 latest_theta = the_theta;
 
 
-                std::cout << trace_id << " " << delta_ori << "   " << is_corner
-                          << is_corner << is_corner << is_corner << std::endl;
+//                std::cout << trace_id << " " << delta_ori << "   " << is_corner
+//                          << is_corner << is_corner << is_corner << std::endl;
 
 
                 ///add transform edge
@@ -494,8 +494,7 @@ int main(int argc, char *argv[]) {
                 /// add range edge
 
                 //  get measurement
-                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 1.0 &&
-                        UwbValid(uwb_index,0)<uwb_err_threshold) {
+                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 1.0 ) {
 
                     Eigen::VectorXd uwb_measure;
 
@@ -516,6 +515,12 @@ int main(int argc, char *argv[]) {
                     // build and add edge
 
                     for (int bi(0); bi < uwb_measure.rows(); ++bi) {
+                        if( bi == 10
+                                || bi == 3
+                                )
+                        {
+                            break;
+                        }
                         auto *dist_edge = new DistanceEdge();
                         dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id + bi);
                         dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
@@ -523,11 +528,18 @@ int main(int argc, char *argv[]) {
                         dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
 
                         Eigen::Matrix<double, 1, 1> information;
-                        information(0, 0) = distance_info;
+                        if(uwb_err_threshold>1.0)
+                        {
+                            information(0, 0) = 1/UwbValid(uwb_index,0)+1.0;
+//                                          distance_sigma = UwbValid(uwb_index,0);
+                        }
+                        else{
+                            information(0,0) = distance_info;
+                        }
 
                         dist_edge->setInformation(information);
                         dist_edge->setSigma(distance_sigma);
-                        dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
+//                        dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
 
                         globalOptimizer.addEdge(dist_edge);
                     }
@@ -549,7 +561,7 @@ int main(int argc, char *argv[]) {
 
     /// 3. Solve the problem
     globalOptimizer.initializeOptimization();
-    globalOptimizer.setVerbose(true);
+//    globalOptimizer.setVerbose(true);
     globalOptimizer.optimize(max_optimize_times);
 
 
@@ -621,7 +633,7 @@ int main(int argc, char *argv[]) {
             <<std::endl;
 
 
-//    plt::title("")
+    plt::title("erro is :"+std::to_string(err_sum/double(error_vec.size())));
 //
     plt::show();
 

@@ -98,9 +98,12 @@ int main(int argc, char *argv[]) {
     double time_offset = 0.0;
 
 
+    double uwb_err_threshold = 0.5;
+
+    int data_num = 5;
 
 
-    if(argc == 10)
+    if(argc == 11)
     {
         std::cout << "set para meter s" << std::endl;
         first_info = std::stod(argv[1]);
@@ -117,10 +120,12 @@ int main(int argc, char *argv[]) {
         max_optimize_times = std::stoi(argv[8]);
 
         time_offset = std::stod(argv[9]);
+
+        uwb_err_threshold = std::stod(argv[10]);
     }
 
 
-    int data_num = 5;
+
 
     std::string out_dir_name = "./";
     std::string dir_name = "/home/steve/locate/";
@@ -304,8 +309,9 @@ int main(int argc, char *argv[]) {
 
     CSVReader BeaconsetReader(dir_name + "beaconset.data.csv");
     CSVReader UwbdataReader(dir_name + "UwbData.data.csv");
+    CSVReader UwbValidReader(dir_name+"UwbValid.data.csv");
 
-    Eigen::MatrixXd beaconset, UwbData;
+    Eigen::MatrixXd beaconset, UwbData,UwbValid;
 
 
     beaconset.resize(BeaconsetReader.GetMatrix().GetRows(),
@@ -322,6 +328,19 @@ int main(int argc, char *argv[]) {
             UwbData(i, j) = *(UwbdataReader.GetMatrix()(i, j));
         }
     }
+
+    UwbValid.resize(UwbValidReader.GetMatrix().GetRows(),
+    UwbValidReader.GetMatrix().GetCols());
+
+    for(int i(0);i<UwbValid.rows();++i)
+    {
+        for(int j(0);j<UwbValid.cols();++j)
+        {
+            UwbValid(i,j) = *(UwbValidReader.GetMatrix()(i,j));
+        }
+    }
+
+
     std::vector<std::vector<double>> range_vec;
 
 
@@ -473,7 +492,8 @@ int main(int argc, char *argv[]) {
                 /// add range edge
 
                 //  get measurement
-                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 1.0) {
+                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 1.0 &&
+                        UwbValid(uwb_index,0)<uwb_err_threshold) {
 
                     Eigen::VectorXd uwb_measure;
 

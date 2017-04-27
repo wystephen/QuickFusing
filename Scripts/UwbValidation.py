@@ -34,7 +34,7 @@ class beaconData:
 
 
 if __name__ == '__main__':
-    dir_name = "/home/steve/locate/3"
+    dir_name = "/home/steve/locate/5"
     uwb_data = np.loadtxt(dir_name+"UwbData.data.csv",delimiter=',')
     beacon = np.loadtxt(dir_name+"beaconset.data.csv",delimiter=',')
 

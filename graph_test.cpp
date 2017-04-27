@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     int data_num = 5;
 
 
-    if(argc == 11)
+    if(argc == 12)
     {
         std::cout << "set para meter s" << std::endl;
         first_info = std::stod(argv[1]);
@@ -122,6 +122,8 @@ int main(int argc, char *argv[]) {
         time_offset = std::stod(argv[9]);
 
         uwb_err_threshold = std::stod(argv[10]);
+
+        data_num = std::stoi(argv[11]);
     }
 
 
@@ -574,7 +576,7 @@ int main(int argc, char *argv[]) {
         int index = vertex_index.at(i);
 
 //        int offset = 9;
-        index += 270;
+        index += 160;//By test.
 
         error_vec.push_back(std::sqrt(std::pow(gx[i]-irx[index],2.0)+
         std::pow(gy[i]-iry[index],2.0)));

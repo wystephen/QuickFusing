@@ -526,7 +526,7 @@ int main(int argc, char *argv[]) {
 
     /// 3. Solve the problem
     globalOptimizer.initializeOptimization();
-//    globalOptimizer.setVerbose(true);
+    globalOptimizer.setVerbose(true);
     globalOptimizer.optimize(max_optimize_times);
 
 
@@ -557,6 +557,14 @@ int main(int argc, char *argv[]) {
         out_err<< error_vec.at(i) << std::endl;
         err_sum+=std::sqrt(std::pow(gx[i]-irx[index],2.0)+
                            std::pow(gy[i]-iry[index],2.0));
+//        plt::plot()
+        std::vector<double> tmpx,tmpy;
+        tmpx.push_back(gx[i]);
+        tmpx.push_back(irx[index]);
+        tmpy.push_back(gy[i]);
+        tmpy.push_back(iry[index]);
+
+        plt::plot(tmpx,tmpy,"y-");
     }
     std::cout << "average error is :" << err_sum/double(error_vec.size()) << std::endl;
 
@@ -583,12 +591,13 @@ int main(int argc, char *argv[]) {
                  <<"corner_ratio:"<<corner_ratio
                  <<"max_iterate:"<<max_optimize_times
                  <<"time_offset:"<<time_offset
-                                 <<std::endl;
+            <<"err:"<<err_sum/double(error_vec.size())
+            <<std::endl;
 
 
 //    plt::title("")
 //
-//    plt::show();
+    plt::show();
 
 
 

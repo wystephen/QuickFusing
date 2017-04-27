@@ -517,6 +517,7 @@ int main(int argc, char *argv[]) {
 
                 /// increase trace id
                 trace_id ++;
+                
             }
 
             imu_index++;

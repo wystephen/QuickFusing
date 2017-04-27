@@ -554,7 +554,7 @@ int main(int argc, char *argv[]) {
         int index = vertex_index.at(i);
 
 //        int offset = 9;
-        index += 260;
+        index += 270;
 
         error_vec.push_back(std::sqrt(std::pow(gx[i]-irx[index],2.0)+
         std::pow(gy[i]-iry[index],2.0)));
@@ -578,7 +578,7 @@ int main(int argc, char *argv[]) {
 
 
     plt::plot(gx,gy,"r-+");
-    plt::plot(irx,iry,"b-+");
+    plt::plot(irx,iry,"b-");
     plt::grid(true);
 
 

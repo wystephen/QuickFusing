@@ -517,7 +517,7 @@ int main(int argc, char *argv[]) {
                     for (int bi(0); bi < uwb_measure.rows(); ++bi) {
                         if( bi == 10
                                 || bi == 3
-                                )
+                                || trace_id%2 == 0)
                         {
                             break;
                         }
@@ -583,6 +583,7 @@ int main(int argc, char *argv[]) {
     std::vector<double> error_vec;
     out_err.precision(10);
     double err_sum(0.0);
+    std::vector<double> rix,riy;
     for(int i(0);i<vertex_index.size();++i)
     {
         int index = vertex_index.at(i);
@@ -601,6 +602,8 @@ int main(int argc, char *argv[]) {
         tmpx.push_back(irx[index]);
         tmpy.push_back(gy[i]);
         tmpy.push_back(iry[index]);
+        rix.push_back(irx[index]);
+        riy.push_back(iry[index]);
 
         plt::plot(tmpx,tmpy,"y-");
     }
@@ -612,7 +615,8 @@ int main(int argc, char *argv[]) {
 
 
     plt::plot(gx,gy,"r-+");
-    plt::plot(irx,iry,"b-");
+//    plt::plot(irx,iry,"b-");
+    plt::plot(rix,riy,"b-");
     plt::grid(true);
 
 

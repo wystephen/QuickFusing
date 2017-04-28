@@ -372,6 +372,7 @@ int main(int argc, char *argv[]) {
     //// for output data
     std::vector<int> vertex_index;
 
+
     std::vector <Eigen::Isometry3d> edge_vector;
 
 
@@ -416,11 +417,12 @@ int main(int argc, char *argv[]) {
         double p[6] = {0};
         for(int j(0);j<3;++j)
         {
-            p[j] = beaconset(i,j);
+//            p[j] = beaconset(i,j);
+            p[j] = 0.0;
         }
 //        std::cout << " beacon " << i << " : " << p[0]<< " " <<p[1]<< " "<<p[2] << std::endl;
         v->setEstimateData(p);
-        v->setFixed(true);
+        v->setFixed(false);
         v->setId(beacon_id+i);
         globalOptimizer.addVertex(v);
     }
@@ -704,6 +706,21 @@ int main(int argc, char *argv[]) {
 //    error_vec.end(),0))/double(error_vec.size()) << std::endl;
 
 
+    //// PLOT BEACONSET
+    std::vector<double> bx, by, bz;
+
+    for (int i(0); i < 4; ++i) {
+        double data[10] = {0};
+
+        globalOptimizer.vertex(beacon_id + i)->getEstimateData(data);
+
+        bx.push_back(data[0]);
+        by.push_back(data[1]);
+        bz.push_back(data[2]);
+    }
+
+
+    plt::plot(bx, by, "r*");
 
     plt::plot(gx,gy,"r-+");
 //    plt::plot(irx,iry,"b-");

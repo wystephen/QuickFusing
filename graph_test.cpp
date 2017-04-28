@@ -417,12 +417,13 @@ int main(int argc, char *argv[]) {
         double p[6] = {0};
         for(int j(0);j<3;++j)
         {
-//            p[j] = beaconset(i,j);
-            p[j] = 0.0;
+            p[j] = beaconset(i, j);
+//            p[j] = 0.0;
         }
 //        std::cout << " beacon " << i << " : " << p[0]<< " " <<p[1]<< " "<<p[2] << std::endl;
         v->setEstimateData(p);
-        v->setFixed(false);
+//        if(0==i||1==i)
+        v->setFixed(true);
         v->setId(beacon_id+i);
         globalOptimizer.addVertex(v);
     }

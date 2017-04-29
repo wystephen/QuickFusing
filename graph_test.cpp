@@ -585,6 +585,20 @@ int main(int argc, char *argv[]) {
                         globalOptimizer.addEdge(dist_edge);
                     }
 
+                    /// try online optimize
+
+                    if (trace_id > 20) {
+                        globalOptimizer.vertex(trace_id - 19)->setFixed(true);
+
+                    }
+                    if (trace_id > 10) {
+                        double time_before(TimeStamp::now());
+                        globalOptimizer.initializeOptimization();
+                        globalOptimizer.optimize(max_optimize_times);
+                        std::cout << "One step optimize" << TimeStamp::now() - time_before << std::endl;
+
+                    }
+
                 }
 
                 /// updata transform matrix
@@ -597,13 +611,16 @@ int main(int argc, char *argv[]) {
 
             imu_index++;
         }
+
+
     }
+    std::cout << "sum time :" << TimeStamp::now() - graph_start_time << std::endl;
 
 
     /// 3. Solve the problem
-    globalOptimizer.initializeOptimization();
+//    globalOptimizer.initializeOptimization();
 //    globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(max_optimize_times);
+//    globalOptimizer.optimize(max_optimize_times);
 
 
     /// 4. plot result

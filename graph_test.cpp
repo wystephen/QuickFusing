@@ -118,11 +118,14 @@ int main(int argc, char *argv[]) {
 
     double uwb_err_threshold = 0.5;
 
+    int delay_times = 5;
+
+    int out_delay_times = 2;
+
     int data_num = 5;
 
 
-
-    if(argc == 12)
+    if (argc == 14)
     {
         std::cout << "set para meter s" << std::endl;
         first_info = std::stod(argv[1]);
@@ -142,7 +145,11 @@ int main(int argc, char *argv[]) {
 
         uwb_err_threshold = std::stod(argv[10]);
 
-        data_num = std::stoi(argv[11]);
+        delay_times = std::stoi(argv[11]);
+
+        out_delay_times = std::stoi(argv[12]);
+
+        data_num = std::stoi(argv[13]);
     }
 
 
@@ -375,6 +382,8 @@ int main(int argc, char *argv[]) {
 
     std::vector <Eigen::Isometry3d> edge_vector;
 
+    std::vector<double> onx, ony;
+
 
     std::ofstream out_v_before("./ResultData/" + std::to_string(data_num)+ "out_v_before.txt");
     std::ofstream out_v_after("./ResultData/" + std::to_string(data_num)+ "out_v_after.txt");
@@ -458,10 +467,26 @@ int main(int argc, char *argv[]) {
 
                 vertex_index.push_back(imu_index);
 
+
+                /// generate better estimate
+
+                Eigen::Isometry3d before_state = Eigen::Isometry3d::Identity();
+                if (imu_index > 0) {
+                    double before_data[10] = {0};
+                    globalOptimizer.vertex(trace_id - 1)->getEstimateData(before_data);
+
+                    Eigen::Vector3d offset(before_data[0], before_data[1], before_data[2]);
+
+                    Eigen::Quaterniond qq(before_data[6], before_data[3], before_data[4], before_data[5]);
+
+                    before_state = tq2Transform(offset, qq);
+
+                }
+
                 /// add vertex
                 auto *v = new g2o::VertexSE3();
                 v->setId(trace_id);
-                v->setEstimate(the_transform);
+                v->setEstimate(before_state * latest_transform.inverse() * the_transform);
 
                 globalOptimizer.addVertex(v);
 
@@ -485,8 +510,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 latest_theta = the_theta;
-
-
+                std::cout << "current delta theta : " << delta_ori << std::endl;
 //                std::cout << trace_id << " " << delta_ori << "   " << is_corner
 //                          << is_corner << is_corner << is_corner << std::endl;
 
@@ -587,18 +611,26 @@ int main(int argc, char *argv[]) {
 
                     /// try online optimize
 
-                    if (trace_id > 20) {
-                        globalOptimizer.vertex(trace_id - 19)->setFixed(true);
+                    int last_offset(delay_times);
+                    if (trace_id > last_offset) {
+                        globalOptimizer.vertex(trace_id - last_offset + 1)->setFixed(true);
 
                     }
+
+                    if (trace_id >= out_delay_times) {
+                        double td[10] = {0};
+                        globalOptimizer.vertex(trace_id - out_delay_times)->getEstimateData(td);
+                        onx.push_back(td[0]);
+                        ony.push_back(td[1]);
+                    }
+
                     if (trace_id > 10) {
                         double time_before(TimeStamp::now());
                         globalOptimizer.initializeOptimization();
                         globalOptimizer.optimize(max_optimize_times);
-                        std::cout << "One step optimize" << TimeStamp::now() - time_before << std::endl;
+//                        std::cout << "One step optimize" << TimeStamp::now() - time_before << std::endl;
 
                     }
-
                 }
 
                 /// updata transform matrix
@@ -614,6 +646,18 @@ int main(int argc, char *argv[]) {
 
 
     }
+
+
+
+    /// add extra to out data
+//
+//    for(int i(0);i<out_delay_times;++i)
+//    {
+//        onx.push_back(onx[onx.size()-1]);
+//        ony.push_back(ony[ony.size()-1]);
+//    }
+
+
     std::cout << "sum time :" << TimeStamp::now() - graph_start_time << std::endl;
 
 
@@ -641,6 +685,7 @@ int main(int argc, char *argv[]) {
     std::vector<double> error_vec;
     out_err.precision(10);
     double err_sum(0.0);
+    double online_err_sum(0.0);
     std::vector<double> rix,riy;
 
     std::ofstream("./ResultData/"+std::to_string(data_num)+"real_pose_ir.txt");
@@ -661,6 +706,12 @@ int main(int argc, char *argv[]) {
         out_err<< error_vec.at(i) << std::endl;
         err_sum+=std::sqrt(std::pow(gx[i]-irx[index],2.0)+
                            std::pow(gy[i]-iry[index],2.0));
+
+        if (i < onx.size()) {
+            online_err_sum += std::sqrt(std::pow(onx[i] - irx[index], 2.0) +
+                                        std::pow(ony[i] - iry[index], 2.0));
+        }
+
 //        plt::plot()
         std::vector<double> tmpx,tmpy;
         tmpx.push_back(gx[i]);
@@ -718,7 +769,8 @@ int main(int argc, char *argv[]) {
         out_v_after<<std::endl;
     }
     out_v_after.close();
-    std::cout << "average error is :" << err_sum/double(error_vec.size()) << std::endl;
+    std::cout << "average error is :" << err_sum / double(error_vec.size()) << std::endl;
+    std::cout << "online error is :" << online_err_sum / double(onx.size()) << std::endl;
 
 //    std::cout << "average error is :" << double(std::accumulate(error_vec.begin(),
 //    error_vec.end(),0))/double(error_vec.size()) << std::endl;
@@ -743,6 +795,8 @@ int main(int argc, char *argv[]) {
     plt::plot(gx,gy,"r-+");
 //    plt::plot(irx,iry,"b-");
     plt::plot(rix,riy,"b-");
+
+    plt::plot(onx, ony, "g-");
     plt::grid(true);
 
 
@@ -750,17 +804,18 @@ int main(int argc, char *argv[]) {
 
     out_para_res.precision(10);
 
-    out_para_res << "first_info:"<<first_info
-                 << "second_info:"<<second_info
-                 << "distance_info:"<<distance_info
-                 <<"distance_sigma:"<<distance_sigma
-                 <<"z_offset:"<<z_offset
-                 <<"turn_threshold:"<<turn_threshold
-                 <<"corner_ratio:"<<corner_ratio
-                 <<"max_iterate:"<<max_optimize_times
-                 <<"time_offset:"<<time_offset
-            <<"err:"<<err_sum/double(error_vec.size())
-            <<std::endl;
+    out_para_res << "first_info:" << first_info
+                 << "second_info:" << second_info
+                 << "distance_info:" << distance_info
+                 << "distance_sigma:" << distance_sigma
+                 << "z_offset:" << z_offset
+                 << "turn_threshold:" << turn_threshold
+                 << "corner_ratio:" << corner_ratio
+                 << "max_iterate:" << max_optimize_times
+                 << "time_offset:" << time_offset
+                 << "delay_times:" << delay_times
+                 << "err:" <<err_sum/double(error_vec.size())
+                 << std::endl;
 
 
     plt::title("erro is :"+std::to_string(err_sum/double(error_vec.size())));

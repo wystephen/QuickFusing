@@ -58,7 +58,7 @@ if __name__ == '__main__':
         res_err[i] = bd.sum_error(res)
         last_res = res
         all_res[i,:] = res
-        
+
 
 
     np.savetxt(dir_name+"UwbValid.data.csv",res_err,delimiter=',')

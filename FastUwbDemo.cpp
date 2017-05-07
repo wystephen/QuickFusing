@@ -448,6 +448,27 @@ int main(int argc, char *argv[]) {
 
             if (imu_index == 0 || (Zupt(imu_index, 0) > 0.5 && Zupt(imu_index - 1, 0) < 0.5)) {
                 auto the_transform = gekf.getTransformation();
+                bool not_nan = true;
+                for(int i(0);i<the_transform.rows();++i)
+                {
+                    for(int j(0);j<the_transform.cols();++j)
+                    {
+                        if(std::isnan(the_transform(i,j)))
+                        {
+                            not_nan = false;
+                        }
+                    }
+                }
+
+                if(!not_nan)
+                {
+//                    continue;
+                    the_transform = latest_transform;
+
+                }
+
+
+//                for(int i(0);i<)
 
                 vertex_index.push_back(imu_index);
 
@@ -543,7 +564,7 @@ int main(int argc, char *argv[]) {
                 /// add range edge
 
                 //  get measurement
-                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 1.0 ) {
+                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 3.0 ) {
 
                     Eigen::VectorXd uwb_measure;
 
@@ -551,15 +572,16 @@ int main(int argc, char *argv[]) {
                     uwb_measure.setZero();
 
 
+                    uwb_measure = UwbData.block(uwb_index,1,1,uwb_measure.rows()).transpose();
 
-                    if (uwb_index == 0 || uwb_index > UwbData.rows() - 3) {
-                        uwb_measure = UwbData.block(uwb_index, 1, 1, uwb_measure.rows()).transpose();
-                    } else {
-                        uwb_measure += UwbData.block(uwb_index, 1, 1, uwb_measure.rows()).transpose();
-                        uwb_measure += UwbData.block(uwb_index + 1, 1, 1, uwb_measure.rows()).transpose();
-
-                        uwb_measure /= 2.0;
-                    }
+//                    if (uwb_index == 0 || uwb_index > UwbData.rows() - 3) {
+//                        uwb_measure = UwbData.block(uwb_index, 1, 1, uwb_measure.rows()).transpose();
+//                    } else {
+//                        uwb_measure += UwbData.block(uwb_index, 1, 1, uwb_measure.rows()).transpose();
+//                        uwb_measure += UwbData.block(uwb_index + 1, 1, 1, uwb_measure.rows()).transpose();
+//
+//                        uwb_measure /= 2.0;
+//                    }
 
                     // build and add edge
 
@@ -574,7 +596,7 @@ int main(int argc, char *argv[]) {
                         dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id + bi);
                         dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                        dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
+                        dist_edge->setMeasurement((uwb_measure(bi)));
 
                         Eigen::Matrix<double, 1, 1> information;
                         if(uwb_err_threshold>1.0)
@@ -588,34 +610,16 @@ int main(int argc, char *argv[]) {
 
                         dist_edge->setInformation(information);
                         dist_edge->setSigma(distance_sigma);
-//                        dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
 
                         if(uwb_measure(bi)>0)
+                        {
+
                             globalOptimizer.addEdge(dist_edge);
+                        }
                     }
 
                     /// try online optimize
 
-//                    int last_offset(delay_times);
-//                    if (trace_id > last_offset) {
-//                        globalOptimizer.vertex(trace_id - last_offset + 1)->setFixed(true);
-//
-//                    }
-//
-//                    if (trace_id >= out_delay_times) {
-//                        double td[10] = {0};
-//                        globalOptimizer.vertex(trace_id - out_delay_times)->getEstimateData(td);
-//                        onx.push_back(td[0]);
-//                        ony.push_back(td[1]);
-//                    }
-//
-//                    if (trace_id > 10) {
-//                        double time_before(TimeStamp::now());
-//                        globalOptimizer.initializeOptimization();
-//                        globalOptimizer.optimize(max_optimize_times);
-//                        std::cout << "One step optimize" << TimeStamp::now() - time_before << std::endl;
-//
-//                    }
                 }
 
                 /// updata transform matrix
@@ -628,19 +632,12 @@ int main(int argc, char *argv[]) {
 
             imu_index++;
         }
-
-
     }
 
 
 
     /// add extra to out data
 //
-//    for(int i(0);i<out_delay_times;++i)
-//    {
-//        onx.push_back(onx[onx.size()-1]);
-//        ony.push_back(ony[ony.size()-1]);
-//    }
 
 
     std::cout << "sum time :" << TimeStamp::now() - graph_start_time << std::endl;
@@ -676,91 +673,6 @@ int main(int argc, char *argv[]) {
 
     std::ofstream("./ResultData/"+std::to_string(data_num)+"real_pose_ir.txt");
 
-    for(int i(0);i<vertex_index.size();++i)
-    {
-
-//        / OUT PUT RESULT OF VERTEX;
-//        double tmp_data[10]={0};
-//        globalOptimizer.vertex(i).getEstimateData()
-        int index = vertex_index.at(i);
-
-//        int offset = 9;
-        index += 160;//By test.
-
-//        error_vec.push_back(std::sqrt(std::pow(gx[i]-irx[index],2.0)+
-//                                      std::pow(gy[i]-iry[index],2.0)));
-//        out_err<< error_vec.at(i) << std::endl;
-//        err_sum+=std::sqrt(std::pow(gx[i]-irx[index],2.0)+
-//                           std::pow(gy[i]-iry[index],2.0));
-
-//        if (i < onx.size()) {
-//            online_err_sum += std::sqrt(std::pow(onx[i] - irx[index], 2.0) +
-//                                        std::pow(ony[i] - iry[index], 2.0));
-//        }
-
-//        plt::plot()
-        std::vector<double> tmpx,tmpy;
-        tmpx.push_back(gx[i]);
-//        tmpx.push_back(irx[index]);
-        tmpy.push_back(gy[i]);
-//        tmpy.push_back(iry[index]);
-//        rix.push_back(irx[index]);
-//        riy.push_back(iry[index]);
-
-        plt::plot(tmpx,tmpy,"y-");
-    }
-
-
-    for(int i(1);i<vertex_index.size();++i)
-    {
-//        globalOptimizer.vertex(i)->edges().size();
-        double tmp_data[10] = {0};
-
-        globalOptimizer.vertex(i-1)->getEstimateData(tmp_data);
-
-        Eigen::Quaterniond tq1(tmp_data[6],tmp_data[3],tmp_data[4],tmp_data[5]);
-
-        auto T1 = tq2Transform(Eigen::Vector3d(tmp_data[0],tmp_data[1],tmp_data[2]),
-                               tq1);
-
-
-        globalOptimizer.vertex(i)->getEstimateData(tmp_data);
-
-        Eigen::Quaterniond tq2(tmp_data[6],tmp_data[3],tmp_data[4],tmp_data[5]);
-
-        auto T2 = tq2Transform(Eigen::Vector3d(tmp_data[0],tmp_data[1],tmp_data[2]),
-                               tq2);
-
-        auto TT = T1.inverse()*T2;
-
-        out_v_after << ((TT.inverse() * edge_vector.at(i-1)).matrix() - Eigen::Isometry3d::Identity().matrix()).norm() << std::endl;
-//        TT.rotation().
-//        Eigen::Quaterniond tq(TT.matrix().block(0,0,3,3));
-//
-//        for(int j(0);j<3;j++)
-//        {
-//            out_v_after << TT(j,3) << " ";
-//        }
-//
-//        out_v_after << tq.x() << " "<< tq.y() <<" "<< tq.z() << " " << tq.w() ;
-
-
-
-
-//        for(int j(0);j<3;j++)
-//        {
-//            out_v_after << tv(j) << " " ;
-//        }
-//        out_v_after << std::acos(std::abs(tv(0))/std::sqrt(tv(0)*tv(0)+tv(1)*tv(1)));
-        out_v_after<<std::endl;
-    }
-    out_v_after.close();
-    std::cout << "average error is :" << err_sum / double(error_vec.size()) << std::endl;
-    std::cout << "online error is :" << online_err_sum / double(onx.size()) << std::endl;
-
-//    std::cout << "average error is :" << double(std::accumulate(error_vec.begin(),
-//    error_vec.end(),0))/double(error_vec.size()) << std::endl;
-
 
     //// PLOT BEACONSET
     std::vector<double> bx, by, bz;
@@ -779,10 +691,6 @@ int main(int argc, char *argv[]) {
     plt::plot(bx, by, "r*");
 
     plt::plot(gx,gy,"r-+");
-//    plt::plot(irx,iry,"b-");
-//    plt::plot(rix,riy,"b-");
-
-//    plt::plot(onx, ony, "g-");
     plt::grid(true);
 
 

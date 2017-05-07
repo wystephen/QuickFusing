@@ -82,6 +82,21 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main() {
+
+    /**
+     * Global value
+     */
+
+    std::string dir_name = "/home/steve/Data/FastUwbDemo/1/";
+
+
+    double offset_cov(0.1),rotation_cov(0.1),range_cov(1.0);
+
+
+    int trace_id = 0;
+    const int beacon_id_offset(100000);
+
+
     /**
     * Build a global optimizer
     */
@@ -99,4 +114,41 @@ int main() {
     g2o::OptimizationAlgorithmLevenberg *solver =
             new g2o::OptimizationAlgorithmLevenberg(blockSolver);
     globalOptimizer.setAlgorithm(solver);
+
+
+    /**
+     * Load Data from file
+     */
+
+    CSVReader ImuDataReader(dir_name + "sim_imu.csv"),
+            ZuptReader(dir_name + "sim_zupt.csv");
+
+    auto ImuDataTmp(ImuDataReader.GetMatrix()), ZuptTmp(ZuptReader.GetMatrix());
+
+    Eigen::MatrixXd ImuData, Zupt;
+    ImuData.resize(ImuDataTmp.GetRows(), ImuDataTmp.GetCols());
+    Zupt.resize(ZuptTmp.GetRows(), ZuptTmp.GetCols());
+
+    for (int i(0); i < ImuDataTmp.GetRows(); ++i) {
+        for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
+            ImuData(i, j) = *ImuDataTmp(i, j);
+        }
+        Zupt(i, 0) = int(*ZuptTmp(i, 0));
+    }
+
+    CSVReader ZuptResultReader(dir_name+"uwb_result.csv");
+    CSVReader QuatReader(dir_name+"all_quat.csv");
+
+    Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(),ZuptResultReader.GetMatrix().GetCols());
+    Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(),QuatReader.GetMatrix().GetCols());
+
+
+
+
+
+
+
+    /**
+     * output and Plot result
+     */
 }

@@ -87,6 +87,11 @@ add_executable(gt graph_test.cpp)
 add_executable(fast_demo FastUwbDemo.cpp)
 target_link_libraries(gt ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
 target_link_libraries(fast_demo ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
+
+
+add_executable(dw DemoUseResult.cpp)
+target_link_libraries(dw ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
+
 # For test
 
 add_executable(fun_test func_test.cpp)

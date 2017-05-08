@@ -120,6 +120,9 @@ int main() {
      * Load Data from file
      */
 
+
+
+
     CSVReader ImuDataReader(dir_name + "sim_imu.csv"),
             ZuptReader(dir_name + "sim_zupt.csv");
 
@@ -136,11 +139,46 @@ int main() {
         Zupt(i, 0) = int(*ZuptTmp(i, 0));
     }
 
-    CSVReader ZuptResultReader(dir_name+"uwb_result.csv");
+    CSVReader ZuptResultReader(dir_name+"sim_pose.csv");
     CSVReader QuatReader(dir_name+"all_quat.csv");
+    CSVReader VertexTime(dir_name+"vertex_time.csv");
 
     Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(),ZuptResultReader.GetMatrix().GetCols());
     Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(),QuatReader.GetMatrix().GetCols());
+    Eigen::MatrixXd v_time(VertexTime.GetMatrix().GetRows(),VertexTime.GetMatrix().GetCols());
+
+    for(int i(0);i<zupt_res.rows();++i)
+    {
+        for(int j(0);j<zupt_res.cols();++j)
+        {
+            zupt_res(i,j)  = *(ZuptResultReader.GetMatrix()(i,j));
+        }
+    }
+
+    for(int i(0);i<quat.rows();++i)
+    {
+        for(int j(0);j<quat.cols();++j)
+        {
+            quat(i,j) = *(QuatReader.GetMatrix()(i,j));
+        }
+    }
+
+    for(int i(0);i<v_time.rows();++i)
+    {
+        for(int j(0);j<v_time.cols();++j)
+        {
+            v_time(i,j) = *(VertexTime.GetMatrix()(i,j));
+        }
+    }
+
+
+    /**
+     * Build Graph
+     */
+
+
+    /// Add Beacon Vertex
+    for(int i(0);i<)
 
 
 

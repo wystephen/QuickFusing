@@ -87,10 +87,10 @@ int main() {
      * Global value
      */
 
-    std::string dir_name = "/home/steve/Data/FastUwbDemo/1/";
+    std::string dir_name = "/home/steve/Data/FastUwbDemo/2/";
 
 
-    double offset_cov(0.1),rotation_cov(0.1),range_cov(1.0);
+    double offset_cov(0.01),rotation_cov(0.01),range_cov(1.0);
 
 
     int trace_id = 0;
@@ -226,6 +226,10 @@ int main() {
         auto *v = new g2o::VertexSE3();
         v->setId(index);
 //        v->setEstimateData(latest_transform.inverse()*this_transform);
+        v->setEstimate(this_transform);
+//        v->setFixed(true);
+//        v->setFixed(false);
+
         globalOptimizer.addVertex(v);
 
 
@@ -248,12 +252,14 @@ int main() {
 
             edge_se3->setMeasurement(latest_transform.inverse()*this_transform);
 
+
             globalOptimizer.addEdge(edge_se3);
 
         }
 
         latest_transform = this_transform;
     }
+
 
 
     /// ADD Range Edge
@@ -264,22 +270,28 @@ int main() {
 
     while(true)
     {
-        if(uwb_index>uwb_raw.rows()-2||zupt_index>zupt_res.rows()-2)
+        if(uwb_index>uwb_raw.rows()-2)
         {
             break;
         }
-        double uwb_time = uwb_raw(uwb_index,0)-640.0;
+        double uwb_time = uwb_raw(uwb_index,0)-480.0;
 
 
-        if(zupt_index>10)
-        {
-            zupt_index-=10;
-        }
+        zupt_index = 0;
 
 
+//        int raw_zupt_index = zupt_index;
         while(true)
         {
-            if(std::fabs(v_time(zupt_index)-uwb_time)<1.0)
+
+            if(zupt_index>zupt_res.rows()-2)
+            {
+                std::cout << "not found right way" << std::endl;
+                break;
+
+            }
+
+            if(std::fabs(v_time(zupt_index)-uwb_time)<2.0)
             {
                 for(int bi(0);bi<uwb_raw.cols()-1;++bi)
                 {
@@ -303,6 +315,7 @@ int main() {
                         dist_edge->setMeasurement(range);
 
                         globalOptimizer.addEdge(dist_edge);
+                        std::cout << "add distance edge" << std::endl;
                     }
                 }
                 break;
@@ -326,6 +339,8 @@ int main() {
     /**
      * output and Plot result
      */
+
+
     std::vector<double> gx,gy,gz;
     for(int i(0);i<zupt_res.rows();++i)
     {

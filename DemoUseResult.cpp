@@ -90,12 +90,20 @@ int main(int argc,char *argv[]) {
     std::string dir_name = "/home/steve/Data/FastUwbDemo/1/";
 
 
-    double offset_cov(0.01),rotation_cov(0.01),range_cov(5.0);
+    double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
     double time_offset(480.0);
 
-    if(argc==2)
+    if(argc>=2)
     {
         time_offset = std::stod(argv[1]);
+    }
+
+    if(argc==5)
+    {
+        offset_cov=std::stod(argv[2]);
+        rotation_cov=std::stod(argv[3]);
+        range_cov=std::stod(argv[4]);
+
     }
 
 
@@ -371,6 +379,8 @@ int main(int argc,char *argv[]) {
 
     plt::plot(gx,gy,"b-*");
     plt::plot(bx,by,"r*");
+    plt::title("offset :"+std::to_string(time_offset));
+    plt::save(std::to_string(time_offset)+"test.jpg");
     plt::show();
 
 

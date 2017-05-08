@@ -6,5 +6,5 @@ import os
 
 if __name__ == '__main__':
 
-    for time_offset in range(470,490):
+    for time_offset in range(68,77,1):
         os.system("../cmake-build-debug/dw {0}".format(time_offset))

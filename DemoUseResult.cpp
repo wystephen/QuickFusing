@@ -46,8 +46,8 @@
 //#include "g2o/types/slam3d_addons/vertex_line3d.h"
 //#include "g2o/types/slam3d_addons/edge_se3_line.h"
 
-//#include "OwnEdge/ZoEdge.h"
-//#include "OwnEdge/ZoEdge.cpp"
+#include "OwnEdge/ZoEdge.h"
+#include "OwnEdge/ZoEdge.cpp"
 #include "OwnEdge/DistanceEdge.h"
 #include "OwnEdge/DistanceEdge.cpp"
 
@@ -87,7 +87,7 @@ int main(int argc,char *argv[]) {
      * Global value
      */
 
-    std::string dir_name = "/home/steve/Data/FastUwbDemo/1/";
+    std::string dir_name = "/home/steve/Data/FastUwbDemo/2/";
 
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
@@ -248,9 +248,27 @@ int main(int argc,char *argv[]) {
         globalOptimizer.addVertex(v);
 
 
+        // Add z = 0 Edge
+//        auto *edge_z0=new Z0Edge();
+
+
+
         /// Add ZUPT Edge
         if(index>0)
         {
+            auto *edge_zo = new Z0Edge();
+            edge_zo->vertices()[0] = globalOptimizer.vertex(index-1);
+            edge_zo->vertices()[1] = globalOptimizer.vertex(index);
+
+            Eigen::Matrix<double,1,1> info;
+            info(0,0) = 100.0;
+            edge_zo->setInformation(info);
+            edge_zo->setMeasurement(0.0);
+
+            globalOptimizer.addEdge(edge_zo);
+
+
+
             auto *edge_se3 = new g2o::EdgeSE3();
 
             edge_se3->vertices()[0] = globalOptimizer.vertex(index-1);
@@ -357,6 +375,8 @@ int main(int argc,char *argv[]) {
 
 
 
+    std::ofstream imu("./ResultData/imu.txt");
+    std::ofstream uwb("./ResultData/uwb.txt");
     std::vector<double> gx,gy,gz;
     for(int i(0);i<zupt_res.rows();++i)
     {
@@ -365,6 +385,7 @@ int main(int argc,char *argv[]) {
         gx.push_back(data[0]);
         gy.push_back(data[1]);
         gz.push_back(data[2]);
+        imu << data[0]<<" "<<data[1]<<" "<<data[2] << std::endl;
     }
 
     std::vector<double> bx,by,bz;
@@ -375,6 +396,17 @@ int main(int argc,char *argv[]) {
         bx.push_back(data[0]);
         by.push_back(data[1]);
         bz.push_back(data[2]);
+        uwb << data[0] << " "<<data[1] << " " << data[2] << std::endl;
+    }
+
+
+    for(int i(0);i<uwb_raw.cols()-1;++i)
+    {
+        for(int j(0);j<i;++j)
+        {
+            std::cout << std::sqrt(std::pow(bx[i]-bx[j],2.0)+
+            std::pow(by[i]-by[j],2.0)+std::pow(bz[i]-bz[j],2.0))<<std::endl;
+        }
     }
 
     plt::plot(gx,gy,"b-*");

@@ -81,16 +81,23 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 }
 
 
-int main() {
+int main(int argc,char *argv[]) {
 
     /**
      * Global value
      */
 
-    std::string dir_name = "/home/steve/Data/FastUwbDemo/2/";
+    std::string dir_name = "/home/steve/Data/FastUwbDemo/1/";
 
 
-    double offset_cov(0.01),rotation_cov(0.01),range_cov(1.0);
+    double offset_cov(0.01),rotation_cov(0.01),range_cov(5.0);
+    double time_offset(480.0);
+
+    if(argc==2)
+    {
+        time_offset = std::stod(argv[1]);
+    }
+
 
 
     int trace_id = 0;
@@ -274,7 +281,7 @@ int main() {
         {
             break;
         }
-        double uwb_time = uwb_raw(uwb_index,0)-480.0;
+        double uwb_time = uwb_raw(uwb_index,0)-time_offset;
 
 
         zupt_index = 0;
@@ -291,7 +298,7 @@ int main() {
 
             }
 
-            if(std::fabs(v_time(zupt_index)-uwb_time)<2.0)
+            if(std::fabs(v_time(zupt_index)-uwb_time)<1.0)
             {
                 for(int bi(0);bi<uwb_raw.cols()-1;++bi)
                 {
@@ -339,6 +346,7 @@ int main() {
     /**
      * output and Plot result
      */
+
 
 
     std::vector<double> gx,gy,gz;

@@ -121,6 +121,17 @@ int main() {
      */
 
 
+    CSVReader UwbRawReader(dir_name+"uwb_result.csv");
+
+    Eigen::MatrixXd uwb_raw(UwbRawReader.GetMatrix().GetRows(),UwbRawReader.GetMatrix().GetCols());
+
+    for(int i(0);i<uwb_raw.rows();++i)
+    {
+        for(int j(0);j<uwb_raw.cols();++j)
+        {
+            uwb_raw(i,j) = *(UwbRawReader.GetMatrix()(i,j));
+        }
+    }
 
 
     CSVReader ImuDataReader(dir_name + "sim_imu.csv"),
@@ -178,8 +189,134 @@ int main() {
 
 
     /// Add Beacon Vertex
-    for(int i(0);i<)
+    for(int i(0);i<uwb_raw.cols()-1;++i)
+    {
+        auto *v = new g2o::VertexSE3();
+        double p[6]={0};
 
+        v->setEstimateData(p);
+        v->setFixed(false);
+        v->setId(beacon_id_offset+i);
+
+        globalOptimizer.addVertex(v);
+    }
+
+    ///Add ZUPT and ZUPT Edge
+    Eigen::Isometry3d latest_transform=Eigen::Isometry3d::Identity();
+
+    for(int index(0);index<zupt_res.rows();++index)
+    {
+
+        Eigen::Quaterniond qt;
+        qt.x() = quat(index,0);
+        qt.y() = quat(index,1);
+        qt.z() = quat(index,2);
+        qt.w() = quat(index,3);
+
+        auto this_transform = tq2Transform(Eigen::Vector3d(zupt_res(index,0),
+        zupt_res(index,1),
+        zupt_res(index,2)),
+        qt);
+        if(index == 0)
+        {
+           latest_transform = this_transform;
+        }
+
+        /// Add ZUPT Vertex
+        auto *v = new g2o::VertexSE3();
+        v->setId(index);
+//        v->setEstimateData(latest_transform.inverse()*this_transform);
+        globalOptimizer.addVertex(v);
+
+
+        /// Add ZUPT Edge
+        if(index>0)
+        {
+            auto *edge_se3 = new g2o::EdgeSE3();
+
+            edge_se3->vertices()[0] = globalOptimizer.vertex(index-1);
+            edge_se3->vertices()[1] = globalOptimizer.vertex(index);
+
+
+            Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
+
+
+            information(0, 0) = information(1, 1) = information(2, 2) = 1.0/offset_cov;
+            information(3, 3) = information(4, 4) = information(5, 5) = 1.0/rotation_cov;
+
+            edge_se3->setInformation(information);
+
+            edge_se3->setMeasurement(latest_transform.inverse()*this_transform);
+
+            globalOptimizer.addEdge(edge_se3);
+
+        }
+
+        latest_transform = this_transform;
+    }
+
+
+    /// ADD Range Edge
+
+    int zupt_index(0);
+
+    int uwb_index(0);
+
+    while(true)
+    {
+        if(uwb_index>uwb_raw.rows()-2||zupt_index>zupt_res.rows()-2)
+        {
+            break;
+        }
+        double uwb_time = uwb_raw(uwb_index,0)-640.0;
+
+
+        if(zupt_index>10)
+        {
+            zupt_index-=10;
+        }
+
+
+        while(true)
+        {
+            if(std::fabs(v_time(zupt_index)-uwb_time)<1.0)
+            {
+                for(int bi(0);bi<uwb_raw.cols()-1;++bi)
+                {
+                    if(uwb_raw(uwb_index,bi+1)>0)
+                    {
+                        double range = uwb_raw(uwb_index,bi+1);
+                        int beacon_id = bi+beacon_id_offset;
+
+                        int zupt_id = zupt_index;
+
+                        auto *dist_edge = new DistanceEdge();
+                        dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
+                        dist_edge->vertices()[1] = globalOptimizer.vertex(zupt_id);
+
+                        Eigen::Matrix<double,1,1> information;
+
+                        information(0,0) = 1/range_cov;
+
+                        dist_edge->setInformation(information);
+                        dist_edge->setSigma(10.0);
+                        dist_edge->setMeasurement(range);
+
+                        globalOptimizer.addEdge(dist_edge);
+                    }
+                }
+                break;
+            }
+
+            zupt_index++;
+        }
+
+        uwb_index++;
+    }
+
+    globalOptimizer.initializeOptimization();
+    globalOptimizer.setVerbose(true);
+    globalOptimizer.optimize(10000);
 
 
 
@@ -189,4 +326,31 @@ int main() {
     /**
      * output and Plot result
      */
+    std::vector<double> gx,gy,gz;
+    for(int i(0);i<zupt_res.rows();++i)
+    {
+        double data[10]={0};
+        globalOptimizer.vertex(i)->getEstimateData(data);
+        gx.push_back(data[0]);
+        gy.push_back(data[1]);
+        gz.push_back(data[2]);
+    }
+
+    std::vector<double> bx,by,bz;
+    for(int i(0);i<uwb_raw.cols()-1;++i)
+    {
+        double data[10]={0};
+        globalOptimizer.vertex(i+beacon_id_offset)->getEstimateData(data);
+        bx.push_back(data[0]);
+        by.push_back(data[1]);
+        bz.push_back(data[2]);
+    }
+
+    plt::plot(gx,gy,"b-*");
+    plt::plot(bx,by,"r*");
+    plt::show();
+
+
+
+
 }

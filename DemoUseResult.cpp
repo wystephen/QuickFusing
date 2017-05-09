@@ -91,7 +91,7 @@ int main(int argc,char *argv[]) {
 
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
-    double time_offset(480.0);
+    double time_offset(72.0);
 
     if(argc>=2)
     {

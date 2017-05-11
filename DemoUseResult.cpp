@@ -23,7 +23,7 @@
 #include "EXUWBPF.hpp"
 
 
-#include "MYEKF.h"
+//#include "MYEKF.h"
 #include<Eigen/Dense>
 #include <Eigen/Geometry>
 
@@ -405,8 +405,9 @@ int main(int argc,char *argv[]) {
         for(int j(0);j<i;++j)
         {
             std::cout << std::sqrt(std::pow(bx[i]-bx[j],2.0)+
-            std::pow(by[i]-by[j],2.0)+std::pow(bz[i]-bz[j],2.0))<<std::endl;
+            std::pow(by[i]-by[j],2.0)+std::pow(bz[i]-bz[j],2.0))<< "   ";
         }
+        std::cout << std::endl;
     }
 
     plt::plot(gx,gy,"b-*");

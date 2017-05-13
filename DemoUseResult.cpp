@@ -87,11 +87,11 @@ int main(int argc,char *argv[]) {
      * Global value
      */
 
-    std::string dir_name = "/home/steve/Data/FastUwbDemo/2/";
+    std::string dir_name = "/home/steve/Data/FastUwbDemo/3/";
 
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
-    double time_offset(72.0);//defualt parameters.
+    double time_offset(0.0);//defualt parameters.
 
     if(argc>=2)
     {

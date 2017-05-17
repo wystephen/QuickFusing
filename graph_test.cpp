@@ -511,6 +511,7 @@ int main(int argc, char *argv[]) {
 
                 latest_theta = the_theta;
                 std::cout << "current delta theta : " << delta_ori << std::endl;
+
 //                std::cout << trace_id << " " << delta_ori << "   " << is_corner
 //                          << is_corner << is_corner << is_corner << std::endl;
 

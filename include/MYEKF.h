@@ -364,6 +364,7 @@ public:
 
 
             //TODO: Try to use rotation matrix?
+            // first-order Runge-Kutta use to update the q....
             quat_ = (cos(v / 2.0) * Eigen::Matrix4d::Identity() +
                      2.0 / v * sin(v / 2.0) * OMEGA) * (q);
 
@@ -493,6 +494,10 @@ public:
 
         R = (Eigen::Matrix3d::Identity() - OMEGA) * (R);
 
+//        std::cout << "current R:" << R << std::endl;
+        //std::cout << "delta theta :" << get
+            
+
         quat_ = dcm2q(R);
 
         return x_out;
@@ -518,6 +523,7 @@ public:
             K = P_ * H_.transpose().eval() * (H_ * P_ * H_.transpose().eval() + R_).inverse();
 
             Eigen::VectorXd dx = K * z;
+            dx_ = dx;
 
             Eigen::MatrixXd Id;
             Id.resize(9, 9);
@@ -595,6 +601,8 @@ public:
         if (avg_vec(1) < 0) {
             theta *= -1.0;
         }
+//        std::cout <<"current dx_:"<< dx_  << std::endl;
+//        std::cout << "current p"<< P_ << std::endl;
 
         return theta * 180.0 / M_PI;
 
@@ -685,6 +693,8 @@ private:
 
 
     Eigen::Vector4d quat_;
+
+    Eigen::MatrixXd dx_;
 
 
     std::deque<Eigen::Vector2d> heading_vec_deque_;

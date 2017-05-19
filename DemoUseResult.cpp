@@ -87,7 +87,8 @@ int main(int argc,char *argv[]) {
      * Global value
      */
 
-    std::string dir_name = "/home/steve/Data/FastUwbDemo/5/";
+//    std::string dir_name = "/home/steve/Data/FastUwbDemo/5/";
+    std::string dir_name = "/home/steve/Data/IMUWB/26/";
 
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);

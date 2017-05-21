@@ -87,12 +87,12 @@ int main(int argc,char *argv[]) {
      * Global value
      */
 
-//    std::string dir_name = "/home/steve/Data/FastUwbDemo/5/";
-    std::string dir_name = "/home/steve/Data/IMUWB/26/";
+    std::string dir_name = "/home/steve/Data/FastUwbDemo/3/";
+//    std::string dir_name = "/home/steve/Data/IMUWB/26/";
 
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
-    double time_offset(0.0);//defualt parameters.
+    double time_offset(164.0);//defualt parameters.
 
 
     if(argc>=2)
@@ -416,7 +416,7 @@ int main(int argc,char *argv[]) {
     plt::plot(bx,by,"r*");
     plt::title("offset :"+std::to_string(time_offset));
     plt::save(std::to_string(time_offset)+"test.jpg");
-    plt::show();
+//    plt::show();
 
 
 

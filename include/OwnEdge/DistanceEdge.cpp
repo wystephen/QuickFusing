@@ -38,6 +38,9 @@ void DistanceEdge::computeError() {
 //    _error(0, 0) = std::pow(dis - (_measurement), 2.0);//*_information(0,0);
 //    std::cout << vertices()[1]->id()<<" : " << vertices()[0]->id() << "  " << dis << std::endl;
     _error(0,0) = std::log(NormalPdf(dis,_measurement,sigma_));
+//    _error(0,0) = (NormalPdf(dis,_measurement,sigma_));
+
+
 //    if(_error(0,0)>1.5)
 
 //    {
@@ -71,12 +74,39 @@ bool DistanceEdge::setMeasurementFromState() {
 //                           (p1[1] - p2[1]) * (p1[1] - p2[1]) +
 //                           (p1[2] - p2[2]) * (p1[2] - p2[2]));
 //
+//    auto value_of=[dis,p1,p2](double *delta_p1,double *delta_p2)->double
+//    {
+//        double new_dis(0.0);
+//        new_dis = std::sqrt((p1[0] - p2[0]+delta_p1[0]-delta_p2[0]) * (p1[0] - p2[0]+delta_p1[0]-delta_p2[0]) +
+//                                   (p1[1] - p2[1]+delta_p1[1]-delta_p2[1]) * (p1[1] - p2[1]+delta_p1[1]-delta_p2[1]) +
+//                                   (p1[2] - p2[2]+delta_p1[2]-delta_p2[2]) * (p1[2] - p2[2]+delta_p1[2]-delta_p2[2]));
+//        return new_dis;
+//    };
+//
+////    double delta_G = 1.0;
+////    delta_G = _error(0,0) * (dis-_measurement)/sigma_/sigma_;
+////    delta_G = std::log(1/std::sqrt(2*M_PI)/sigma_) * (dis-_measurement)/sigma_/sigma_;
+//
+//    double delta_offset(_error(0,0)/1000000000.0);
+//
 //    for (int i(0); i < 3; ++i) {
-//        if (std::abs(p1[i] - p2[i]) - _measurement < 0.00000000000001) {
-//            continue;
-//        }
-//        _jacobianOplusXi(0, i) = (p1[i] - p2[i]);//* 2.0 * (dis - _measurement);
-//        _jacobianOplusXj(0, i) = -(p1[i] - p2[i]);//* 2.0 * (dis - _measurement);
+////        if (std::abs(p1[i] - p2[i]) - _measurement <1e-20) {
+////            continue;
+////        }
+//
+//        double dp1[3]={0};
+//        double dp2[3]={0};
+//
+//
+//
+//        dp1[i] = delta_offset;
+//        _jacobianOplusXi(0,i)=-(std::log(NormalPdf(dis,_measurement,sigma_))-std::log(NormalPdf(value_of(dp1,dp2),_measurement,sigma_)))/delta_offset;
+//        dp1[i]=0.0;
+//        dp2[i] = delta_offset;
+//        _jacobianOplusXj(0,i)=-(std::log(NormalPdf(dis,_measurement,sigma_))-std::log(NormalPdf(value_of(dp1,dp2),_measurement,sigma_)))/delta_offset;
+//
+////        _jacobianOplusXi(0, i) = -(p1[i] - p2[i]) * (dis )*delta_G;
+////        _jacobianOplusXj(0, i) = (p1[i] - p2[i])* 2.0 * (dis )*delta_G;
 //    }
 //
 //}

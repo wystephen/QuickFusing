@@ -87,12 +87,13 @@ int main(int argc,char *argv[]) {
      * Global value
      */
 
-    std::string dir_name = "/home/steve/Data/FastUwbDemo/3/";
-//    std::string dir_name = "/home/steve/Data/IMUWB/26/";
+//    std::string dir_name = "/home/steve/Data/FastUwbDemo/3/";
 
+//    std::string dir_name = "/home/steve/Data/IMUWB/27/";
+    std::string dir_name = "/home/steve/Data/NewRecord/Record1/";
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
-    double time_offset(164.0);//defualt parameters.
+    double time_offset(0.0);//defualt parameters.
 
 
     if(argc>=2)
@@ -258,16 +259,16 @@ int main(int argc,char *argv[]) {
         /// Add ZUPT Edge
         if(index>0)
         {
-            auto *edge_zo = new Z0Edge();
-            edge_zo->vertices()[0] = globalOptimizer.vertex(index-1);
-            edge_zo->vertices()[1] = globalOptimizer.vertex(index);
-
-            Eigen::Matrix<double,1,1> info;
-            info(0,0) = 100.0;
-            edge_zo->setInformation(info);
-            edge_zo->setMeasurement(0.0);
-
-            globalOptimizer.addEdge(edge_zo);
+//            auto *edge_zo = new Z0Edge();
+//            edge_zo->vertices()[0] = globalOptimizer.vertex(index-1);
+//            edge_zo->vertices()[1] = globalOptimizer.vertex(index);
+//
+//            Eigen::Matrix<double,1,1> info;
+//            info(0,0) = 100.0;
+//            edge_zo->setInformation(info);
+//            edge_zo->setMeasurement(0.0);
+//
+//            globalOptimizer.addEdge(edge_zo);
 
 
 

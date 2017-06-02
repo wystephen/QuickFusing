@@ -18,7 +18,7 @@
 class ResultEvaluation {
 public:
     ResultEvaluation(std::string keypoint_file_name) {
-        CSVReader KeyPoint(keypoint_file_name);
+        CppExtent::CSVReader KeyPoint(keypoint_file_name);
 
         keypoint_.resize(KeyPoint.GetMatrix().GetRows(),
                          KeyPoint.GetMatrix().GetCols());

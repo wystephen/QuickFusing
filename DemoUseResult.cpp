@@ -90,10 +90,11 @@ int main(int argc,char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/FastUwbDemo/3/";
 
 //    std::string dir_name = "/home/steve/Data/IMUWB/27/";
-    std::string dir_name = "/home/steve/Data/NewRecord/Record1/";
+//    std::string dir_name = "/home/steve/Data/NewRecord/Record2/";
+    std::string dir_name = "/home/steve/tmp/test/44/";
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
-    double time_offset(0.0);//defualt parameters.
+    double time_offset(0.0);//defualt paramet35s.
 
 
     if(argc>=2)
@@ -139,7 +140,7 @@ int main(int argc,char *argv[]) {
      */
 
 
-    CSVReader UwbRawReader(dir_name+"uwb_result.csv");
+    CppExtent::CSVReader UwbRawReader(dir_name+"uwb_result.csv");
 
     Eigen::MatrixXd uwb_raw(UwbRawReader.GetMatrix().GetRows(),UwbRawReader.GetMatrix().GetCols());
 
@@ -152,7 +153,7 @@ int main(int argc,char *argv[]) {
     }
 
 
-    CSVReader ImuDataReader(dir_name + "sim_imu.csv"),
+    CppExtent::CSVReader ImuDataReader(dir_name + "sim_imu.csv"),
             ZuptReader(dir_name + "sim_zupt.csv");
 
     auto ImuDataTmp(ImuDataReader.GetMatrix()), ZuptTmp(ZuptReader.GetMatrix());
@@ -168,9 +169,9 @@ int main(int argc,char *argv[]) {
         Zupt(i, 0) = int(*ZuptTmp(i, 0));
     }
 
-    CSVReader ZuptResultReader(dir_name+"sim_pose.csv");
-    CSVReader QuatReader(dir_name+"all_quat.csv");
-    CSVReader VertexTime(dir_name+"vertex_time.csv");
+    CppExtent::CSVReader ZuptResultReader(dir_name+"sim_pose.csv");
+    CppExtent::CSVReader QuatReader(dir_name+"all_quat.csv");
+    CppExtent::CSVReader VertexTime(dir_name+"vertex_time.csv");
 
     Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(),ZuptResultReader.GetMatrix().GetCols());
     Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(),QuatReader.GetMatrix().GetCols());
@@ -259,15 +260,15 @@ int main(int argc,char *argv[]) {
         /// Add ZUPT Edge
         if(index>0)
         {
-//            auto *edge_zo = new Z0Edge();
-//            edge_zo->vertices()[0] = globalOptimizer.vertex(index-1);
-//            edge_zo->vertices()[1] = globalOptimizer.vertex(index);
-//
-//            Eigen::Matrix<double,1,1> info;
-//            info(0,0) = 100.0;
-//            edge_zo->setInformation(info);
-//            edge_zo->setMeasurement(0.0);
-//
+            auto *edge_zo = new Z0Edge();
+            edge_zo->vertices()[0] = globalOptimizer.vertex(index-1);
+            edge_zo->vertices()[1] = globalOptimizer.vertex(index);
+
+            Eigen::Matrix<double,1,1> info;
+            info(0,0) = 100.0;
+            edge_zo->setInformation(info);
+            edge_zo->setMeasurement(0.0);
+
 //            globalOptimizer.addEdge(edge_zo);
 
 
@@ -281,12 +282,18 @@ int main(int argc,char *argv[]) {
             Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
 
 
+
+
             information(0, 0) = information(1, 1) = information(2, 2) = 1.0/offset_cov;
             information(3, 3) = information(4, 4) = information(5, 5) = 1.0/rotation_cov;
+
+
+
 
             edge_se3->setInformation(information);
 
             edge_se3->setMeasurement(latest_transform.inverse()*this_transform);
+
 
 
             globalOptimizer.addEdge(edge_se3);
@@ -331,7 +338,7 @@ int main(int argc,char *argv[]) {
             {
                 for(int bi(0);bi<uwb_raw.cols()-1;++bi)
                 {
-                    if(uwb_raw(uwb_index,bi+1)>0&&uwb_raw(uwb_index,bi+1)<60.0)
+                    if(uwb_raw(uwb_index,bi+1)>0&&uwb_raw(uwb_index,bi+1)<3.0)
                     {
                         double range = uwb_raw(uwb_index,bi+1);
                         int beacon_id = bi+beacon_id_offset;
@@ -365,7 +372,13 @@ int main(int argc,char *argv[]) {
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(10000);
+
+//    globalOptimizer.optimize(100);
+//    for(int i(0);i<zupt_res.rows();++i)
+//    {
+//        globalOptimizer.vertex(i)->setFixed(false);
+//    }
+    globalOptimizer.optimize(100000);
 
 
 

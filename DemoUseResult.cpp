@@ -285,11 +285,11 @@ int main(int argc,char *argv[]) {
         if(index>0)
         {
             auto *edge_zo = new Z0Edge();
-            edge_zo->vertices()[0] = globalOptimizer.vertex(never_used_id);
+            edge_zo->vertices()[0] = globalOptimizer.vertex(index -1);
             edge_zo->vertices()[1] = globalOptimizer.vertex(index);
 
             Eigen::Matrix<double,1,1> info;
-            info(0,0) = 0.1;
+            info(0,0) = 1.0;
             edge_zo->setInformation(info);
             edge_zo->setMeasurement(v_high(index,0));
 
@@ -374,7 +374,7 @@ int main(int argc,char *argv[]) {
             {
                 for(int bi(0);bi<uwb_raw.cols()-1;++bi)
                 {
-                    if(uwb_raw(uwb_index,bi+1)>0&&uwb_raw(uwb_index,bi+1)<3.0)
+                    if(uwb_raw(uwb_index,bi+1)>0&&uwb_raw(uwb_index,bi+1)<311.0)
                     {
                         double range = uwb_raw(uwb_index,bi+1);
                         int beacon_id = bi+beacon_id_offset;

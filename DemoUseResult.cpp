@@ -91,7 +91,7 @@ int main(int argc,char *argv[]) {
 
 //    std::string dir_name = "/home/steve/Data/IMUWB/27/";
 //    std::string dir_name = "/home/steve/Data/NewRecord/Record2/";
-    std::string dir_name = "/home/steve/tmp/test/44/";
+    std::string dir_name = "/home/steve/tmp/test/45/";
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
     double time_offset(0.0);//defualt paramet35s.
@@ -172,10 +172,14 @@ int main(int argc,char *argv[]) {
     CppExtent::CSVReader ZuptResultReader(dir_name+"sim_pose.csv");
     CppExtent::CSVReader QuatReader(dir_name+"all_quat.csv");
     CppExtent::CSVReader VertexTime(dir_name+"vertex_time.csv");
+    CppExtent::CSVReader VertexHigh(dir_name+"vertex_high.csv");
 
     Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(),ZuptResultReader.GetMatrix().GetCols());
     Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(),QuatReader.GetMatrix().GetCols());
     Eigen::MatrixXd v_time(VertexTime.GetMatrix().GetRows(),VertexTime.GetMatrix().GetCols());
+    Eigen::MatrixXd v_high(VertexHigh.GetMatrix().GetRows(),VertexHigh.GetMatrix().GetCols());
+
+    auto v_high_matrix = VertexHigh.GetMatrix();
 
     for(int i(0);i<zupt_res.rows();++i)
     {
@@ -201,6 +205,14 @@ int main(int argc,char *argv[]) {
         }
     }
 
+    for(int i(0);i<v_high.rows();++i)
+    {
+        for(int j(0);j<v_high.cols();++j)
+        {
+            v_high(i,j) = *v_high_matrix(i,j);
+        }
+    }
+
 
     /**
      * Build Graph
@@ -219,6 +231,18 @@ int main(int argc,char *argv[]) {
 
         globalOptimizer.addVertex(v);
     }
+
+    /// Add never used vertex
+
+    int never_used_id = 9999910;
+    auto *v = new g2o::VertexSE3();
+    double p[6] ={0};
+
+    v->setEstimateData(p);
+    v->setFixed(true);
+    v->setId(never_used_id);
+
+    globalOptimizer.addVertex(v);
 
     ///Add ZUPT and ZUPT Edge
     Eigen::Isometry3d latest_transform=Eigen::Isometry3d::Identity();
@@ -261,15 +285,15 @@ int main(int argc,char *argv[]) {
         if(index>0)
         {
             auto *edge_zo = new Z0Edge();
-            edge_zo->vertices()[0] = globalOptimizer.vertex(index-1);
+            edge_zo->vertices()[0] = globalOptimizer.vertex(never_used_id);
             edge_zo->vertices()[1] = globalOptimizer.vertex(index);
 
             Eigen::Matrix<double,1,1> info;
-            info(0,0) = 100.0;
+            info(0,0) = 0.1;
             edge_zo->setInformation(info);
-            edge_zo->setMeasurement(0.0);
+            edge_zo->setMeasurement(v_high(index,0));
 
-//            globalOptimizer.addEdge(edge_zo);
+            globalOptimizer.addEdge(edge_zo);
 
 
 
@@ -302,6 +326,18 @@ int main(int argc,char *argv[]) {
 
         latest_transform = this_transform;
     }
+
+
+    /// ADD High Edge
+
+    /**
+     * TODO: Redifined a new version of z constraint for high.
+     * NOTE:  now the zero edge added in the process above.
+     */
+
+
+
+
 
 
 

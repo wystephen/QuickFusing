@@ -293,7 +293,7 @@ int main(int argc,char *argv[]) {
             edge_zo->setInformation(info);
             edge_zo->setMeasurement(v_high(index,0));
 
-//            globalOptimizer.addEdge(edge_zo);
+            globalOptimizer.addEdge(edge_zo);
 
 
 

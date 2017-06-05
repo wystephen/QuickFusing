@@ -41,6 +41,7 @@ endif ()
 SET(G2O_ROOT /usr/local/include/g2o)
 FIND_PACKAGE(G2O)
 FIND_PACKAGE(CSparse)
+FIND_PACKAGE(Cholmod)
 
 include_directories(
         ${EIGEN3_INCLUDE_DIR}
@@ -56,6 +57,8 @@ include_directories(
         /usr/local/include
         ${CSPARSE_INCLUDE_DIR}
         ${G2O_INCLUDE_DIR}
+        ${Cholmod_INCLUDE_DIR}
+        ${SuiteSparse_INCLUDE_DIR}
 )
 
 link_directories(
@@ -74,7 +77,7 @@ SET(G2O_LIBS g2o_cli g2o_ext_freeglut_minimal g2o_simulator
         g2o_types_sba g2o_types_slam3d g2o_csparse_extension g2o_opengl_helper
         g2o_solver_dense g2o_stuff g2o_types_sclam2d g2o_parser g2o_solver_pcg
         g2o_types_data g2o_types_sim3 cxsparse
-        g2o_types_slam3d_addons)
+        g2o_types_slam3d_addons g2o_solver_cholmod )
 
 
 #FILE(GLOB SOURCES "*.cu" "*.cpp" "*.c" "*.h")
@@ -90,7 +93,9 @@ target_link_libraries(fast_demo ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIE
 
 
 add_executable(dw DemoUseResult.cpp)
-target_link_libraries(dw ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
+target_link_libraries(dw ${G2O_LIBS} ${Cholmod_LIBRARIES} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )
+
+
 
 # For test
 

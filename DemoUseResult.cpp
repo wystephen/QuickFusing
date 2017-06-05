@@ -32,9 +32,10 @@
 #include "g2o/core/factory.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
+#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+
 
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_impl.h"
@@ -123,7 +124,7 @@ int main(int argc,char *argv[]) {
 
 
     typedef g2o::BlockSolverX SlamBlockSolver;
-    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
     // Initial solver
     SlamLinearSolver *linearSolver = new SlamLinearSolver();

@@ -4,7 +4,7 @@ project(QuickFusing)
 #set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_BUILD_TOOL Release)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O4 -msse2 -msse3 -msse4 -lopencv_aruco -lpthread ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -lopencv_aruco -lpthread ")
 #set(CUDA_NVCC_FLAGSS ${CUDA_NVCC_FLAGS} --gpu-architecture sm_20)
 
 
@@ -45,7 +45,6 @@ FIND_PACKAGE(Cholmod)
 
 include_directories(
         ${EIGEN3_INCLUDE_DIR}
-
         ./include
         /usr/local/cuda/include
         /home/steve/Cpp_Extent/Cpp_Extent
@@ -93,7 +92,8 @@ target_link_libraries(fast_demo ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIE
 
 
 add_executable(dw DemoUseResult.cpp)
-target_link_libraries(dw ${G2O_LIBS} ${Cholmod_LIBRARIES} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )
+#target_link_libraries(dw ${G2O_LIBS} ${Cholmod_LIBRARIES} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )
+target_link_libraries(dw ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )
 
 
 

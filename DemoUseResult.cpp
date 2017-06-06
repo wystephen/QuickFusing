@@ -124,7 +124,8 @@ int main(int argc,char *argv[]) {
 
 
     typedef g2o::BlockSolverX SlamBlockSolver;
-    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+//    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
     // Initial solver
     SlamLinearSolver *linearSolver = new SlamLinearSolver();

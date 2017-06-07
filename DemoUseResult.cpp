@@ -92,7 +92,8 @@ int main(int argc,char *argv[]) {
 
 //    std::string dir_name = "/home/steve/Data/IMUWB/27/";
 //    std::string dir_name = "/home/steve/Data/NewRecord/Record2/";
-    std::string dir_name = "/home/steve/tmp/test/45/";
+//    std::string dir_name = "/home/steve/tmp/test/45/";
+    std::string dir_name = "/home/steve/Code/Mini-IMU/Scripts/IMUWB/46/";
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
     double time_offset(0.0);//defualt paramet35s.
@@ -295,7 +296,7 @@ int main(int argc,char *argv[]) {
             edge_zo->setInformation(info);
             edge_zo->setMeasurement(v_high(index,0));
 
-            globalOptimizer.addEdge(edge_zo);
+//            globalOptimizer.addEdge(edge_zo);
 
 
 

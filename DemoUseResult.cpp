@@ -175,7 +175,7 @@ int main(int argc,char *argv[]) {
     CppExtent::CSVReader ZuptResultReader(dir_name+"sim_pose.csv");
     CppExtent::CSVReader QuatReader(dir_name+"all_quat.csv");
     CppExtent::CSVReader VertexTime(dir_name+"vertex_time.csv");
-    CppExtent::CSVReader VertexHigh(dir_name+"vertex_high.csv");
+    CppExtent::CSVReader VertexHigh(dir_name+"vertex_high_modified.csv");
 
     Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(),ZuptResultReader.GetMatrix().GetCols());
     Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(),QuatReader.GetMatrix().GetCols());
@@ -295,6 +295,11 @@ int main(int argc,char *argv[]) {
             info(0,0) = 0.1;
             edge_zo->setInformation(info);
             edge_zo->setMeasurement(v_high(index,0));
+
+            if(v_high(index,0)>=0.0)
+            {
+                globalOptimizer.addEdge(edge_zo);
+            }
 
 //            globalOptimizer.addEdge(edge_zo);
 

@@ -292,7 +292,7 @@ int main(int argc,char *argv[]) {
             edge_zo->vertices()[1] = globalOptimizer.vertex(index);
 
             Eigen::Matrix<double,1,1> info;
-            info(0,0) = 0.1;
+            info(0,0) = 10.0;
             edge_zo->setInformation(info);
             edge_zo->setMeasurement(v_high(index,0));
 
@@ -401,7 +401,10 @@ int main(int argc,char *argv[]) {
                         dist_edge->setSigma(10.0);
                         dist_edge->setMeasurement(range);
 
-                        globalOptimizer.addEdge(dist_edge);
+                        if( v_high(zupt_index,0)>=0.0)
+                        {
+                            globalOptimizer.addEdge(dist_edge);
+                        }
                         std::cout << "add distance edge" << std::endl;
                     }
                 }
@@ -475,8 +478,6 @@ int main(int argc,char *argv[]) {
     plt::title("offset :"+std::to_string(time_offset));
     plt::save(std::to_string(time_offset)+"test.jpg");
 //    plt::show();
-
-
 
 
 }

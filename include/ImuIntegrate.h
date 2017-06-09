@@ -20,6 +20,7 @@
 //#include "sophus/so3.h"
 //#include "sophus/se3.h"
 
+
 class ImuIntegrate {
 public:
     ImuIntegrate(double error) {

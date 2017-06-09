@@ -93,7 +93,7 @@ int main(int argc,char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/IMUWB/27/";
 //    std::string dir_name = "/home/steve/Data/NewRecord/Record2/";
 //    std::string dir_name = "/home/steve/tmp/test/45/";
-    std::string dir_name = "/home/steve/Code/Mini-IMU/Scripts/IMUWB/46/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/46/";
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
     double time_offset(0.0);//defualt paramet35s.
@@ -235,6 +235,41 @@ int main(int argc,char *argv[]) {
         globalOptimizer.addVertex(v);
     }
 
+    /**
+     * SPECIALL
+     * // TODO: REMOVE It!!!!
+     */
+
+    std::vector<int> low_b{0,1,3,6};
+    std::vector<int> high_b{2,4,5,7};
+
+
+    for(int i(0);i<4;++i)
+    {
+        auto *e = new Z0Edge();
+        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset+low_b[i]);
+        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset+low_b[i+1]);
+
+        Eigen::Matrix<double,1,1> info;
+        info(0,0) = 0.05;
+
+        e->setMeasurement(0.45);
+        globalOptimizer.addEdge(e);
+    }
+
+    for(int i(0);i<4;++i)
+    {
+        auto *e = new Z0Edge();
+        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset+high_b[i]);
+        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset+high_b[i+1]);
+
+        Eigen::Matrix<double,1,1> info;
+        info(0,0) = 0.05;
+
+        e->setMeasurement(4.45);
+        globalOptimizer.addEdge(e);
+    }
+
     /// Add never used vertex
 
     int never_used_id = 9999910;
@@ -296,7 +331,7 @@ int main(int argc,char *argv[]) {
             edge_zo->setInformation(info);
             edge_zo->setMeasurement(v_high(index,0));
 
-            if(v_high(index,0)>=0.0)
+            if(v_high(index,0)>-1.0)
             {
                 globalOptimizer.addEdge(edge_zo);
             }
@@ -319,7 +354,11 @@ int main(int argc,char *argv[]) {
             information(0, 0) = information(1, 1) = information(2, 2) = 1.0/offset_cov;
             information(3, 3) = information(4, 4) = information(5, 5) = 1.0/rotation_cov;
 
-
+//            if(v_high(index,0)<0.0)
+//            {
+//                information(0, 0) = information(1, 1) = information(2, 2) = 1.0/offset_cov*2.0;
+//                information(3, 3) = information(4, 4) = information(5, 5) = 1.0/rotation_cov;
+//            }
 
 
             edge_se3->setInformation(information);
@@ -401,7 +440,7 @@ int main(int argc,char *argv[]) {
                         dist_edge->setSigma(10.0);
                         dist_edge->setMeasurement(range);
 
-                        if( v_high(zupt_index,0)>=0.0)
+                        if( v_high(zupt_index,0)>=-1.0)
                         {
                             globalOptimizer.addEdge(dist_edge);
                         }
@@ -465,12 +504,18 @@ int main(int argc,char *argv[]) {
 
     for(int i(0);i<uwb_raw.cols()-1;++i)
     {
+
         for(int j(0);j<i;++j)
         {
             std::cout << std::sqrt(std::pow(bx[i]-bx[j],2.0)+
             std::pow(by[i]-by[j],2.0)+std::pow(bz[i]-bz[j],2.0))<< "   ";
         }
         std::cout << std::endl;
+    }
+
+    for(int i(0);i<uwb_raw.cols();++i)
+    {
+        std::cout << "i : " << i << " z = " << bz[i] << std::endl;
     }
 
     plt::plot(gx,gy,"b-*");

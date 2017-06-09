@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 if __name__ == '__main__':
-    dir_name = "/home/steve/Code/Mini-IMU/Scripts/IMUWB/46/"
+    dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/46/"
     high_mat = np.loadtxt(dir_name+'vertex_high.csv',delimiter=',')
 
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     avg_press = np.mean(high_mat)
 
     for i in range(10,high_mat.shape[0]-10):
-        if np.abs(high_mat[i]-high_mat[i-4])>5e9 or np.abs(high_mat[i]-high_mat[i+4])>5e9:
+        if np.abs(high_mat[i]-high_mat[i-10])>5e9 or np.abs(high_mat[i]-high_mat[i+10])>5e9:
             stat_whole[i] = np.max(high_mat)
 
     for i in range(high_mat.shape[0]):

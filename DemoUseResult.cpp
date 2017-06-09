@@ -216,7 +216,9 @@ int main(int argc,char *argv[]) {
         }
     }
 
-
+    /// ROBUST KERNEL
+    static g2o::RobustKernel* robustKernel =
+            g2o::RobustKernelFactory::instance()->construct( "Cauchy" );
     /**
      * Build Graph
      */
@@ -240,35 +242,40 @@ int main(int argc,char *argv[]) {
      * // TODO: REMOVE It!!!!
      */
 
-    std::vector<int> low_b{0,1,3,6};
-    std::vector<int> high_b{2,4,5,7};
+    std::vector<int> low_b{0,1,3,6,0};
+    std::vector<int> high_b{2,4,5,7,2};
+
+//
+//    for(int i(0);i<4;++i)
+//    {
+//        auto *e = new Z0Edge();
+//        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset+low_b[i]);
+//        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset+low_b[i+1]);
+//
+//        Eigen::Matrix<double,1,1> info;
+//        info(0,0) = 1.0;
+//
+//        e->setMeasurement(0.45);
+//        e->setRobustKernel(robustKernel);
+//        globalOptimizer.addEdge(e);
+//    }
+//
+//    for(int i(0);i<4;++i)
+//    {
+//        auto *e = new Z0Edge();
+//        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset+high_b[i]);
+//        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset+high_b[i+1]);
+//
+//        Eigen::Matrix<double,1,1> info;
+//        info(0,0) = 1.0;
+//
+//        e->setMeasurement(4.45);
+//        e->setRobustKernel(robustKernel);
+//        globalOptimizer.addEdge(e);
+//    }
 
 
-    for(int i(0);i<4;++i)
-    {
-        auto *e = new Z0Edge();
-        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset+low_b[i]);
-        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset+low_b[i+1]);
 
-        Eigen::Matrix<double,1,1> info;
-        info(0,0) = 0.05;
-
-        e->setMeasurement(0.45);
-        globalOptimizer.addEdge(e);
-    }
-
-    for(int i(0);i<4;++i)
-    {
-        auto *e = new Z0Edge();
-        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset+high_b[i]);
-        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset+high_b[i+1]);
-
-        Eigen::Matrix<double,1,1> info;
-        info(0,0) = 0.05;
-
-        e->setMeasurement(4.45);
-        globalOptimizer.addEdge(e);
-    }
 
     /// Add never used vertex
 
@@ -421,7 +428,7 @@ int main(int argc,char *argv[]) {
             {
                 for(int bi(0);bi<uwb_raw.cols()-1;++bi)
                 {
-                    if(uwb_raw(uwb_index,bi+1)>0&&uwb_raw(uwb_index,bi+1)<55.0)
+                    if(uwb_raw(uwb_index,bi+1)>0&&uwb_raw(uwb_index,bi+1)<155.0)
                     {
                         double range = uwb_raw(uwb_index,bi+1);
                         int beacon_id = bi+beacon_id_offset;
@@ -437,8 +444,11 @@ int main(int argc,char *argv[]) {
                         information(0,0) = 1/range_cov;
 
                         dist_edge->setInformation(information);
-                        dist_edge->setSigma(10.0);
+                        dist_edge->setSigma(5.0);
                         dist_edge->setMeasurement(range);
+
+
+                        dist_edge->setRobustKernel(robustKernel);
 
                         if( v_high(zupt_index,0)>=-1.0)
                         {
@@ -456,6 +466,21 @@ int main(int argc,char *argv[]) {
         uwb_index++;
     }
 
+
+    /// TODO: DELETE THIS ADD A SPECIAL RANGE
+    auto *edge = new DistanceEdge();
+    edge->vertices()[0] = globalOptimizer.vertex(0);
+    edge->vertices()[1] = globalOptimizer.vertex(zupt_res.rows()-1);
+
+    edge->setMeasurement(0.0);
+
+    Eigen::Matrix<double,1,1> information;
+    information(0,0) = 1/range_cov;
+
+    edge->setInformation(information);
+    edge->setSigma(2.0);
+    globalOptimizer.addEdge(edge);
+
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
 
@@ -464,7 +489,7 @@ int main(int argc,char *argv[]) {
 //    {
 //        globalOptimizer.vertex(i)->setFixed(false);
 //    }
-    globalOptimizer.optimize(100000);
+    globalOptimizer.optimize(20000);
 
 
 
@@ -513,7 +538,7 @@ int main(int argc,char *argv[]) {
         std::cout << std::endl;
     }
 
-    for(int i(0);i<uwb_raw.cols();++i)
+    for(int i(0);i<uwb_raw.cols()-1;++i)
     {
         std::cout << "i : " << i << " z = " << bz[i] << std::endl;
     }

@@ -98,6 +98,8 @@ int main(int argc, char *argv[]) {
     double offset_cov(0.001), rotation_cov(0.002), range_cov(5.0);
     double time_offset(0.0);//defualt paramet35s.
 
+    double valid_range(4.0),range_sigma(5.0),z0_info(5.0);
+
 
     if (argc >= 2) {
         time_offset = std::stod(argv[1]);
@@ -108,6 +110,13 @@ int main(int argc, char *argv[]) {
         rotation_cov = std::stod(argv[3]);
         range_cov = std::stod(argv[4]);
 
+    }
+
+    if( argc == 8)
+    {
+        valid_range = std::stod(argv[5]);
+        range_sigma = std::stod(argv[6]);
+        z0_info = std::stod(argv[7]);
     }
 
 
@@ -317,7 +326,7 @@ int main(int argc, char *argv[]) {
             edge_zo->vertices()[1] = globalOptimizer.vertex(index);
 
             Eigen::Matrix<double, 1, 1> info;
-            info(0, 0) = 10.0;
+            info(0, 0) = z0_info;
             edge_zo->setInformation(info);
             edge_zo->setMeasurement(v_high(index, 0));
 
@@ -435,7 +444,7 @@ int main(int argc, char *argv[]) {
                         information(0, 0) = 1 / range_cov;
 
                         dist_edge->setInformation(information);
-                        dist_edge->setSigma(5.0);
+                        dist_edge->setSigma(range_sigma);
                         dist_edge->setMeasurement(range);
 
 
@@ -444,7 +453,7 @@ int main(int argc, char *argv[]) {
                         if (v_high(zupt_index, 0) >= -1.0) {
                             globalOptimizer.addEdge(dist_edge);
                         }else{
-                            if(range<4.0)
+                            if(range<valid_range)
                             {
                                globalOptimizer.addEdge(dist_edge);
                             }
@@ -545,7 +554,9 @@ int main(int argc, char *argv[]) {
     plt::plot(gx, gy, "b-*");
     plt::plot(bx, by, "r*");
     plt::title("para:"+std::to_string(offset_cov)+":"
-    +std::to_string(rotation_cov)+":"+std::to_string(range_cov));
+    +std::to_string(rotation_cov)+":"+std::to_string(range_cov)+":"
+    +std::to_string(valid_range)+":"+std::to_string(range_sigma)+
+    ":"+std::to_string(z0_info));
 
     plt::save(std::to_string(TimeStamp::now())
 

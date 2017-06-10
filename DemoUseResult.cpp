@@ -93,7 +93,7 @@ int main(int argc,char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/IMUWB/27/";
 //    std::string dir_name = "/home/steve/Data/NewRecord/Record2/";
 //    std::string dir_name = "/home/steve/tmp/test/45/";
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/47/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/46/";
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
     double time_offset(0.0);//defualt paramet35s.
@@ -125,8 +125,8 @@ int main(int argc,char *argv[]) {
 
 
     typedef g2o::BlockSolverX SlamBlockSolver;
-//    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
-    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+//    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
     // Initial solver
     SlamLinearSolver *linearSolver = new SlamLinearSolver();
@@ -246,33 +246,33 @@ int main(int argc,char *argv[]) {
     std::vector<int> high_b{2,4,5,7,2};
 
 //
-//    for(int i(0);i<4;++i)
-//    {
-//        auto *e = new Z0Edge();
-//        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset+low_b[i]);
-//        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset+low_b[i+1]);
-//
-//        Eigen::Matrix<double,1,1> info;
-//        info(0,0) = 1.0;
-//
-//        e->setMeasurement(0.45);
-//        e->setRobustKernel(robustKernel);
-//        globalOptimizer.addEdge(e);
-//    }
-//
-//    for(int i(0);i<4;++i)
-//    {
-//        auto *e = new Z0Edge();
-//        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset+high_b[i]);
-//        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset+high_b[i+1]);
-//
-//        Eigen::Matrix<double,1,1> info;
-//        info(0,0) = 1.0;
-//
-//        e->setMeasurement(4.45);
-//        e->setRobustKernel(robustKernel);
-//        globalOptimizer.addEdge(e);
-//    }
+    for(int i(0);i<4;++i)
+    {
+        auto *e = new Z0Edge();
+        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset+low_b[i]);
+        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset+low_b[i+1]);
+
+        Eigen::Matrix<double,1,1> info;
+        info(0,0) = 1.0;
+
+        e->setMeasurement(0.45);
+        e->setRobustKernel(robustKernel);
+        globalOptimizer.addEdge(e);
+    }
+
+    for(int i(0);i<4;++i)
+    {
+        auto *e = new Z0Edge();
+        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset+high_b[i]);
+        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset+high_b[i+1]);
+
+        Eigen::Matrix<double,1,1> info;
+        info(0,0) = 1.0;
+
+        e->setMeasurement(4.45);
+        e->setRobustKernel(robustKernel);
+        globalOptimizer.addEdge(e);
+    }
 
 
 

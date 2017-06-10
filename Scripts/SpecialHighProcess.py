@@ -45,7 +45,7 @@ if __name__ == '__main__':
         else:
             out_high[i]=-10
 
-
+    # out_high *= 0.0
 
 
     plt.figure()

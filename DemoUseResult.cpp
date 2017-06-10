@@ -93,7 +93,7 @@ int main(int argc,char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/IMUWB/27/";
 //    std::string dir_name = "/home/steve/Data/NewRecord/Record2/";
 //    std::string dir_name = "/home/steve/tmp/test/45/";
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/46/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/47/";
 
     double offset_cov(0.001),rotation_cov(0.002),range_cov(5.0);
     double time_offset(0.0);//defualt paramet35s.
@@ -468,18 +468,18 @@ int main(int argc,char *argv[]) {
 
 
     /// TODO: DELETE THIS ADD A SPECIAL RANGE
-    auto *edge = new DistanceEdge();
-    edge->vertices()[0] = globalOptimizer.vertex(0);
-    edge->vertices()[1] = globalOptimizer.vertex(zupt_res.rows()-1);
-
-    edge->setMeasurement(0.0);
-
-    Eigen::Matrix<double,1,1> information;
-    information(0,0) = 1/range_cov;
-
-    edge->setInformation(information);
-    edge->setSigma(2.0);
-    globalOptimizer.addEdge(edge);
+//    auto *edge = new DistanceEdge();
+//    edge->vertices()[0] = globalOptimizer.vertex(0);
+//    edge->vertices()[1] = globalOptimizer.vertex(zupt_res.rows()-1);
+//
+//    edge->setMeasurement(0.0);
+//
+//    Eigen::Matrix<double,1,1> information;
+//    information(0,0) = 1/range_cov;
+//
+//    edge->setInformation(information);
+//    edge->setSigma(2.0);
+//    globalOptimizer.addEdge(edge);
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
@@ -489,7 +489,7 @@ int main(int argc,char *argv[]) {
 //    {
 //        globalOptimizer.vertex(i)->setFixed(false);
 //    }
-    globalOptimizer.optimize(20000);
+    globalOptimizer.optimize(5000);
 
 
 

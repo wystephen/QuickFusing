@@ -93,16 +93,21 @@ int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/IMUWB/27/";
 //    std::string dir_name = "/home/steve/Data/NewRecord/Record2/";
 //    std::string dir_name = "/home/steve/tmp/test/45/";
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/47/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/46/";
 
     double offset_cov(0.001), rotation_cov(0.002), range_cov(5.0);
-    double time_offset(0.0);//defualt paramet35s.
+    double max_iterators(0.0);//defualt paramet35s.
 
     double valid_range(4.0),range_sigma(5.0),z0_info(5.0);
 
 
     if (argc >= 2) {
-        time_offset = std::stod(argv[1]);
+        max_iterators = std::stod(argv[1]);
+    }
+
+    if(max_iterators<2)
+    {
+        max_iterators=5000;
     }
 
     if (argc == 5) {
@@ -131,8 +136,8 @@ int main(int argc, char *argv[]) {
 
 
     typedef g2o::BlockSolverX SlamBlockSolver;
-    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
-//    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+//    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
     // Initial solver
     SlamLinearSolver *linearSolver = new SlamLinearSolver();
@@ -241,7 +246,7 @@ int main(int argc, char *argv[]) {
     std::vector<int> high_b{2, 4, 5, 7, 2};
 
 //
-    if(uwb_raw.cols()==8)
+    if(uwb_raw.cols()==9)
     {
         for (int i(0); i < 4; ++i) {
             auto *e = new Z0Edge();
@@ -249,7 +254,7 @@ int main(int argc, char *argv[]) {
             e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
 
             Eigen::Matrix<double, 1, 1> info;
-            info(0, 0) = 0.10;
+            info(0, 0) = 0.0010;
 
             e->setMeasurement(0.45);
             e->setRobustKernel(robustKernel);
@@ -262,13 +267,30 @@ int main(int argc, char *argv[]) {
             e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
 
             Eigen::Matrix<double, 1, 1> info;
-            info(0, 0) = 0.10;
+            info(0, 0) = 0.0010;
 
             e->setMeasurement(4.45);
             e->setRobustKernel(robustKernel);
             globalOptimizer.addEdge(e);
         }
     }
+
+//    if(uwb_raw.cols()==6)
+//    {
+//        for(int i(0);i<6;++i)
+//        {
+//             auto *e = new Z0Edge();
+//            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + i);
+//            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + i + 1);
+//
+//            Eigen::Matrix<double, 1, 1> info;
+//            info(0, 0) = 10.0;
+//
+//            e->setMeasurement(0.45);
+//            e->setRobustKernel(robustKernel);
+//            globalOptimizer.addEdge(e);
+//        }
+//    }
 
 
 
@@ -376,7 +398,7 @@ int main(int argc, char *argv[]) {
 
                 information(3, 3) =
                 information(4, 4) =
-                information(5, 5) = 1.0 / rotation_cov / 10.0;
+                information(5, 5) = 1.0 / rotation_cov / 2.0;
             }
 
 
@@ -420,13 +442,15 @@ int main(int argc, char *argv[]) {
         if (uwb_index > uwb_raw.rows() - 2) {
             break;
         }
-        double uwb_time = uwb_raw(uwb_index, 0) - time_offset;
+        double uwb_time = uwb_raw(uwb_index, 0);
 
 
+
+
+
+        ///Find time diff smaller than 1.0(after find time diff smaller than 0.5)
         zupt_index = 0;
 
-
-//        int raw_zupt_index = zupt_index;
         while (true) {
 
             if (zupt_index > zupt_res.rows() - 2) {
@@ -463,7 +487,7 @@ int main(int argc, char *argv[]) {
                         }else{
                             if(range<valid_range)
                             {
-                               globalOptimizer.addEdge(dist_edge);
+                                globalOptimizer.addEdge(dist_edge);
                             }
                         }
                         std::cout << "add distance edge" << std::endl;
@@ -504,7 +528,7 @@ int main(int argc, char *argv[]) {
 //    {
 //        globalOptimizer.vertex(i)->setFixed(false);
 //    }
-    globalOptimizer.optimize(5000);
+    globalOptimizer.optimize(max_iterators);
 
 
     /**

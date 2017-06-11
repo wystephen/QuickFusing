@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/IMUWB/27/";
 //    std::string dir_name = "/home/steve/Data/NewRecord/Record2/";
 //    std::string dir_name = "/home/steve/tmp/test/45/";
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/46/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/47/";
 
     double offset_cov(0.001), rotation_cov(0.002), range_cov(5.0);
     double time_offset(0.0);//defualt paramet35s.
@@ -241,31 +241,35 @@ int main(int argc, char *argv[]) {
     std::vector<int> high_b{2, 4, 5, 7, 2};
 
 //
-    for (int i(0); i < 4; ++i) {
-        auto *e = new Z0Edge();
-        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
-        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
+    if(uwb_raw.cols()==8)
+    {
+        for (int i(0); i < 4; ++i) {
+            auto *e = new Z0Edge();
+            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
+            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
 
-        Eigen::Matrix<double, 1, 1> info;
-        info(0, 0) = 0.10;
+            Eigen::Matrix<double, 1, 1> info;
+            info(0, 0) = 0.10;
 
-        e->setMeasurement(0.45);
-        e->setRobustKernel(robustKernel);
-        globalOptimizer.addEdge(e);
+            e->setMeasurement(0.45);
+            e->setRobustKernel(robustKernel);
+            globalOptimizer.addEdge(e);
+        }
+
+        for (int i(0); i < 4; ++i) {
+            auto *e = new Z0Edge();
+            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + high_b[i]);
+            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
+
+            Eigen::Matrix<double, 1, 1> info;
+            info(0, 0) = 0.10;
+
+            e->setMeasurement(4.45);
+            e->setRobustKernel(robustKernel);
+            globalOptimizer.addEdge(e);
+        }
     }
 
-    for (int i(0); i < 4; ++i) {
-        auto *e = new Z0Edge();
-        e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + high_b[i]);
-        e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
-
-        Eigen::Matrix<double, 1, 1> info;
-        info(0, 0) = 0.10;
-
-        e->setMeasurement(4.45);
-        e->setRobustKernel(robustKernel);
-        globalOptimizer.addEdge(e);
-    }
 
 
 
@@ -308,6 +312,10 @@ int main(int argc, char *argv[]) {
         v->setEstimate(this_transform);
 //        v->setFixed(true);
 //        v->setFixed(false);
+        if(index==0)
+        {
+            v->setFixed(true);
+        }
 
         globalOptimizer.addVertex(v);
 

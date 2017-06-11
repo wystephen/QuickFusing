@@ -17,7 +17,7 @@ find_package(Eigen3 REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
 
 find_package(Sophus REQUIRED)
-
+set(Sophus_LIBRARIES libSophus.so)
 find_package(OpenMP)
 find_package(BLAS)
 find_package(LAPACK)

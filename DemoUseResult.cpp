@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
         max_iterators=5000;
     }
 
-    if (argc == 5) {
+    if (argc >=5 ) {
         offset_cov = std::stod(argv[2]);
         rotation_cov = std::stod(argv[3]);
         range_cov = std::stod(argv[4]);
@@ -398,7 +398,7 @@ int main(int argc, char *argv[]) {
 
                 information(3, 3) =
                 information(4, 4) =
-                information(5, 5) = 1.0 / rotation_cov / 2.0;
+                information(5, 5) = 1.0 / rotation_cov / 10.0;
             }
 
 

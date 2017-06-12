@@ -33,7 +33,7 @@ if __name__ == '__main__':
     for i in range(20,high_mat.shape[0]-20):
         if np.abs(high_mat[i]-high_mat[i-4])>5e9 or\
                         np.abs(high_mat[i]-high_mat[i+4])>5e9:
-            stat_whole[i] = np.max(high_mat)
+            stat_whole[i-2:i+2] = np.max(high_mat)
 
     for i in range(high_mat.shape[0]):
         if stat_whole[i] < avg_press:
@@ -53,9 +53,9 @@ if __name__ == '__main__':
     plt.plot(stat_whole)
 
 
-    plt.figure()
-    plt.title('OUT high')
-    plt.plot(out_high)
+    # plt.figure()
+    # plt.title('OUT high')
+    # plt.plot(out_high)
 
 
     np.savetxt(dir_name+'vertex_high_modified.csv',out_high,delimiter=',')

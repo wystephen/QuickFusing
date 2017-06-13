@@ -521,7 +521,7 @@ int main(int argc, char *argv[]) {
 
     /// Initial graph and optimize
     globalOptimizer.initializeOptimization();
-    globalOptimizer.setVerbose(true);
+    globalOptimizer.setVerbose(false);
 
 //    globalOptimizer.optimize(100);
 //    for(int i(0);i<zupt_res.rows();++i)

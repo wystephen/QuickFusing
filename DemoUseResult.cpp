@@ -454,7 +454,7 @@ int main(int argc, char *argv[]) {
         while (true) {
 
             if (zupt_index > zupt_res.rows() - 2) {
-                std::cout << "not found right way" << std::endl;
+//                std::cout << "not found right way" << std::endl;
                 break;
 
             }
@@ -490,7 +490,7 @@ int main(int argc, char *argv[]) {
                                 globalOptimizer.addEdge(dist_edge);
                             }
                         }
-                        std::cout << "add distance edge" << std::endl;
+//                        std::cout << "add distance edge" << std::endl;
                     }
                 }
                 break;

@@ -525,23 +525,23 @@ int main(int argc, char *argv[]) {
         // Add edge after search all range:
 
         // 1. upstairs or downstairs(only truth the minimal one);
-        if (v_high(zupt_index, 0) < 0.0) {
-            int min_index(-1);
-            double min_range(1000);
-            for (int kk(0); kk < current_range.rows(); ++kk) {
-                if (current_range(kk) > 0.0 && current_range(kk) < min_range) {
-                    min_index = kk;
-
-                    min_range = current_range(kk);
-                }
-            }
-
-            for (int kk(0); kk < current_range.rows(); ++kk) {
-                if (kk != min_index) {
-                    current_range(kk) = -10.0;
-                }
-            }
-        }
+//        if (v_high(zupt_index, 0) < 0.0) {
+//            int min_index(-1);
+//            double min_range(1000);
+//            for (int kk(0); kk < current_range.rows(); ++kk) {
+//                if (current_range(kk) > 0.0 && current_range(kk) < min_range) {
+//                    min_index = kk;
+//
+//                    min_range = current_range(kk);
+//                }
+//            }
+//
+//            for (int kk(0); kk < current_range.rows(); ++kk) {
+//                if (kk != min_index) {
+//                    current_range(kk) = -10.0;
+//                }
+//            }
+//        }
 
         // 2. normal
         for (int kk(0); kk < current_range.rows(); ++kk) {

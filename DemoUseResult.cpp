@@ -473,46 +473,43 @@ int main(int argc, char *argv[]) {
                 for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
                     if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 90.0) {
                         double range = uwb_raw(uwb_index, bi + 1);
-//                        int beacon_id = bi + beacon_id_offset;
-//
-//                        int zupt_id = zupt_index;
+                        int beacon_id = bi + beacon_id_offset;
 
-//                        auto *dist_edge = new DistanceEdge();
-//                        dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
-//                        dist_edge->vertices()[1] = globalOptimizer.vertex(zupt_id);
-//
-//                        Eigen::Matrix<double, 1, 1> information;
-//
-//                        information(0, 0) = 1 / range_cov;
-//
-//
-//
-//                        dist_edge->setInformation(information);
-//                        dist_edge->setSigma(range_sigma);
-//                        dist_edge->setMeasurement(range);
-//                        current_range(bi) = range;
+                        int zupt_id = zupt_index;
+
+                        auto *dist_edge = new DistanceEdge();
+                        dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
+                        dist_edge->vertices()[1] = globalOptimizer.vertex(zupt_id);
+
+                        Eigen::Matrix<double, 1, 1> information;
+
+                        information(0, 0) = 1 / range_cov;
+
+
+                        dist_edge->setInformation(information);
+                        dist_edge->setSigma(range_sigma);
+                        dist_edge->setMeasurement(range);
+                        current_range(bi) = range;
                         if (std::fabs(uwb_raw(uwb_index) - zupt_time) < current_range_time_diff(bi)) {
                             current_range(bi) = range;
                             current_range_time_diff(bi) = std::fabs(uwb_raw(uwb_index) - zupt_time);
                         }
 
 
-//                        if(range< 2.0)
-//                        {
-//                            information(0,0) = 1/range_cov *100.0;
-//                        }
-//
-//                        dist_edge->setRobustKernel(robustKernel);
-//
-//                        if (v_high(zupt_index, 0) >= -1.0) {
-//                            globalOptimizer.addEdge(dist_edge);
-//
-//                        }else{
-//                            if(range<valid_range)
-//                            {
-//                                globalOptimizer.addEdge(dist_edge);
-//                            }
-//                        }
+                        if (range < 2.0) {
+                            information(0, 0) = 1 / range_cov * 100.0;
+                        }
+
+                        dist_edge->setRobustKernel(robustKernel);
+
+                        if (v_high(zupt_index, 0) >= -1.0) {
+                            globalOptimizer.addEdge(dist_edge);
+
+                        } else {
+                            if (range < valid_range) {
+                                globalOptimizer.addEdge(dist_edge);
+                            }
+                        }
 //                        std::cout << "add distance edge" << std::endl;
                     }
                 }
@@ -543,32 +540,32 @@ int main(int argc, char *argv[]) {
 //            }
 //        }
 
-        // 2. normal
-        for (int kk(0); kk < current_range.rows(); ++kk) {
-            if (90.0 > current_range(kk) > 0.0) {
-                double range = current_range(kk);
-                int beacon_id = kk + beacon_id_offset;
-
-                int zupt_id = zupt_index;
-
-                auto *dist_edge = new DistanceEdge();
-                dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
-                dist_edge->vertices()[1] = globalOptimizer.vertex(zupt_id);
-
-                Eigen::Matrix<double, 1, 1> information;
-
-                information(0, 0) = 1 / range_cov;
-
-
-                dist_edge->setInformation(information);
-                dist_edge->setSigma(range_sigma);
-                dist_edge->setMeasurement(range);
-
-                dist_edge->setRobustKernel(robustKernel);
-
-                globalOptimizer.addEdge(dist_edge);
-            }
-        }
+//        // 2. normal
+//        for (int kk(0); kk < current_range.rows(); ++kk) {
+//            if (90.0 > current_range(kk) > 0.0) {
+//                double range = current_range(kk);
+//                int beacon_id = kk + beacon_id_offset;
+//
+//                int zupt_id = zupt_index;
+//
+//                auto *dist_edge = new DistanceEdge();
+//                dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
+//                dist_edge->vertices()[1] = globalOptimizer.vertex(zupt_id);
+//
+//                Eigen::Matrix<double, 1, 1> information;
+//
+//                information(0, 0) = 1 / range_cov;
+//
+//
+//                dist_edge->setInformation(information);
+//                dist_edge->setSigma(range_sigma);
+//                dist_edge->setMeasurement(range);
+//
+//                dist_edge->setRobustKernel(robustKernel);
+//
+//                globalOptimizer.addEdge(dist_edge);
+//            }
+//        }
 
 
 //            range_file

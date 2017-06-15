@@ -63,6 +63,10 @@
 //#include "g2o/types/slam3d_addons/line3d.h"
 
 
+#include <sophus/so3.h>
+#include <sophus/se3.h>
+
+
 
 G2O_USE_TYPE_GROUP(slam3d)
 
@@ -105,10 +109,10 @@ int main(int argc, char *argv[]) {
         max_iterators = std::stod(argv[1]);
     }
 
-    if(max_iterators<2)
-    {
-        max_iterators=5000;
-    }
+//    if(0.01<=max_iterators<2)
+//    {
+//        max_iterators=5000;
+//    }
 
     if (argc >=5 ) {
         offset_cov = std::stod(argv[2]);
@@ -438,28 +442,34 @@ int main(int argc, char *argv[]) {
 
     int uwb_index(0);
 
+    std::ofstream range_file("./ResultData/range_file.txt");
     while (true) {
-        if (uwb_index > uwb_raw.rows() - 2) {
+        if (zupt_index > v_time.rows()-2) {
             break;
         }
-        double uwb_time = uwb_raw(uwb_index, 0);
+        double zupt_time = v_time(zupt_index) ;//uwb_raw(uwb_index, 0);
 
 
 
 
+        Eigen::VectorXd current_range(uwb_raw.cols());
+        current_range.setOnes();
+        current_range *= -10;
 
         ///Find time diff smaller than 1.0(after find time diff smaller than 0.5)
-        zupt_index = 0;
+//        zupt_index = 0;
+        uwb_index = 0;
 
         while (true) {
 
-            if (zupt_index > zupt_res.rows() - 2) {
+            if (uwb_index > uwb_raw.rows() - 1) {
 //                std::cout << "not found right way" << std::endl;
                 break;
 
             }
 
-            if (std::fabs(v_time(zupt_index) - uwb_time) < 1.0) {
+
+            if (std::fabs(uwb_raw(uwb_index) - zupt_time) < 1.0) {
                 for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
                     if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 90.0) {
                         double range = uwb_raw(uwb_index, bi + 1);
@@ -478,6 +488,7 @@ int main(int argc, char *argv[]) {
                         dist_edge->setInformation(information);
                         dist_edge->setSigma(range_sigma);
                         dist_edge->setMeasurement(range);
+                        current_range(bi) = range;
 
 //                        if (v_high(zupt_index, 0) < -1.0) {
 //                            dist_edge->setRobustKernel(robustKernel);
@@ -488,6 +499,7 @@ int main(int argc, char *argv[]) {
 
                         if (v_high(zupt_index, 0) >= -1.0) {
                             globalOptimizer.addEdge(dist_edge);
+
                         }else{
                             if(range<valid_range)
                             {
@@ -497,31 +509,40 @@ int main(int argc, char *argv[]) {
 //                        std::cout << "add distance edge" << std::endl;
                     }
                 }
-                break;
+
             }
 
-            zupt_index++;
+            uwb_index++;
         }
 
-        uwb_index++;
+//            range_file
+            range_file << current_range(0);
+            for( int tmp_k(1);tmp_k < current_range.rows();++tmp_k)
+            {
+                range_file << "," << current_range(tmp_k);
+            }
+            range_file << std::endl;
+
+        zupt_index++;
     }
 
 
     /// TODO: DELETE THIS ADD A SPECIAL RANGE
-    auto *edge = new DistanceEdge();
-    edge->vertices()[0] = globalOptimizer.vertex(0);
-    edge->vertices()[1] = globalOptimizer.vertex(zupt_res.rows()-1);
+//    auto *edge = new DistanceEdge();
+//    edge->vertices()[0] = globalOptimizer.vertex(0);
+//    edge->vertices()[1] = globalOptimizer.vertex(zupt_res.rows()-1);
+//
+//    edge->setMeasurement(0.0);
+//
+//    Eigen::Matrix<double,1,1> information;
+//    information(0,0) = 20;
+//
+//
+//
+//    edge->setInformation(information);
+//    edge->setSigma(2.0);
+//    globalOptimizer.addEdge(edge);
 
-    edge->setMeasurement(0.0);
-
-    Eigen::Matrix<double,1,1> information;
-    information(0,0) = 20;
-
-
-
-    edge->setInformation(information);
-    edge->setSigma(2.0);
-    globalOptimizer.addEdge(edge);
 
 
 
@@ -534,7 +555,11 @@ int main(int argc, char *argv[]) {
 //    {
 //        globalOptimizer.vertex(i)->setFixed(false);
 //    }
-    globalOptimizer.optimize(max_iterators);
+    if(max_iterators>0)
+    {
+
+        globalOptimizer.optimize(max_iterators);
+    }
 
 
     /**
@@ -544,7 +569,9 @@ int main(int argc, char *argv[]) {
 
 
     std::ofstream imu("./ResultData/imu.txt");
+    std::ofstream uwb_tmp("./ResultData/uwb_tmp.txt");
     std::ofstream uwb("./ResultData/uwb.txt");
+    std::ofstream axis_file("./ResultData/axis.txt");
     std::vector<double> gx, gy, gz;
     for (int i(0); i < zupt_res.rows(); ++i) {
         double data[10] = {0};
@@ -553,6 +580,58 @@ int main(int argc, char *argv[]) {
         gy.push_back(data[1]);
         gz.push_back(data[2]);
         imu << data[0] << " " << data[1] << " " << data[2] << std::endl;
+        // pose
+//        axis_file << data[0] << "," << data[1] << "," << data[2] ;//<< ",";//<< ",0,0,1,0,1,0,1,0,0" << std::endl;
+
+        //axis
+
+        Sophus::SO3 so3_rotation(data[3],data[4],data[5]);
+        Sophus::SE3 se3_transform(so3_rotation,
+        Eigen::Vector3d(data[0],data[1],data[2]));
+
+//        Eigen::Matrix3d rotation_matrix;
+//        rotation_matrix= so3_rotation.matrix();
+
+        Eigen::Matrix4d translate_matrix;
+//        se3_transform = se3_transform.inverse();
+        translate_matrix = se3_transform.matrix();
+        Eigen::Vector4d last_vec;
+
+        Eigen::Vector4d tmp_vec(0,0,0,1);
+        tmp_vec = translate_matrix * tmp_vec;
+        axis_file << tmp_vec(0) << "," << tmp_vec(1) << "," << tmp_vec(2) ;
+
+        for(int i(0);i<3;++i)
+        {
+            Eigen::Vector4d ori_vec(0,0,0,1.0);
+            ori_vec(i) = -1.0;
+
+            ori_vec = translate_matrix * ori_vec;
+
+            for(int j(0);j<3;++j)
+            {
+                axis_file << "," << ori_vec(j)-tmp_vec(j);
+            }
+
+//            if(i>0)
+//            {
+//                if(std::abs(double(last_vec.transpose() * ori_vec))>1e-3)
+//                {
+//                    std::cout << "error in inner product" << std::endl;
+//                }else{
+//                    std::cout << "axis ok" << std::endl;
+//                }
+//            }
+//            last_vec = ori_vec;
+
+        }
+        axis_file << std::endl;
+
+
+
+
+
+
     }
 
     std::vector<double> bx, by, bz;
@@ -563,6 +642,7 @@ int main(int argc, char *argv[]) {
         by.push_back(data[1]);
         bz.push_back(data[2]);
         uwb << data[0] << " " << data[1] << " " << data[2] << std::endl;
+        uwb_tmp << data[0] << "," << data[1] << "," << data[2] << std::endl;
     }
 
 

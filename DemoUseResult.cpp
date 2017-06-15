@@ -247,6 +247,8 @@ int main(int argc, char *argv[]) {
     std::vector<int> low_b{0, 1, 3, 6, 0};
     std::vector<int> high_b{2, 4, 5, 7, 2};
 
+    double *beacon_high = new double[uwb_raw.cols()];
+
 //
     if (uwb_raw.cols() == 9) {
         for (int i(0); i < 4; ++i) {
@@ -257,6 +259,7 @@ int main(int argc, char *argv[]) {
             Eigen::Matrix<double, 1, 1> info;
             info(0, 0) = 0.0010;
 
+            beacon_high[low_b[i]] = 0.45;
             e->setMeasurement(0.45);
             e->setRobustKernel(robustKernel);
             globalOptimizer.addEdge(e);
@@ -270,6 +273,7 @@ int main(int argc, char *argv[]) {
             Eigen::Matrix<double, 1, 1> info;
             info(0, 0) = 0.0010;
 
+            beacon_high[high_b[i]] = 4.45;
             e->setMeasurement(4.45);
             e->setRobustKernel(robustKernel);
             globalOptimizer.addEdge(e);
@@ -496,20 +500,24 @@ int main(int argc, char *argv[]) {
                         }
 
 
-                        if (range < 2.0) {
-                            information(0, 0) = 1 / range_cov * 100.0;
-                        }
+//                        if (range < 2.0) {
+//                            information(0, 0) = 1 / range_cov * 100.0;
+//                        }
 
                         dist_edge->setRobustKernel(robustKernel);
-
-                        if (v_high(zupt_index, 0) >= -1.0) {
-                            globalOptimizer.addEdge(dist_edge);
-
-                        } else {
-                            if (range < valid_range) {
+//                        if(fabs(v_high(zupt_index,0)-beacon_high[bi])< 3.0)
+                        {
+                            if (v_high(zupt_index, 0) >= -1.0) {
                                 globalOptimizer.addEdge(dist_edge);
+
+                            } else {
+                                if (range < valid_range) {
+                                    globalOptimizer.addEdge(dist_edge);
+                                }
                             }
                         }
+
+
 //                        std::cout << "add distance edge" << std::endl;
                     }
                 }

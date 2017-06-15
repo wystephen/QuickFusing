@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
             e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
 
             Eigen::Matrix<double, 1, 1> info;
-            info(0, 0) = 0.0010;
+            info(0, 0) = 0.00010;
 
             beacon_high[low_b[i]] = 0.45;
             e->setMeasurement(0.45);
@@ -271,7 +271,7 @@ int main(int argc, char *argv[]) {
             e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
 
             Eigen::Matrix<double, 1, 1> info;
-            info(0, 0) = 0.0010;
+            info(0, 0) = 0.00010;
 
             beacon_high[high_b[i]] = 4.45;
             e->setMeasurement(4.45);
@@ -488,7 +488,9 @@ int main(int argc, char *argv[]) {
                         Eigen::Matrix<double, 1, 1> information;
 
                         information(0, 0) = 1 / range_cov;
-
+                        if (range < 2.0) {
+                            information(0, 0) = 1 / range_cov * 100.0;
+                        }
 
                         dist_edge->setInformation(information);
                         dist_edge->setSigma(range_sigma);
@@ -500,10 +502,6 @@ int main(int argc, char *argv[]) {
                         }
 
 
-//                        if (range < 2.0) {
-//                            information(0, 0) = 1 / range_cov * 100.0;
-//                        }
-
                         dist_edge->setRobustKernel(robustKernel);
 //                        if(fabs(v_high(zupt_index,0)-beacon_high[bi])< 3.0)
                         {
@@ -512,6 +510,7 @@ int main(int argc, char *argv[]) {
 
                             } else {
                                 if (range < valid_range) {
+
                                     globalOptimizer.addEdge(dist_edge);
                                 }
                             }
@@ -595,7 +594,7 @@ int main(int argc, char *argv[]) {
 //    edge->setMeasurement(0.0);
 //
 //    Eigen::Matrix<double,1,1> information;
-//    information(0,0) = 20;
+//    information(0,0) = 20000;
 //
 //
 //

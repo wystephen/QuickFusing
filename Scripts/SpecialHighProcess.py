@@ -33,7 +33,7 @@ if __name__ == '__main__':
     for i in range(20,high_mat.shape[0]-20):
         if np.abs(high_mat[i]-high_mat[i-14])>5e9 or\
                         np.abs(high_mat[i]-high_mat[i+14])>5e9:
-            stat_whole[i-15:i+15] = np.max(high_mat)
+            stat_whole[i-2:i+2] = np.max(high_mat)
 
     for i in range(high_mat.shape[0]):
         if stat_whole[i] < avg_press:

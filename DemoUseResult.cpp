@@ -461,7 +461,7 @@ int main(int argc, char *argv[]) {
 
             if (std::fabs(v_time(zupt_index) - uwb_time) < 1.0) {
                 for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
-                    if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 155.0) {
+                    if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 90.0) {
                         double range = uwb_raw(uwb_index, bi + 1);
                         int beacon_id = bi + beacon_id_offset;
 
@@ -478,6 +478,10 @@ int main(int argc, char *argv[]) {
                         dist_edge->setInformation(information);
                         dist_edge->setSigma(range_sigma);
                         dist_edge->setMeasurement(range);
+
+//                        if (v_high(zupt_index, 0) < -1.0) {
+//                            dist_edge->setRobustKernel(robustKernel);
+//                        }
 
 
                         dist_edge->setRobustKernel(robustKernel);
@@ -504,24 +508,26 @@ int main(int argc, char *argv[]) {
 
 
     /// TODO: DELETE THIS ADD A SPECIAL RANGE
-//    auto *edge = new DistanceEdge();
-//    edge->vertices()[0] = globalOptimizer.vertex(0);
-//    edge->vertices()[1] = globalOptimizer.vertex(zupt_res.rows()-1);
-//
-//    edge->setMeasurement(0.0);
-//
-//    Eigen::Matrix<double,1,1> information;
-//    information(0,0) = 20;
-//
-//    edge->setInformation(information);
-//    edge->setSigma(2.0);
-//    globalOptimizer.addEdge(edge);
+    auto *edge = new DistanceEdge();
+    edge->vertices()[0] = globalOptimizer.vertex(0);
+    edge->vertices()[1] = globalOptimizer.vertex(zupt_res.rows()-1);
+
+    edge->setMeasurement(0.0);
+
+    Eigen::Matrix<double,1,1> information;
+    information(0,0) = 20;
+
+
+
+    edge->setInformation(information);
+    edge->setSigma(2.0);
+    globalOptimizer.addEdge(edge);
 
 
 
     /// Initial graph and optimize
     globalOptimizer.initializeOptimization();
-    globalOptimizer.setVerbose(false);
+    globalOptimizer.setVerbose(true);
 
 //    globalOptimizer.optimize(100);
 //    for(int i(0);i<zupt_res.rows();++i)

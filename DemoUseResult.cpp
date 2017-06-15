@@ -67,7 +67,6 @@
 #include <sophus/se3.h>
 
 
-
 G2O_USE_TYPE_GROUP(slam3d)
 
 
@@ -102,7 +101,7 @@ int main(int argc, char *argv[]) {
     double offset_cov(0.001), rotation_cov(0.002), range_cov(5.0);
     double max_iterators(0.0);//defualt paramet35s.
 
-    double valid_range(4.0),range_sigma(5.0),z0_info(5.0);
+    double valid_range(4.0), range_sigma(5.0), z0_info(5.0);
 
 
     if (argc >= 2) {
@@ -114,15 +113,14 @@ int main(int argc, char *argv[]) {
 //        max_iterators=5000;
 //    }
 
-    if (argc >=5 ) {
+    if (argc >= 5) {
         offset_cov = std::stod(argv[2]);
         rotation_cov = std::stod(argv[3]);
         range_cov = std::stod(argv[4]);
 
     }
 
-    if( argc == 8)
-    {
+    if (argc == 8) {
         valid_range = std::stod(argv[5]);
         range_sigma = std::stod(argv[6]);
         z0_info = std::stod(argv[7]);
@@ -250,8 +248,7 @@ int main(int argc, char *argv[]) {
     std::vector<int> high_b{2, 4, 5, 7, 2};
 
 //
-    if(uwb_raw.cols()==9)
-    {
+    if (uwb_raw.cols() == 9) {
         for (int i(0); i < 4; ++i) {
             auto *e = new Z0Edge();
             e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
@@ -338,10 +335,10 @@ int main(int argc, char *argv[]) {
         v->setEstimate(this_transform);
 //        v->setFixed(true);
 //        v->setFixed(false);
-        if(index==0)
-        {
-            v->setFixed(true);
-        }
+//        if(index==0)
+//        {
+//            v->setFixed(true);
+//        }
 
         globalOptimizer.addVertex(v);
 
@@ -444,15 +441,18 @@ int main(int argc, char *argv[]) {
 
     std::ofstream range_file("./ResultData/range_file.txt");
     while (true) {
-        if (zupt_index > v_time.rows()-2) {
+        if (zupt_index > v_time.rows() - 2) {
             break;
         }
-        double zupt_time = v_time(zupt_index) ;//uwb_raw(uwb_index, 0);
+        double zupt_time = v_time(zupt_index);//uwb_raw(uwb_index, 0);
 
 
 
 
         Eigen::VectorXd current_range(uwb_raw.cols());
+        Eigen::VectorXd current_range_time_diff(uwb_raw.cols());
+        current_range_time_diff.setOnes();
+        current_range_time_diff *= 1000.0;
         current_range.setOnes();
         current_range *= -10;
 
@@ -473,39 +473,46 @@ int main(int argc, char *argv[]) {
                 for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
                     if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 90.0) {
                         double range = uwb_raw(uwb_index, bi + 1);
-                        int beacon_id = bi + beacon_id_offset;
+//                        int beacon_id = bi + beacon_id_offset;
+//
+//                        int zupt_id = zupt_index;
 
-                        int zupt_id = zupt_index;
-
-                        auto *dist_edge = new DistanceEdge();
-                        dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
-                        dist_edge->vertices()[1] = globalOptimizer.vertex(zupt_id);
-
-                        Eigen::Matrix<double, 1, 1> information;
-
-                        information(0, 0) = 1 / range_cov;
-
-                        dist_edge->setInformation(information);
-                        dist_edge->setSigma(range_sigma);
-                        dist_edge->setMeasurement(range);
-                        current_range(bi) = range;
-
-//                        if (v_high(zupt_index, 0) < -1.0) {
-//                            dist_edge->setRobustKernel(robustKernel);
-//                        }
-
-
-                        dist_edge->setRobustKernel(robustKernel);
-
-                        if (v_high(zupt_index, 0) >= -1.0) {
-                            globalOptimizer.addEdge(dist_edge);
-
-                        }else{
-                            if(range<valid_range)
-                            {
-                                globalOptimizer.addEdge(dist_edge);
-                            }
+//                        auto *dist_edge = new DistanceEdge();
+//                        dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
+//                        dist_edge->vertices()[1] = globalOptimizer.vertex(zupt_id);
+//
+//                        Eigen::Matrix<double, 1, 1> information;
+//
+//                        information(0, 0) = 1 / range_cov;
+//
+//
+//
+//                        dist_edge->setInformation(information);
+//                        dist_edge->setSigma(range_sigma);
+//                        dist_edge->setMeasurement(range);
+//                        current_range(bi) = range;
+                        if (std::fabs(uwb_raw(uwb_index) - zupt_time) < current_range_time_diff(bi)) {
+                            current_range(bi) = range;
+                            current_range_time_diff(bi) = std::fabs(uwb_raw(uwb_index) - zupt_time);
                         }
+
+
+//                        if(range< 2.0)
+//                        {
+//                            information(0,0) = 1/range_cov *100.0;
+//                        }
+//
+//                        dist_edge->setRobustKernel(robustKernel);
+//
+//                        if (v_high(zupt_index, 0) >= -1.0) {
+//                            globalOptimizer.addEdge(dist_edge);
+//
+//                        }else{
+//                            if(range<valid_range)
+//                            {
+//                                globalOptimizer.addEdge(dist_edge);
+//                            }
+//                        }
 //                        std::cout << "add distance edge" << std::endl;
                     }
                 }
@@ -515,13 +522,61 @@ int main(int argc, char *argv[]) {
             uwb_index++;
         }
 
-//            range_file
-            range_file << current_range(0);
-            for( int tmp_k(1);tmp_k < current_range.rows();++tmp_k)
-            {
-                range_file << "," << current_range(tmp_k);
+        // Add edge after search all range:
+
+        // 1. upstairs or downstairs(only truth the minimal one);
+        if (v_high(zupt_index, 0) < 0.0) {
+            int min_index(-1);
+            double min_range(1000);
+            for (int kk(0); kk < current_range.rows(); ++kk) {
+                if (current_range(kk) > 0.0 && current_range(kk) < min_range) {
+                    min_index = kk;
+
+                    min_range = current_range(kk);
+                }
             }
-            range_file << std::endl;
+
+            for (int kk(0); kk < current_range.rows(); ++kk) {
+                if (kk != min_index) {
+                    current_range(kk) = -10.0;
+                }
+            }
+        }
+
+        // 2. normal
+        for (int kk(0); kk < current_range.rows(); ++kk) {
+            if (90.0 > current_range(kk) > 0.0) {
+                double range = current_range(kk);
+                int beacon_id = kk + beacon_id_offset;
+
+                int zupt_id = zupt_index;
+
+                auto *dist_edge = new DistanceEdge();
+                dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
+                dist_edge->vertices()[1] = globalOptimizer.vertex(zupt_id);
+
+                Eigen::Matrix<double, 1, 1> information;
+
+                information(0, 0) = 1 / range_cov;
+
+
+                dist_edge->setInformation(information);
+                dist_edge->setSigma(range_sigma);
+                dist_edge->setMeasurement(range);
+
+                dist_edge->setRobustKernel(robustKernel);
+
+                globalOptimizer.addEdge(dist_edge);
+            }
+        }
+
+
+//            range_file
+        range_file << current_range(0);
+        for (int tmp_k(1); tmp_k < current_range.rows(); ++tmp_k) {
+            range_file << "," << current_range(tmp_k);
+        }
+        range_file << std::endl;
 
         zupt_index++;
     }
@@ -555,8 +610,7 @@ int main(int argc, char *argv[]) {
 //    {
 //        globalOptimizer.vertex(i)->setFixed(false);
 //    }
-    if(max_iterators>0)
-    {
+    if (max_iterators > 0) {
 
         globalOptimizer.optimize(max_iterators);
     }
@@ -585,9 +639,9 @@ int main(int argc, char *argv[]) {
 
         //axis
 
-        Sophus::SO3 so3_rotation(data[3],data[4],data[5]);
+        Sophus::SO3 so3_rotation(data[3], data[4], data[5]);
         Sophus::SE3 se3_transform(so3_rotation,
-        Eigen::Vector3d(data[0],data[1],data[2]));
+                                  Eigen::Vector3d(data[0], data[1], data[2]));
 
 //        Eigen::Matrix3d rotation_matrix;
 //        rotation_matrix= so3_rotation.matrix();
@@ -597,20 +651,18 @@ int main(int argc, char *argv[]) {
         translate_matrix = se3_transform.matrix();
         Eigen::Vector4d last_vec;
 
-        Eigen::Vector4d tmp_vec(0,0,0,1);
+        Eigen::Vector4d tmp_vec(0, 0, 0, 1);
         tmp_vec = translate_matrix * tmp_vec;
-        axis_file << tmp_vec(0) << "," << tmp_vec(1) << "," << tmp_vec(2) ;
+        axis_file << tmp_vec(0) << "," << tmp_vec(1) << "," << tmp_vec(2);
 
-        for(int i(0);i<3;++i)
-        {
-            Eigen::Vector4d ori_vec(0,0,0,1.0);
+        for (int i(0); i < 3; ++i) {
+            Eigen::Vector4d ori_vec(0, 0, 0, 1.0);
             ori_vec(i) = -1.0;
 
             ori_vec = translate_matrix * ori_vec;
 
-            for(int j(0);j<3;++j)
-            {
-                axis_file << "," << ori_vec(j)-tmp_vec(j);
+            for (int j(0); j < 3; ++j) {
+                axis_file << "," << ori_vec(j) - tmp_vec(j);
             }
 
 //            if(i>0)
@@ -626,10 +678,6 @@ int main(int argc, char *argv[]) {
 
         }
         axis_file << std::endl;
-
-
-
-
 
 
     }
@@ -660,25 +708,25 @@ int main(int argc, char *argv[]) {
     }
 
     int first_i = 0;
-    int last_i = gx.size()-1;
+    int last_i = gx.size() - 1;
 
     std::cout << "distance between first and last: " <<
               std::sqrt(
-                      std::pow(gx[first_i]-gx[last_i],2.0)+
-                      std::pow(gy[first_i]-gy[last_i],2.0)+
-                      std::pow(gz[first_i]-gz[last_i],2.0)
-              )<< std::endl;
+                      std::pow(gx[first_i] - gx[last_i], 2.0) +
+                      std::pow(gy[first_i] - gy[last_i], 2.0) +
+                      std::pow(gz[first_i] - gz[last_i], 2.0)
+              ) << std::endl;
 
     plt::plot(gx, gy, "b-*");
     plt::plot(bx, by, "r*");
-    plt::title("para:"+std::to_string(offset_cov)+":"
-    +std::to_string(rotation_cov)+":"+std::to_string(range_cov)+":"
-    +std::to_string(valid_range)+":"+std::to_string(range_sigma)+
-    ":"+std::to_string(z0_info));
+    plt::title("para:" + std::to_string(offset_cov) + ":"
+               + std::to_string(rotation_cov) + ":" + std::to_string(range_cov) + ":"
+               + std::to_string(valid_range) + ":" + std::to_string(range_sigma) +
+               ":" + std::to_string(z0_info));
 
     plt::save(std::to_string(TimeStamp::now())
 
-            +          "test.jpg");
+              + "test.jpg");
 //    plt::show();
 
 

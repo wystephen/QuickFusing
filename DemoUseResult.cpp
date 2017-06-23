@@ -403,16 +403,7 @@ int main(int argc, char *argv[]) {
             Eigen::Vector4d out_vec = current_transform * source_vec;
 
             double t_theta = std::atan(out_vec(1) / out_vec(0));
-            if (std::abs(t_theta) > 0.1) {
-                information(0, 0) =
-                information(1, 1) =
-                information(2, 2) = 1.0 / offset_cov;
-
-
-                information(3, 3) =
-                information(4, 4) =
-                information(5, 5) = 1.0 / rotation_cov / 10.0;
-            }
+/
 
 
             edge_se3->setInformation(information);

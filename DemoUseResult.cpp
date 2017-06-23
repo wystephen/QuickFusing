@@ -364,20 +364,21 @@ int main(int argc, char *argv[]) {
         if (index > 0) {
 
             /// Edge for z constraint
-//            auto *edge_zo = new Z0Edge();
-//            edge_zo->vertices()[0] = globalOptimizer.vertex(index - 1);
-//            edge_zo->vertices()[1] = globalOptimizer.vertex(index);
+            auto *edge_zo = new Z0Edge();
+            edge_zo->vertices()[0] = globalOptimizer.vertex(index - 1);
+            edge_zo->vertices()[1] = globalOptimizer.vertex(index);
 
-//            Eigen::Matrix<double, 1, 1> info;
-//            info(0, 0) = z0_info;
-//            edge_zo->setInformation(info);
+            Eigen::Matrix<double, 1, 1> info;
+            info(0, 0) = z0_info;
+            edge_zo->setInformation(info);
 //            edge_zo->setMeasurement(v_high(index, 0));
-//
+
 //            if (v_high(index, 0) > -1.0) {
 //                globalOptimizer.addEdge(edge_zo);
 //            }
+            edge_zo->setMeasurement(0.0);
 
-//            globalOptimizer.addEdge(edge_zo);
+            globalOptimizer.addEdge(edge_zo);
 
 
             /// ZUPT EDGE

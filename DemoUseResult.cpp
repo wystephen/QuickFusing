@@ -258,35 +258,35 @@ int main(int argc, char *argv[]) {
     double *beacon_high = new double[uwb_raw.cols()];
 
 //
-    if (uwb_raw.cols() == 9) {
-        for (int i(0); i < 4; ++i) {
-            auto *e = new Z0Edge();
-            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
-            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
-
-            Eigen::Matrix<double, 1, 1> info;
-            info(0, 0) = 0.00010;
-
-            beacon_high[low_b[i]] = 0.45;
-            e->setMeasurement(0.45);
-            e->setRobustKernel(robustKernel);
-            globalOptimizer.addEdge(e);
-        }
-
-        for (int i(0); i < 4; ++i) {
-            auto *e = new Z0Edge();
-            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + high_b[i]);
-            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
-
-            Eigen::Matrix<double, 1, 1> info;
-            info(0, 0) = 0.00010;
-
-            beacon_high[high_b[i]] = 4.45;
-            e->setMeasurement(4.45);
-            e->setRobustKernel(robustKernel);
-            globalOptimizer.addEdge(e);
-        }
-    }
+//    if (uwb_raw.cols() == 9) {
+//        for (int i(0); i < 4; ++i) {
+//            auto *e = new Z0Edge();
+//            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
+//            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
+//
+//            Eigen::Matrix<double, 1, 1> info;
+//            info(0, 0) = 0.00010;
+//
+//            beacon_high[low_b[i]] = 0.45;
+//            e->setMeasurement(0.45);
+//            e->setRobustKernel(robustKernel);
+//            globalOptimizer.addEdge(e);
+//        }
+//
+//        for (int i(0); i < 4; ++i) {
+//            auto *e = new Z0Edge();
+//            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + high_b[i]);
+//            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
+//
+//            Eigen::Matrix<double, 1, 1> info;
+//            info(0, 0) = 0.00010;
+//
+//            beacon_high[high_b[i]] = 4.45;
+//            e->setMeasurement(4.45);
+//            e->setRobustKernel(robustKernel);
+//            globalOptimizer.addEdge(e);
+//        }
+//    }
 
 //    if(uwb_raw.cols()==6)
 //    {
@@ -378,7 +378,7 @@ int main(int argc, char *argv[]) {
 //            }
             edge_zo->setMeasurement(0.0);
 
-//            globalOptimizer.addEdge(edge_zo);
+            globalOptimizer.addEdge(edge_zo);
 
 
             /// ZUPT EDGE
@@ -497,9 +497,9 @@ int main(int argc, char *argv[]) {
                         Eigen::Matrix<double, 1, 1> information;
 
                         information(0, 0) = 1 / range_cov;
-                        if (range < 2.0) {
-                            information(0, 0) = 1 / range_cov * 100.0;
-                        }
+//                        if (range < 2.0) {
+//                            information(0, 0) = 1 / range_cov * 100.0;
+//                        }
 
                         dist_edge->setInformation(information);
                         dist_edge->setSigma(range_sigma);
@@ -518,7 +518,7 @@ int main(int argc, char *argv[]) {
 //
 //                            } else {
 //                                if (range < valid_range) {
-                        if(bi != 3 && bi!=4)
+//                        if(bi != 3 && bi!=4)
                         {
 
                             globalOptimizer.addEdge(dist_edge);

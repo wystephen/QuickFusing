@@ -378,7 +378,7 @@ int main(int argc, char *argv[]) {
 //            }
             edge_zo->setMeasurement(0.0);
 
-            globalOptimizer.addEdge(edge_zo);
+//            globalOptimizer.addEdge(edge_zo);
 
 
             /// ZUPT EDGE

@@ -640,7 +640,6 @@ int main(int argc, char *argv[]) {
 //        globalOptimizer.vertex(i)->setFixed(false);
 //    }
     if (max_iterators > 0) {
-
         globalOptimizer.optimize(max_iterators);
     }
 

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 if __name__ == '__main__':
-    dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/67/"
+    dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/72/"
 
     imu_time = np.loadtxt(dir_name+'imu.txt',delimiter=',')
     uwb_data = np.loadtxt(dir_name+'uwb_result.csv',delimiter=',')

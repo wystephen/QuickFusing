@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/IMUWB/27/";
 //    std::string dir_name = "/home/steve/Data/NewRecord/Record2/";
 //    std::string dir_name = "/home/steve/tmp/test/45/";
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/46/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/";
 
     double offset_cov(0.001), rotation_cov(0.002), range_cov(5.0);
     double max_iterators(0.0);//defualt paramet35s.
@@ -120,11 +120,29 @@ int main(int argc, char *argv[]) {
 
     }
 
-    if (argc == 8) {
+    if (argc >= 8) {
         valid_range = std::stod(argv[5]);
         range_sigma = std::stod(argv[6]);
         z0_info = std::stod(argv[7]);
     }
+
+    int tmp_dir_num = 54;
+    if (argc >= 9) {
+        tmp_dir_num = std::stoi(argv[8]);
+    }
+
+
+    bool with_high(false);
+    if (argc >= 10) {
+        if (std::stoi(argv[9]) > 0) {
+            with_high = true;
+        } else {
+            with_high = false;
+        }
+    }
+
+
+    dir_name = dir_name + std::to_string(tmp_dir_num) + "/";
 
 
     int trace_id = 0;
@@ -186,14 +204,27 @@ int main(int argc, char *argv[]) {
     CppExtent::CSVReader ZuptResultReader(dir_name + "sim_pose.csv");
     CppExtent::CSVReader QuatReader(dir_name + "all_quat.csv");
     CppExtent::CSVReader VertexTime(dir_name + "vertex_time.csv");
-    CppExtent::CSVReader VertexHigh(dir_name + "vertex_high_modified.csv");
+
+    Eigen::MatrixXd v_high(1, 1);
+
+    if (with_high) {
+        CppExtent::CSVReader VertexHigh(dir_name + "vertex_high_modified.csv");
+
+        v_high.resize(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
+        v_high.setZero(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
+
+        auto v_high_matrix = VertexHigh.GetMatrix();
+
+        for (int i(0); i < v_high.rows(); ++i) {
+            for (int j(0); j < v_high.cols(); ++j) {
+                v_high(i, j) = *v_high_matrix(i, j);
+            }
+        }
+    }
 
     Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(), ZuptResultReader.GetMatrix().GetCols());
     Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(), QuatReader.GetMatrix().GetCols());
     Eigen::MatrixXd v_time(VertexTime.GetMatrix().GetRows(), VertexTime.GetMatrix().GetCols());
-    Eigen::MatrixXd v_high(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
-
-    auto v_high_matrix = VertexHigh.GetMatrix();
 
     for (int i(0); i < zupt_res.rows(); ++i) {
         for (int j(0); j < zupt_res.cols(); ++j) {
@@ -213,11 +244,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    for (int i(0); i < v_high.rows(); ++i) {
-        for (int j(0); j < v_high.cols(); ++j) {
-            v_high(i, j) = *v_high_matrix(i, j);
-        }
-    }
 
     /// ROBUST KERNEL
     static g2o::RobustKernel *robustKernel =
@@ -244,14 +270,13 @@ int main(int argc, char *argv[]) {
      * // TODO: REMOVE It!!!!
      */
 
-    std::vector<int> low_b{0, 1, 3, 6, 0};
-    std::vector<int> high_b{2, 4, 5, 7, 2};
+    std::vector<int> low_b{0, 4, 6, 7, 8, 9, 0};
+    std::vector<int> high_b{6, 5, 1, 3, 2, 6};
 
     double *beacon_high = new double[uwb_raw.cols()];
 
-//
-    if (uwb_raw.cols() == 9) {
-        for (int i(0); i < 4; ++i) {
+    if (with_high) {
+        for (int i(0); i < low_b.size() - 1; ++i) {
             auto *e = new Z0Edge();
             e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
             e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
@@ -259,13 +284,13 @@ int main(int argc, char *argv[]) {
             Eigen::Matrix<double, 1, 1> info;
             info(0, 0) = 0.00010;
 
-            beacon_high[low_b[i]] = 0.45;
-            e->setMeasurement(0.45);
-            e->setRobustKernel(robustKernel);
+            beacon_high[low_b[i]] = 3.5;
+            e->setMeasurement(3.5);
+//                e->setRobustKernel(robustKernel);
             globalOptimizer.addEdge(e);
         }
 
-        for (int i(0); i < 4; ++i) {
+        for (int i(0); i < high_b.size() - 1; ++i) {
             auto *e = new Z0Edge();
             e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + high_b[i]);
             e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
@@ -273,11 +298,13 @@ int main(int argc, char *argv[]) {
             Eigen::Matrix<double, 1, 1> info;
             info(0, 0) = 0.00010;
 
-            beacon_high[high_b[i]] = 4.45;
-            e->setMeasurement(4.45);
-            e->setRobustKernel(robustKernel);
+            beacon_high[high_b[i]] = -1.5;
+            e->setMeasurement(-1.5);
+//                e->setRobustKernel(robustKernel);
             globalOptimizer.addEdge(e);
         }
+
+
     }
 
 //    if(uwb_raw.cols()==6)
@@ -363,11 +390,13 @@ int main(int argc, char *argv[]) {
             Eigen::Matrix<double, 1, 1> info;
             info(0, 0) = z0_info;
             edge_zo->setInformation(info);
-            edge_zo->setMeasurement(v_high(index, 0));
-
-            if (v_high(index, 0) > -1.0) {
-                globalOptimizer.addEdge(edge_zo);
+            if (with_high) {
+                edge_zo->setMeasurement(v_high(index, 0));
+                if (v_high(index, 0) > -1.0) {
+                    globalOptimizer.addEdge(edge_zo);
+                }
             }
+//            edge_zo->setMeasurement(0.0);
 
 //            globalOptimizer.addEdge(edge_zo);
 
@@ -451,8 +480,6 @@ int main(int argc, char *argv[]) {
         double zupt_time = v_time(zupt_index);//uwb_raw(uwb_index, 0);
 
 
-
-
         Eigen::VectorXd current_range(uwb_raw.cols());
         Eigen::VectorXd current_range_time_diff(uwb_raw.cols());
         current_range_time_diff.setOnes();
@@ -467,7 +494,6 @@ int main(int argc, char *argv[]) {
         while (true) {
 
             if (uwb_index > uwb_raw.rows() - 1) {
-//                std::cout << "not found right way" << std::endl;
                 break;
 
             }
@@ -475,7 +501,7 @@ int main(int argc, char *argv[]) {
 
             if (std::fabs(uwb_raw(uwb_index) - zupt_time) < 1.0) {
                 for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
-                    if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 90.0) {
+                    if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 55.0) {
                         double range = uwb_raw(uwb_index, bi + 1);
                         int beacon_id = bi + beacon_id_offset;
 
@@ -488,36 +514,21 @@ int main(int argc, char *argv[]) {
                         Eigen::Matrix<double, 1, 1> information;
 
                         information(0, 0) = 1 / range_cov;
-                        if (range < 2.0) {
-                            information(0, 0) = 1 / range_cov * 100.0;
-                        }
 
                         dist_edge->setInformation(information);
                         dist_edge->setSigma(range_sigma);
                         dist_edge->setMeasurement(range);
                         current_range(bi) = range;
-                        if (std::fabs(uwb_raw(uwb_index) - zupt_time) < current_range_time_diff(bi)) {
-                            current_range(bi) = range;
-                            current_range_time_diff(bi) = std::fabs(uwb_raw(uwb_index) - zupt_time);
-                        }
 
 
                         dist_edge->setRobustKernel(robustKernel);
-//                        if(fabs(v_high(zupt_index,0)-beacon_high[bi])< 3.0)
-                        {
-                            if (v_high(zupt_index, 0) >= -1.0) {
-                                globalOptimizer.addEdge(dist_edge);
 
-                            } else {
-                                if (range < valid_range) {
+                        if (fabs(v_high(zupt_index) - beacon_high[bi]) < 1.2) {
 
-                                    globalOptimizer.addEdge(dist_edge);
-                                }
-                            }
+                            globalOptimizer.addEdge(dist_edge);
                         }
 
 
-//                        std::cout << "add distance edge" << std::endl;
                     }
                 }
 
@@ -527,52 +538,6 @@ int main(int argc, char *argv[]) {
         }
 
         // Add edge after search all range:
-
-        // 1. upstairs or downstairs(only truth the minimal one);
-//        if (v_high(zupt_index, 0) < 0.0) {
-//            int min_index(-1);
-//            double min_range(1000);
-//            for (int kk(0); kk < current_range.rows(); ++kk) {
-//                if (current_range(kk) > 0.0 && current_range(kk) < min_range) {
-//                    min_index = kk;
-//
-//                    min_range = current_range(kk);
-//                }
-//            }
-//
-//            for (int kk(0); kk < current_range.rows(); ++kk) {
-//                if (kk != min_index) {
-//                    current_range(kk) = -10.0;
-//                }
-//            }
-//        }
-
-//        // 2. normal
-//        for (int kk(0); kk < current_range.rows(); ++kk) {
-//            if (90.0 > current_range(kk) > 0.0) {
-//                double range = current_range(kk);
-//                int beacon_id = kk + beacon_id_offset;
-//
-//                int zupt_id = zupt_index;
-//
-//                auto *dist_edge = new DistanceEdge();
-//                dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
-//                dist_edge->vertices()[1] = globalOptimizer.vertex(zupt_id);
-//
-//                Eigen::Matrix<double, 1, 1> information;
-//
-//                information(0, 0) = 1 / range_cov;
-//
-//
-//                dist_edge->setInformation(information);
-//                dist_edge->setSigma(range_sigma);
-//                dist_edge->setMeasurement(range);
-//
-//                dist_edge->setRobustKernel(robustKernel);
-//
-//                globalOptimizer.addEdge(dist_edge);
-//            }
-//        }
 
 
 //            range_file
@@ -586,22 +551,6 @@ int main(int argc, char *argv[]) {
     }
 
 
-    /// TODO: DELETE THIS ADD A SPECIAL RANGE
-//    auto *edge = new DistanceEdge();
-//    edge->vertices()[0] = globalOptimizer.vertex(0);
-//    edge->vertices()[1] = globalOptimizer.vertex(zupt_res.rows()-1);
-//
-//    edge->setMeasurement(0.0);
-//
-//    Eigen::Matrix<double,1,1> information;
-//    information(0,0) = 20000;
-//
-//
-//
-//    edge->setInformation(information);
-//    edge->setSigma(2.0);
-//    globalOptimizer.addEdge(edge);
-
 
 
 
@@ -609,13 +558,7 @@ int main(int argc, char *argv[]) {
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
 
-//    globalOptimizer.optimize(100);
-//    for(int i(0);i<zupt_res.rows();++i)
-//    {
-//        globalOptimizer.vertex(i)->setFixed(false);
-//    }
     if (max_iterators > 0) {
-
         globalOptimizer.optimize(max_iterators);
     }
 

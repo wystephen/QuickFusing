@@ -127,12 +127,11 @@ int main(int argc, char *argv[]) {
     }
 
     int tmp_dir_num = 54;
-    if (argc == 9)
-    {
-       tmp_dir_num = std::stoi(argv[8]);
+    if (argc == 9) {
+        tmp_dir_num = std::stoi(argv[8]);
     }
 
-    dir_name = dir_name + std::to_string(tmp_dir_num)+"/";
+    dir_name = dir_name + std::to_string(tmp_dir_num) + "/";
 
 
     int trace_id = 0;
@@ -378,7 +377,7 @@ int main(int argc, char *argv[]) {
 //            }
             edge_zo->setMeasurement(0.0);
 
-            globalOptimizer.addEdge(edge_zo);
+//            globalOptimizer.addEdge(edge_zo);
 
 
             /// ZUPT EDGE
@@ -404,16 +403,16 @@ int main(int argc, char *argv[]) {
             Eigen::Vector4d out_vec = current_transform * source_vec;
 
             double t_theta = std::atan(out_vec(1) / out_vec(0));
-//            if (std::abs(t_theta) > 0.1) {
-//                information(0, 0) =
-//                information(1, 1) =
-//                information(2, 2) = 1.0 / offset_cov;
-//
-//
-//                information(3, 3) =
-//                information(4, 4) =
-//                information(5, 5) = 1.0 / rotation_cov / 10.0;
-//            }
+            if (std::abs(t_theta) > 0.1) {
+                information(0, 0) =
+                information(1, 1) =
+                information(2, 2) = 1.0 / offset_cov;
+
+
+                information(3, 3) =
+                information(4, 4) =
+                information(5, 5) = 1.0 / rotation_cov / 10.0;
+            }
 
 
             edge_se3->setInformation(information);
@@ -476,7 +475,6 @@ int main(int argc, char *argv[]) {
         while (true) {
 
             if (uwb_index > uwb_raw.rows() - 1) {
-//                std::cout << "not found right way" << std::endl;
                 break;
 
             }
@@ -497,39 +495,18 @@ int main(int argc, char *argv[]) {
                         Eigen::Matrix<double, 1, 1> information;
 
                         information(0, 0) = 1 / range_cov;
-//                        if (range < 2.0) {
-//                            information(0, 0) = 1 / range_cov * 100.0;
-//                        }
 
                         dist_edge->setInformation(information);
                         dist_edge->setSigma(range_sigma);
                         dist_edge->setMeasurement(range);
                         current_range(bi) = range;
-                        if (std::fabs(uwb_raw(uwb_index) - zupt_time) < current_range_time_diff(bi)) {
-                            current_range(bi) = range;
-                            current_range_time_diff(bi) = std::fabs(uwb_raw(uwb_index) - zupt_time);
-                        }
 
 
                         dist_edge->setRobustKernel(robustKernel);
-//                        if (fabs(v_high(zupt_index, 0) - beacon_high[bi]) < 3.0) {
-//                            if (v_high(zupt_index, 0) >= -1.0) {
-//                                globalOptimizer.addEdge(dist_edge);
-//
-//                            } else {
-//                                if (range < valid_range) {
-//                        if(bi != 3 && bi!=4)
-                        {
 
-                            globalOptimizer.addEdge(dist_edge);
-                        }
-
-//                                }
-//                            }
-//                        }
+                        globalOptimizer.addEdge(dist_edge);
 
 
-//                        std::cout << "add distance edge" << std::endl;
                     }
                 }
 
@@ -539,52 +516,6 @@ int main(int argc, char *argv[]) {
         }
 
         // Add edge after search all range:
-
-        // 1. upstairs or downstairs(only truth the minimal one);
-//        if (v_high(zupt_index, 0) < 0.0) {
-//            int min_index(-1);
-//            double min_range(1000);
-//            for (int kk(0); kk < current_range.rows(); ++kk) {
-//                if (current_range(kk) > 0.0 && current_range(kk) < min_range) {
-//                    min_index = kk;
-//
-//                    min_range = current_range(kk);
-//                }
-//            }
-//
-//            for (int kk(0); kk < current_range.rows(); ++kk) {
-//                if (kk != min_index) {
-//                    current_range(kk) = -10.0;
-//                }
-//            }
-//        }
-
-//        // 2. normal
-//        for (int kk(0); kk < current_range.rows(); ++kk) {
-//            if (90.0 > current_range(kk) > 0.0) {
-//                double range = current_range(kk);
-//                int beacon_id = kk + beacon_id_offset;
-//
-//                int zupt_id = zupt_index;
-//
-//                auto *dist_edge = new DistanceEdge();
-//                dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
-//                dist_edge->vertices()[1] = globalOptimizer.vertex(zupt_id);
-//
-//                Eigen::Matrix<double, 1, 1> information;
-//
-//                information(0, 0) = 1 / range_cov;
-//
-//
-//                dist_edge->setInformation(information);
-//                dist_edge->setSigma(range_sigma);
-//                dist_edge->setMeasurement(range);
-//
-//                dist_edge->setRobustKernel(robustKernel);
-//
-//                globalOptimizer.addEdge(dist_edge);
-//            }
-//        }
 
 
 //            range_file
@@ -598,35 +529,6 @@ int main(int argc, char *argv[]) {
     }
 
 
-    /// TODO: DELETE THIS ADD A SPECIAL RANGE
-//    auto *edge = new DistanceEdge();
-//    edge->vertices()[0] = globalOptimizer.vertex(0);
-//    edge->vertices()[1] = globalOptimizer.vertex(zupt_res.rows()-1);
-//
-//    edge->setMeasurement(0.0);
-//
-//    Eigen::Matrix<double,1,1> information;
-//    information(0,0) = 20000;
-//
-//
-//
-//    edge->setInformation(information);
-//    edge->setSigma(2.0);
-//    globalOptimizer.addEdge(edge);
-
-    //// Add Range
-//    for (int i(0); i < 4; ++i) {
-//        auto *edge = new DistanceEdge();
-//        edge->vertices()[0] = globalOptimizer.vertex(low_b[i] + beacon_id_offset);
-//        edge->vertices()[1] = globalOptimizer.vertex(high_b[i] + beacon_id_offset);
-//        edge->setMeasurement(4.01);
-//        edge->setSigma(5.0);
-//        Eigen::Matrix<double, 1, 1> information;
-//        information(0, 0) = 100;
-//        edge->setInformation(information);
-//        globalOptimizer.addEdge(edge);
-//
-//    }
 
 
 
@@ -634,11 +536,6 @@ int main(int argc, char *argv[]) {
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
 
-//    globalOptimizer.optimize(100);
-//    for(int i(0);i<zupt_res.rows();++i)
-//    {
-//        globalOptimizer.vertex(i)->setFixed(false);
-//    }
     if (max_iterators > 0) {
         globalOptimizer.optimize(max_iterators);
     }

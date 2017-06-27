@@ -15,8 +15,8 @@ if __name__ == '__main__':
 
     time_inteval_factor = (max(imu_time[:,0])-time_base) / (max(uwb_data[:,0])-time_base)
 
-    for i in range(uwb_data.shape[0]):
-        uwb_data[i,0] = time_base+(uwb_data[i,0]-time_base)*time_inteval_factor
+    # for i in range(uwb_data.shape[0]):
+    #     uwb_data[i,0] = time_base+(uwb_data[i,0]-time_base)*time_inteval_factor
 
     print(min(imu_time[:,0]),max(imu_time[:,0]))
     print(min(uwb_data[:,0]),max(uwb_data[:,0]))

@@ -205,10 +205,12 @@ int main(int argc, char *argv[]) {
     CppExtent::CSVReader QuatReader(dir_name + "all_quat.csv");
     CppExtent::CSVReader VertexTime(dir_name + "vertex_time.csv");
 
-    Eigen::MatrixXd v_high;
+    Eigen::MatrixXd v_high(1, 1);
 
     if (with_high) {
         CppExtent::CSVReader VertexHigh(dir_name + "vertex_high_modified.csv");
+
+        v_high.resize(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
         v_high.setZero(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
 
         auto v_high_matrix = VertexHigh.GetMatrix();
@@ -268,39 +270,39 @@ int main(int argc, char *argv[]) {
      * // TODO: REMOVE It!!!!
      */
 
-    std::vector<int> low_b{0,4,6,7,8,9,0};
-    std::vector<int> high_b{6,5,1,3,2,6};
+    std::vector<int> low_b{0, 4, 6, 7, 8, 9, 0};
+    std::vector<int> high_b{6, 5, 1, 3, 2, 6};
 
     double *beacon_high = new double[uwb_raw.cols()];
 
     if (with_high) {
-            for (int i(0); i < 4; ++i) {
-                auto *e = new Z0Edge();
-                e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
-                e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
+        for (int i(0); i < low_b.size() - 1; ++i) {
+            auto *e = new Z0Edge();
+            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
+            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
 
-                Eigen::Matrix<double, 1, 1> info;
-                info(0, 0) = 0.00010;
+            Eigen::Matrix<double, 1, 1> info;
+            info(0, 0) = 0.00010;
 
-                beacon_high[low_b[i]] = 3.5;
-                e->setMeasurement(3.5);
+            beacon_high[low_b[i]] = 3.5;
+            e->setMeasurement(3.5);
 //                e->setRobustKernel(robustKernel);
-                globalOptimizer.addEdge(e);
-            }
+            globalOptimizer.addEdge(e);
+        }
 
-            for (int i(0); i < 4; ++i) {
-                auto *e = new Z0Edge();
-                e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + high_b[i]);
-                e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
+        for (int i(0); i < high_b.size() - 1; ++i) {
+            auto *e = new Z0Edge();
+            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + high_b[i]);
+            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
 
-                Eigen::Matrix<double, 1, 1> info;
-                info(0, 0) = 0.00010;
+            Eigen::Matrix<double, 1, 1> info;
+            info(0, 0) = 0.00010;
 
-                beacon_high[high_b[i]] = -1.5;
-                e->setMeasurement(-1.5);
+            beacon_high[high_b[i]] = -1.5;
+            e->setMeasurement(-1.5);
 //                e->setRobustKernel(robustKernel);
-                globalOptimizer.addEdge(e);
-            }
+            globalOptimizer.addEdge(e);
+        }
 
 
     }
@@ -521,8 +523,7 @@ int main(int argc, char *argv[]) {
 
                         dist_edge->setRobustKernel(robustKernel);
 
-                        if(fabs(v_high(zupt_index)-beacon_high[bi])<1.2)
-                        {
+                        if (fabs(v_high(zupt_index) - beacon_high[bi]) < 1.2) {
 
                             globalOptimizer.addEdge(dist_edge);
                         }

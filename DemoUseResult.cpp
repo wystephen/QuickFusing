@@ -326,8 +326,6 @@ int main(int argc, char *argv[]) {
 
 
 
-
-
     /// Add never used vertex
 
     int never_used_id = 9999910;

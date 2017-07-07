@@ -522,10 +522,17 @@ int main(int argc, char *argv[]) {
 
                         dist_edge->setRobustKernel(robustKernel);
 
-                        if (fabs(v_high(zupt_index) - beacon_high[bi]) < 1.2) {
+                        if(with_high)
+                        {
+                            if (fabs(v_high(zupt_index) - beacon_high[bi]) < 1.2) {
 
+                                globalOptimizer.addEdge(dist_edge);
+                            }
+                        }else{
                             globalOptimizer.addEdge(dist_edge);
                         }
+
+
 
 
                     }

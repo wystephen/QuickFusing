@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
         CppExtent::CSVReader VertexHigh(dir_name + "vertex_high_modified.csv");
 
         v_high.resize(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
-        v_high.setZero(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
+//        v_high.setZero(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
 
         auto v_high_matrix = VertexHigh.GetMatrix();
 

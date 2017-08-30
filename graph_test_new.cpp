@@ -118,9 +118,9 @@ int main(int argc, char *argv[]) {
 
     double uwb_err_threshold = 0.5;
 
-    int delay_times = 5;
+    int delay_times = 25;
 
-    int out_delay_times = 2;
+    int out_delay_times = 15;
 
     int data_num = 5;
 
@@ -229,6 +229,8 @@ int main(int argc, char *argv[]) {
 
     int trace_id(0);
     int beacon_id(100000);
+
+    std::vector<Eigen::Isometry3d> transform_vec;
 
 
 
@@ -383,6 +385,7 @@ int main(int argc, char *argv[]) {
     std::vector <Eigen::Isometry3d> edge_vector;
 
     std::vector<double> onx, ony;
+    std::vector<double> onx_estimate,ony_estimate;
 
 
     std::ofstream out_v_before("./ResultData/" + std::to_string(data_num)+ "out_v_before.txt");
@@ -540,6 +543,7 @@ int main(int argc, char *argv[]) {
                     edge_se3->setMeasurement(latest_transform.inverse() * the_transform);
 
                     edge_vector.push_back(latest_transform.inverse()*the_transform);
+//                    transform_vec.push_back()
 
 
 //                    double tmp_data[10]={0};
@@ -623,6 +627,21 @@ int main(int argc, char *argv[]) {
                         globalOptimizer.vertex(trace_id - out_delay_times)->getEstimateData(td);
                         onx.push_back(td[0]);
                         ony.push_back(td[1]);
+
+                        //todo:td to
+                        Eigen::Isometry3d previous_transform=(Eigen::Isometry3d::Identity());
+
+                        Eigen::Vector3d pre_offset(td[0],td[1],td[2]);
+                        Eigen::Quaterniond pre_qq(td[6],td[3],td[4],td[5]);
+
+                        previous_transform  = tq2Transform(pre_offset,pre_qq);
+                        for(int k(0);k<out_delay_times;++k)
+                        {
+                            previous_transform = previous_transform*edge_vector.at(k+trace_id-out_delay_times);
+                        }
+                        onx_estimate.push_back(previous_transform(0,3));
+                        ony_estimate.push_back(previous_transform(1,3));
+
                     }
 
                     if (trace_id > 10) {
@@ -798,6 +817,7 @@ int main(int argc, char *argv[]) {
     plt::plot(rix,riy,"b-");
 
     plt::plot(onx, ony, "g-");
+    plt::plot(onx_estimate,ony_estimate,"y+");
     plt::grid(true);
 
 

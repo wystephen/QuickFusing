@@ -118,9 +118,9 @@ int main(int argc, char *argv[]) {
 
     double uwb_err_threshold = 0.5;
 
-    int delay_times = 25;
+    int delay_times = 10;
 
-    int out_delay_times = 15;
+    int out_delay_times = 5;
 
     int data_num = 5;
 
@@ -637,8 +637,9 @@ int main(int argc, char *argv[]) {
                         previous_transform  = tq2Transform(pre_offset,pre_qq);
                         for(int k(0);k<out_delay_times;++k)
                         {
-                            previous_transform = previous_transform*edge_vector.at(k+trace_id-out_delay_times);
+                            previous_transform =previous_transform* edge_vector.at(k+trace_id-out_delay_times);
                         }
+//                        previous_transform.
                         onx_estimate.push_back(previous_transform(0,3));
                         ony_estimate.push_back(previous_transform(1,3));
 
@@ -817,7 +818,7 @@ int main(int argc, char *argv[]) {
     plt::plot(rix,riy,"b-");
 
     plt::plot(onx, ony, "g-");
-    plt::plot(onx_estimate,ony_estimate,"y+");
+    plt::plot(onx_estimate,ony_estimate,"c-+");
     plt::grid(true);
 
 

@@ -335,9 +335,9 @@ int main(int argc, char *argv[]) {
     * Load uwb data.
     */
 
-    CSVReader BeaconsetReader(dir_name + "beaconset.data.csv");
-    CSVReader UwbdataReader(dir_name + "UwbData.data.csv");
-    CSVReader UwbValidReader(dir_name+"UwbValid.data.csv");
+    CppExtent::CSVReader BeaconsetReader(dir_name + "beaconset.data.csv");
+    CppExtent::CSVReader UwbdataReader(dir_name + "UwbData.data.csv");
+    CppExtent::CSVReader UwbValidReader(dir_name+"UwbValid.data.csv");
 
     Eigen::MatrixXd beaconset, UwbData,UwbValid;
 
@@ -499,7 +499,7 @@ int main(int argc, char *argv[]) {
                 } else if (delta_ori < -M_PI) {
                     delta_ori += (2.0 * M_PI);
                 }
-                if (isnan(delta_ori)) {
+                if (std::isnan(delta_ori)) {
                     delta_ori = 0.0;
                 }
 //                gekf.getDeltaOrientation();

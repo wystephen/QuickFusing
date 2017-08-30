@@ -69,16 +69,14 @@ G2O_USE_TYPE_GROUP(slam3d)
 namespace plt = matplotlibcpp;
 
 
-
-
 Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
-Eigen::Quaterniond q){
+                               Eigen::Quaterniond q) {
     Eigen::Isometry3d T;
     T.setIdentity();
     T.rotate(q.toRotationMatrix());
-    T(0,3) = offset(0);
-    T(1,3) = offset(1);
-    T(2,3) = offset(2);
+    T(0, 3) = offset(0);
+    T(1, 3) = offset(1);
+    T(2, 3) = offset(2);
     return T;
 }
 
@@ -106,9 +104,9 @@ int main(int argc, char *argv[]) {
     double distance_sigma = 2.0;
 
 
-    double z_offset = 1.90-1.12;
+    double z_offset = 1.90 - 1.12;
 
-    double turn_threshold  = 1.0;
+    double turn_threshold = 1.0;
     double corner_ratio = 10.0;
 
     int max_optimize_times = 4000;
@@ -121,18 +119,18 @@ int main(int argc, char *argv[]) {
     int delay_times = 10;
 
     int out_delay_times = 5;
+    5;
 
     int data_num = 5;
 
 
-    if (argc == 14)
-    {
+    if (argc == 14) {
         std::cout << "set para meter s" << std::endl;
         first_info = std::stod(argv[1]);
-        second_info=std::stod(argv[2]);
+        second_info = std::stod(argv[2]);
 
-        distance_info=std::stod(argv[3]);
-        distance_sigma=std::stod(argv[4]);
+        distance_info = std::stod(argv[3]);
+        distance_sigma = std::stod(argv[4]);
 
         z_offset = std::stod(argv[5]);
 
@@ -151,8 +149,6 @@ int main(int argc, char *argv[]) {
 
         data_num = std::stoi(argv[13]);
     }
-
-
 
 
     std::string out_dir_name = "./";
@@ -313,7 +309,6 @@ int main(int argc, char *argv[]) {
     myekf.InitNavEq(ImuData.block(0, 1, 20, 6));
 
 
-
     std::vector<double> wi, w1, w2, w3;
 
     for (int i(0); i < ImuData.rows(); ++i) {
@@ -339,9 +334,9 @@ int main(int argc, char *argv[]) {
 
     CppExtent::CSVReader BeaconsetReader(dir_name + "beaconset.data.csv");
     CppExtent::CSVReader UwbdataReader(dir_name + "UwbData.data.csv");
-    CppExtent::CSVReader UwbValidReader(dir_name+"UwbValid.data.csv");
+    CppExtent::CSVReader UwbValidReader(dir_name + "UwbValid.data.csv");
 
-    Eigen::MatrixXd beaconset, UwbData,UwbValid;
+    Eigen::MatrixXd beaconset, UwbData, UwbValid;
 
 
     beaconset.resize(BeaconsetReader.GetMatrix().GetRows(),
@@ -360,13 +355,11 @@ int main(int argc, char *argv[]) {
     }
 
     UwbValid.resize(UwbValidReader.GetMatrix().GetRows(),
-    UwbValidReader.GetMatrix().GetCols());
+                    UwbValidReader.GetMatrix().GetCols());
 
-    for(int i(0);i<UwbValid.rows();++i)
-    {
-        for(int j(0);j<UwbValid.cols();++j)
-        {
-            UwbValid(i,j) = *(UwbValidReader.GetMatrix()(i,j));
+    for (int i(0); i < UwbValid.rows(); ++i) {
+        for (int j(0); j < UwbValid.cols(); ++j) {
+            UwbValid(i, j) = *(UwbValidReader.GetMatrix()(i, j));
         }
     }
 
@@ -382,20 +375,19 @@ int main(int argc, char *argv[]) {
     std::vector<int> vertex_index;
 
 
-    std::vector <Eigen::Isometry3d> edge_vector;
+    std::vector<Eigen::Isometry3d> edge_vector;
 
     std::vector<double> onx, ony;
-    std::vector<double> onx_estimate,ony_estimate;
+    std::vector<double> onx_estimate, ony_estimate;
 
 
-    std::ofstream out_v_before("./ResultData/" + std::to_string(data_num)+ "out_v_before.txt");
-    std::ofstream out_v_after("./ResultData/" + std::to_string(data_num)+ "out_v_after.txt");
+    std::ofstream out_v_before("./ResultData/" + std::to_string(data_num) + "out_v_before.txt");
+    std::ofstream out_v_after("./ResultData/" + std::to_string(data_num) + "out_v_after.txt");
 
 
     ///////// try to add time offset to uwb data
-    for(int i(0);i<UwbData.rows();++i)
-    {
-        UwbData(i,0) += time_offset;
+    for (int i(0); i < UwbData.rows(); ++i) {
+        UwbData(i, 0) += time_offset;
     }
 
     /// 0. prepare some class
@@ -404,7 +396,7 @@ int main(int argc, char *argv[]) {
     int imu_index(0);
 
     MyEkf gekf(init_para);
-    gekf.InitNavEq(ImuData.block(0,1,20,6));
+    gekf.InitNavEq(ImuData.block(0, 1, 20, 6));
 
     Eigen::Isometry3d latest_transform = (Eigen::Isometry3d::Identity());
 
@@ -415,20 +407,17 @@ int main(int argc, char *argv[]) {
      * Spacial preprocess !!!!
      * set z of beaconset to zero
      */
-    for(int i(0);i<beaconset.rows();++i)
-    {
-        beaconset(i,2) = 0.0;
+    for (int i(0); i < beaconset.rows(); ++i) {
+        beaconset(i, 2) = 0.0;
     }
 
 
 
     /// 1. add beacon vertex
-    for(int i(0);i<beaconset.rows();++i)
-    {
-        auto *v = new  g2o::VertexSE3();
+    for (int i(0); i < beaconset.rows(); ++i) {
+        auto *v = new g2o::VertexSE3();
         double p[6] = {0};
-        for(int j(0);j<3;++j)
-        {
+        for (int j(0); j < 3; ++j) {
             p[j] = beaconset(i, j);
 //            p[j] = 0.0;
         }
@@ -436,7 +425,7 @@ int main(int argc, char *argv[]) {
         v->setEstimateData(p);
 //        if(0==i||1==i)
         v->setFixed(true);
-        v->setId(beacon_id+i);
+        v->setId(beacon_id + i);
         globalOptimizer.addVertex(v);
     }
 
@@ -457,7 +446,7 @@ int main(int argc, char *argv[]) {
              * update imu data
              */
             gekf.GetPosition(ImuData.block(imu_index, 1, 1, 6).transpose(),
-                               Zupt(imu_index, 0));
+                             Zupt(imu_index, 0));
 
             /**
              *  Add a vertex to graph when first time of zero-velocity detected.
@@ -542,7 +531,7 @@ int main(int argc, char *argv[]) {
 
                     edge_se3->setMeasurement(latest_transform.inverse() * the_transform);
 
-                    edge_vector.push_back(latest_transform.inverse()*the_transform);
+                    edge_vector.push_back(latest_transform.inverse() * the_transform);
 //                    transform_vec.push_back()
 
 
@@ -554,7 +543,7 @@ int main(int argc, char *argv[]) {
 //                    }
 //                    out_v_before << std::endl;
 
-                    out_v_before<< delta_ori/180.0*M_PI <<std::endl;
+                    out_v_before << delta_ori / 180.0 * M_PI << std::endl;
 
                     globalOptimizer.addEdge(edge_se3);
 
@@ -564,13 +553,12 @@ int main(int argc, char *argv[]) {
                 /// add range edge
 
                 //  get measurement
-                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 1.0 ) {
+                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 1.0) {
 
                     Eigen::VectorXd uwb_measure;
 
                     uwb_measure.resize(UwbData.cols() - 1);
                     uwb_measure.setZero();
-
 
 
                     if (uwb_index == 0 || uwb_index > UwbData.rows() - 3) {
@@ -585,10 +573,9 @@ int main(int argc, char *argv[]) {
                     // build and add edge
 
                     for (int bi(0); bi < uwb_measure.rows(); ++bi) {
-                        if( bi == 10
+                        if (bi == 10
 
-                                )
-                        {
+                                ) {
                             break;
                         }
                         auto *dist_edge = new DistanceEdge();
@@ -598,13 +585,11 @@ int main(int argc, char *argv[]) {
                         dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
 
                         Eigen::Matrix<double, 1, 1> information;
-                        if(uwb_err_threshold>1.0)
-                        {
-                            information(0, 0) = 1/UwbValid(uwb_index,0)+1.0;
+                        if (uwb_err_threshold > 1.0) {
+                            information(0, 0) = 1 / UwbValid(uwb_index, 0) + 1.0;
 //                                          distance_sigma = UwbValid(uwb_index,0);
-                        }
-                        else{
-                            information(0,0) = distance_info;
+                        } else {
+                            information(0, 0) = distance_info;
                         }
 
                         dist_edge->setInformation(information);
@@ -629,19 +614,21 @@ int main(int argc, char *argv[]) {
                         ony.push_back(td[1]);
 
                         //todo:td to
-                        Eigen::Isometry3d previous_transform=(Eigen::Isometry3d::Identity());
+                        int tm_out_delay_times = out_delay_times + 3;
+                        globalOptimizer.vertex(trace_id - tm_out_delay_times)->getEstimateData(td);
 
-                        Eigen::Vector3d pre_offset(td[0],td[1],td[2]);
-                        Eigen::Quaterniond pre_qq(td[6],td[3],td[4],td[5]);
+                        Eigen::Isometry3d previous_transform = (Eigen::Isometry3d::Identity());
 
-                        previous_transform  = tq2Transform(pre_offset,pre_qq);
-                        for(int k(0);k<out_delay_times;++k)
-                        {
-                            previous_transform =previous_transform* edge_vector.at(k+trace_id-out_delay_times);
+                        Eigen::Vector3d pre_offset(td[0], td[1], td[2]);
+                        Eigen::Quaterniond pre_qq(td[6], td[3], td[4], td[5]);
+
+                        previous_transform = tq2Transform(pre_offset, pre_qq);
+                        for (int k(0); k < tm_out_delay_times; ++k) {
+                            previous_transform = previous_transform * edge_vector.at(k + trace_id - tm_out_delay_times);
                         }
 //                        previous_transform.
-                        onx_estimate.push_back(previous_transform(0,3));
-                        ony_estimate.push_back(previous_transform(1,3));
+                        onx_estimate.push_back(previous_transform(0, 3));
+                        ony_estimate.push_back(previous_transform(1, 3));
 
                     }
 
@@ -658,7 +645,7 @@ int main(int argc, char *argv[]) {
                 latest_transform = the_transform;
 
                 /// increase trace id
-                trace_id ++;
+                trace_id++;
 
             }
 
@@ -689,30 +676,28 @@ int main(int argc, char *argv[]) {
 
 
     /// 4. plot result
-    std::ofstream out_result("./ResultData/" + std::to_string(data_num)+ "test.txt");
-    std::vector<double> gx,gy;
-    for(int vid(0);vid<trace_id;++vid)
-    {
+    std::ofstream out_result("./ResultData/" + std::to_string(data_num) + "test.txt");
+    std::vector<double> gx, gy;
+    for (int vid(0); vid < trace_id; ++vid) {
         double data[10] = {0};
         globalOptimizer.vertex(vid)->getEstimateData(data);
         gx.push_back(data[0]);
         gy.push_back(data[1]);
-        out_result << data[0] << " " << data[1] <<" "<< data[2]<< std::endl;
+        out_result << data[0] << " " << data[1] << " " << data[2] << std::endl;
     }
     out_result.close();
 
     //// 5.compute error
-    std::ofstream out_err("./ResultData/" + std::to_string(data_num)+ "err.txt");
+    std::ofstream out_err("./ResultData/" + std::to_string(data_num) + "err.txt");
     std::vector<double> error_vec;
     out_err.precision(10);
     double err_sum(0.0);
     double online_err_sum(0.0);
-    std::vector<double> rix,riy;
+    std::vector<double> rix, riy;
 
-    std::ofstream("./ResultData/"+std::to_string(data_num)+"real_pose_ir.txt");
+    std::ofstream("./ResultData/" + std::to_string(data_num) + "real_pose_ir.txt");
 
-    for(int i(0);i<vertex_index.size();++i)
-    {
+    for (int i(0); i < vertex_index.size(); ++i) {
 
 //        / OUT PUT RESULT OF VERTEX;
 //        double tmp_data[10]={0};
@@ -722,11 +707,11 @@ int main(int argc, char *argv[]) {
 //        int offset = 9;
         index += 160;//By test.
 
-        error_vec.push_back(std::sqrt(std::pow(gx[i]-irx[index],2.0)+
-        std::pow(gy[i]-iry[index],2.0)));
-        out_err<< error_vec.at(i) << std::endl;
-        err_sum+=std::sqrt(std::pow(gx[i]-irx[index],2.0)+
-                           std::pow(gy[i]-iry[index],2.0));
+        error_vec.push_back(std::sqrt(std::pow(gx[i] - irx[index], 2.0) +
+                                      std::pow(gy[i] - iry[index], 2.0)));
+        out_err << error_vec.at(i) << std::endl;
+        err_sum += std::sqrt(std::pow(gx[i] - irx[index], 2.0) +
+                             std::pow(gy[i] - iry[index], 2.0));
 
         if (i < onx.size()) {
             online_err_sum += std::sqrt(std::pow(onx[i] - irx[index], 2.0) +
@@ -734,7 +719,7 @@ int main(int argc, char *argv[]) {
         }
 
 //        plt::plot()
-        std::vector<double> tmpx,tmpy;
+        std::vector<double> tmpx, tmpy;
         tmpx.push_back(gx[i]);
         tmpx.push_back(irx[index]);
         tmpy.push_back(gy[i]);
@@ -742,33 +727,33 @@ int main(int argc, char *argv[]) {
         rix.push_back(irx[index]);
         riy.push_back(iry[index]);
 
-        plt::plot(tmpx,tmpy,"y-");
+        plt::plot(tmpx, tmpy, "y-");
     }
 
 
-    for(int i(1);i<vertex_index.size();++i)
-    {
+    for (int i(1); i < vertex_index.size(); ++i) {
 //        globalOptimizer.vertex(i)->edges().size();
         double tmp_data[10] = {0};
 
-        globalOptimizer.vertex(i-1)->getEstimateData(tmp_data);
+        globalOptimizer.vertex(i - 1)->getEstimateData(tmp_data);
 
-        Eigen::Quaterniond tq1(tmp_data[6],tmp_data[3],tmp_data[4],tmp_data[5]);
+        Eigen::Quaterniond tq1(tmp_data[6], tmp_data[3], tmp_data[4], tmp_data[5]);
 
-        auto T1 = tq2Transform(Eigen::Vector3d(tmp_data[0],tmp_data[1],tmp_data[2]),
-        tq1);
+        auto T1 = tq2Transform(Eigen::Vector3d(tmp_data[0], tmp_data[1], tmp_data[2]),
+                               tq1);
 
 
         globalOptimizer.vertex(i)->getEstimateData(tmp_data);
 
-        Eigen::Quaterniond tq2(tmp_data[6],tmp_data[3],tmp_data[4],tmp_data[5]);
+        Eigen::Quaterniond tq2(tmp_data[6], tmp_data[3], tmp_data[4], tmp_data[5]);
 
-        auto T2 = tq2Transform(Eigen::Vector3d(tmp_data[0],tmp_data[1],tmp_data[2]),
-        tq2);
+        auto T2 = tq2Transform(Eigen::Vector3d(tmp_data[0], tmp_data[1], tmp_data[2]),
+                               tq2);
 
-        auto TT = T1.inverse()*T2;
+        auto TT = T1.inverse() * T2;
 
-            out_v_after << ((TT.inverse() * edge_vector.at(i-1)).matrix() - Eigen::Isometry3d::Identity().matrix()).norm() << std::endl;
+        out_v_after << ((TT.inverse() * edge_vector.at(i - 1)).matrix() - Eigen::Isometry3d::Identity().matrix()).norm()
+                    << std::endl;
 //        TT.rotation().
 //        Eigen::Quaterniond tq(TT.matrix().block(0,0,3,3));
 //
@@ -787,7 +772,7 @@ int main(int argc, char *argv[]) {
 //            out_v_after << tv(j) << " " ;
 //        }
 //        out_v_after << std::acos(std::abs(tv(0))/std::sqrt(tv(0)*tv(0)+tv(1)*tv(1)));
-        out_v_after<<std::endl;
+        out_v_after << std::endl;
     }
     out_v_after.close();
     std::cout << "average error is :" << err_sum / double(error_vec.size()) << std::endl;
@@ -813,16 +798,16 @@ int main(int argc, char *argv[]) {
 
     plt::plot(bx, by, "r*");
 
-    plt::plot(gx,gy,"r-+");
+    plt::plot(gx, gy, "r-+");
 //    plt::plot(irx,iry,"b-");
-    plt::plot(rix,riy,"b-");
+    plt::plot(rix, riy, "b-");
 
     plt::plot(onx, ony, "g-");
-    plt::plot(onx_estimate,ony_estimate,"c-+");
+    plt::plot(onx_estimate, ony_estimate, "c-+");
     plt::grid(true);
 
 
-    std::ofstream out_para_res("./ResultData/para_err.txt",std::ios::app);
+    std::ofstream out_para_res("./ResultData/para_err.txt", std::ios::app);
 
     out_para_res.precision(10);
 
@@ -836,11 +821,11 @@ int main(int argc, char *argv[]) {
                  << "max_iterate:" << max_optimize_times
                  << "time_offset:" << time_offset
                  << "delay_times:" << delay_times
-                 << "err:" <<err_sum/double(error_vec.size())
+                 << "err:" << err_sum / double(error_vec.size())
                  << std::endl;
 
 
-    plt::title("erro is :"+std::to_string(err_sum/double(error_vec.size())));
+    plt::title("erro is :" + std::to_string(err_sum / double(error_vec.size())));
 //
     plt::show();
 

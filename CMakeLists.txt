@@ -86,8 +86,10 @@ SET(G2O_LIBS g2o_cli g2o_ext_freeglut_minimal g2o_simulator
 #target_link_libraries(QuickFusing ${PYTHON_LIBRARIES})
 
 add_executable(gt graph_test.cpp)
+add_executable(gt_new graph_test_new.cpp)
 add_executable(fast_demo FastUwbDemo.cpp)
 target_link_libraries(gt ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
+target_link_libraries(gt_new ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
 target_link_libraries(fast_demo ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
 
 

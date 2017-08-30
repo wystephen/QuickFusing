@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
 
 
     // Load real pose
-    CSVReader ImuRealPose(dir_name + "ImuRealPose.data.csv"),
+    CppExtent::CSVReader ImuRealPose(dir_name + "ImuRealPose.data.csv"),
             UwbRealPose(dir_name + "ImuRealPose.data.csv");
 
     std::vector<double> irx, iry, urx, ury;
@@ -256,7 +256,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    CSVReader ImuDataReader(dir_name + "ImuData.data.csv"),
+    CppExtent::CSVReader ImuDataReader(dir_name + "ImuData.data.csv"),
             ZuptReader(dir_name + "Zupt.data.csv"),
             UwbResultReader(dir_name + "UwbResult.data.csv");
 

@@ -118,9 +118,9 @@ int main(int argc, char *argv[]) {
 
     double uwb_err_threshold = 0.5;
 
-    int delay_times = 5;
+    int delay_times = 25;
 
-    int out_delay_times = 2;
+    int out_delay_times = 4;
 
     int data_num = 5;
 

@@ -116,10 +116,9 @@ int main(int argc, char *argv[]) {
 
     double uwb_err_threshold = 0.5;
 
-    int delay_times = 10;
+    int delay_times = 25;
 
-    int out_delay_times = 5;
-    5;
+    int out_delay_times = 4;
 
     int data_num = 5;
 
@@ -606,15 +605,15 @@ int main(int argc, char *argv[]) {
                         globalOptimizer.vertex(trace_id - last_offset + 1)->setFixed(true);
 
                     }
-
-                    if (trace_id >= out_delay_times) {
+                    int tm_out_delay_times = out_delay_times + 4;
+                    if (trace_id >= tm_out_delay_times) {
                         double td[10] = {0};
                         globalOptimizer.vertex(trace_id - out_delay_times)->getEstimateData(td);
                         onx.push_back(td[0]);
                         ony.push_back(td[1]);
 
                         //todo:td to
-                        int tm_out_delay_times = out_delay_times + 3;
+
                         globalOptimizer.vertex(trace_id - tm_out_delay_times)->getEstimateData(td);
 
                         Eigen::Isometry3d previous_transform = (Eigen::Isometry3d::Identity());
@@ -624,7 +623,8 @@ int main(int argc, char *argv[]) {
 
                         previous_transform = tq2Transform(pre_offset, pre_qq);
                         for (int k(0); k < tm_out_delay_times; ++k) {
-                            previous_transform = previous_transform * edge_vector.at(k + trace_id - tm_out_delay_times);
+                            previous_transform = previous_transform *
+                                    edge_vector.at(k + trace_id - tm_out_delay_times);
                         }
 //                        previous_transform.
                         onx_estimate.push_back(previous_transform(0, 3));

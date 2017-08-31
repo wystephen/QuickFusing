@@ -624,7 +624,7 @@ int main(int argc, char *argv[]) {
                         previous_transform = tq2Transform(pre_offset, pre_qq);
                         for (int k(0); k < tm_out_delay_times; ++k) {
                             previous_transform = previous_transform *
-                                    edge_vector.at(k + trace_id - tm_out_delay_times);
+                                                 edge_vector.at(k + trace_id - tm_out_delay_times);
                         }
 //                        previous_transform.
                         onx_estimate.push_back(previous_transform(0, 3));

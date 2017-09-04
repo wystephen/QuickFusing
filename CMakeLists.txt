@@ -96,7 +96,7 @@ target_link_libraries(fast_demo ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIE
 
 # for only imu mag
 add_executable(ImuOnlyGraph IMUOnly-graph_test.cpp)
-target_link_libraries(ImuOnlyGraph ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} )
+target_link_libraries(ImuOnlyGraph ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
 
 add_executable(dw DemoUseResult.cpp)
 #target_link_libraries(dw ${G2O_LIBS} ${Cholmod_LIBRARIES} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )

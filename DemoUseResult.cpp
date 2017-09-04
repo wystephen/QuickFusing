@@ -118,7 +118,6 @@ int main(int argc, char *argv[]) {
         offset_cov = std::stod(argv[2]);
         rotation_cov = std::stod(argv[3]);
         range_cov = std::stod(argv[4]);
-
     }
 
     if (argc >= 8) {

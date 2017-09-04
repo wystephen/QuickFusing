@@ -24,6 +24,7 @@
 
 
 #include "MYEKF.h"
+#include "Zero_Detecter.h"
 #include<Eigen/Dense>
 #include <Eigen/Geometry>
 #include <sophus/se3.h>
@@ -83,19 +84,20 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/1/";
+    std::string dir_name = "/home/steve/Data/XIMU&UWB/1/";
 
     // Load data
     CppExtent::CSVReader imu_data_reader(dir_name+"ImuData.csv");
 
     Eigen::MatrixXd imudata(imu_data_reader.GetMatrix().GetRows(),
     imu_data_reader.GetMatrix().GetCols());
+    auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
 
     for(int i(0);i<imudata.rows();++i)
     {
         for(int j(0);j<imudata.cols();++j)
         {
-            imudata(i,j) = *(imu_data_reader.GetMatrix()(i,j));
+            imudata(i,j) = *(imu_data_tmp_matrix(i,j));
         }
     }
     std::cout << "imu data size: " << imudata.rows() << "x"
@@ -104,6 +106,34 @@ int main(int argc, char *argv[]) {
 
     std::vector<double> ix,iy; //ix iy
     std::vector<double> gx,gy;// graph x
+
+
+    SettingPara initial_para(true);
+
+    initial_para.Ts_ = 1.0f / 128.0f;
+
+
+
+
+    for(int index(0);index < imudata.rows();++index)
+    {
+        double zupt_flag = 0.0;
+        if(index < initial_para.ZeroDetectorWindowSize_)
+        {
+
+            zupt_flag = 1.0;
+        }else{
+            if(GLRT_Detector(imudata.block(index-initial_para.ZeroDetectorWindowSize_,
+            0,initial_para.ZeroDetectorWindowSize_,6),initial_para.sigma_a_,
+            initial_para.sigma_g_,initial_para.ZeroDetectorWindowSize_))
+            {
+                zupt_flag = 1.0;
+            }
+        }
+        auto tx =
+    }
+
+
 
 
 

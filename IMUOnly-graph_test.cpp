@@ -134,8 +134,11 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/XIMU&UWB/5/";
 
     /// Global parameters
-    double first_info(0.01),second_info(0.01);
-    double ori_info(0.01);
+    double first_info(0.01),second_info(0.01*M_PI/180.0);
+    double ori_info(0.0001);
+
+    double turn_threshold = 1.0;
+    double corner_ratio = 10.0;
 
     //// Load data
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
@@ -157,6 +160,8 @@ int main(int argc, char *argv[]) {
 
     std::vector<double> ix, iy; //ix iy
     std::vector<double> gx, gy;// graph x
+
+    std::vector<double> ori_1,ori_2,ori_3;
 
     /**
      * Initial  graph parameters
@@ -213,6 +218,7 @@ int main(int argc, char *argv[]) {
 
     int trace_id(0);
     Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
+    double last_theta = 0.0;
 
     for (int index(0); index < imudata.rows(); ++index) {
 //        std::cout << "index:" << index << std::endl;
@@ -254,6 +260,31 @@ int main(int argc, char *argv[]) {
                 information(0, 0) = information(1, 1) = information(2, 2) = first_info;
                 information(3, 3) = information(4, 4) = information(5, 5) = second_info;
 
+                double the_theta(myekf.getOriente());
+                double delta_ori = the_theta - last_theta;
+
+                if (delta_ori > M_PI) {
+                    delta_ori -= (2 * M_PI);
+                } else if (delta_ori < -M_PI) {
+                    delta_ori += (2.0 * M_PI);
+                }
+                if (std::isnan(delta_ori)) {
+                    delta_ori = 0.0;
+                }
+//                gekf.getDeltaOrientation();
+                bool is_corner(false);
+//                if(std::abs(the_theta-))
+                if (std::abs(delta_ori) > turn_threshold) {
+                    is_corner = true;
+                }
+
+                last_theta = the_theta;
+
+                if(is_corner)
+                {
+                    information /= corner_ratio;
+                }
+
 
 
                 edge_se3->setInformation(information);
@@ -276,7 +307,10 @@ int main(int argc, char *argv[]) {
 
             edge_ori->setInformation(information);
 
-            Sophus::SO3 ori_so3(Eigen::Quaterniond(imudata(index,9),imudata(index,10),imudata(index,11),imudata(index,12)));
+            Sophus::SO3 ori_so3(Eigen::Quaterniond(imudata(index,12),imudata(index,10),imudata(index,11),imudata(index,9)));
+            ori_1.push_back(ori_so3.log()(0));
+            ori_2.push_back(ori_so3.log()(1));
+            ori_3.push_back(ori_so3.log()(2));
 
             edge_ori->setMeasurement(ori_so3);
 
@@ -297,8 +331,9 @@ int main(int argc, char *argv[]) {
 
     ///optimization
 
+    globalOptimizer.setVerbose(true);
     globalOptimizer.initializeOptimization();
-    globalOptimizer.optimize(1000);
+    globalOptimizer.optimize(10);
 
     for(int k(0);k<trace_id;++k)
     {
@@ -310,8 +345,11 @@ int main(int argc, char *argv[]) {
     }
 
 
-    plt::plot(gx, gy, "r-+");
-    plt::plot(ix, iy, "b-+");
+//    plt::plot(gx, gy, "r-+");
+//    plt::plot(ix, iy, "b-");
+    plt::plot(ori_1,"r-+");
+    plt::plot(ori_2,"b-+");
+    plt::plot(ori_3,"g-+");
     plt::title("show");
     plt::show();
 

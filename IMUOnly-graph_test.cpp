@@ -135,10 +135,10 @@ int main(int argc, char *argv[]) {
 
     /// Global parameters
     double first_info(10),second_info(10*M_PI/180.0);
-    double ori_info(100);
+    double ori_info(10);
 
     double turn_threshold = 1.0;
-    double corner_ratio = 150.0;
+    double corner_ratio = 10.0;
 
     //// Load data
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");

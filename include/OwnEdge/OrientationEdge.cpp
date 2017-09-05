@@ -37,7 +37,7 @@ void OrientationEdge::computeError() {
 //    Sophus::SO3 m_so3(_measurement[0],_measurement[1],_measurement[2]);
 
 //    auto phi12 = ((to_so3.inverse()*from_so3)*_measurement.inverse()).log();
-    auto phi12 = ((from_so3*to_so3.inverse())*_measurement).log();
+    auto phi12 = ((from_so3*to_so3.inverse()).inverse()*_measurement).log();
 //    double delta = std::abs(to_so3.log()(2)-_measurement.log()(2));
 
 //    while(delta>2.0*M_PI)

@@ -12,6 +12,9 @@
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
+#include <sophus/se3.h>
+#include <sophus/so3.h>
+
 class OrientationEdge:
         public g2o::BaseBinaryEdge<1, double, g2o::VertexSE3, g2o::VertexSE3> {
 public:

@@ -135,10 +135,10 @@ int main(int argc, char *argv[]) {
 
     /// Global parameters
     double first_info(0.01),second_info(0.01*M_PI/180.0);
-    double ori_info(0.0001);
+    double ori_info(1.5);
 
     double turn_threshold = 1.0;
-    double corner_ratio = 10.0;
+    double corner_ratio = 40.0;
 
     //// Load data
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
@@ -313,6 +313,9 @@ int main(int argc, char *argv[]) {
             ori_3.push_back(ori_so3.log()(2));
 
             edge_ori->setMeasurement(ori_so3);
+            /// robust kernel
+            static g2o::RobustKernel* robustKernel = g2o::RobustKernelFactory::instance()->construct( "Cauchy" );
+//            edge_ori->setRobustKernel(robustKernel);
 
             globalOptimizer.addEdge(edge_ori);
 
@@ -333,7 +336,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.setVerbose(true);
     globalOptimizer.initializeOptimization();
-    globalOptimizer.optimize(10);
+    globalOptimizer.optimize(1000);
 
     for(int k(0);k<trace_id;++k)
     {
@@ -345,11 +348,11 @@ int main(int argc, char *argv[]) {
     }
 
 
-//    plt::plot(gx, gy, "r-+");
-//    plt::plot(ix, iy, "b-");
-    plt::plot(ori_1,"r-+");
-    plt::plot(ori_2,"b-+");
-    plt::plot(ori_3,"g-+");
+    plt::plot(gx, gy, "r-+");
+    plt::plot(ix, iy, "b-");
+//    plt::plot(ori_1,"r-+");
+//    plt::plot(ori_2,"b-+");
+//    plt::plot(ori_3,"g-+");
     plt::title("show");
     plt::show();
 

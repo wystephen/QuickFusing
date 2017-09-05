@@ -36,10 +36,9 @@ void OrientationEdge::computeError() {
     Sophus::SO3 to_so3(p2[3],p2[4],p2[5]);
 //    Sophus::SO3 m_so3(_measurement[0],_measurement[1],_measurement[2]);
 
-    auto phi12 = ((from_so3.inverse() * to_so3).inverse()*_measurement).log();
+    auto phi12 = ((to_so3.inverse()*from_so3).inverse()*_measurement).log();
 
-    _error(0,0) =  phi12.norm()+0.00001;//...
-
+    _error(0,0) =  phi12.norm();//...
 
 }
 

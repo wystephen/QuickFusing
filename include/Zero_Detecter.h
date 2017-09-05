@@ -114,7 +114,7 @@ int ZeroDetector::Detector(Eigen::MatrixXd u) {
 
 bool GLRT_Detector(Eigen::MatrixXd u, double sigma2_a, double sigma2_g, long W) {
     Eigen::Vector3d ya_m;
-    double g = para_ptr_->gravity_;
+    double g = 9.81;//para_ptr_->gravity_;
 
     double T(0.0);
     Eigen::MatrixXd Tmatrix(1, 1);

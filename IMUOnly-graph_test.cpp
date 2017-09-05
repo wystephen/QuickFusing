@@ -24,7 +24,7 @@
 
 
 #include "MYEKF.h"
-#include "Zero_Detecter.h"
+//#include "Zero_Detecter.h"
 #include<Eigen/Dense>
 #include <Eigen/Geometry>
 #include <sophus/se3.h>
@@ -70,6 +70,48 @@ G2O_USE_TYPE_GROUP(slam3d)
 
 namespace plt = matplotlibcpp;
 
+bool GLRT_Detector(Eigen::MatrixXd u,
+                   const SettingPara &para_) {
+    Eigen::Vector3d ya_m;
+    double g = para_.gravity_;
+
+    double T(0.0);
+    Eigen::MatrixXd Tmatrix(1, 1);
+
+    for (int i(0); i < 3; ++i) {
+        ya_m(i) = u.block(i, 0, 1, u.cols()).mean();
+    }
+
+    Eigen::Vector3d tmp;
+
+    for (int i(0); i < u.cols(); ++i) {
+
+        tmp = u.block(0, i, 3, 1) - g * ya_m / ya_m.norm();
+        double tt(0.0);
+
+//        std::cout << " u block size : " << u.block(3,i,3,1).rows()<< std::endl;
+//        std::cout << "tmp size :" << tmp.rows()<< std::endl;
+
+        Tmatrix += u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / para_.sigma_g_ +
+                   tmp.transpose() * tmp / para_.sigma_a_;
+
+
+    }
+
+    if (Tmatrix.size() != 1) {
+        MYERROR("Tmatrxi size is not equal to 1")
+    }
+
+    T = Tmatrix(0, 0);
+
+    T = T / para_.ZeroDetectorWindowSize_;
+    if (T < para_.gamma_) {
+        return true;
+    } else {
+        return false;
+    }
+
+}
 
 Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
                                Eigen::Quaterniond q) {
@@ -87,58 +129,52 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/XIMU&UWB/1/";
 
     // Load data
-    CppExtent::CSVReader imu_data_reader(dir_name+"ImuData.csv");
+    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
 
     Eigen::MatrixXd imudata(imu_data_reader.GetMatrix().GetRows(),
-    imu_data_reader.GetMatrix().GetCols());
+                            imu_data_reader.GetMatrix().GetCols());
     auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
 
-    for(int i(0);i<imudata.rows();++i)
-    {
-        for(int j(0);j<imudata.cols();++j)
-        {
-            imudata(i,j) = *(imu_data_tmp_matrix(i,j));
+    for (int i(0); i < imudata.rows(); ++i) {
+        for (int j(0); j < imudata.cols(); ++j) {
+            imudata(i, j) = *(imu_data_tmp_matrix(i, j));
         }
     }
     std::cout << "imu data size: " << imudata.rows() << "x"
               << imudata.cols() << std::endl;
 
 
-    std::vector<double> ix,iy; //ix iy
-    std::vector<double> gx,gy;// graph x
+    std::vector<double> ix, iy; //ix iy
+    std::vector<double> gx, gy;// graph x
 
 
     SettingPara initial_para(true);
 
     initial_para.Ts_ = 1.0f / 128.0f;
 
+    MyEkf myekf(initial_para);
+    myekf.InitNavEq(imudata.block(0, 0, 20, 6));
 
-
-
-    for(int index(0);index < imudata.rows();++index)
-    {
+    for (int index(0); index < imudata.rows(); ++index) {
         double zupt_flag = 0.0;
-        if(index < initial_para.ZeroDetectorWindowSize_)
-        {
-
+        if (index <= initial_para.ZeroDetectorWindowSize_) {
             zupt_flag = 1.0;
-        }else{
-            if(GLRT_Detector(imudata.block(index-initial_para.ZeroDetectorWindowSize_,
-            0,initial_para.ZeroDetectorWindowSize_,6),initial_para.sigma_a_,
-            initial_para.sigma_g_,initial_para.ZeroDetectorWindowSize_))
-            {
+        } else {
+            if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_,
+                                            0, initial_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
+                              initial_para)) {
                 zupt_flag = 1.0;
             }
         }
-        auto tx =
+        auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6), zupt_flag);
+
+        ix.push_back(tx(0));
+        iy.push_back(tx(1));
     }
 
 
-
-
-
-
-    plt::plot(gx,gy,"r-+");
+    plt::plot(gx, gy, "r-+");
+    plt::plot(ix, iy, "b-+");
     plt::title("show");
     plt::show();
 

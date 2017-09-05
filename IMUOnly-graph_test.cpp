@@ -28,6 +28,7 @@
 #include<Eigen/Dense>
 #include <Eigen/Geometry>
 #include <sophus/se3.h>
+#include <sophus/so3.h>
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
@@ -45,6 +46,7 @@
 #include "g2o/core/robust_kernel_factory.h"
 
 
+
 //#include "g2o/types/slam3d_addons/vertex_line3d.h"
 //#include "g2o/types/slam3d_addons/edge_se3_line.h"
 
@@ -52,6 +54,9 @@
 //#include "OwnEdge/ZoEdge.cpp"
 #include "OwnEdge/DistanceEdge.h"
 #include "OwnEdge/DistanceEdge.cpp"
+
+#include "OwnEdge/OrientationEdge.h"
+#include "OwnEdge/OrientationEdge.cpp"
 
 //#include "OwnEdge/Line2D.h"
 //#include "OwnEdge/Line2D.cpp"
@@ -128,6 +133,10 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/XIMU&UWB/5/";
 
+    /// Global parameters
+    double first_info(0.01),second_info(0.01);
+    double ori_info(0.01);
+
     //// Load data
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
 
@@ -202,6 +211,9 @@ int main(int argc, char *argv[]) {
 
     double last_zupt_flag = 0.0;
 
+    int trace_id(0);
+    Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
+
     for (int index(0); index < imudata.rows(); ++index) {
 //        std::cout << "index:" << index << std::endl;
         double zupt_flag = 0.0;
@@ -218,12 +230,83 @@ int main(int argc, char *argv[]) {
         if(0 == index|(zupt_flag<0.5 & last_zupt_flag>0.5))
         {
             std::cout << "index: " << index << "kep step" << std::endl;
-            //
+
+            auto the_transform = myekf.getTransformation();
+
+            /// vertex zupt
+            auto *v = new g2o::VertexSE3();
+            v->setId(trace_id);
+            v->setEstimate(the_transform);
+
+            globalOptimizer.addVertex(v);
+
+            /// add transform edge
+            if(trace_id>0)
+            {
+                auto *edge_se3 = new g2o::EdgeSE3();
+
+                edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+                edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+                Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
+
+
+                information(0, 0) = information(1, 1) = information(2, 2) = first_info;
+                information(3, 3) = information(4, 4) = information(5, 5) = second_info;
+
+
+
+                edge_se3->setInformation(information);
+
+                edge_se3->setMeasurement(last_transform.inverse() * the_transform);
+                globalOptimizer.addEdge(edge_se3);
+
+
+            }
+
+            /// add ori edg
+            auto *edge_ori = new OrientationEdge();
+
+            edge_ori->vertices()[0] = globalOptimizer.vertex(trace_id);
+            edge_ori->vertices()[1] = globalOptimizer.vertex(attitude_vertex_id);
+
+
+            Eigen::Matrix<double,3,3> information = Eigen::Matrix<double,3,3>::Identity();
+            information *= ori_info;
+
+            edge_ori->setInformation(information);
+
+            Sophus::SO3 ori_so3(Eigen::Quaterniond(imudata(index,9),imudata(index,10),imudata(index,11),imudata(index,12)));
+
+            edge_ori->setMeasurement(ori_so3);
+
+            globalOptimizer.addEdge(edge_ori);
+
+
+
+
+
+            trace_id++;
+            last_transform = the_transform;
         }
 
         last_zupt_flag = zupt_flag;
         ix.push_back(tx(0));
         iy.push_back(tx(1));
+    }
+
+    ///optimization
+
+    globalOptimizer.initializeOptimization();
+    globalOptimizer.optimize(1000);
+
+    for(int k(0);k<trace_id;++k)
+    {
+        double t_data[10]={0};
+        globalOptimizer.vertex(k)->getEstimateData(t_data);
+
+        gx.push_back(t_data[0]);
+        gy.push_back(t_data[1]);
     }
 
 

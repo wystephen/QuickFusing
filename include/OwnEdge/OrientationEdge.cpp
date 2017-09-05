@@ -4,13 +4,13 @@
 
 #include "OrientationEdge.h"
 
-OrientationEdge::OrientationEdge() :g2o::BaseBinaryEdge<1,double,g2o::VertexSE3,g2o::VertexSE3>(){
+OrientationEdge::OrientationEdge() :g2o::BaseBinaryEdge<3, Sophus::SO3,g2o::VertexSE3,g2o::VertexSE3>(){
     /**
      *
      */
 
     information().setIdentity();
-    _information(0,0) = 10.0f;
+    _information(0,0) *= 10.0f;
 }
 
 
@@ -34,8 +34,9 @@ void OrientationEdge::computeError() {
 
     Sophus::SO3 from_so3(p1[3],p1[4],p1[5]);
     Sophus::SO3 to_so3(p2[3],p2[4],p2[5]);
+//    Sophus::SO3 m_so3(_measurement[0],_measurement[1],_measurement[2]);
 
-    auto phi12 = (from_so3.inverse() * to_so3).log();
+    auto phi12 = ((from_so3.inverse() * to_so3).inverse()*_measurement).log();
 
     _error(0,0) =  phi12.norm()+0.00001;//...
 
@@ -43,7 +44,7 @@ void OrientationEdge::computeError() {
 }
 
 bool OrientationEdge::setMeasurementFromState() {
-    setMeasurement(0.0f);
+    setMeasurement(Sophus::SO3(0.0,0.0,0.0));
     return true;
 }
 

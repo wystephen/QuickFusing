@@ -16,7 +16,7 @@
 #include <sophus/so3.h>
 
 class OrientationEdge:
-        public g2o::BaseBinaryEdge<1, double, g2o::VertexSE3, g2o::VertexSE3> {
+        public g2o::BaseBinaryEdge<3, Sophus::SO3, g2o::VertexSE3, g2o::VertexSE3> {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -32,19 +32,21 @@ public:
      * distance
      * @param m
      */
-    virtual void setMeasurement(const double &m) {
+    virtual void setMeasurement(const Sophus::SO3 &m) {
         _measurement = m;
     }
 
     virtual bool getMeasurementData(double *d) const {
-        *d = _measurement;
+        Eigen::Map<Eigen::Vector3d> v(d);
+
+        v = _measurement.log();
         return true;
     }
 
 //    void linearizeOplus();
 
     virtual int measurementDimension() const {
-        return 1;
+        return 3;
     }
 
     virtual bool setMeasurementFromState();

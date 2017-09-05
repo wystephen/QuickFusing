@@ -610,7 +610,7 @@ public:
 //        std::cout <<"current dx_:"<< dx_  << std::endl;
 //        std::cout << "current p"<< P_ << std::endl;
 
-        return theta * 180.0 / M_PI;
+        return theta;
 
     }
 

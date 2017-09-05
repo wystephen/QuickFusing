@@ -134,11 +134,11 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/XIMU&UWB/5/";
 
     /// Global parameters
-    double first_info(0.01),second_info(0.01*M_PI/180.0);
-    double ori_info(0.01);
+    double first_info(10),second_info(10*M_PI/180.0);
+    double ori_info(100);
 
-    double turn_threshold = 15.0;
-    double corner_ratio = 14.0;
+    double turn_threshold = 1.0;
+    double corner_ratio = 150.0;
 
     //// Load data
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
@@ -287,7 +287,6 @@ int main(int argc, char *argv[]) {
                 }
 
 
-
                 edge_se3->setInformation(information);
 
                 edge_se3->setMeasurement(last_transform.inverse() * the_transform);
@@ -321,14 +320,13 @@ int main(int argc, char *argv[]) {
             globalOptimizer.addEdge(edge_ori);
 
 
-
-
-
             trace_id++;
             last_transform = the_transform;
         }
 
-
+//        globalOptimizer.setVerbose(true);
+//        globalOptimizer.initializeOptimization();
+//        globalOptimizer.optimize(100);
 
         last_zupt_flag = zupt_flag;
         ix.push_back(tx(0));
@@ -339,7 +337,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.setVerbose(true);
     globalOptimizer.initializeOptimization();
-    globalOptimizer.optimize(10000);
+    globalOptimizer.optimize(30000);
 
     for(int k(0);k<trace_id;++k)
     {

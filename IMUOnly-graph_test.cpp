@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
     double first_info(10),second_info(10*M_PI/180.0);
     double ori_info(10);
 
-    double turn_threshold = 1.0;
+    double turn_threshold = 1000.0;
     double corner_ratio = 10.0;
 
     //// Load data

@@ -131,8 +131,11 @@ int main(int argc, char *argv[]) {
     // Load data
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
 
-    Eigen::MatrixXd imudata(imu_data_reader.GetMatrix().GetRows(),
+    Eigen::MatrixXd imudata;
+
+    imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                             imu_data_reader.GetMatrix().GetCols());
+    imudata.setZero();
     auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
 
     for (int i(0); i < imudata.rows(); ++i) {
@@ -156,6 +159,7 @@ int main(int argc, char *argv[]) {
     myekf.InitNavEq(imudata.block(0, 0, 20, 6));
 
     for (int index(0); index < imudata.rows(); ++index) {
+        std::cout << "index:" << index << std::endl;
         double zupt_flag = 0.0;
         if (index <= initial_para.ZeroDetectorWindowSize_) {
             zupt_flag = 1.0;
@@ -166,7 +170,7 @@ int main(int argc, char *argv[]) {
                 zupt_flag = 1.0;
             }
         }
-        auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6), zupt_flag);
+        auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6).transpose(), zupt_flag);
 
         ix.push_back(tx(0));
         iy.push_back(tx(1));

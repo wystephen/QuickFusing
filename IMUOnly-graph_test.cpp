@@ -126,13 +126,12 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/XIMU&UWB/1/";
+    std::string dir_name = "/home/steve/Data/XIMU&UWB/5/";
 
-    // Load data
+    //// Load data
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
 
     Eigen::MatrixXd imudata;
-
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                             imu_data_reader.GetMatrix().GetCols());
     imudata.setZero();
@@ -150,16 +149,61 @@ int main(int argc, char *argv[]) {
     std::vector<double> ix, iy; //ix iy
     std::vector<double> gx, gy;// graph x
 
+    /**
+     * Initial  graph parameters
+     */
+    g2o::SparseOptimizer globalOptimizer;
 
+
+    typedef g2o::BlockSolverX SlamBlockSolver;
+    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+
+    // Initial solver
+    SlamLinearSolver *linearSolver = new SlamLinearSolver();
+//    linearSolver->setBlockOrdering(false);
+    linearSolver->setWriteDebug(true);
+    SlamBlockSolver *blockSolver = new SlamBlockSolver(linearSolver);
+    g2o::OptimizationAlgorithmLevenberg *solver =
+            new g2o::OptimizationAlgorithmLevenberg(blockSolver);
+    globalOptimizer.setAlgorithm(solver);
+
+
+
+    int zupt_id_offset(0.0);
+    int airpre_id_offset(100000);
+
+    int attitude_vertex_id(400000);
+
+    /// insert attitude offset vertex. represent the globle offset of positioning(6dof) between imu and world frame
+    auto *v = new g2o::VertexSE3();
+    double p[6] = {0.0};
+    v->setEstimateData(p);
+
+    v->setFixed(false);
+    v->setId(attitude_vertex_id);
+    globalOptimizer.addVertex(v);
+
+
+
+
+    /**
+     * Initial ZUPT parameters
+     */
     SettingPara initial_para(true);
-
+    initial_para.init_pos1_ = Eigen::Vector3d(0.0,0.0, 0.0);
+    initial_para.init_heading1_ = M_PI / 2.0;
     initial_para.Ts_ = 1.0f / 128.0f;
+
+    initial_para.sigma_a_ /= 2.0;
+    initial_para.sigma_g_ /= 2.0;
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 0, 20, 6));
 
+    double last_zupt_flag = 0.0;
+
     for (int index(0); index < imudata.rows(); ++index) {
-        std::cout << "index:" << index << std::endl;
+//        std::cout << "index:" << index << std::endl;
         double zupt_flag = 0.0;
         if (index <= initial_para.ZeroDetectorWindowSize_) {
             zupt_flag = 1.0;
@@ -171,7 +215,13 @@ int main(int argc, char *argv[]) {
             }
         }
         auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6).transpose(), zupt_flag);
+        if(0 == index|(zupt_flag<0.5 & last_zupt_flag>0.5))
+        {
+            std::cout << "index: " << index << "kep step" << std::endl;
+            //
+        }
 
+        last_zupt_flag = zupt_flag;
         ix.push_back(tx(0));
         iy.push_back(tx(1));
     }

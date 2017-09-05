@@ -504,6 +504,12 @@ public:
 
     }
 
+    /**
+     * Attention:
+     * @param u  vector ( 6x1 matrix).
+     * @param zupt1
+     * @return
+     */
     Eigen::VectorXd GetPosition(Eigen::VectorXd u, double zupt1) {
 
 //        MYCHECK(1);

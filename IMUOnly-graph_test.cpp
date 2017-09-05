@@ -135,10 +135,10 @@ int main(int argc, char *argv[]) {
 
     /// Global parameters
     double first_info(0.01),second_info(0.01*M_PI/180.0);
-    double ori_info(1.5);
+    double ori_info(0.01);
 
-    double turn_threshold = 1.0;
-    double corner_ratio = 40.0;
+    double turn_threshold = 15.0;
+    double corner_ratio = 14.0;
 
     //// Load data
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
@@ -235,7 +235,8 @@ int main(int argc, char *argv[]) {
         auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6).transpose(), zupt_flag);
         if(0 == index|(zupt_flag<0.5 & last_zupt_flag>0.5))
         {
-            std::cout << "index: " << index << "kep step" << std::endl;
+            std::cout << "index: " << index << "key step"
+                                                          << "ori:" << myekf.getOriente() << std::endl;
 
             auto the_transform = myekf.getTransformation();
 
@@ -315,7 +316,7 @@ int main(int argc, char *argv[]) {
             edge_ori->setMeasurement(ori_so3);
             /// robust kernel
             static g2o::RobustKernel* robustKernel = g2o::RobustKernelFactory::instance()->construct( "Cauchy" );
-//            edge_ori->setRobustKernel(robustKernel);
+            edge_ori->setRobustKernel(robustKernel);
 
             globalOptimizer.addEdge(edge_ori);
 
@@ -327,6 +328,8 @@ int main(int argc, char *argv[]) {
             last_transform = the_transform;
         }
 
+
+
         last_zupt_flag = zupt_flag;
         ix.push_back(tx(0));
         iy.push_back(tx(1));
@@ -336,7 +339,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.setVerbose(true);
     globalOptimizer.initializeOptimization();
-    globalOptimizer.optimize(1000);
+    globalOptimizer.optimize(10000);
 
     for(int k(0);k<trace_id;++k)
     {

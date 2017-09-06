@@ -92,7 +92,11 @@ bool GLRT_Detector_special(Eigen::MatrixXd u,
     for (int i(0); i < u.cols(); ++i) {
 
         tmp = u.block(0, i, 3, 1) - g * ya_m / ya_m.norm();
-        double tt(0.0);
+        if(std::isnan(tmp.sum()))
+        {
+            std::cout << "nan at tmp in " << __FUNCTION__ << ":"
+                      << __FILE__ << ":" << __LINE__ << std::endl;
+        }
 
 //        std::cout << " u block size : " << u.block(3,i,3,1).rows()<< std::endl;
 //        std::cout << "tmp size :" << tmp.rows()<< std::endl;
@@ -110,6 +114,7 @@ bool GLRT_Detector_special(Eigen::MatrixXd u,
     T = Tmatrix(0, 0);
 
     T = T / double(para_.ZeroDetectorWindowSize_);
+    std::cout << "T :" << T << std::endl;
     if (T < para_.gamma_) {
         return true;
     } else {
@@ -207,8 +212,8 @@ int main(int argc, char *argv[]) {
     initial_para.init_heading1_ = M_PI / 2.0;
     initial_para.Ts_ = 1.0f / 128.0f;
 
-    initial_para.sigma_a_ *= 0.8;
-    initial_para.sigma_g_ *= 0.8;
+    initial_para.sigma_a_ = 0.8;
+    initial_para.sigma_g_ = 0.8;
 
     initial_para.ZeroDetectorWindowSize_ = 10;// Time windows size fo zupt detector
 
@@ -227,6 +232,10 @@ int main(int argc, char *argv[]) {
         if (index <= initial_para.ZeroDetectorWindowSize_) {
             zupt_flag = 1.0;
         } else {
+            std::cout << "size of imu block :" << imudata.block(index-initial_para.ZeroDetectorWindowSize_,0,
+            initial_para.ZeroDetectorWindowSize_,6).rows() << ","
+                                                           << imudata.block(index-initial_para.ZeroDetectorWindowSize_,0,
+            initial_para.ZeroDetectorWindowSize_,6).cols() << std::endl;
             if (GLRT_Detector_special(imudata.block(index - initial_para.ZeroDetectorWindowSize_,
                                                     0, initial_para.ZeroDetectorWindowSize_, 6).transpose(),
                                       initial_para)) {

@@ -43,6 +43,17 @@ FIND_PACKAGE(G2O)
 FIND_PACKAGE(CSparse)
 FIND_PACKAGE(Cholmod)
 
+
+# Find GTSAM components
+find_package(GTSAM REQUIRED) # Uses installed package
+include_directories(${GTSAM_INCLUDE_DIR})
+set(GTSAM_LIBRARIES gtsam)   # TODO: automatic search libs
+
+find_package(GTSAMCMakeTools)
+include(GtsamMakeConfigFile)
+include(GtsamBuildTypes)
+include(GtsamTesting)
+
 include_directories(
         ${EIGEN3_INCLUDE_DIR}
         ./include
@@ -58,6 +69,8 @@ include_directories(
         ${G2O_INCLUDE_DIR}
         ${Cholmod_INCLUDE_DIR}
         ${SuiteSparse_INCLUDE_DIR}
+        ${GTSAM_INCLUDE_DIR}
+
 )
 
 link_directories(
@@ -97,6 +110,14 @@ target_link_libraries(fast_demo ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIE
 # for only imu mag
 add_executable(ImuOnlyGraph IMUOnly-graph_test.cpp)
 target_link_libraries(ImuOnlyGraph ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
+
+
+# imu mag fusion based on gtsam
+add_executable(ImuMagFusion ImuMagFusion.cpp)
+target_link_libraries(ImuMagFusion
+        ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES}
+        -ltbb ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
+
 
 add_executable(dw DemoUseResult.cpp)
 #target_link_libraries(dw ${G2O_LIBS} ${Cholmod_LIBRARIES} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )

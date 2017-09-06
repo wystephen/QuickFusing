@@ -101,8 +101,8 @@ bool GLRT_Detector_special(Eigen::MatrixXd u,
 //        std::cout << " u block size : " << u.block(3,i,3,1).rows()<< std::endl;
 //        std::cout << "tmp size :" << tmp.rows()<< std::endl;
 
-        T += (u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / para_.sigma_a_ +
-              tmp.transpose() * tmp / para_.sigma_g_).sum();
+        T += (u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / para_.sigma_g_ +
+              tmp.transpose() * tmp / para_.sigma_a_).sum();
 
 //        if(std::isnan(Tmatrix.sum()))
 //        {
@@ -123,7 +123,9 @@ bool GLRT_Detector_special(Eigen::MatrixXd u,
 //    std::cout << "T :" << T << std::endl;
     if (T < para_.gamma_) {
         return true;
+
     } else {
+
         return false;
     }
 
@@ -218,8 +220,10 @@ int main(int argc, char *argv[]) {
     initial_para.init_heading1_ = M_PI / 2.0;
     initial_para.Ts_ = 1.0f / 128.0f;
 
-    initial_para.sigma_a_ = 1.8;
-    initial_para.sigma_g_ = 1.8;
+//    initial_para.sigma_a_ = 4.5;
+//    initial_para.sigma_g_ = 4.5;
+    initial_para.sigma_a_ /= 2.0;
+    initial_para.sigma_g_ /= 2.0;
 
 //    initial_para.ZeroDetectorWindowSize_ = 10;// Time windows size fo zupt detector
 
@@ -238,11 +242,11 @@ int main(int argc, char *argv[]) {
         if (index <= initial_para.ZeroDetectorWindowSize_) {
             zupt_flag = 1.0;
         } else {
-            std::cout << "size of imu block :" << imudata.block(index - initial_para.ZeroDetectorWindowSize_, 0,
-                                                                initial_para.ZeroDetectorWindowSize_, 6).rows() << ","
-                      << imudata.block(index - initial_para.ZeroDetectorWindowSize_, 0,
-                                       initial_para.ZeroDetectorWindowSize_, 6).cols() << std::endl;
-
+//            std::cout << "size of imu block :" << imudata.block(index - initial_para.ZeroDetectorWindowSize_, 0,
+//                                                                initial_para.ZeroDetectorWindowSize_, 6).rows() << ","
+//                      << imudata.block(index - initial_para.ZeroDetectorWindowSize_, 0,
+//                                       initial_para.ZeroDetectorWindowSize_, 6).cols() << std::endl;
+//
 
             if (std::isnan(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 0,
                                          initial_para.ZeroDetectorWindowSize_, 6).sum())) {

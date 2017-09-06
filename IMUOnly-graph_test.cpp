@@ -220,12 +220,12 @@ int main(int argc, char *argv[]) {
     initial_para.init_heading1_ = M_PI / 2.0;
     initial_para.Ts_ = 1.0f / 128.0f;
 
-//    initial_para.sigma_a_ = 4.5;
-//    initial_para.sigma_g_ = 4.5;
-    initial_para.sigma_a_ /= 2.0;
-    initial_para.sigma_g_ /= 2.0;
+    initial_para.sigma_a_ = 1.1;
+    initial_para.sigma_g_ = 2.0/180.0*M_PI;
+//    initial_para.sigma_a_ /= 3.0;
+//    initial_para.sigma_g_ /= 3.0;
 
-//    initial_para.ZeroDetectorWindowSize_ = 10;// Time windows size fo zupt detector
+    initial_para.ZeroDetectorWindowSize_ = 10;// Time windows size fo zupt detector
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 0, 20, 6));

@@ -251,6 +251,12 @@ int main(int argc, char *argv[]) {
     p->biasAccOmegaInt = bias_acc_omega_int;
 
 
+    NavState prev_state(prior_pose, prior_velocity);
+    NavState prop_state = prev_state;
+    imuBias::ConstantBias prev_bias = prior_imu_bias;
+
+    ////Define the imu preintegrated
+    imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
 
     /**
      * Initial ZUPT parameters
@@ -274,6 +280,7 @@ int main(int argc, char *argv[]) {
 
     for (int index(0); index < imudata.rows(); ++index) {
 //        std::cout << "index:" << index << std::endl;
+        /**ZUPT DETECTOR FIRST*/
         double zupt_flag = 0.0;
         if (index <= initial_para.ZeroDetectorWindowSize_) {
             zupt_flag = 1.0;
@@ -284,6 +291,8 @@ int main(int argc, char *argv[]) {
                 zupt_flag = 1.0;
             }
         }
+
+        /** ZUPT METHOD **/
         auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6).transpose(), zupt_flag);
         if (0 == index | (zupt_flag < 0.5 & last_zupt_flag > 0.5)) {
             std::cout << "index: " << index << "key step"
@@ -292,10 +301,22 @@ int main(int argc, char *argv[]) {
             auto the_transform = myekf.getTransformation();
 
 
-            last_zupt_flag = zupt_flag;
             ix.push_back(tx(0));
             iy.push_back(tx(1));
         }
+
+        /** GTSAM FOR INTEGRATE **/
+        if (zupt_flag > 0.5 && )
+
+        {
+
+        }
+
+
+            /**
+             * updata data
+             */
+            last_zupt_flag = zupt_flag;
     }
 
     ///optimization

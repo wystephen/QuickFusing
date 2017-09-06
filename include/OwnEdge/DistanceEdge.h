@@ -66,34 +66,30 @@ public:
 
     double sigma_ = 1.0;
 
-    bool setSigma(double sigma)
-    {
-        if(sigma>0)
-        {
+    bool setSigma(double sigma) {
+        if (sigma > 0) {
             sigma_ = sigma;
             return true;
-        }else{
+        } else {
             return false;
         }
 
     }
 
-    double getSigma()
-    {
+    double getSigma() {
         return sigma_;
     }
 
-    inline double logNormalPdf(double x, double miu, double sigma)
-    {
+    inline double logNormalPdf(double x, double miu, double sigma) {
         double para1((x - miu) * (x - miu) / 2 / sigma / sigma);
         double para2(1 / std::sqrt(2 * sigma * sigma * M_PI));
 
-        return std::log(para2+1e-10)/para1;
+        return std::log(para2 + 1e-10) / para1;
     }
 
     inline double NormalPdf(double x,
-                     double miu,
-                     double sigma) {
+                            double miu,
+                            double sigma) {
 //    std::cout << "dis :" << x << " range:" << miu << std::endl;
         double para1((x - miu) * (x - miu) / 2 / sigma / sigma);
         double para2(1 / std::sqrt(2 * sigma * sigma * M_PI));

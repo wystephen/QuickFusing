@@ -294,7 +294,7 @@ int main(int argc, char *argv[]) {
 
         /** ZUPT METHOD **/
         auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6).transpose(), zupt_flag);
-        if (0 == index | (zupt_flag < 0.5 & last_zupt_flag > 0.5)) {
+        if (0 == index || (zupt_flag < 0.5 & last_zupt_flag > 0.5)) {
             std::cout << "index: " << index << "key step"
                       << "ori:" << myekf.getOriente() << std::endl;
 

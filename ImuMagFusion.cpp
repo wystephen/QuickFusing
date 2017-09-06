@@ -306,8 +306,7 @@ int main(int argc, char *argv[]) {
         }
 
         /** GTSAM FOR INTEGRATE **/
-        if (zupt_flag > 0.5 && )
-
+        if (zupt_flag > 0.5 && last_zupt_flag < 0.5)
         {
 
         }

@@ -75,8 +75,8 @@ G2O_USE_TYPE_GROUP(slam3d)
 
 namespace plt = matplotlibcpp;
 
-bool GLRT_Detector(Eigen::MatrixXd u,
-                   const SettingPara &para_) {
+bool GLRT_Detector_special(Eigen::MatrixXd u,
+                           const SettingPara &para_) {
     Eigen::Vector3d ya_m;
     double g = para_.gravity_;
 
@@ -97,8 +97,8 @@ bool GLRT_Detector(Eigen::MatrixXd u,
 //        std::cout << " u block size : " << u.block(3,i,3,1).rows()<< std::endl;
 //        std::cout << "tmp size :" << tmp.rows()<< std::endl;
 
-        Tmatrix += u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / para_.sigma_g_ +
-                   tmp.transpose() * tmp / para_.sigma_a_;
+        Tmatrix += (u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / para_.sigma_a_ +
+                    tmp.transpose() * tmp / para_.sigma_g_);
 
 
     }
@@ -109,7 +109,7 @@ bool GLRT_Detector(Eigen::MatrixXd u,
 
     T = Tmatrix(0, 0);
 
-    T = T / para_.ZeroDetectorWindowSize_;
+    T = T / double(para_.ZeroDetectorWindowSize_);
     if (T < para_.gamma_) {
         return true;
     } else {
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
 
     /// Global parameters
-    double first_info(10),second_info(10*M_PI/180.0);
+    double first_info(10), second_info(10 * M_PI / 180.0);
     double ori_info(10);
 
     double turn_threshold = 1000.0;
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
-                            imu_data_reader.GetMatrix().GetCols());
+                   imu_data_reader.GetMatrix().GetCols());
     imudata.setZero();
     auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
 
@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
     std::vector<double> ix, iy; //ix iy
     std::vector<double> gx, gy;// graph x
 
-    std::vector<double> ori_1,ori_2,ori_3;
+    std::vector<double> ori_1, ori_2, ori_3;
 
     /**
      * Initial  graph parameters
@@ -180,7 +180,6 @@ int main(int argc, char *argv[]) {
     g2o::OptimizationAlgorithmLevenberg *solver =
             new g2o::OptimizationAlgorithmLevenberg(blockSolver);
     globalOptimizer.setAlgorithm(solver);
-
 
 
     int zupt_id_offset(0.0);
@@ -204,12 +203,14 @@ int main(int argc, char *argv[]) {
      * Initial ZUPT parameters
      */
     SettingPara initial_para(true);
-    initial_para.init_pos1_ = Eigen::Vector3d(0.0,0.0, 0.0);
+    initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
     initial_para.init_heading1_ = M_PI / 2.0;
     initial_para.Ts_ = 1.0f / 128.0f;
 
-    initial_para.sigma_a_ /= 3.0;
-    initial_para.sigma_g_ /= 3.0;
+    initial_para.sigma_a_ *= 0.8;
+    initial_para.sigma_g_ *= 0.8;
+
+    initial_para.ZeroDetectorWindowSize_ = 10;// Time windows size fo zupt detector
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 0, 20, 6));
@@ -226,19 +227,19 @@ int main(int argc, char *argv[]) {
         if (index <= initial_para.ZeroDetectorWindowSize_) {
             zupt_flag = 1.0;
         } else {
-            if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_,
-                                            0, initial_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
-                              initial_para)) {
+            if (GLRT_Detector_special(imudata.block(index - initial_para.ZeroDetectorWindowSize_,
+                                                    0, initial_para.ZeroDetectorWindowSize_, 6).transpose(),
+                                      initial_para)) {
                 zupt_flag = 1.0;
             }
         }
+        std::cout << "index:" << index << " zupt state: " << zupt_flag << std::endl;
         ///ZUPT GET POSITION
         auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6).transpose(), zupt_flag);
 
-        if((zupt_flag<0.5 && last_zupt_flag>0.5))
-        {
+        if ((zupt_flag < 0.5 && last_zupt_flag > 0.5)) {
             std::cout << "index: " << index << "key step"
-                                                          << "ori:" << myekf.getOriente() << std::endl;
+                      << "ori:" << myekf.getOriente() << std::endl;
 
             auto the_transform = myekf.getTransformation();
 
@@ -250,11 +251,10 @@ int main(int argc, char *argv[]) {
             globalOptimizer.addVertex(v);
 
             /// add transform edge
-            if(trace_id>0)
-            {
+            if (trace_id > 0) {
                 auto *edge_se3 = new g2o::EdgeSE3();
 
-                edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+                edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
                 edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
 
                 Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
@@ -283,8 +283,7 @@ int main(int argc, char *argv[]) {
 
                 last_theta = the_theta;
 
-                if(is_corner)
-                {
+                if (is_corner) {
                     information /= corner_ratio;
                 }
 
@@ -304,19 +303,20 @@ int main(int argc, char *argv[]) {
             edge_ori->vertices()[1] = globalOptimizer.vertex(attitude_vertex_id);
 
 
-            Eigen::Matrix<double,3,3> information = Eigen::Matrix<double,3,3>::Identity();
+            Eigen::Matrix<double, 3, 3> information = Eigen::Matrix<double, 3, 3>::Identity();
             information *= ori_info;
 
             edge_ori->setInformation(information);
 
-            Sophus::SO3 ori_so3(Eigen::Quaterniond(imudata(index,12),imudata(index,10),imudata(index,11),imudata(index,9)));
+            Sophus::SO3 ori_so3(
+                    Eigen::Quaterniond(imudata(index, 12), imudata(index, 10), imudata(index, 11), imudata(index, 9)));
             ori_1.push_back(ori_so3.log()(0));
             ori_2.push_back(ori_so3.log()(1));
             ori_3.push_back(ori_so3.log()(2));
 
             edge_ori->setMeasurement(ori_so3);
             /// robust kernel
-            static g2o::RobustKernel* robustKernel = g2o::RobustKernelFactory::instance()->construct( "Cauchy" );
+            static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct("Cauchy");
             edge_ori->setRobustKernel(robustKernel);
 
             globalOptimizer.addEdge(edge_ori);
@@ -341,9 +341,8 @@ int main(int argc, char *argv[]) {
     globalOptimizer.initializeOptimization();
 //    globalOptimizer.optimize(30000);
 
-    for(int k(0);k<trace_id;++k)
-    {
-        double t_data[10]={0};
+    for (int k(0); k < trace_id; ++k) {
+        double t_data[10] = {0};
         globalOptimizer.vertex(k)->getEstimateData(t_data);
 
         gx.push_back(t_data[0]);

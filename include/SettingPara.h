@@ -44,7 +44,7 @@ public:
 
         altitude_ = 100.0;
 
-        ComputeGravity();
+//        ComputeGravity();
 
 
 

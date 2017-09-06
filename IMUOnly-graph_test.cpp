@@ -81,7 +81,8 @@ bool GLRT_Detector_special(Eigen::MatrixXd u,
     double g = para_.gravity_;
 
     double T(0.0);
-    Eigen::MatrixXd Tmatrix(1, 1);
+//    Eigen::MatrixXd Tmatrix(1, 1);
+//    Tmatrix
 
     for (int i(0); i < 3; ++i) {
         ya_m(i) = u.block(i, 0, 1, u.cols()).mean();
@@ -101,19 +102,25 @@ bool GLRT_Detector_special(Eigen::MatrixXd u,
 //        std::cout << " u block size : " << u.block(3,i,3,1).rows()<< std::endl;
 //        std::cout << "tmp size :" << tmp.rows()<< std::endl;
 
-        Tmatrix += (u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / para_.sigma_a_ +
-                    tmp.transpose() * tmp / para_.sigma_g_);
+        T += (u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / para_.sigma_a_ +
+                    tmp.transpose() * tmp / para_.sigma_g_).sum();
+
+//        if(std::isnan(Tmatrix.sum()))
+//        {
+//            std::cout << "Tmatrix is nan" << __FILE__
+//                                          << ":"<< __LINE__ << std::endl;
+//        }
 
 
     }
 
-    if (Tmatrix.size() != 1) {
-        MYERROR("Tmatrxi size is not equal to 1")
-    }
+//    if (Tmatrix.size() != 1) {
+//        MYERROR("Tmatrxi size is not equal to 1")
+//    }
 
-    T = Tmatrix(0, 0);
 
     T = T / double(para_.ZeroDetectorWindowSize_);
+
     std::cout << "T :" << T << std::endl;
     if (T < para_.gamma_) {
         return true;
@@ -212,8 +219,8 @@ int main(int argc, char *argv[]) {
     initial_para.init_heading1_ = M_PI / 2.0;
     initial_para.Ts_ = 1.0f / 128.0f;
 
-    initial_para.sigma_a_ = 0.8;
-    initial_para.sigma_g_ = 0.8;
+    initial_para.sigma_a_ = 1.8;
+    initial_para.sigma_g_ = 1.8;
 
     initial_para.ZeroDetectorWindowSize_ = 10;// Time windows size fo zupt detector
 
@@ -236,6 +243,13 @@ int main(int argc, char *argv[]) {
             initial_para.ZeroDetectorWindowSize_,6).rows() << ","
                                                            << imudata.block(index-initial_para.ZeroDetectorWindowSize_,0,
             initial_para.ZeroDetectorWindowSize_,6).cols() << std::endl;
+
+
+            if(std::isnan(imudata.block(index-initial_para.ZeroDetectorWindowSize_,0,
+                                        initial_para.ZeroDetectorWindowSize_,6).sum()))
+            {
+                std::cout << " input data of GLRT is nana " << std::endl;
+            }
             if (GLRT_Detector_special(imudata.block(index - initial_para.ZeroDetectorWindowSize_,
                                                     0, initial_para.ZeroDetectorWindowSize_, 6).transpose(),
                                       initial_para)) {

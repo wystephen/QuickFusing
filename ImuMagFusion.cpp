@@ -324,24 +324,27 @@ int main(int argc, char *argv[]) {
         if (zupt_flag > 0.5 && last_zupt_flag < 0.5) {
             /// first moment of zupt detected
 
-//            trace_id++;
+            trace_id++;
             ///Added to
-//            PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
-//            (imu_preintegrated_);
-//
-//            ImuFactor imu_factor(
-//                    X(trace_id - 1), V(trace_id - 1),
-//                    X(trace_id), V(trace_id),
-//                    B(trace_id - 1),
-//                    *preint_imu
-//            );
-//            graph->add(imu_factor);
-//            imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
-//            graph->add(BetweenFactor<imuBias::ConstantBias>(
-//                    B(correction_count - 1),
-//                    B(correction_count),
-//                    zero_bias, bias_noise_model
-//            ));
+            PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
+            (imu_preintegrated_);
+            // Add all prior factors (pose, velocity, bias) to the graph.
+            graph->add(PriorFactor<Pose3>(X(trace_id), prior_pose, pose_noise_model));
+            graph->add(PriorFactor<Vector3>(V(trace_id), prior_velocity, velocity_noise_model));
+            graph->add(PriorFactor<imuBias::ConstantBias>(B(trace_id), prior_imu_bias, bias_noise_model));
+            ImuFactor imu_factor(
+                    X(trace_id - 1), V(trace_id - 1),
+                    X(trace_id), V(trace_id),
+                    B(trace_id - 1),
+                    *preint_imu
+            );
+            graph->add(imu_factor);
+            imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+            graph->add(BetweenFactor<imuBias::ConstantBias>(
+                    B(correction_count - 1),
+                    B(correction_count),
+                    zero_bias, bias_noise_model
+            ));
 
             //velocity
 

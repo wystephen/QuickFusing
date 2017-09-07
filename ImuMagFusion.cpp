@@ -336,6 +336,7 @@ int main(int argc, char *argv[]) {
             initial_values.insert(B(trace_id),prev_bias);
 //            // Add all prior factors (pose, velocity, bias) to the graph.
 
+            std::cout << "trace id : " << trace_id << std::endl;
             ImuFactor imu_factor(
                     X(trace_id - 1), V(trace_id - 1),
                     X(trace_id), V(trace_id),

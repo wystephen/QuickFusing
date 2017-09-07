@@ -337,6 +337,15 @@ int main(int argc, char *argv[]) {
 //            // Add all prior factors (pose, velocity, bias) to the graph.
 
             std::cout << "trace id : " << trace_id << std::endl;
+            std::cout << "X trace id -1 :" << X(trace_id-1) << std::endl;
+            std::cout << "V trace id -1 :" << V(trace_id-1) << std::endl;
+
+            std::cout <<"x traceid :" << X(trace_id) << std::endl;
+            std::cout << " v trace id :" << V(trace_id) << std::endl;
+
+            std::cout << " B trace id -1 : " << B(trace_id-1) << std::endl;
+
+            std::cout << " prein imu :" << *preint_imu << std::endl;
             ImuFactor imu_factor(
                     X(trace_id - 1), V(trace_id - 1),
                     X(trace_id), V(trace_id),

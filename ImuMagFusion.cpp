@@ -324,7 +324,7 @@ int main(int argc, char *argv[]) {
         if (zupt_flag > 0.5 && last_zupt_flag < 0.5) {
             /// first moment of zupt detected
 
-            trace_id++;
+//            trace_id++;
             ///Added to
             PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
             (imu_preintegrated_);
@@ -377,12 +377,15 @@ int main(int argc, char *argv[]) {
 
     ///optimization
 
-//    for (int k(0); k < trace_id; ++k) {
-//        double t_data[10] = {0};
-//
-//        gx.push_back(t_data[0]);
-//        gy.push_back(t_data[1]);
-//    }
+
+
+    std::cout << "trace id :" << trace_id << std::endl;
+    for (int k(0); k < trace_id; ++k) {
+        double t_data[10] = {0};
+
+        gx.push_back(t_data[0]);
+        gy.push_back(t_data[1]);
+    }
 
 
     plt::plot(gx, gy, "r-+");

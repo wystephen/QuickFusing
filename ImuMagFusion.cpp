@@ -279,8 +279,8 @@ int main(int argc, char *argv[]) {
     initial_para.init_heading1_ = M_PI / 2.0;
     initial_para.Ts_ = 1.0f / 128.0f;
 
-    initial_para.sigma_a_  = 1.1;
-    initial_para.sigma_g_ = 2.0/180.0*M_PI;
+    initial_para.sigma_a_ = 1.1;
+    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
 
     initial_para.ZeroDetectorWindowSize_ = 10;
 
@@ -321,58 +321,58 @@ int main(int argc, char *argv[]) {
         }
 
         /** GTSAM FOR INTEGRATE **/
-        if (zupt_flag > 0.5 && last_zupt_flag < 0.5)
-        {
+        if (zupt_flag > 0.5 && last_zupt_flag < 0.5) {
             /// first moment of zupt detected
 
             trace_id++;
             ///Added to
-            PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements*>
+            PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
             (imu_preintegrated_);
 
             ImuFactor imu_factor(
-                    X(trace_id-1),V(trace_id-1),
-                    X(trace_id),V(trace_id),
-                    B(trace_id-1),
+                    X(trace_id - 1), V(trace_id - 1),
+                    X(trace_id), V(trace_id),
+                    B(trace_id - 1),
                     *preint_imu
             );
             graph->add(imu_factor);
-            imuBias::ConstantBias zero_bias(Vector3(0,0,0),Vector3(0,0,0));
+            imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
             graph->add(BetweenFactor<imuBias::ConstantBias>(
-                    B(correction_count-1),
+                    B(correction_count - 1),
                     B(correction_count),
-                    zero_bias,bias_noise_model
+                    zero_bias, bias_noise_model
             ));
+
+            //velocity
 
 
             /// integrated
 
 
 
-        }else if(zupt_flag < 0.5 && last_zupt_flag > 0.5)
-        {
+        } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
             /// last moment of zupt detected
             imu_preintegrated_->resetIntegration();
 
         }
 
-        if(zupt_flag>0.5){
+        if (zupt_flag > 0.5) {
             /// zero velocity
 
 
-        }else{
+        } else {
             ///
-            imu_preintegrated_->integrateMeasurement(imudata.block(index,0,1,3).transpose(),
-            imudata.block(index,3,1,3).transpose(),
-            initial_para.Ts_);
+            imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
+                                                     imudata.block(index, 3, 1, 3).transpose(),
+                                                     initial_para.Ts_);
 
         }
 
 
-            /**
-             * updata data
-             */
-            last_zupt_flag = zupt_flag;
+        /**
+         * updata data
+         */
+        last_zupt_flag = zupt_flag;
     }
 
     ///optimization

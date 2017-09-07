@@ -326,22 +326,22 @@ int main(int argc, char *argv[]) {
 
 //            trace_id++;
             ///Added to
-            PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
-            (imu_preintegrated_);
-
-            ImuFactor imu_factor(
-                    X(trace_id - 1), V(trace_id - 1),
-                    X(trace_id), V(trace_id),
-                    B(trace_id - 1),
-                    *preint_imu
-            );
-            graph->add(imu_factor);
-            imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
-            graph->add(BetweenFactor<imuBias::ConstantBias>(
-                    B(correction_count - 1),
-                    B(correction_count),
-                    zero_bias, bias_noise_model
-            ));
+//            PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
+//            (imu_preintegrated_);
+//
+//            ImuFactor imu_factor(
+//                    X(trace_id - 1), V(trace_id - 1),
+//                    X(trace_id), V(trace_id),
+//                    B(trace_id - 1),
+//                    *preint_imu
+//            );
+//            graph->add(imu_factor);
+//            imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+//            graph->add(BetweenFactor<imuBias::ConstantBias>(
+//                    B(correction_count - 1),
+//                    B(correction_count),
+//                    zero_bias, bias_noise_model
+//            ));
 
             //velocity
 

@@ -328,29 +328,31 @@ int main(int argc, char *argv[]) {
             ///Added to
             PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
             (imu_preintegrated_);
-            // Add all prior factors (pose, velocity, bias) to the graph.
-//            graph->add(PriorFactor<Pose3>(X(trace_id), prior_pose, pose_noise_model));
-//            graph->add(PriorFactor<Vector3>(V(trace_id), prior_velocity, velocity_noise_model));
-//            graph->add(PriorFactor<imuBias::ConstantBias>(B(trace_id), prior_imu_bias, bias_noise_model));
+
             initial_values.insert(X(trace_id),prop_state.pose());
             initial_values.insert(V(trace_id),prop_state.v());
             initial_values.insert(B(trace_id),prev_bias);
-            ImuFactor imu_factor(
-                    X(trace_id - 1), V(trace_id - 1),
-                    X(trace_id), V(trace_id),
-                    B(trace_id - 1),
-                    *preint_imu
-            );
-            graph->add(imu_factor);
-            imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
-            graph->add(BetweenFactor<imuBias::ConstantBias>(
-                    B(trace_id - 1),
-                    B(trace_id),
-                    zero_bias, bias_noise_model
-            ));
+//            // Add all prior factors (pose, velocity, bias) to the graph.
+//            graph->add(PriorFactor<Pose3>(X(trace_id), prior_pose, pose_noise_model));
+//            graph->add(PriorFactor<Vector3>(V(trace_id), prior_velocity, velocity_noise_model));
+//            graph->add(PriorFactor<imuBias::ConstantBias>(B(trace_id), prior_imu_bias, bias_noise_model));
+//
+//            ImuFactor imu_factor(
+//                    X(trace_id - 1), V(trace_id - 1),
+//                    X(trace_id), V(trace_id),
+//                    B(trace_id - 1),
+//                    *preint_imu
+//            );
+//            graph->add(imu_factor);
+//            imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+//            graph->add(BetweenFactor<imuBias::ConstantBias>(
+//                    B(trace_id - 1),
+//                    B(trace_id),
+//                    zero_bias, bias_noise_model
+//            ));
 
             //velocity constraint
-//            graph->add(1)
+//            graph->add(gtsam::LieVe)
 
 
 
@@ -360,7 +362,7 @@ int main(int argc, char *argv[]) {
 
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
             /// last moment of zupt detected
-            imu_preintegrated_->resetIntegration();
+            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
         }
 

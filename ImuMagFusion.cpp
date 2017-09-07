@@ -328,28 +328,32 @@ int main(int argc, char *argv[]) {
             ///Added to
             PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
             (imu_preintegrated_);
+//            PreintegratedImuMeasurements* preint_imu=
+//                    new PreintegratedImuMeasurements(p,prior_imu_bias);
+
+//                    (imu_preintegrated_);
 
 //            prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
 
-            initial_values.insert(X(trace_id),prop_state.pose());
-            initial_values.insert(V(trace_id),prop_state.v());
-            initial_values.insert(B(trace_id),prev_bias);
+            initial_values.insert(X(trace_id), prop_state.pose());
+            initial_values.insert(V(trace_id), prop_state.v());
+            initial_values.insert(B(trace_id), prev_bias);
 //            // Add all prior factors (pose, velocity, bias) to the graph.
 
             std::cout << "trace id : " << trace_id << std::endl;
-            std::cout << "X trace id -1 :" << X(trace_id-1) << std::endl;
-            std::cout << "V trace id -1 :" << V(trace_id-1) << std::endl;
+            std::cout << "X trace id -1 :" << X(trace_id - 1) << std::endl;
+            std::cout << "V trace id -1 :" << V(trace_id - 1) << std::endl;
 
-            std::cout <<"x traceid :" << X(trace_id) << std::endl;
+            std::cout << "x traceid :" << X(trace_id) << std::endl;
             std::cout << " v trace id :" << V(trace_id) << std::endl;
 
-            std::cout << " B trace id -1 : " << B(trace_id-1) << std::endl;
+            std::cout << " B trace id -1 : " << B(trace_id - 1) << std::endl;
 
             std::cout << " prein imu :" << *preint_imu << std::endl;
             ImuFactor imu_factor(
                     X(trace_id - 1), V(trace_id - 1),
                     X(trace_id), V(trace_id),
-                    B(trace_id-1),
+                    B(trace_id - 1),
                     *preint_imu
             );
 
@@ -372,18 +376,15 @@ int main(int argc, char *argv[]) {
 //
 
             /// reset integrated
-            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
+//            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
-            LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
-//    gtsam::Value result;
-            auto result = optimizer.optimize();
 
 
 
 
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
             /// last moment of zupt detected
-//            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
+            imu_preintegrated_->resetIntegrationAndSetBias(prior_imu_bias);
 
         }
 
@@ -408,18 +409,18 @@ int main(int argc, char *argv[]) {
 
     ///optimization
 
-
-    LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
+    std::cout << "begin to optimization" << std::endl;
+    LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
 //    gtsam::Value result;
-    auto result = optimizer.optimize(100);
+    auto result = optimizer.optimize();
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(0); k < trace_id; ++k) {
         double t_data[10] = {0};
 
         auto pose_result = result.at<Pose3>(X(k));
-        t_data[0] = pose_result.matrix()(0,3);
-        t_data[1] = pose_result.matrix()(0,3);
+        t_data[0] = pose_result.matrix()(0, 3);
+        t_data[1] = pose_result.matrix()(0, 3);
 
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);

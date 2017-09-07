@@ -558,6 +558,9 @@ int main(int argc, char *argv[]) {
         range_file << std::endl;
 
         zupt_index++;
+
+
+
     }
 
 

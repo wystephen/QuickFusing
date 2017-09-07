@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
 
     // Load real pose
 
-    CSVReader ImuDataReader(dir_name + "sim_imu.csv"),
+    CppExtent::CSVReader ImuDataReader(dir_name + "sim_imu.csv"),
             ZuptReader(dir_name + "sim_zupt.csv");
 //            UwbResultReader(dir_name + "UwbResult.data.csv");
 
@@ -320,7 +320,7 @@ int main(int argc, char *argv[]) {
     */
 
 //    CSVReader BeaconsetReader(dir_name + "beaconset.data.csv");
-    CSVReader UwbdataReader(dir_name + "uwb_result.csv");
+    CppExtent::CSVReader UwbdataReader(dir_name + "uwb_result.csv");
 //    CSVReader UwbValidReader(dir_name+"UwbValid.data.csv");
 
     Eigen::MatrixXd beaconset, UwbData,UwbValid;
@@ -504,7 +504,7 @@ int main(int argc, char *argv[]) {
                 } else if (delta_ori < -M_PI) {
                     delta_ori += (2.0 * M_PI);
                 }
-                if (isnan(delta_ori)) {
+                if (std::isnan(delta_ori)) {
                     delta_ori = 0.0;
                 }
 //                gekf.getDeltaOrientation();

@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
     Matrix33 bias_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_bias_rw_sigma, 2);
     Matrix66 bias_acc_omega_int = Matrix::Identity(6, 6) * 1e-5; // error in the bias used for preintegration
 
-    boost::shared_ptr<PreintegratedCombinedMeasurements::Params> p = PreintegratedCombinedMeasurements::Params::MakeSharedD(
+    boost::shared_ptr<PreintegratedImuMeasurements::Params> p = PreintegratedCombinedMeasurements::Params::MakeSharedD(
             0.0);
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
@@ -259,9 +259,9 @@ int main(int argc, char *argv[]) {
     // PreintegratedRotation params:
     p->gyroscopeCovariance = measured_omega_cov; // gyro white noise in continuous
     // PreintegrationCombinedMeasurements params:
-    p->biasAccCovariance = bias_acc_cov; // acc bias in continuous
-    p->biasOmegaCovariance = bias_omega_cov; // gyro bias in continuous
-    p->biasAccOmegaInt = bias_acc_omega_int;
+//    p->biasAccCovariance = bias_acc_cov; // acc bias in continuous
+//    p->biasOmegaCovariance = bias_omega_cov; // gyro bias in continuous
+//    p->biasAccOmegaInt = bias_acc_omega_int;
 
 
     NavState prev_state(prior_pose, prior_velocity);
@@ -328,17 +328,6 @@ int main(int argc, char *argv[]) {
             ///Added to
             PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
             (imu_preintegrated_);
-//            PreintegratedImuMeasurements* preint_imu=
-//                    new PreintegratedImuMeasurements(p,prior_imu_bias);
-
-//                    (imu_preintegrated_);
-
-//            prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
-
-//            initial_values.insert(X(trace_id), prop_state.pose());
-//            initial_values.insert(V(trace_id), prop_state.v());
-//            initial_values.insert(B(trace_id), prev_bias);
-//            // Add all prior factors (pose, velocity, bias) to the graph.
 
             std::cout << "trace id : " << trace_id << std::endl;
             std::cout << "X trace id -1 :" << X(trace_id - 1) << std::endl;

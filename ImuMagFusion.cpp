@@ -329,9 +329,12 @@ int main(int argc, char *argv[]) {
             PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
             (imu_preintegrated_);
             // Add all prior factors (pose, velocity, bias) to the graph.
-            graph->add(PriorFactor<Pose3>(X(trace_id), prior_pose, pose_noise_model));
-            graph->add(PriorFactor<Vector3>(V(trace_id), prior_velocity, velocity_noise_model));
-            graph->add(PriorFactor<imuBias::ConstantBias>(B(trace_id), prior_imu_bias, bias_noise_model));
+//            graph->add(PriorFactor<Pose3>(X(trace_id), prior_pose, pose_noise_model));
+//            graph->add(PriorFactor<Vector3>(V(trace_id), prior_velocity, velocity_noise_model));
+//            graph->add(PriorFactor<imuBias::ConstantBias>(B(trace_id), prior_imu_bias, bias_noise_model));
+            initial_values.insert(X(trace_id),prop_state.pose());
+            initial_values.insert(V(trace_id),prop_state.v());
+            initial_values.insert(B(trace_id),prev_bias);
             ImuFactor imu_factor(
                     X(trace_id - 1), V(trace_id - 1),
                     X(trace_id), V(trace_id),
@@ -341,12 +344,14 @@ int main(int argc, char *argv[]) {
             graph->add(imu_factor);
             imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
             graph->add(BetweenFactor<imuBias::ConstantBias>(
-                    B(correction_count - 1),
-                    B(correction_count),
+                    B(trace_id - 1),
+                    B(trace_id),
                     zero_bias, bias_noise_model
             ));
 
-            //velocity
+            //velocity constraint
+//            graph->add(1)
+
 
 
             /// integrated
@@ -381,10 +386,17 @@ int main(int argc, char *argv[]) {
     ///optimization
 
 
+    LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
+//    gtsam::Value result;
+    auto result = optimizer.optimize();
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(0); k < trace_id; ++k) {
         double t_data[10] = {0};
+
+        auto pose_result = result.at<Pose3>(X(k));
+        t_data[0] = pose_result.matrix()(0,3);
+        t_data[1] = pose_result.matrix()(0,3);
 
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);

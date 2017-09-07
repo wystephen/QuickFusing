@@ -343,7 +343,10 @@ int main(int argc, char *argv[]) {
                     B(trace_id-1),
                     *preint_imu
             );
+
+            std::cout << "after built imu factor " << std::endl;
             graph->add(imu_factor);
+            std::cout << " after added imu factor " << std::endl;
             imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
             graph->add(BetweenFactor<imuBias::ConstantBias>(
                     B(trace_id - 1),
@@ -359,13 +362,17 @@ int main(int argc, char *argv[]) {
 //            graph->add(PriorFactor<imuBias::ConstantBias>(B(trace_id), prior_imu_bias, bias_noise_model));
 //
 
-            /// integrated
+            /// reset integrated
+            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
+
+
+
 
 
 
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
             /// last moment of zupt detected
-            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
+//            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
         }
 

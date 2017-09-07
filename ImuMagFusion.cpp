@@ -339,7 +339,7 @@ int main(int argc, char *argv[]) {
             ImuFactor imu_factor(
                     X(trace_id - 1), V(trace_id - 1),
                     X(trace_id), V(trace_id),
-                    B(trace_id - 1),
+                    B(trace_id),
                     *preint_imu
             );
 //            graph->add(imu_factor);

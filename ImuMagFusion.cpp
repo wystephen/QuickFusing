@@ -329,7 +329,7 @@ int main(int argc, char *argv[]) {
             PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
             (imu_preintegrated_);
 
-            prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
+//            prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
 
             initial_values.insert(X(trace_id),prop_state.pose());
             initial_values.insert(V(trace_id),prop_state.v());
@@ -374,7 +374,9 @@ int main(int argc, char *argv[]) {
             /// reset integrated
             imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
-
+            LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
+//    gtsam::Value result;
+            auto result = optimizer.optimize();
 
 
 
@@ -409,7 +411,7 @@ int main(int argc, char *argv[]) {
 
     LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
 //    gtsam::Value result;
-    auto result = optimizer.optimize();
+    auto result = optimizer.optimize(100);
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(0); k < trace_id; ++k) {

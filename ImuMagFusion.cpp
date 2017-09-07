@@ -335,9 +335,9 @@ int main(int argc, char *argv[]) {
 
 //            prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
 
-            initial_values.insert(X(trace_id), prop_state.pose());
-            initial_values.insert(V(trace_id), prop_state.v());
-            initial_values.insert(B(trace_id), prev_bias);
+//            initial_values.insert(X(trace_id), prop_state.pose());
+//            initial_values.insert(V(trace_id), prop_state.v());
+//            initial_values.insert(B(trace_id), prev_bias);
 //            // Add all prior factors (pose, velocity, bias) to the graph.
 
             std::cout << "trace id : " << trace_id << std::endl;
@@ -375,6 +375,7 @@ int main(int argc, char *argv[]) {
 //            graph->add(PriorFactor<imuBias::ConstantBias>(B(trace_id), prior_imu_bias, bias_noise_model));
 //
 
+
             /// reset integrated
 //            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
@@ -384,7 +385,22 @@ int main(int argc, char *argv[]) {
 
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
             /// last moment of zupt detected
-            imu_preintegrated_->resetIntegrationAndSetBias(prior_imu_bias);
+//            delete imu_preintegrated_;
+            prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
+            initial_values.insert(X(trace_id), prop_state.pose());
+            initial_values.insert(V(trace_id), prop_state.v());
+            initial_values.insert(B(trace_id), prev_bias);
+
+            LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+            Values result = optimizer.optimize();
+
+            // Overwrite the beginning of the preintegration for the next step.
+            prev_state = NavState(result.at<Pose3>(X(trace_id)),
+                                  result.at<Vector3>(V(trace_id)));
+            prev_bias = result.at<imuBias::ConstantBias>(B(trace_id));
+
+            // Reset the preintegration object.
+            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
         }
 

@@ -365,7 +365,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.setVerbose(true);
     globalOptimizer.initializeOptimization();
-//    globalOptimizer.optimize(30000);
+    globalOptimizer.optimize(30000);
 
     for (int k(0); k < trace_id; ++k) {
         double t_data[10] = {0};

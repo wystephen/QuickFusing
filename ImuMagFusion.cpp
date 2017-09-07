@@ -279,8 +279,10 @@ int main(int argc, char *argv[]) {
     initial_para.init_heading1_ = M_PI / 2.0;
     initial_para.Ts_ = 1.0f / 128.0f;
 
-    initial_para.sigma_a_ /= 2.0;
-    initial_para.sigma_g_ /= 2.0;
+    initial_para.sigma_a_  = 1.1;
+    initial_para.sigma_g_ = 2.0/180.0*M_PI;
+
+    initial_para.ZeroDetectorWindowSize_ = 10;
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 0, 20, 6));
@@ -333,12 +335,12 @@ int main(int argc, char *argv[]) {
 
     ///optimization
 
-    for (int k(0); k < trace_id; ++k) {
-        double t_data[10] = {0};
-
-        gx.push_back(t_data[0]);
-        gy.push_back(t_data[1]);
-    }
+//    for (int k(0); k < trace_id; ++k) {
+//        double t_data[10] = {0};
+//
+//        gx.push_back(t_data[0]);
+//        gy.push_back(t_data[1]);
+//    }
 
 
     plt::plot(gx, gy, "r-+");

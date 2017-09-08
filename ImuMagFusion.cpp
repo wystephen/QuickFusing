@@ -329,37 +329,42 @@ int main(int argc, char *argv[]) {
             PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
             (imu_preintegrated_);
 
-            std::cout << "trace id : " << trace_id << std::endl;
-            std::cout << "X trace id -1 :" << X(trace_id - 1) << std::endl;
-            std::cout << "V trace id -1 :" << V(trace_id - 1) << std::endl;
 
-            std::cout << "x traceid :" << X(trace_id) << std::endl;
-            std::cout << " v trace id :" << V(trace_id) << std::endl;
 
-            std::cout << " B trace id -1 : " << B(trace_id - 1) << std::endl;
-
-            std::cout << " prein imu :" << *preint_imu << std::endl;
-            ImuFactor imu_factor(
-                    X(trace_id - 1), V(trace_id - 1),
-                    X(trace_id), V(trace_id),
-                    B(trace_id - 1),
-                    *preint_imu
-            );
-
-            std::cout << "after built imu factor " << std::endl;
-            graph->add(imu_factor);
-            std::cout << " after added imu factor " << std::endl;
-            imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
             try {
+                std::cout << "trace id : " << trace_id << std::endl;
+                std::cout << "X trace id -1 :" << X(trace_id - 1) << std::endl;
+                std::cout << "V trace id -1 :" << V(trace_id - 1) << std::endl;
+
+                std::cout << "x traceid :" << X(trace_id) << std::endl;
+                std::cout << " v trace id :" << V(trace_id) << std::endl;
+
+                std::cout << " B trace id -1 : " << B(trace_id - 1) << std::endl;
+
+                std::cout << " prein imu :" << *preint_imu << std::endl;
+                ImuFactor imu_factor(
+                        X(trace_id - 1), V(trace_id - 1),
+                        X(trace_id), V(trace_id),
+                        B(trace_id - 1),
+                        *preint_imu
+                );
+
+                std::cout << "after built imu factor " << std::endl;
+                graph->add(imu_factor);
+                std::cout << " after added imu factor " << std::endl;
+                imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+
                 graph->add(BetweenFactor<imuBias::ConstantBias>(
                         B(trace_id - 1),
                         B(trace_id),
                         zero_bias, bias_noise_model
                 ));
 
-            } catch (std::exception &e) {
+            } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
+            } catch (...) {
+                std::cout << "unexpected error " << std::endl;
             }
 
             //velocity constraint
@@ -370,13 +375,19 @@ int main(int argc, char *argv[]) {
 //            graph->add(PriorFactor<imuBias::ConstantBias>(B(trace_id), prior_imu_bias, bias_noise_model));
 //
             /// Use zupt result as gps
-            noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 1.0);
-            GPSFactor gps_factor(X(correction_count),
-                                 Point3(tx(0),
-                                        tx(1),
-                                        tx(2)),
-                                 correction_noise);
-            graph->add(gps_factor);
+            try {
+                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 1.0);
+                GPSFactor gps_factor(X(correction_count),
+                                     Point3(tx(0),
+                                            tx(1),
+                                            tx(2)),
+                                     correction_noise);
+                graph->add(gps_factor);
+
+            } catch (std::exception &e) {
+                std::cout << "error at :" << __FILE__
+                          << " " << __LINE__ << " : " << e.what() << std::endl;
+            }
 
 
             /// reset integrated

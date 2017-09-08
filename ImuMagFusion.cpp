@@ -350,17 +350,16 @@ int main(int argc, char *argv[]) {
             graph->add(imu_factor);
             std::cout << " after added imu factor " << std::endl;
             imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
-            try{
-            graph->add(BetweenFactor<imuBias::ConstantBias>(
-                    B(trace_id - 1),
-                    B(trace_id),
-                    zero_bias, bias_noise_model
-            ));
+            try {
+                graph->add(BetweenFactor<imuBias::ConstantBias>(
+                        B(trace_id - 1),
+                        B(trace_id),
+                        zero_bias, bias_noise_model
+                ));
 
-            }catch(std::exception &e)
-            {
+            } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
-                << " " << __LINE__<< " : " << e.what() << std::endl;
+                          << " " << __LINE__ << " : " << e.what() << std::endl;
             }
 
             //velocity constraint

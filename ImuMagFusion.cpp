@@ -363,6 +363,14 @@ int main(int argc, char *argv[]) {
 //            graph->add(PriorFactor<Vector3>(V(trace_id), prior_velocity, velocity_noise_model));
 //            graph->add(PriorFactor<imuBias::ConstantBias>(B(trace_id), prior_imu_bias, bias_noise_model));
 //
+            /// Use zupt result as gps
+            noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 1.0);
+            GPSFactor gps_factor(X(correction_count),
+                                 Point3(tx(0),
+                                        tx(1),
+                                        tx(2)),
+                                 correction_noise);
+            graph->add(gps_factor);
 
 
             /// reset integrated

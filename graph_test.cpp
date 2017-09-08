@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
     double second_info = 1000.0;
 
 
-    double distance_info = 100.0;
+    double distance_info = 1.0;
     double distance_sigma = 2.0;
 
 

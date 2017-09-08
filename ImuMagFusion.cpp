@@ -350,11 +350,18 @@ int main(int argc, char *argv[]) {
             graph->add(imu_factor);
             std::cout << " after added imu factor " << std::endl;
             imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+            try{
             graph->add(BetweenFactor<imuBias::ConstantBias>(
                     B(trace_id - 1),
                     B(trace_id),
                     zero_bias, bias_noise_model
             ));
+
+            }catch(std::exception &e)
+            {
+                std::cout << "error at :" << __FILE__
+                << " " << __LINE__<< " : " << e.what() << std::endl;
+            }
 
             //velocity constraint
 //            graph->add(gtsam::LieVe)
@@ -388,13 +395,13 @@ int main(int argc, char *argv[]) {
             initial_values.insert(V(trace_id), prop_state.v());
             initial_values.insert(B(trace_id), prev_bias);
 
-            LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
-            Values result = optimizer.optimize();
+//            LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+//            Values result = optimizer.optimize();
 
             // Overwrite the beginning of the preintegration for the next step.
-            prev_state = NavState(result.at<Pose3>(X(trace_id)),
-                                  result.at<Vector3>(V(trace_id)));
-            prev_bias = result.at<imuBias::ConstantBias>(B(trace_id));
+//            prev_state = NavState(result.at<Pose3>(X(trace_id)),
+//                                  result.at<Vector3>(V(trace_id)));
+//            prev_bias = result.at<imuBias::ConstantBias>(B(trace_id));
 
             // Reset the preintegration object.
             imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);

@@ -203,6 +203,18 @@ int main(int argc, char *argv[]) {
 
     std::vector<double> ori_1, ori_2, ori_3;
 
+    /**
+     * Initial ZUPT parameters
+     */
+    SettingPara initial_para(true);
+    initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
+    initial_para.init_heading1_ = M_PI / 2.0;
+    initial_para.Ts_ = 1.0f / 128.0f;
+
+    initial_para.sigma_a_ = 1.1;//zupt detector parameter
+    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
+
+    initial_para.ZeroDetectorWindowSize_ = 10;
 
     /**
      * Create and prepare for graph
@@ -238,8 +250,8 @@ int main(int argc, char *argv[]) {
     graph->add(PriorFactor<imuBias::ConstantBias>(B(correction_count), prior_imu_bias, bias_noise_model));
 
     // We use the sensor specs to build the noise model for the IMU factor.
-    double accel_noise_sigma = 0.0003924;
-    double gyro_noise_sigma = 0.000205689024915;
+    double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
+    double gyro_noise_sigma = initial_para.sigma_gyro_(0);//0.000205689024915;
     double accel_bias_rw_sigma = 0.004905;
     double gyro_bias_rw_sigma = 0.000001454441043;
     Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
@@ -272,17 +284,10 @@ int main(int argc, char *argv[]) {
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
 
     /**
-     * Initial ZUPT parameters
+     *
+     * Initial ekf
      */
-    SettingPara initial_para(true);
-    initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
-    initial_para.init_heading1_ = M_PI / 2.0;
-    initial_para.Ts_ = 1.0f / 128.0f;
 
-    initial_para.sigma_a_ = 1.1;
-    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
-
-    initial_para.ZeroDetectorWindowSize_ = 10;
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 0, 20, 6));
@@ -330,6 +335,14 @@ int main(int argc, char *argv[]) {
             (imu_preintegrated_);
 
 
+            if(preint_imu->equals(*imu_preintegrated_))
+            {
+                std::cout << " equal " << std::endl;
+            }else{
+                std::cout << "unequal" << std::endl;
+            }
+
+
 
             try {
                 auto x1=X(trace_id-1);
@@ -356,6 +369,8 @@ int main(int argc, char *argv[]) {
                 ImuFactor imu_factor(
                         x1,v1,x2,v2,bias1,*preint_imu
                 );
+
+//                std::cout <<
 
                 std::cout << "after built imu factor " << std::endl;
                 graph->add(imu_factor);

@@ -6,7 +6,7 @@ project(QuickFusing)
 #set(CMAKE_BUILD_TOOL Release)
 set(CMAKE_BUILD_TOOL Debug)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -lpthread")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread -Wreturn-type -Wsign-compare")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11 -lpthread -Wreturn-type -Wsign-compare")
 #set(CUDA_NVCC_FLAGSS ${CUDA_NVCC_FLAGS} --gpu-architecture sm_20)
 
 

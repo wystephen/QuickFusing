@@ -332,6 +332,11 @@ int main(int argc, char *argv[]) {
 
 
             try {
+                auto x1=X(trace_id-1);
+                auto v1=V(trace_id-1);
+                auto x2=X(trace_id);
+                auto v2=X(trace_id);
+                auto bias1=B(trace_id-1);
                 std::cout << "trace id : " << trace_id << std::endl;
                 std::cout << "X trace id -1 :" << X(trace_id - 1) << std::endl;
                 std::cout << "V trace id -1 :" << V(trace_id - 1) << std::endl;
@@ -342,11 +347,14 @@ int main(int argc, char *argv[]) {
                 std::cout << " B trace id -1 : " << B(trace_id - 1) << std::endl;
 
                 std::cout << " prein imu :" << *preint_imu << std::endl;
+//                ImuFactor imu_factor(
+//                        X(trace_id - 1), V(trace_id - 1),
+//                        X(trace_id), V(trace_id),
+//                        B(trace_id - 1),
+//                        *preint_imu
+//                );
                 ImuFactor imu_factor(
-                        X(trace_id - 1), V(trace_id - 1),
-                        X(trace_id), V(trace_id),
-                        B(trace_id - 1),
-                        *preint_imu
+                        x1,v1,x2,v2,bias1,*preint_imu
                 );
 
                 std::cout << "after built imu factor " << std::endl;

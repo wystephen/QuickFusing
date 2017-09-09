@@ -27,8 +27,8 @@
 //#include "Zero_Detecter.h"
 #include<Eigen/Dense>
 #include <Eigen/Geometry>
-#include <sophus/se3.h>
-#include <sophus/so3.h>
+//#include <sophus/se3.h>
+//#include <sophus/so3.h>
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
@@ -252,7 +252,7 @@ int main(int argc, char *argv[]) {
     Matrix33 bias_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_bias_rw_sigma, 2);
     Matrix66 bias_acc_omega_int = Matrix::Identity(6, 6) * 1e-5; // error in the bias used for preintegration
 
-    boost::shared_ptr<PreintegratedImuMeasurements::Params> p = PreintegratedCombinedMeasurements::Params::MakeSharedD(
+    boost::shared_ptr<PreintegratedImuMeasurements::Params> p = PreintegratedImuMeasurements::Params::MakeSharedD(
             0.0);
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous

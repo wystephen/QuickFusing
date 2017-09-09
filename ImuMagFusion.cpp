@@ -42,8 +42,6 @@
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_impl.h"
 
-#include "g2o/core/robust_kernel.h"
-#include "g2o/core/robust_kernel_factory.h"
 
 
 
@@ -58,18 +56,9 @@
 #include "OwnEdge/OrientationEdge.h"
 #include "OwnEdge/OrientationEdge.cpp"
 
-//#include "OwnEdge/Line2D.h"
-//#include "OwnEdge/Line2D.cpp"
-//#include "OwnEdge/Point2Line2D.h"
-//#include "OwnEdge/Point2Line2D.cpp"
-
-//#include "OwnEdge/DistanceSE3Line3D.h"
-//#include "OwnEdge/DistanceSE3Line3D.cpp"
-//#include "g2o_types_slam3d_addons_api.h"
-//#include "g2o/types/slam3d_addons/line3d.h"
 
 // GTSAM related includes.
-#include <gtsam/navigation/CombinedImuFactor.h>
+//#include <gtsam/navigation/CombinedImuFactor.h>
 #include <gtsam/navigation/GPSFactor.h>
 #include <gtsam/navigation/ImuFactor.h>
 #include <gtsam/slam/dataset.h>
@@ -78,6 +67,7 @@
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/inference/Symbol.h>
+
 #include <fstream>
 #include <iostream>
 
@@ -335,12 +325,12 @@ int main(int argc, char *argv[]) {
             (imu_preintegrated_);
 
 
-            if(preint_imu->equals(*imu_preintegrated_))
-            {
-                std::cout << " equal " << std::endl;
-            }else{
-                std::cout << "unequal" << std::endl;
-            }
+//            if(preint_imu->equals(*imu_preintegrated_))
+//            {
+//                std::cout << " equal " << std::endl;
+//            }else{
+//                std::cout << "unequal" << std::endl;
+//            }
 
 
 
@@ -366,6 +356,8 @@ int main(int argc, char *argv[]) {
 //                        B(trace_id - 1),
 //                        *preint_imu
 //                );
+                auto get_state = preint_imu->predict(prev_state,prev_bias);
+                std::cout << "get state :" << get_state << std::endl;
                 ImuFactor imu_factor(
                         x1,v1,x2,v2,bias1,*preint_imu
                 );

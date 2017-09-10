@@ -24,7 +24,9 @@
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/inference/Symbol.h>
+#include <gtsam_unstable/dynamics/VelocityConstraint3.h>
 
+#include <gtsam/base/LieVector.h>
 #include <thread>
 
 using namespace gtsam;
@@ -294,6 +296,13 @@ int main(int argc, char *argv[]) {
                         B(trace_id),
                         zero_bias, bias_noise_model
                 ));
+
+                // velocity constraint
+                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));
+//                graph->add(BetweenFactor<G)
+//                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
+
+
 // / last moment of zupt detected
                 prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
                 initial_values.insert(X(trace_id), prop_state.pose());

@@ -328,21 +328,21 @@ int main(int argc, char *argv[]) {
 
 
             try {
-                auto x1=X(trace_id-1);
-                auto v1=V(trace_id-1);
-                auto x2=X(trace_id);
-                auto v2=X(trace_id);
-                auto bias1=B(trace_id-1);
-                std::cout << "trace id : " << trace_id << std::endl;
-                std::cout << "X trace id -1 :" << X(trace_id - 1) << std::endl;
-                std::cout << "V trace id -1 :" << V(trace_id - 1) << std::endl;
-
-                std::cout << "x traceid :" << X(trace_id) << std::endl;
-                std::cout << " v trace id :" << V(trace_id) << std::endl;
-
-                std::cout << " B trace id -1 : " << B(trace_id - 1) << std::endl;
-
-                std::cout << " prein imu :" << *preint_imu << std::endl;
+//                X x1=X(trace_id-1);
+//                V v1=V(trace_id-1);
+//                auto x2=X(trace_id);
+//                auto v2=X(trace_id);
+//                auto bias1=B(trace_id-1);
+//                std::cout << "trace id : " << trace_id << std::endl;
+//                std::cout << "X trace id -1 :" << X(trace_id - 1) << std::endl;
+//                std::cout << "V trace id -1 :" << V(trace_id - 1) << std::endl;
+//
+//                std::cout << "x traceid :" << X(trace_id) << std::endl;
+//                std::cout << " v trace id :" << V(trace_id) << std::endl;
+//
+//                std::cout << " B trace id -1 : " << B(trace_id - 1) << std::endl;
+//
+//                std::cout << " prein imu :" << *preint_imu << std::endl;
 //                ImuFactor imu_factor(
 //                        X(trace_id - 1), V(trace_id - 1),
 //                        X(trace_id), V(trace_id),
@@ -354,7 +354,9 @@ int main(int argc, char *argv[]) {
                 std::cout << "derect output:" << preint_imu->predict(prev_state,prev_bias);
 
                 ImuFactor imu_factor(
-                        x1,v1,x2,v2,bias1,*preint_imu
+                       X(trace_id-1),V(trace_id-1),
+                        X(trace_id),V(trace_id),
+                        B(trace_id-1),*preint_imu
                 );
 
 
@@ -391,28 +393,46 @@ int main(int argc, char *argv[]) {
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
+            }catch(...)
+            {
+                std::cout << "error at :" << __FILE__
+                          << " " << __LINE__ << " : unkonw error " << std::endl;
             }
 
             /// reset integrated
 //            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
-            /// last moment of zupt detected
-            prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
-            initial_values.insert(X(trace_id), prop_state.pose());
-            initial_values.insert(V(trace_id), prop_state.v());
-            initial_values.insert(B(trace_id), prev_bias);
+            try{
+                /// last moment of zupt detected
+                prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
+//            initial_values.insert(X(trace_id), prop_state.pose();
+//            initial_values.insert(V(trace_id), prop_state.v());
+//            initial_values.insert(B(trace_id), prev_bias);
+                initial_values.insert(X(trace_id), prior_pose);
+                initial_values.insert(V(trace_id), prior_velocity);
+                initial_values.insert(B(trace_id), prior_imu_bias);
 
-            LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
-            Values result = optimizer.optimize();
+                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+                Values result = optimizer.optimize();
 
-            // Overwrite the beginning of the preintegration for the next step.
-            prev_state = NavState(result.at<Pose3>(X(trace_id)),
-                                  result.at<Vector3>(V(trace_id)));
-            prev_bias = result.at<imuBias::ConstantBias>(B(trace_id));
+                // Overwrite the beginning of the preintegration for the next step.
+                prev_state = NavState(result.at<Pose3>(X(trace_id)),
+                                      result.at<Vector3>(V(trace_id)));
+                prev_bias = result.at<imuBias::ConstantBias>(B(trace_id));
 
-            // Reset the preintegration object.
-            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
+                // Reset the preintegration object.
+                imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
+            }catch(std::exception & e)
+            {
+                std::cout << "error at :" << __FILE__
+                          << " " << __LINE__ << " : " << e.what() << std::endl;
+            }catch(...)
+            {
+                std::cout << "error at :" << __FILE__
+                          << " " << __LINE__ << " : unkonw error " << std::endl;
+            }
+
 
         }
 

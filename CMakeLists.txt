@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(QuickFusing)
 
-set(CMAKE_CCOMPILER /usr/bin/clang)
-set(CMAKE_CXXCOMPILER /usr/bin/clang++)
+#set(CMAKE_CCOMPILER /usr/bin/clang)
+#set(CMAKE_CXXCOMPILER /usr/bin/clang++)
 
 set(CMAKE_CXX_STANDARD 14)
 

@@ -413,13 +413,13 @@ int main(int argc, char *argv[]) {
                 initial_values.insert(V(trace_id), prior_velocity);
                 initial_values.insert(B(trace_id), prior_imu_bias);
 
-                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
-                Values result = optimizer.optimize();
+//                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+//                Values result = optimizer.optimize();
 
                 // Overwrite the beginning of the preintegration for the next step.
-                prev_state = NavState(result.at<Pose3>(X(trace_id)),
-                                      result.at<Vector3>(V(trace_id)));
-                prev_bias = result.at<imuBias::ConstantBias>(B(trace_id));
+//                prev_state = NavState(result.at<Pose3>(X(trace_id)),
+//                                      result.at<Vector3>(V(trace_id)));
+//                prev_bias = result.at<imuBias::ConstantBias>(B(trace_id));
 
                 // Reset the preintegration object.
                 imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);

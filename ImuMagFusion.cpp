@@ -288,6 +288,9 @@ int main(int argc, char *argv[]) {
     Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
     double last_theta = 0.0;
 
+
+    int add_vertex_counter = 0;
+
     for (int index(0); index < imudata.rows(); ++index) {
 //        std::cout << "index:" << index << std::endl;
         /**ZUPT DETECTOR FIRST*/
@@ -316,8 +319,10 @@ int main(int argc, char *argv[]) {
         }
 
         /** GTSAM FOR INTEGRATE **/
-        if (zupt_flag > 0.5 && last_zupt_flag < 0.5) {
+        add_vertex_counter ++;
+        if ((zupt_flag > 0.5 && last_zupt_flag < 0.5)||add_vertex_counter>20) {
             /// first moment of zupt detected
+            add_vertex_counter = 0;
 
             trace_id++;
             ///Added to
@@ -356,8 +361,12 @@ int main(int argc, char *argv[]) {
 //                        B(trace_id - 1),
 //                        *preint_imu
 //                );
-                auto get_state = preint_imu->predict(prev_state,prev_bias);
-                std::cout << "get state :" << get_state << std::endl;
+//                auto get_state = preint_imu->predict(prev_state,prev_bias);
+                std::cout << "prev state :" << prev_state << std::endl;
+                std::cout << " pre bias: " << prev_bias << std::endl;
+                std::cout << "derect output:" << preint_imu->predict(prev_state,prev_bias);
+
+//                std::cout << "get state :" << get_state << std::endl;
                 ImuFactor imu_factor(
                         x1,v1,x2,v2,bias1,*preint_imu
                 );

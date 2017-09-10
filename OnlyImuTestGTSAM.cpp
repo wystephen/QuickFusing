@@ -284,13 +284,20 @@ int main(int argc, char *argv[]) {
                 std::cout << "after built imu factor " << std::endl;
                 graph->add(imu_factor);
                 std::cout << " after added imu factor " << std::endl;
-                imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
-//
-                graph->add(BetweenFactor<imuBias::ConstantBias>(
-                        B(trace_id - 1),
-                        B(trace_id),
-                        zero_bias, bias_noise_model
-                ));
+//                imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+////
+//                graph->add(BetweenFactor<imuBias::ConstantBias>(
+//                        B(trace_id - 1),
+//                        B(trace_id),
+//                        zero_bias, bias_noise_model
+//                ));
+// / last moment of zupt detected
+                prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
+                initial_values.insert(X(trace_id), prop_state.pose());
+                initial_values.insert(V(trace_id), prop_state.v());
+                initial_values.insert(B(trace_id), prev_bias);
+
+                preint_imu->resetIntegration();
 
             } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
@@ -303,13 +310,13 @@ int main(int argc, char *argv[]) {
 
             /// Use zupt result as gps
             try {
-                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 1.0);
-                GPSFactor gps_factor(X(correction_count),
-                                     Point3(tx(0),
-                                            tx(1),
-                                            tx(2)),
-                                     correction_noise);
-                graph->add(gps_factor);
+//                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 1.0);
+//                GPSFactor gps_factor(X(correction_count),
+//                                     Point3(tx(0),
+//                                            tx(1),
+//                                            tx(2)),
+//                                     correction_noise);
+//                graph->add(gps_factor);
 
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
@@ -325,25 +332,13 @@ int main(int argc, char *argv[]) {
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
             try {
                 /// last moment of zupt detected
-                prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
-//            initial_values.insert(X(trace_id), prop_state.pose();
+//                prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
+//            initial_values.insert(X(trace_id), prop_state.pose());
 //            initial_values.insert(V(trace_id), prop_state.v());
 //            initial_values.insert(B(trace_id), prev_bias);
-                initial_values.insert(X(trace_id), prior_pose);
-                initial_values.insert(V(trace_id), prior_velocity);
-                initial_values.insert(B(trace_id), prior_imu_bias);
-
-//                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
-//                Values result = optimizer.optimize();
-
-                // Overwrite the beginning of the preintegration for the next step.
-//                prev_state = NavState(result.at<Pose3>(X(trace_id)),
-//                                      result.at<Vector3>(V(trace_id)));
-//                prev_bias = result.at<imuBias::ConstantBias>(B(trace_id));
-
-                // Reset the preintegration object.
-//                imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
-                imu_preintegrated_->resetIntegration();
+//
+//
+//                imu_preintegrated_->resetIntegration();
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;

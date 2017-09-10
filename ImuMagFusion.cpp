@@ -320,7 +320,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter ++;
-        if ((zupt_flag > 0.5 && last_zupt_flag < 0.5)||add_vertex_counter>20) {
+        if ((zupt_flag > 0.5 && last_zupt_flag < 0.5)||add_vertex_counter>20||true) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -413,9 +413,12 @@ int main(int argc, char *argv[]) {
                           << " " << __LINE__ << " : " << e.what() << std::endl;
             }
 
-
+            prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
+            initial_values.insert(X(trace_id), prop_state.pose());
+            initial_values.insert(V(trace_id), prop_state.v());
+            initial_values.insert(B(trace_id), prev_bias);
             /// reset integrated
-//            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
+            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
             /// last moment of zupt detected

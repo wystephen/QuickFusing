@@ -25,6 +25,8 @@
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/inference/Symbol.h>
 
+#include <thread>
+
 using namespace gtsam;
 using namespace std;
 
@@ -35,6 +37,7 @@ using symbol_shorthand::B; // Bias  (ax,ay,az,gx,gy,gz)
 PreintegratedImuMeasurements *imu_preintegrated_;
 
 namespace plt = matplotlibcpp;
+
 
 bool GLRT_Detector(Eigen::MatrixXd u,
                    const SettingPara &para_) {
@@ -284,18 +287,19 @@ int main(int argc, char *argv[]) {
                 std::cout << "after built imu factor " << std::endl;
                 graph->add(imu_factor);
                 std::cout << " after added imu factor " << std::endl;
-//                imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
-////
-//                graph->add(BetweenFactor<imuBias::ConstantBias>(
-//                        B(trace_id - 1),
-//                        B(trace_id),
-//                        zero_bias, bias_noise_model
-//                ));
+                imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+//
+                graph->add(BetweenFactor<imuBias::ConstantBias>(
+                        B(trace_id - 1),
+                        B(trace_id),
+                        zero_bias, bias_noise_model
+                ));
 // / last moment of zupt detected
                 prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
                 initial_values.insert(X(trace_id), prop_state.pose());
                 initial_values.insert(V(trace_id), prop_state.v());
                 initial_values.insert(B(trace_id), prev_bias);
+                prev_state = prop_state;
 
                 preint_imu->resetIntegration();
 
@@ -376,9 +380,30 @@ int main(int argc, char *argv[]) {
     ///optimization
 
     std::cout << "begin to optimization" << std::endl;
-    LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+    LevenbergMarquardtParams lm_para;
+    lm_para.setMaxIterations(10000);
+//    lm_para.iterativeParams.
+    LevenbergMarquardtOptimizer optimizer(*graph, initial_values,lm_para);
+//    NonlinearOptimizerParams op_para;
+//    op_para.setMaxIterations(10000);
+//    optimizer.params().setMaxIterations(10000);
+
 //    gtsam::Value result;
-    auto result = optimizer.optimize();
+//    auto it_times = optimizer.getInnerIterations()
+    std::thread out_iterations([&] {
+        while (1) {
+            std::cout << optimizer.getInnerIterations() << std::endl;
+            sleep(1);
+
+//            if(optimizer.getInnerIterations()>10000)
+//            {
+//                optimizer.params()
+//            }
+        }
+    });
+    out_iterations.detach();
+
+    auto result = optimizer.optimizeSafely();
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(0); k < trace_id; ++k) {

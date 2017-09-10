@@ -411,7 +411,7 @@ int main(int argc, char *argv[]) {
 
         auto pose_result = result.at<Pose3>(X(k));
         t_data[0] = pose_result.matrix()(0, 3);
-        t_data[1] = pose_result.matrix()(0, 3);
+        t_data[1] = pose_result.matrix()(1, 3);
 
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);

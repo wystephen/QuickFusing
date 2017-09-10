@@ -313,30 +313,18 @@ int main(int argc, char *argv[]) {
 
             auto the_transform = myekf.getTransformation();
 
-
             ix.push_back(tx(0));
             iy.push_back(tx(1));
         }
 
         /** GTSAM FOR INTEGRATE **/
-        add_vertex_counter ++;
-        if ((zupt_flag > 0.5 && last_zupt_flag < 0.5)||add_vertex_counter>20||true) {
+        if ((zupt_flag > 0.5 && last_zupt_flag < 0.5)) {
             /// first moment of zupt detected
-            add_vertex_counter = 0;
 
             trace_id++;
             ///Added to
             PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
             (imu_preintegrated_);
-
-
-//            if(preint_imu->equals(*imu_preintegrated_))
-//            {
-//                std::cout << " equal " << std::endl;
-//            }else{
-//                std::cout << "unequal" << std::endl;
-//            }
-
 
 
             try {
@@ -361,17 +349,14 @@ int main(int argc, char *argv[]) {
 //                        B(trace_id - 1),
 //                        *preint_imu
 //                );
-//                auto get_state = preint_imu->predict(prev_state,prev_bias);
                 std::cout << "prev state :" << prev_state << std::endl;
                 std::cout << " pre bias: " << prev_bias << std::endl;
                 std::cout << "derect output:" << preint_imu->predict(prev_state,prev_bias);
 
-//                std::cout << "get state :" << get_state << std::endl;
                 ImuFactor imu_factor(
                         x1,v1,x2,v2,bias1,*preint_imu
                 );
 
-//                std::cout <<
 
                 std::cout << "after built imu factor " << std::endl;
                 graph->add(imu_factor);
@@ -392,12 +377,7 @@ int main(int argc, char *argv[]) {
             }
 
             //velocity constraint
-//            graph->add(gtsam::LieVe)
 
-//            graph->add(PriorFactor<Pose3>(X(trace_id), prior_pose, pose_noise_model));
-//            graph->add(PriorFactor<Vector3>(V(trace_id), prior_velocity, velocity_noise_model));
-//            graph->add(PriorFactor<imuBias::ConstantBias>(B(trace_id), prior_imu_bias, bias_noise_model));
-//
             /// Use zupt result as gps
             try {
                 noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 1.0);
@@ -413,28 +393,23 @@ int main(int argc, char *argv[]) {
                           << " " << __LINE__ << " : " << e.what() << std::endl;
             }
 
-            prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
-            initial_values.insert(X(trace_id), prop_state.pose());
-            initial_values.insert(V(trace_id), prop_state.v());
-            initial_values.insert(B(trace_id), prev_bias);
             /// reset integrated
-            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
+//            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
             /// last moment of zupt detected
-//            delete imu_preintegrated_;
             prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
             initial_values.insert(X(trace_id), prop_state.pose());
             initial_values.insert(V(trace_id), prop_state.v());
             initial_values.insert(B(trace_id), prev_bias);
 
-//            LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
-//            Values result = optimizer.optimize();
+            LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+            Values result = optimizer.optimize();
 
             // Overwrite the beginning of the preintegration for the next step.
-//            prev_state = NavState(result.at<Pose3>(X(trace_id)),
-//                                  result.at<Vector3>(V(trace_id)));
-//            prev_bias = result.at<imuBias::ConstantBias>(B(trace_id));
+            prev_state = NavState(result.at<Pose3>(X(trace_id)),
+                                  result.at<Vector3>(V(trace_id)));
+            prev_bias = result.at<imuBias::ConstantBias>(B(trace_id));
 
             // Reset the preintegration object.
             imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);

@@ -1,9 +1,7 @@
 //
-// Created by steve on 17-9-6.
+// Created by steve on 17-9-10.
 //
 
-#include <eigen3/Eigen/Dense>
-#include <ImuIntegrate.h>
 
 #include "CSVReader.h"
 #include "matplotlib_interface.h"
@@ -11,54 +9,13 @@
 
 #include "SettingPara.h"
 #include "EKF.hpp"
-
-#include "ResultEvaluation.hpp"
-
-/////stamp---------
-
-#include "RangeKF.hpp"
-
-#include "PUWBPF.hpp"
-
-#include "EXUWBPF.hpp"
-
-
 #include "MYEKF.h"
-//#include "Zero_Detecter.h"
-#include<Eigen/Dense>
+
+#include <Eigen/Dense>
 #include <Eigen/Geometry>
-//#include <sophus/se3.h>
-//#include <sophus/so3.h>
-
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/core/block_solver.h"
-#include "g2o/core/factory.h"
-#include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
-#include "g2o/types/slam3d/types_slam3d.h"
-#include "g2o/types/slam3d_addons/types_slam3d_addons.h"
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
-
-#include "g2o/core/robust_kernel.h"
-#include "g2o/core/robust_kernel_impl.h"
-
-
-
-
-//#include "g2o/types/slam3d_addons/vertex_line3d.h"
-//#include "g2o/types/slam3d_addons/edge_se3_line.h"
-
-//#include "OwnEdge/ZoEdge.h"
-//#include "OwnEdge/ZoEdge.cpp"
-#include "OwnEdge/DistanceEdge.h"
-#include "OwnEdge/DistanceEdge.cpp"
-
-#include "OwnEdge/OrientationEdge.h"
-#include "OwnEdge/OrientationEdge.cpp"
-
 
 // GTSAM related includes.
-//#include <gtsam/navigation/CombinedImuFactor.h>
+#include <gtsam/navigation/CombinedImuFactor.h>
 #include <gtsam/navigation/GPSFactor.h>
 #include <gtsam/navigation/ImuFactor.h>
 #include <gtsam/slam/dataset.h>
@@ -68,12 +25,6 @@
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/inference/Symbol.h>
 
-#include <fstream>
-#include <iostream>
-
-// Uncomment line below to use the CombinedIMUFactor as opposed to the standard ImuFactor.
-// #define USE_COMBINED
-
 using namespace gtsam;
 using namespace std;
 
@@ -81,14 +32,7 @@ using symbol_shorthand::X; // Pose3 (x,y,z,r,p,y)
 using symbol_shorthand::V; // Vel   (xdot,ydot,zdot)
 using symbol_shorthand::B; // Bias  (ax,ay,az,gx,gy,gz)
 
-const string output_filename = "imuFactorExampleResults.csv";
-
-// This will either be PreintegratedImuMeasurements (for ImuFactor) or
-// PreintegratedCombinedMeasurements (for CombinedImuFactor).
-PreintegrationType *imu_preintegrated_;
-
-G2O_USE_TYPE_GROUP(slam3d)
-
+PreintegratedImuMeasurements *imu_preintegrated_;
 
 namespace plt = matplotlibcpp;
 
@@ -205,6 +149,7 @@ int main(int argc, char *argv[]) {
     initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
 
     initial_para.ZeroDetectorWindowSize_ = 10;
+
 
     /**
      * Create and prepare for graph
@@ -327,12 +272,12 @@ int main(int argc, char *argv[]) {
 
                 std::cout << "prev state :" << prev_state << std::endl;
                 std::cout << " pre bias: " << prev_bias << std::endl;
-                std::cout << "derect output:" << preint_imu->predict(prev_state,prev_bias);
+                std::cout << "derect output:" << preint_imu->predict(prev_state, prev_bias);
 
                 ImuFactor imu_factor(
-                       X(trace_id-1),V(trace_id-1),
-                        X(trace_id),V(trace_id),
-                        B(trace_id-1),*preint_imu
+                        X(trace_id - 1), V(trace_id - 1),
+                        X(trace_id), V(trace_id),
+                        B(trace_id - 1), *preint_imu
                 );
 
 
@@ -369,8 +314,7 @@ int main(int argc, char *argv[]) {
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
-            }catch(...)
-            {
+            } catch (...) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : unkonw error " << std::endl;
             }
@@ -379,7 +323,7 @@ int main(int argc, char *argv[]) {
 //            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
-            try{
+            try {
                 /// last moment of zupt detected
                 prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
 //            initial_values.insert(X(trace_id), prop_state.pose();
@@ -400,12 +344,10 @@ int main(int argc, char *argv[]) {
                 // Reset the preintegration object.
 //                imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
                 imu_preintegrated_->resetIntegration();
-            }catch(std::exception & e)
-            {
+            } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
-            }catch(...)
-            {
+            } catch (...) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : unkonw error " << std::endl;
             }
@@ -431,6 +373,10 @@ int main(int argc, char *argv[]) {
          */
         last_zupt_flag = zupt_flag;
     }
+
+
+
+
 
     ///optimization
 

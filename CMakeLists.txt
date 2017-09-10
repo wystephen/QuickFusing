@@ -123,7 +123,10 @@ add_executable(ImuMagFusion ImuMagFusion.cpp)
 target_link_libraries(ImuMagFusion
         ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES}
         -ltbb ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
-
+add_executable(OnlyImuTestGTSAM OnlyImuTestGTSAM.cpp)
+target_link_libraries(OnlyImuTestGTSAM
+        ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES}
+        -ltbb ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
 
 add_executable(dw DemoUseResult.cpp)
 #target_link_libraries(dw ${G2O_LIBS} ${Cholmod_LIBRARIES} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )

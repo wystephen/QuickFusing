@@ -390,20 +390,26 @@ int main(int argc, char *argv[]) {
 
 //    gtsam::Value result;
 //    auto it_times = optimizer.getInnerIterations()
-    std::thread out_iterations([&] {
-        while (1) {
-            std::cout << optimizer.getInnerIterations() << std::endl;
-            sleep(1);
-
-//            if(optimizer.getInnerIterations()>10000)
-//            {
-//                optimizer.params()
-//            }
-        }
-    });
-    out_iterations.detach();
-
-    auto result = optimizer.optimizeSafely();
+//    std::thread out_iterations([&] {
+//        while (1) {
+//            std::cout << optimizer.getInnerIterations() << std::endl;
+//            sleep(1);
+//
+////            if(optimizer.getInnerIterations()>10000)
+////            {
+////                optimizer.params()
+////            }
+//        }
+//    });
+//    out_iterations.detach();
+//
+//    auto result = optimizer.optimizeSafely();
+    for(int i(0);i<1000;i++)
+    {
+        optimizer.iterate();
+        std::cout << "i :'" << i << std::endl;
+    }
+    auto result = optimizer.values();
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(0); k < trace_id; ++k) {

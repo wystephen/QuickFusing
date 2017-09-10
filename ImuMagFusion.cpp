@@ -408,10 +408,6 @@ int main(int argc, char *argv[]) {
             /// reset integrated
 //            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
-
-
-
-
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
             /// last moment of zupt detected
 //            delete imu_preintegrated_;

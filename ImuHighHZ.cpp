@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 20) {
+        if (add_vertex_counter > 10) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
 //                graph->add(BetweenFactor<G)
 //                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
                 if(zupt_flag>0.5){
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.000001);
+                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.0001);
                     PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
                                                        velocity_noise);
                     graph->add(zero_velocity);
@@ -322,11 +322,11 @@ int main(int argc, char *argv[]) {
                 preint_imu->resetIntegration();
 
                 //optimize
-                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
-                for (int i(0); i < 100; ++i) {
-                    optimizer.iterate();
-                }
-                initial_values = optimizer.values();
+//                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+//                for (int i(0); i < 100; ++i) {
+//                    optimizer.iterate();
+//                }
+//                initial_values = optimizer.values();
 
             } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
@@ -383,12 +383,12 @@ int main(int argc, char *argv[]) {
 
         } else {
             ///
-            imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
-                                                     imudata.block(index, 3, 1, 3).transpose(),
-                                                     initial_para.Ts_);
+
 
         }
-
+        imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
+                                                 imudata.block(index, 3, 1, 3).transpose(),
+                                                 initial_para.Ts_);
 
         /**
          * updata data
@@ -403,11 +403,11 @@ int main(int argc, char *argv[]) {
     ///optimization
 
     std::cout << "begin to optimization" << std::endl;
-    LevenbergMarquardtParams lm_para;
-    lm_para.setMaxIterations(10000);
-    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
+//    LevenbergMarquardtParams lm_para;
+//    lm_para.setMaxIterations(10000);
+    LevenbergMarquardtOptimizer optimizer(*graph, initial_values);//, lm_para);
 
-    for (int i(0); i < 10000; i++) {
+    for (int i(0); i < 50000; i++) {
         optimizer.iterate();
         if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
     }

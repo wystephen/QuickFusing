@@ -264,11 +264,12 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 10) {
+        if (add_vertex_counter > 20) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
             trace_id++;
+            std::cout << "trace id : " << trace_id << std::endl;
             ///Added to
             PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
             (imu_preintegrated_);
@@ -276,9 +277,9 @@ int main(int argc, char *argv[]) {
 
             try {
 
-                std::cout << "prev state :" << prev_state << std::endl;
-                std::cout << " pre bias: " << prev_bias << std::endl;
-                std::cout << "derect output:" << preint_imu->predict(prev_state, prev_bias);
+//                std::cout << "prev state :" << prev_state << std::endl;
+//                std::cout << " pre bias: " << prev_bias << std::endl;
+//                std::cout << "derect output:" << preint_imu->predict(prev_state, prev_bias);
 
                 ImuFactor imu_factor(
                         X(trace_id - 1), V(trace_id - 1),
@@ -287,9 +288,9 @@ int main(int argc, char *argv[]) {
                 );
 
 
-                std::cout << "after built imu factor " << std::endl;
+//                std::cout << "after built imu factor " << std::endl;
                 graph->add(imu_factor);
-                std::cout << " after added imu factor " << std::endl;
+//                std::cout << " after added imu factor " << std::endl;
                 imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
 //
                 graph->add(BetweenFactor<imuBias::ConstantBias>(

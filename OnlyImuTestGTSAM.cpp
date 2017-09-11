@@ -264,8 +264,10 @@ int main(int argc, char *argv[]) {
         }
 
         /** GTSAM FOR INTEGRATE **/
-        if ((zupt_flag > 0.5 && last_zupt_flag < 0.5)) {
+//add_vertex_counter++;
+        if ((zupt_flag > 0.5 && last_zupt_flag < 0.5)){//||add_vertex_counter>10) {
             /// first moment of zupt detected
+            add_vertex_counter = 0;
 
             trace_id++;
             ///Added to
@@ -306,7 +308,7 @@ int main(int argc, char *argv[]) {
 // / last moment of zupt detected
                 prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
                 initial_values.insert(X(trace_id), prop_state.pose());
-                initial_values.insert(V(trace_id), prop_state.v());
+                initial_values.insert(V(trace_id), Vector3(0,0,0));
                 initial_values.insert(B(trace_id), prev_bias);
                 prev_state = prop_state;
 

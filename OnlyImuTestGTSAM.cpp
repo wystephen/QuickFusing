@@ -300,9 +300,13 @@ int main(int argc, char *argv[]) {
                 ));
 
                 // velocity constraint
-                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));
+//                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));
 //                graph->add(BetweenFactor<G)
 //                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
+                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,0.000001);
+                PriorFactor<Vector3> zero_velocity(V(trace_id),Vector3(0.0,0.0,0.0),
+                                                   velocity_noise);
+                graph->add(zero_velocity);
 
 
 // / last moment of zupt detected
@@ -413,10 +417,10 @@ int main(int argc, char *argv[]) {
 //    out_iterations.detach();
 //
 //    auto result = optimizer.optimizeSafely();
-    for(int i(0);i<1000;i++)
+    for(int i(0);i<10000;i++)
     {
         optimizer.iterate();
-        std::cout << "i :'" << i << std::endl;
+        if(i%100==0) std::cout << "i :'" << i << std::endl;
     }
     auto result = optimizer.values();
 

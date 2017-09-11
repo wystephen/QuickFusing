@@ -179,7 +179,7 @@ int main(int argc, char *argv[]) {
 
     // Assemble prior noise model and add it the graph.
     noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
-            (Vector(6) << 0.01, 0.01, 0.01, 0.5, 0.5, 0.5).finished()); // rad,rad,rad,m, m, m
+            (Vector(6) << 0.01, 0.01, 0.01, 0.05, 0.05, 0.05).finished()); // rad,rad,rad,m, m, m
     noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.1); // m/s
     noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
 
@@ -318,6 +318,14 @@ int main(int argc, char *argv[]) {
 
                 preint_imu->resetIntegration();
 
+                //optimize
+                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+                for(int i(0);i<100;++i)
+                {
+                    optimizer.iterate();
+                }
+                initial_values = optimizer.values();
+
             } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
@@ -329,11 +337,11 @@ int main(int argc, char *argv[]) {
 
             /// Use zupt result as gps
             try {
-                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
-                GPSFactor gps_factor(X(correction_count),
-                                     Point3(tx(0),tx(1),tx(2)),
-                                     correction_noise);
-                graph->add(gps_factor);
+//                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+//                GPSFactor gps_factor(X(correction_count),
+//                                     Point3(tx(0),tx(1),tx(2)),
+//                                     correction_noise);
+//                graph->add(gps_factor);
 
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__

@@ -407,11 +407,12 @@ int main(int argc, char *argv[]) {
 //    lm_para.setMaxIterations(10000);
     LevenbergMarquardtOptimizer optimizer(*graph, initial_values);//, lm_para);
 
-    for (int i(0); i < 50000; i++) {
-        optimizer.iterate();
-        if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
-    }
-    auto result = optimizer.values();
+//    for (int i(0); i < 50000; i++) {
+//        optimizer.iterate();
+//        if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
+//    }
+//    auto result = optimizer.values();
+    auto result = optimizer.optimizeSafely();
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(0); k < trace_id; ++k) {

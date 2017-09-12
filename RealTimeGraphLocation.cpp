@@ -230,6 +230,38 @@ int main(int argc, char *argv[]) {
             g2o::RobustKernelFactory::instance()->construct("Cauchy");
 
     /**
+     * ZUPT initial
+     */
+    SettingPara init_para(true);
+
+    init_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
+    init_para.init_heading1_ = 0.0;// -2.0;//M_PI / 2.0;
+
+
+    init_para.sigma_acc_ = 0.5 * Eigen::Vector3d(1,1,1);
+    init_para.sigma_gyro_= 0.5 * Eigen::Vector3d(1,1,1) * M_PI / 180.0;
+
+    init_para.sigma_initial_pos1_ *= 1e-3;
+//    init_para.sigma_initial_vel1_ *=
+    init_para.sigma_initial_att1_ = Eigen::Vector3d(0.1,0.1,0.1) * M_PI / 180.0;
+
+//    init_para.Ts_ = 0.005f;//1.0/ 200.0;
+//    init_para.Ts_ = 1.0f/100.0f;//1.0/ 200.0;
+    init_para.Ts_ = 1.0f / 200.0f;
+
+    init_para.gravity_ = 9.8;
+
+    MyEkf myekf(init_para);
+
+    std::vector<double> zupt_v;
+
+    myekf.InitNavEq(imu_data.block(1, 1, 40, 6));
+
+    /**
+     *
+     */
+
+    /**
      * Main loop
      */
 

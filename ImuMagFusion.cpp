@@ -93,7 +93,6 @@ G2O_USE_TYPE_GROUP(slam3d)
 namespace plt = matplotlibcpp;
 
 
-
 Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
                                Eigen::Quaterniond q) {
     Eigen::Isometry3d T;
@@ -273,12 +272,12 @@ int main(int argc, char *argv[]) {
 
                 std::cout << "prev state :" << prev_state << std::endl;
                 std::cout << " pre bias: " << prev_bias << std::endl;
-                std::cout << "derect output:" << preint_imu->predict(prev_state,prev_bias);
+                std::cout << "derect output:" << preint_imu->predict(prev_state, prev_bias);
 
                 ImuFactor imu_factor(
-                       X(trace_id-1),V(trace_id-1),
-                        X(trace_id),V(trace_id),
-                        B(trace_id-1),*preint_imu
+                        X(trace_id - 1), V(trace_id - 1),
+                        X(trace_id), V(trace_id),
+                        B(trace_id - 1), *preint_imu
                 );
 
 
@@ -292,6 +291,13 @@ int main(int argc, char *argv[]) {
                         B(trace_id),
                         zero_bias, bias_noise_model
                 ));
+                prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
+//            initial_values.insert(X(trace_id), prop_state.pose();
+//            initial_values.insert(V(trace_id), prop_state.v());
+//            initial_values.insert(B(trace_id), prev_bias);
+                initial_values.insert(X(trace_id), prior_pose);
+                initial_values.insert(V(trace_id), prior_velocity);
+                initial_values.insert(B(trace_id), prior_imu_bias);
 
             } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
@@ -315,8 +321,7 @@ int main(int argc, char *argv[]) {
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
-            }catch(...)
-            {
+            } catch (...) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : unkonw error " << std::endl;
             }
@@ -325,15 +330,9 @@ int main(int argc, char *argv[]) {
 //            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
         } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
-            try{
+            try {
                 /// last moment of zupt detected
-                prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
-//            initial_values.insert(X(trace_id), prop_state.pose();
-//            initial_values.insert(V(trace_id), prop_state.v());
-//            initial_values.insert(B(trace_id), prev_bias);
-                initial_values.insert(X(trace_id), prior_pose);
-                initial_values.insert(V(trace_id), prior_velocity);
-                initial_values.insert(B(trace_id), prior_imu_bias);
+
 
 //                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
 //                Values result = optimizer.optimize();
@@ -346,12 +345,10 @@ int main(int argc, char *argv[]) {
                 // Reset the preintegration object.
 //                imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
                 imu_preintegrated_->resetIntegration();
-            }catch(std::exception & e)
-            {
+            } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
-            }catch(...)
-            {
+            } catch (...) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : unkonw error " << std::endl;
             }

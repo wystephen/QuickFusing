@@ -4,6 +4,7 @@
 /// EIGEN
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <Zero_Detecter.h>
 
 ///OWN
 #include "CSVReader.h"
@@ -270,6 +271,8 @@ int main(int argc, char *argv[]) {
      */
     int beacon_offset = 100000;// beacon_offset
 
+    int trace_id = 0;
+
     for(int beacon_id(0);beacon_id<uwb_raw.cols()-1;++beacon_id)
     {
         auto *v= new g2o::VertexSE3();
@@ -279,6 +282,25 @@ int main(int argc, char *argv[]) {
         v->setId(beacon_offset+beacon_id);
         globalOptimizer.addVertex(v);
 
+    }
+
+    bool last_zupt_flag = false;
+
+    for(int index(0);index < imu_data.rows();++index)
+    {
+        bool zupt_flag = false;
+
+        if(index > init_para.ZeroDetectorWindowSize_)
+        {
+            zupt_flag=GLRT_Detector(imu_data.block(index-init_para.ZeroDetectorWindowSize_,1,
+            init_para.ZeroDetectorWindowSize_,6),init_para);
+        }
+
+
+
+
+
+       last_zupt_flag = zupt_flag;
     }
 
 

@@ -165,13 +165,13 @@ int main(int argc, char *argv[]) {
 
     auto ImuDataTmp(ImuDataReader.GetMatrix()), ZuptTmp(ZuptReader.GetMatrix());
 
-    Eigen::MatrixXd ImuData, Zupt;
-    ImuData.resize(ImuDataTmp.GetRows(), ImuDataTmp.GetCols());
+    Eigen::MatrixXd imu_data, Zupt;
+    imu_data.resize(ImuDataTmp.GetRows(), ImuDataTmp.GetCols());
     Zupt.resize(ZuptTmp.GetRows(), ZuptTmp.GetCols());
 
     for (int i(0); i < ImuDataTmp.GetRows(); ++i) {
         for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
-            ImuData(i, j) = *ImuDataTmp(i, j);
+            imu_data(i, j) = *ImuDataTmp(i, j);
         }
         Zupt(i, 0) = int(*ZuptTmp(i, 0));
     }
@@ -258,12 +258,31 @@ int main(int argc, char *argv[]) {
     myekf.InitNavEq(imu_data.block(1, 1, 40, 6));
 
     /**
-     *
+     * Vector for save result
      */
+    std::vector<double> online_gx,online_gy,online_gz;
+    std::vector<double> gx,gy,gz;
+    std::vector<double> imu_x,imu_y,imu_z;
+
 
     /**
      * Main loop
      */
+    int beacon_offset = 100000;// beacon_offset
+
+    for(int beacon_id(0);beacon_id<uwb_raw.cols()-1;++beacon_id)
+    {
+        auto *v= new g2o::VertexSE3();
+        double p[6] = {0};
+        v->setEstimateData(p);
+        v->setFixed(false);
+        v->setId(beacon_offset+beacon_id);
+        globalOptimizer.addVertex(v);
+
+    }
+
+
+
 
 
     /**

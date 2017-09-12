@@ -69,16 +69,14 @@ G2O_USE_TYPE_GROUP(slam3d)
 namespace plt = matplotlibcpp;
 
 
-
-
 Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
-                               Eigen::Quaterniond q){
+                               Eigen::Quaterniond q) {
     Eigen::Isometry3d T;
     T.setIdentity();
     T.rotate(q.toRotationMatrix());
-    T(0,3) = offset(0);
-    T(1,3) = offset(1);
-    T(2,3) = offset(2);
+    T(0, 3) = offset(0);
+    T(1, 3) = offset(1);
+    T(2, 3) = offset(2);
     return T;
 }
 
@@ -106,9 +104,9 @@ int main(int argc, char *argv[]) {
     double distance_sigma = 2.0;
 
 
-    double z_offset = 1.90-1.12;
+    double z_offset = 1.90 - 1.12;
 
-    double turn_threshold  = 1.0;
+    double turn_threshold = 1.0;
     double corner_ratio = 10.0;
 
     int max_optimize_times = 4000;
@@ -125,14 +123,13 @@ int main(int argc, char *argv[]) {
     int data_num = 5;
 
 
-    if (argc == 14)
-    {
+    if (argc == 14) {
         std::cout << "set para meter s" << std::endl;
         first_info = std::stod(argv[1]);
-        second_info=std::stod(argv[2]);
+        second_info = std::stod(argv[2]);
 
-        distance_info=std::stod(argv[3]);
-        distance_sigma=std::stod(argv[4]);
+        distance_info = std::stod(argv[3]);
+        distance_sigma = std::stod(argv[4]);
 
         z_offset = std::stod(argv[5]);
 
@@ -151,8 +148,6 @@ int main(int argc, char *argv[]) {
 
         data_num = std::stoi(argv[13]);
     }
-
-
 
 
     std::string out_dir_name = "./";
@@ -196,7 +191,7 @@ int main(int argc, char *argv[]) {
 //    }
 
     dir_name = dir_name + std::to_string(data_num);
-    dir_name  = "/home/steve/Data/FastUwbDemo/1/";
+    dir_name = "/home/steve/Data/FastUwbDemo/1/";
     if (argc != 10) {
         out_dir_name = dir_name;
     }
@@ -285,7 +280,7 @@ int main(int argc, char *argv[]) {
 
     SettingPara init_para(true);
 
-    init_para.init_pos1_ = Eigen::Vector3d(0.0,0.0,0.0);//irx[0], iry[0], 0.0);
+    init_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);//irx[0], iry[0], 0.0);
     init_para.init_heading1_ = M_PI / 2.0;
 
     init_para.Ts_ = 1.0 / 128.0;
@@ -293,7 +288,6 @@ int main(int argc, char *argv[]) {
     MyEkf myekf(init_para);
 
     myekf.InitNavEq(ImuData.block(0, 1, 20, 6));
-
 
 
     std::vector<double> wi, w1, w2, w3;
@@ -323,7 +317,7 @@ int main(int argc, char *argv[]) {
     CppExtent::CSVReader UwbdataReader(dir_name + "uwb_result.csv");
 //    CSVReader UwbValidReader(dir_name+"UwbValid.data.csv");
 
-    Eigen::MatrixXd beaconset, UwbData,UwbValid;
+    Eigen::MatrixXd beaconset, UwbData, UwbValid;
 
 
 //    beaconset.resize(BeaconsetReader.GetMatrix().GetRows(),
@@ -364,19 +358,18 @@ int main(int argc, char *argv[]) {
     std::vector<int> vertex_index;
 
 
-    std::vector <Eigen::Isometry3d> edge_vector;
+    std::vector<Eigen::Isometry3d> edge_vector;
 
     std::vector<double> onx, ony;
 
 
-    std::ofstream out_v_before("./ResultData/" + std::to_string(data_num)+ "out_v_before.txt");
-    std::ofstream out_v_after("./ResultData/" + std::to_string(data_num)+ "out_v_after.txt");
+    std::ofstream out_v_before("./ResultData/" + std::to_string(data_num) + "out_v_before.txt");
+    std::ofstream out_v_after("./ResultData/" + std::to_string(data_num) + "out_v_after.txt");
 
 
     ///////// try to add time offset to uwb data
-    for(int i(0);i<UwbData.rows();++i)
-    {
-        UwbData(i,0) += time_offset;
+    for (int i(0); i < UwbData.rows(); ++i) {
+        UwbData(i, 0) += time_offset;
     }
 
     /// 0. prepare some class
@@ -385,7 +378,7 @@ int main(int argc, char *argv[]) {
     int imu_index(0);
 
     MyEkf gekf(init_para);
-    gekf.InitNavEq(ImuData.block(0,1,20,6));
+    gekf.InitNavEq(ImuData.block(0, 1, 20, 6));
 
     Eigen::Isometry3d latest_transform = (Eigen::Isometry3d::Identity());
 
@@ -404,12 +397,10 @@ int main(int argc, char *argv[]) {
 
 
     /// 1. add beacon vertex
-    for(int i(0);i<beaconset.rows();++i)
-    {
-        auto *v = new  g2o::VertexSE3();
+    for (int i(0); i < beaconset.rows(); ++i) {
+        auto *v = new g2o::VertexSE3();
         double p[6] = {0};
-        for(int j(0);j<3;++j)
-        {
+        for (int j(0); j < 3; ++j) {
 //            p[j] = beaconset(i, j);
             p[j] = 0.0;
         }
@@ -417,7 +408,7 @@ int main(int argc, char *argv[]) {
         v->setEstimateData(p);
 //        if(0==i||1==i)
         v->setFixed(false);
-        v->setId(beacon_id+i);
+        v->setId(beacon_id + i);
         globalOptimizer.addVertex(v);
     }
 
@@ -449,19 +440,15 @@ int main(int argc, char *argv[]) {
             if (imu_index == 0 || (Zupt(imu_index, 0) > 0.5 && Zupt(imu_index - 1, 0) < 0.5)) {
                 auto the_transform = gekf.getTransformation();
                 bool not_nan = true;
-                for(int i(0);i<the_transform.rows();++i)
-                {
-                    for(int j(0);j<the_transform.cols();++j)
-                    {
-                        if(std::isnan(the_transform(i,j)))
-                        {
+                for (int i(0); i < the_transform.rows(); ++i) {
+                    for (int j(0); j < the_transform.cols(); ++j) {
+                        if (std::isnan(the_transform(i, j))) {
                             not_nan = false;
                         }
                     }
                 }
 
-                if(!not_nan)
-                {
+                if (!not_nan) {
 //                    continue;
                     the_transform = latest_transform;
 
@@ -543,7 +530,7 @@ int main(int argc, char *argv[]) {
 
                     edge_se3->setMeasurement(latest_transform.inverse() * the_transform);
 
-                    edge_vector.push_back(latest_transform.inverse()*the_transform);
+                    edge_vector.push_back(latest_transform.inverse() * the_transform);
 
 
 //                    double tmp_data[10]={0};
@@ -554,7 +541,7 @@ int main(int argc, char *argv[]) {
 //                    }
 //                    out_v_before << std::endl;
 
-                    out_v_before<< delta_ori/180.0*M_PI <<std::endl;
+                    out_v_before << delta_ori / 180.0 * M_PI << std::endl;
 
                     globalOptimizer.addEdge(edge_se3);
 
@@ -564,7 +551,7 @@ int main(int argc, char *argv[]) {
                 /// add range edge
 
                 //  get measurement
-                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 3.0 ) {
+                if (std::abs(UwbData(uwb_index, 0) - ImuData(imu_index, 0)) < 3.0) {
 
                     Eigen::VectorXd uwb_measure;
 
@@ -572,7 +559,7 @@ int main(int argc, char *argv[]) {
                     uwb_measure.setZero();
 
 
-                    uwb_measure = UwbData.block(uwb_index,1,1,uwb_measure.rows()).transpose();
+                    uwb_measure = UwbData.block(uwb_index, 1, 1, uwb_measure.rows()).transpose();
 
 //                    if (uwb_index == 0 || uwb_index > UwbData.rows() - 3) {
 //                        uwb_measure = UwbData.block(uwb_index, 1, 1, uwb_measure.rows()).transpose();
@@ -586,10 +573,9 @@ int main(int argc, char *argv[]) {
                     // build and add edge
 
                     for (int bi(0); bi < uwb_measure.rows(); ++bi) {
-                        if( bi == 10
+                        if (bi == 10
 
-                                )
-                        {
+                                ) {
                             break;
                         }
                         auto *dist_edge = new DistanceEdge();
@@ -599,20 +585,17 @@ int main(int argc, char *argv[]) {
                         dist_edge->setMeasurement((uwb_measure(bi)));
 
                         Eigen::Matrix<double, 1, 1> information;
-                        if(uwb_err_threshold>1.0)
-                        {
-                            information(0, 0) = 1/UwbValid(uwb_index,0)+1.0;
+                        if (uwb_err_threshold > 1.0) {
+                            information(0, 0) = 1 / UwbValid(uwb_index, 0) + 1.0;
 //                                          distance_sigma = UwbValid(uwb_index,0);
-                        }
-                        else{
-                            information(0,0) = distance_info;
+                        } else {
+                            information(0, 0) = distance_info;
                         }
 
                         dist_edge->setInformation(information);
                         dist_edge->setSigma(distance_sigma);
 
-                        if(uwb_measure(bi)>0)
-                        {
+                        if (uwb_measure(bi) > 0) {
 
                             globalOptimizer.addEdge(dist_edge);
                         }
@@ -626,7 +609,7 @@ int main(int argc, char *argv[]) {
                 latest_transform = the_transform;
 
                 /// increase trace id
-                trace_id ++;
+                trace_id++;
 
             }
 
@@ -651,27 +634,26 @@ int main(int argc, char *argv[]) {
 
 
     /// 4. plot result
-    std::ofstream out_result("./ResultData/" + std::to_string(data_num)+ "test.txt");
-    std::vector<double> gx,gy;
-    for(int vid(0);vid<trace_id;++vid)
-    {
+    std::ofstream out_result("./ResultData/" + std::to_string(data_num) + "test.txt");
+    std::vector<double> gx, gy;
+    for (int vid(0); vid < trace_id; ++vid) {
         double data[10] = {0};
         globalOptimizer.vertex(vid)->getEstimateData(data);
         gx.push_back(data[0]);
         gy.push_back(data[1]);
-        out_result << data[0] << " " << data[1] <<" "<< data[2]<< std::endl;
+        out_result << data[0] << " " << data[1] << " " << data[2] << std::endl;
     }
     out_result.close();
 
     //// 5.compute error
-    std::ofstream out_err("./ResultData/" + std::to_string(data_num)+ "err.txt");
+    std::ofstream out_err("./ResultData/" + std::to_string(data_num) + "err.txt");
     std::vector<double> error_vec;
     out_err.precision(10);
     double err_sum(0.0);
     double online_err_sum(0.0);
-    std::vector<double> rix,riy;
+    std::vector<double> rix, riy;
 
-    std::ofstream("./ResultData/"+std::to_string(data_num)+"real_pose_ir.txt");
+    std::ofstream("./ResultData/" + std::to_string(data_num) + "real_pose_ir.txt");
 
 
     //// PLOT BEACONSET
@@ -690,11 +672,11 @@ int main(int argc, char *argv[]) {
 
     plt::plot(bx, by, "r*");
 
-    plt::plot(gx,gy,"r-+");
+    plt::plot(gx, gy, "r-+");
     plt::grid(true);
 
 
-    std::ofstream out_para_res("./ResultData/para_err.txt",std::ios::app);
+    std::ofstream out_para_res("./ResultData/para_err.txt", std::ios::app);
 
     out_para_res.precision(10);
 
@@ -708,11 +690,11 @@ int main(int argc, char *argv[]) {
                  << "max_iterate:" << max_optimize_times
                  << "time_offset:" << time_offset
                  << "delay_times:" << delay_times
-                 << "err:" <<err_sum/double(error_vec.size())
+                 << "err:" << err_sum / double(error_vec.size())
                  << std::endl;
 
 
-    plt::title("erro is :"+std::to_string(err_sum/double(error_vec.size())));
+    plt::title("erro is :" + std::to_string(err_sum / double(error_vec.size())));
 //
     plt::show();
 

@@ -62,8 +62,8 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 }
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+
     /// All paramaters for algorithm
 
     int only_method = 3;
@@ -134,44 +134,8 @@ int main(int argc, char *argv[])
 
 
     std::string out_dir_name = "./";
-    std::string dir_name = "/home/steve/locate/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/";
 
-    /**
-     * Parameters:
-     * ## pf only uwb
-     * 1. only uwb methond 0-with x y a w 3- only x y
-     * 2. particle_num
-     * 3. transpose sigma
-     * 4. evaluation sigma
-     *
-     * ## pf uwb and imu
-     *
-     * 1. particle num
-     * 2. transpose sigma
-     * 3. evaluation sigma
-     *
-     * ## which data
-     * 1. data_number 1-5
-     *
-     * ## dir_name
-     */
-//    if (argc == 10 || argc == 9) {
-//        only_method = atoi(argv[1]);
-//        only_particle_num = atoi(argv[2]);
-//        only_transpose_sigma = atof(argv[3]);
-//        only_eval_sigma = atof(argv[4]);
-//
-//        fus_particle_num = atoi(argv[5]);
-//        fus_transpose_sigma = atof(argv[6]);
-//        fus_eval_sigma = atof(argv[7]);
-//
-//        data_num = atoi(argv[8]);
-//        if (argc == 10) {
-//            out_dir_name = std::string(argv[9]);
-//        } else {
-//            out_dir_name = dir_name;
-//        }
-//    }
 
     dir_name = dir_name + std::to_string(data_num);
     if (argc != 10) {
@@ -181,6 +145,113 @@ int main(int argc, char *argv[])
     std::cout.precision(20); //
 
     double first_t(TimeStamp::now());
+
+    /**
+     * Load data
+     */
+    CppExtent::CSVReader UwbRawReader(dir_name + "uwb_result.csv");
+
+    Eigen::MatrixXd uwb_raw(UwbRawReader.GetMatrix().GetRows(), UwbRawReader.GetMatrix().GetCols());
+
+    for (int i(0); i < uwb_raw.rows(); ++i) {
+        for (int j(0); j < uwb_raw.cols(); ++j) {
+            uwb_raw(i, j) = *(UwbRawReader.GetMatrix()(i, j));
+        }
+    }
+
+
+    CppExtent::CSVReader ImuDataReader(dir_name + "sim_imu.csv"),
+            ZuptReader(dir_name + "sim_zupt.csv");
+
+    auto ImuDataTmp(ImuDataReader.GetMatrix()), ZuptTmp(ZuptReader.GetMatrix());
+
+    Eigen::MatrixXd ImuData, Zupt;
+    ImuData.resize(ImuDataTmp.GetRows(), ImuDataTmp.GetCols());
+    Zupt.resize(ZuptTmp.GetRows(), ZuptTmp.GetCols());
+
+    for (int i(0); i < ImuDataTmp.GetRows(); ++i) {
+        for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
+            ImuData(i, j) = *ImuDataTmp(i, j);
+        }
+        Zupt(i, 0) = int(*ZuptTmp(i, 0));
+    }
+
+    CppExtent::CSVReader ZuptResultReader(dir_name + "sim_pose.csv");
+    CppExtent::CSVReader QuatReader(dir_name + "all_quat.csv");
+    CppExtent::CSVReader VertexTime(dir_name + "vertex_time.csv");
+
+    Eigen::MatrixXd v_high(1, 1);
+
+    if (with_high) {
+        CppExtent::CSVReader VertexHigh(dir_name + "vertex_high_modified.csv");
+
+        v_high.resize(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
+//        v_high.setZero(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
+
+        auto v_high_matrix = VertexHigh.GetMatrix();
+
+        for (int i(0); i < v_high.rows(); ++i) {
+            for (int j(0); j < v_high.cols(); ++j) {
+                v_high(i, j) = *v_high_matrix(i, j);
+            }
+        }
+    }
+
+    Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(), ZuptResultReader.GetMatrix().GetCols());
+    Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(), QuatReader.GetMatrix().GetCols());
+    Eigen::MatrixXd v_time(VertexTime.GetMatrix().GetRows(), VertexTime.GetMatrix().GetCols());
+
+    for (int i(0); i < zupt_res.rows(); ++i) {
+        for (int j(0); j < zupt_res.cols(); ++j) {
+            zupt_res(i, j) = *(ZuptResultReader.GetMatrix()(i, j));
+        }
+    }
+
+    for (int i(0); i < quat.rows(); ++i) {
+        for (int j(0); j < quat.cols(); ++j) {
+            quat(i, j) = *(QuatReader.GetMatrix()(i, j));
+        }
+    }
+
+    for (int i(0); i < v_time.rows(); ++i) {
+        for (int j(0); j < v_time.cols(); ++j) {
+            v_time(i, j) = *(VertexTime.GetMatrix()(i, j));
+        }
+    }
+
+    /**
+     * Build graph and optimizer
+     */
+    g2o::SparseOptimizer globalOptimizer;
+
+
+    typedef g2o::BlockSolverX SlamBlockSolver;
+//    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+
+    // Initial solver
+    SlamLinearSolver *linearSolver = new SlamLinearSolver();
+//    linearSolver->setBlockOrdering(false);
+    linearSolver->setWriteDebug(true);
+    SlamBlockSolver *blockSolver = new SlamBlockSolver(linearSolver);
+    g2o::OptimizationAlgorithmLevenberg *solver =
+            new g2o::OptimizationAlgorithmLevenberg(blockSolver);
+    globalOptimizer.setAlgorithm(solver);
+
+
+    /// ROBUST KERNEL
+    static g2o::RobustKernel *robustKernel =
+            g2o::RobustKernelFactory::instance()->construct("Cauchy");
+
+    /**
+     * Main loop
+     */
+
+
+    /**
+     * Save and show
+     */
+
 
 
 }

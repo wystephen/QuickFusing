@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 
     int out_delay_times = 4;
 
-    int data_num = 5;
+    int data_num = 93;
 
 
     if (argc == 14) {
@@ -182,20 +182,6 @@ int main(int argc, char *argv[]) {
 
     Eigen::MatrixXd v_high(1, 1);
 
-    if (with_high) {
-        CppExtent::CSVReader VertexHigh(dir_name + "vertex_high_modified.csv");
-
-        v_high.resize(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
-//        v_high.setZero(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
-
-        auto v_high_matrix = VertexHigh.GetMatrix();
-
-        for (int i(0); i < v_high.rows(); ++i) {
-            for (int j(0); j < v_high.cols(); ++j) {
-                v_high(i, j) = *v_high_matrix(i, j);
-            }
-        }
-    }
 
     Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(), ZuptResultReader.GetMatrix().GetCols());
     Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(), QuatReader.GetMatrix().GetCols());

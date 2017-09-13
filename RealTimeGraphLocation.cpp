@@ -239,12 +239,12 @@ int main(int argc, char *argv[]) {
     init_para.init_heading1_ = 0.0;// -2.0;//M_PI / 2.0;
 
 
-    init_para.sigma_acc_ = 0.5 * Eigen::Vector3d(1,1,1);
-    init_para.sigma_gyro_= 0.5 * Eigen::Vector3d(1,1,1) * M_PI / 180.0;
+    init_para.sigma_acc_ = 0.5 * Eigen::Vector3d(1, 1, 1);
+    init_para.sigma_gyro_ = 0.5 * Eigen::Vector3d(1, 1, 1) * M_PI / 180.0;
 
     init_para.sigma_initial_pos1_ *= 1e-3;
 //    init_para.sigma_initial_vel1_ *=
-    init_para.sigma_initial_att1_ = Eigen::Vector3d(0.1,0.1,0.1) * M_PI / 180.0;
+    init_para.sigma_initial_att1_ = Eigen::Vector3d(0.1, 0.1, 0.1) * M_PI / 180.0;
 
 //    init_para.Ts_ = 0.005f;//1.0/ 200.0;
 //    init_para.Ts_ = 1.0f/100.0f;//1.0/ 200.0;
@@ -261,9 +261,9 @@ int main(int argc, char *argv[]) {
     /**
      * Vector for save result
      */
-    std::vector<double> online_gx,online_gy,online_gz;
-    std::vector<double> gx,gy,gz;
-    std::vector<double> imu_x,imu_y,imu_z;
+    std::vector<double> online_gx, online_gy, online_gz;
+    std::vector<double> gx, gy, gz;
+    std::vector<double> imu_x, imu_y, imu_z;
 
 
     /**
@@ -273,34 +273,28 @@ int main(int argc, char *argv[]) {
 
     int trace_id = 0;
 
-    for(int beacon_id(0);beacon_id<uwb_raw.cols()-1;++beacon_id)
-    {
-        auto *v= new g2o::VertexSE3();
+    for (int beacon_id(0); beacon_id < uwb_raw.cols() - 1; ++beacon_id) {
+        auto *v = new g2o::VertexSE3();
         double p[6] = {0};
         v->setEstimateData(p);
         v->setFixed(false);
-        v->setId(beacon_offset+beacon_id);
+        v->setId(beacon_offset + beacon_id);
         globalOptimizer.addVertex(v);
 
     }
 
     bool last_zupt_flag = false;
 
-    for(int index(0);index < imu_data.rows();++index)
-    {
+    for (int index(0); index < imu_data.rows(); ++index) {
         bool zupt_flag = false;
 
-        if(index > init_para.ZeroDetectorWindowSize_)
-        {
-            zupt_flag=GLRT_Detector(imu_data.block(index-init_para.ZeroDetectorWindowSize_,1,
-            init_para.ZeroDetectorWindowSize_,6),init_para);
+        if (index > init_para.ZeroDetectorWindowSize_) {
+            zupt_flag = GLRT_Detector(imu_data.block(index - init_para.ZeroDetectorWindowSize_, 1,
+                                                     init_para.ZeroDetectorWindowSize_, 6), init_para);
         }
 
 
-
-
-
-       last_zupt_flag = zupt_flag;
+        last_zupt_flag = zupt_flag;
     }
 
 

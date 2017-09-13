@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/";
 
 
-    dir_name = dir_name + std::to_string(data_num)+"/";
+    dir_name = dir_name + std::to_string(data_num) + "/";
     if (argc != 10) {
         out_dir_name = dir_name;
     }
@@ -171,10 +171,10 @@ int main(int argc, char *argv[]) {
     for (int i(0); i < ImuDataTmp.GetRows(); ++i) {
         for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
             imu_data(i, j) = *ImuDataTmp(i, j);
-            if (0 < j&& j < 4) {
+            if (0 < j && j < 4) {
                 imu_data(i, j) *= 9.81;
-            } else if (4 <= j && j< 7) {
-                imu_data(i,j) *= (M_PI/180.0f);
+            } else if (4 <= j && j < 7) {
+                imu_data(i, j) *= (M_PI / 180.0f);
             }
         }
 //        Zupt(i, 0) = int(*ZuptTmp(i, 0));
@@ -234,9 +234,9 @@ int main(int argc, char *argv[]) {
     /**
      * Vector for save result
      */
-    std::vector<double> online_gx, online_gy, online_gz;
-    std::vector<double> gx, gy, gz;
-    std::vector<double> imu_x, imu_y, imu_z;
+    std::vector<double> online_gx, online_gy, online_gz;// online graph optimize output
+    std::vector<double> gx, gy, gz;// graph_optimizer output
+    std::vector<double> imu_x, imu_y, imu_z;// imu output
 
 
     /**
@@ -264,11 +264,13 @@ int main(int argc, char *argv[]) {
         if (index > init_para.ZeroDetectorWindowSize_) {
 //            std::cout << "index :" << index << std::endl;
             zupt_flag = GLRT_Detector(imu_data.block(index - init_para.ZeroDetectorWindowSize_, 1,
-                                                     init_para.ZeroDetectorWindowSize_, 6).transpose().eval()
-                    , init_para);
+                                                     init_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
+                                      init_para);
         }
-std::cout << "zupt flag:" << zupt_flag<< std::endl;
-        zupt_v.push_back(zupt_flag?1.0:0.0);
+//        std::cout << "zupt flag:" << zupt_flag << std::endl;
+        zupt_v.push_back(zupt_flag ? 1.0 : 0.0);
+
+
 
 
         last_zupt_flag = zupt_flag;
@@ -282,7 +284,7 @@ std::cout << "zupt flag:" << zupt_flag<< std::endl;
      * Save and show
      */
 
-    plt::plot(zupt_v,"r-+");
+    plt::plot(zupt_v, "r-+");
     plt::show();
 
 

@@ -35,6 +35,7 @@ bool GLRT_Detector(Eigen::MatrixXd u,
         if (std::isnan(tmp.sum())) {
             std::cout << "nan at tmp in " << __FUNCTION__ << ":"
                       << __FILE__ << ":" << __LINE__ << std::endl;
+//            throw(std::expe)
         }
 
 //        std::cout << " u block size : " << u.block(3,i,3,1).rows()<< std::endl;

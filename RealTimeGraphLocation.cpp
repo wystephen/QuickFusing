@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/";
 
 
-    dir_name = dir_name + std::to_string(data_num);
+    dir_name = dir_name + std::to_string(data_num)+"/";
     if (argc != 10) {
         out_dir_name = dir_name;
     }
@@ -161,50 +161,20 @@ int main(int argc, char *argv[]) {
     }
 
 
-    CppExtent::CSVReader ImuDataReader(dir_name + "sim_imu.csv"),
-            ZuptReader(dir_name + "sim_zupt.csv");
+    CppExtent::CSVReader ImuDataReader(dir_name + "sim_imu.csv");
 
-    auto ImuDataTmp(ImuDataReader.GetMatrix()), ZuptTmp(ZuptReader.GetMatrix());
+    auto ImuDataTmp(ImuDataReader.GetMatrix());//, ZuptTmp(ZuptReader.GetMatrix());
 
     Eigen::MatrixXd imu_data, Zupt;
     imu_data.resize(ImuDataTmp.GetRows(), ImuDataTmp.GetCols());
-    Zupt.resize(ZuptTmp.GetRows(), ZuptTmp.GetCols());
 
     for (int i(0); i < ImuDataTmp.GetRows(); ++i) {
         for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
             imu_data(i, j) = *ImuDataTmp(i, j);
         }
-        Zupt(i, 0) = int(*ZuptTmp(i, 0));
+//        Zupt(i, 0) = int(*ZuptTmp(i, 0));
     }
 
-    CppExtent::CSVReader ZuptResultReader(dir_name + "sim_pose.csv");
-    CppExtent::CSVReader QuatReader(dir_name + "all_quat.csv");
-    CppExtent::CSVReader VertexTime(dir_name + "vertex_time.csv");
-
-    Eigen::MatrixXd v_high(1, 1);
-
-
-    Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(), ZuptResultReader.GetMatrix().GetCols());
-    Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(), QuatReader.GetMatrix().GetCols());
-    Eigen::MatrixXd v_time(VertexTime.GetMatrix().GetRows(), VertexTime.GetMatrix().GetCols());
-
-    for (int i(0); i < zupt_res.rows(); ++i) {
-        for (int j(0); j < zupt_res.cols(); ++j) {
-            zupt_res(i, j) = *(ZuptResultReader.GetMatrix()(i, j));
-        }
-    }
-
-    for (int i(0); i < quat.rows(); ++i) {
-        for (int j(0); j < quat.cols(); ++j) {
-            quat(i, j) = *(QuatReader.GetMatrix()(i, j));
-        }
-    }
-
-    for (int i(0); i < v_time.rows(); ++i) {
-        for (int j(0); j < v_time.cols(); ++j) {
-            v_time(i, j) = *(VertexTime.GetMatrix()(i, j));
-        }
-    }
 
     /**
      * Build graph and optimizer
@@ -289,9 +259,13 @@ int main(int argc, char *argv[]) {
         bool zupt_flag = false;
 
         if (index > init_para.ZeroDetectorWindowSize_) {
+//            std::cout << "index :" << index << std::endl;
             zupt_flag = GLRT_Detector(imu_data.block(index - init_para.ZeroDetectorWindowSize_, 1,
-                                                     init_para.ZeroDetectorWindowSize_, 6), init_para);
+                                                     init_para.ZeroDetectorWindowSize_, 6).transpose().eval()
+                    , init_para);
         }
+
+        zupt_v.push_back(zupt_flag?1.0:0.0);
 
 
         last_zupt_flag = zupt_flag;
@@ -305,6 +279,8 @@ int main(int argc, char *argv[]) {
      * Save and show
      */
 
+    plt::plot(zupt_v,"r-+");
+    plt::show();
 
 
 }

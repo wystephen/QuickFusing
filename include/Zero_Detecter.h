@@ -15,6 +15,7 @@
 #define IMU_NAVIGATION_ZERO_DETECTER_H
 bool GLRT_Detector(Eigen::MatrixXd u,
                    const SettingPara &para_) {
+    assert(u.rows()!=6);
     Eigen::Vector3d ya_m;
     double g = para_.gravity_;
 

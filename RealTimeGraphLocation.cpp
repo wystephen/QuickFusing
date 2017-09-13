@@ -271,8 +271,6 @@ int main(int argc, char *argv[]) {
         zupt_v.push_back(zupt_flag ? 1.0 : 0.0);
 
 
-
-
         last_zupt_flag = zupt_flag;
     }
 

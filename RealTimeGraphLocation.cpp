@@ -171,6 +171,11 @@ int main(int argc, char *argv[]) {
     for (int i(0); i < ImuDataTmp.GetRows(); ++i) {
         for (int j(0); j < ImuDataTmp.GetCols(); ++j) {
             imu_data(i, j) = *ImuDataTmp(i, j);
+            if (0 < j&& j < 4) {
+                imu_data(i, j) *= 9.81;
+            } else if (4 <= j && j< 7) {
+                imu_data(i,j) *= (M_PI/180.0f);
+            }
         }
 //        Zupt(i, 0) = int(*ZuptTmp(i, 0));
     }
@@ -209,8 +214,8 @@ int main(int argc, char *argv[]) {
     init_para.init_heading1_ = 0.0;
 
 
-//    init_para.sigma_acc_ = 0.0 * Eigen::Vector3d(1, 1, 1);
-//    init_para.sigma_gyro_ = 4.0 * Eigen::Vector3d(1, 1, 1) * M_PI / 180.0;
+    init_para.sigma_acc_ = 0.5 * Eigen::Vector3d(1, 1, 1);
+    init_para.sigma_gyro_ = 0.5 * Eigen::Vector3d(1, 1, 1) * M_PI / 180.0;
     init_para.ZeroDetectorWindowSize_ = 10;
 
     init_para.sigma_initial_pos1_ *= 1e-3;
@@ -262,7 +267,7 @@ int main(int argc, char *argv[]) {
                                                      init_para.ZeroDetectorWindowSize_, 6).transpose().eval()
                     , init_para);
         }
-
+std::cout << "zupt flag:" << zupt_flag<< std::endl;
         zupt_v.push_back(zupt_flag?1.0:0.0);
 
 

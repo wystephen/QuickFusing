@@ -12,7 +12,7 @@
 
 
 #include <deque>
-
+class SettingPara; // forward declaration
 class MyEkf {
 public:
     MyEkf(SettingPara para) {

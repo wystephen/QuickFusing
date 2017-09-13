@@ -209,8 +209,9 @@ int main(int argc, char *argv[]) {
     init_para.init_heading1_ = 0.0;
 
 
-    init_para.sigma_acc_ = 10.0 * Eigen::Vector3d(1, 1, 1);
-    init_para.sigma_gyro_ = 400.0 * Eigen::Vector3d(1, 1, 1) * M_PI / 180.0;
+//    init_para.sigma_acc_ = 0.0 * Eigen::Vector3d(1, 1, 1);
+//    init_para.sigma_gyro_ = 4.0 * Eigen::Vector3d(1, 1, 1) * M_PI / 180.0;
+    init_para.ZeroDetectorWindowSize_ = 10;
 
     init_para.sigma_initial_pos1_ *= 1e-3;
     init_para.sigma_initial_att1_ = Eigen::Vector3d(0.1, 0.1, 0.1) * M_PI / 180.0;
@@ -253,7 +254,7 @@ int main(int argc, char *argv[]) {
     bool last_zupt_flag = false;
 
     for (int index(0); index < imu_data.rows(); ++index) {
-        bool zupt_flag = false;
+        bool zupt_flag = true;
 
         if (index > init_para.ZeroDetectorWindowSize_) {
 //            std::cout << "index :" << index << std::endl;

@@ -461,7 +461,7 @@ int main(int argc, char *argv[]) {
 
 
     globalOptimizer.initializeOptimization();
-    globalOptimizer.optimize(1000);
+    globalOptimizer.optimize(2);
 
 
     /**

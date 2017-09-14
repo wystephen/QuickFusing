@@ -332,7 +332,9 @@ int main(int argc, char *argv[]) {
 
 
         if (uwb_raw(uwb_data_index, 0) < imu_data(imu_data_index, 0)) {
+            /// next uwb raw
             uwb_data_index++;
+
         } else {
 
             bool zupt_flag = true;
@@ -374,7 +376,7 @@ int main(int argc, char *argv[]) {
                 /// add vertex
                 auto *v = new g2o::VertexSE3();
                 v->setId(trace_id);
-                v->setEstimate(before_state * last_transform.inverse() * the_transform);
+//                v->setEstimate(before_state * last_transform.inverse() * the_transform);
 
                 globalOptimizer.addVertex(v);
 
@@ -446,51 +448,50 @@ int main(int argc, char *argv[]) {
 
                 /// add range edge
 
-                if (std::abs(uwb_raw(uwb_data_index, 0) - imu_data(imu_data_index, 0)) < 1.0) {
+//                if (std::abs(uwb_raw(uwb_data_index, 0) - imu_data(imu_data_index, 0)) < 1.0) {
 
-                    Eigen::VectorXd uwb_measure;
+                Eigen::VectorXd uwb_measure;
 
-                    uwb_measure.resize(uwb_raw.cols() - 1);
-                    uwb_measure.setZero();
+                uwb_measure.resize(uwb_raw.cols() - 1);
+                uwb_measure.setZero();
 
 
-                    if (uwb_data_index == 0 || uwb_data_index > uwb_raw.rows() - 3) {
-                        uwb_measure = uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
-                    } else {
-                        uwb_measure += uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
-                        uwb_measure += uwb_raw.block(uwb_data_index + 1, 1, 1, uwb_measure.rows()).transpose();
+                if (uwb_data_index == 0 || uwb_data_index > uwb_raw.rows() - 3) {
+                    uwb_measure = uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
+                } else {
+                    uwb_measure += uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
+                    uwb_measure += uwb_raw.block(uwb_data_index + 1, 1, 1, uwb_measure.rows()).transpose();
 
-                        uwb_measure /= 2.0;
-                    }
+                    uwb_measure /= 2.0;
+                }
 
-                    // build and add edge
+                // build and add edge
 
-                    for (int bi(0); bi < uwb_measure.rows(); ++bi) {
+                for (int bi(0); bi < uwb_measure.rows(); ++bi) {
 //                        if (bi == 10) {
 //                            break;
 //                        }
-                        if(uwb_measure(bi)<0.3)
-                        {
-                            continue;
-                        }
-                        auto *dist_edge = new DistanceEdge();
-                        dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + bi);
-                        dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
-
-                        dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
-
-                        Eigen::Matrix<double, 1, 1> information;
-                        information(0, 0) = distance_info;
-
-                        dist_edge->setInformation(information);
-                        dist_edge->setSigma(distance_sigma);
-                        dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
-
-                        globalOptimizer.addEdge(dist_edge);
+                    if (uwb_measure(bi) < 0.1) {
+                        continue;
                     }
+                    auto *dist_edge = new DistanceEdge();
+                    dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + bi);
+                    dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
+                    dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
 
+                    Eigen::Matrix<double, 1, 1> information;
+                    information(0, 0) = distance_info;
+
+                    dist_edge->setInformation(information);
+                    dist_edge->setSigma(distance_sigma);
+//                        dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
+
+                    globalOptimizer.addEdge(dist_edge);
                 }
+
+
+//                }
 
                 /// try online optimize
 
@@ -517,7 +518,9 @@ int main(int argc, char *argv[]) {
 
                 /// updata transform matrix
                 last_transform = the_transform;
+
                 trace_id++;
+
             }
 
 

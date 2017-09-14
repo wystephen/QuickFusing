@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
 
 
     double distance_info = 5.0;
-    double distance_sigma = 2.0;
+    double distance_sigma = 3.0;
 
 
     double z_offset = 1.90 - 1.12;
@@ -274,7 +274,7 @@ int main(int argc, char *argv[]) {
     /**
      * Main loop
      */
-    int beacon_id_offset = 200000;// beacon_offset
+    int beacon_id_offset = 8000;// beacon_offset
 
     int trace_id = 0;
 
@@ -293,34 +293,22 @@ int main(int argc, char *argv[]) {
     int imu_data_index(0);
 
 
-    bool last_zupt_flag = false;
+    bool last_zupt_flag = true;
     double last_theta = 0.0;
 
-    Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
+    Eigen::Isometry3d last_transform = myekf.getTransformation();// Eigen::Isometry3d::Identity();
+    last_theta = myekf.getOriente();
 
 
     /**
   * Spacial preprocess !!!!
   * set z of beaconset to zero
   */
-//    for (int i(0); i < beaconset.rows(); ++i) {
-//        beaconset(i, 2) = 0.0;
-//    }
 
 
 
     /// add beacon vertex
-    for (int i(0); i < uwb_raw.cols() - 1; ++i) {
-        auto *v = new g2o::VertexSE3();
-        double p[6] = {0};
-//        for (int j(0); j < 3; ++j) {
-//            p[j] = beaconset(i, j);
-//        }
-        v->setEstimateData(p);
-        v->setFixed(false);
-        v->setId(beacon_id_offset + i);
-        globalOptimizer.addVertex(v);
-    }
+
 
     bool tmp_set_bool(true);// avoid the warning given by IDE...
     while (tmp_set_bool) {
@@ -364,9 +352,10 @@ int main(int argc, char *argv[]) {
 
                 /// add vertex
                 auto *v = new g2o::VertexSE3();
+                double p[6] = {0};
                 v->setId(trace_id);
-//                v->setEstimate(before_state * last_transform.inverse() * the_transform);
-
+                v->setFixed(false);
+                v->setEstimateData(p);
                 globalOptimizer.addVertex(v);
 
                 /// get delta theta
@@ -389,10 +378,6 @@ int main(int argc, char *argv[]) {
                 }
 
                 last_theta = the_theta;
-                std::cout << "current delta theta : " << delta_ori << std::endl;
-
-//                std::cout << trace_id << " " << delta_ori << "   " << is_corner
-//                          << is_corner << is_corner << is_corner << std::endl;
 
                 ///add transform edge
 
@@ -414,23 +399,10 @@ int main(int argc, char *argv[]) {
                     }
 
                     edge_se3->setInformation(information);
-
                     edge_se3->setMeasurement(last_transform.inverse() * the_transform);
 
-//                edge_vector.push_back(latest_transform.inverse() * the_transform);
 
-
-//                    double tmp_data[10]={0};
-//                    edge_se3->getMeasurementData(tmp_data);
-//                    for(int ti(0);ti<7;++ti)
-//                    {
-//                        out_v_before<< tmp_data[ti] << " ";
-//                    }
-//                    out_v_before << std::endl;
-
-//                out_v_before << delta_ori / 180.0 * M_PI << std::endl;
-
-//                    globalOptimizer.addEdge(edge_se3);
+                    globalOptimizer.addEdge(edge_se3);
 
 
                 }
@@ -444,38 +416,27 @@ int main(int argc, char *argv[]) {
                     uwb_measure.resize(uwb_raw.cols() - 1);
                     uwb_measure.setZero();
 
-
-                    if (uwb_data_index == 0 || uwb_data_index > uwb_raw.rows() - 3) {
-                        uwb_measure = uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
-                    } else {
-                        uwb_measure += uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
-                        uwb_measure += uwb_raw.block(uwb_data_index + 1, 1, 1, uwb_measure.rows()).transpose();
-
-                        uwb_measure /= 2.0;
-                    }
-
-                    // build and add edge
+                    uwb_measure = uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
 
                     for (int bi(0); bi < uwb_measure.rows(); ++bi) {
-//                        if (bi == 10) {
-//                            break;
-//                        }
                         if ((uwb_measure(bi) - z_offset) < 0.1) {
                             continue;
-                        }else{
+                        } else {
                             auto *dist_edge = new DistanceEdge();
                             dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + bi);
                             dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-//                    if(uwb_measure(bi)>z_offset)
-                            dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
+                            std::cout << "trace id:"<<trace_id << "beaconid:" << bi << std::endl;
+
+                            dist_edge->setMeasurement(
+                                    std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
 
                             Eigen::Matrix<double, 1, 1> information;
                             information(0, 0) = distance_info;
 
                             dist_edge->setInformation(information);
                             dist_edge->setSigma(distance_sigma);
-                        dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
+//                            dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
 
                             globalOptimizer.addEdge(dist_edge);
                         }
@@ -485,28 +446,7 @@ int main(int argc, char *argv[]) {
 
                 }
 
-                /// try online optimize
 
-//                int last_offset(delay_times);
-//                if (trace_id > last_offset) {
-//                    globalOptimizer.vertex(trace_id - last_offset + 1)->setFixed(true);
-//
-//                }
-//
-//                if (trace_id >= out_delay_times) {
-//                    double td[10] = {0};
-//                    globalOptimizer.vertex(trace_id - out_delay_times)->getEstimateData(td);
-//                    online_gx.push_back(td[0]);
-//                    online_gy.push_back(td[1]);
-//                }
-//
-//                if (trace_id > 10) {
-//                    double time_before(TimeStamp::now());
-//                    globalOptimizer.initializeOptimization();
-//                    globalOptimizer.optimize(max_optimize_times);
-////                        std::cout << "One step optimize" << TimeStamp::now() - time_before << std::endl;
-//
-//                }
 
                 /// updata transform matrix
                 last_transform = the_transform;
@@ -541,7 +481,7 @@ int main(int argc, char *argv[]) {
     }
 
 //    plt::plot(zupt_v, "r-+");
-    plt::plot(imu_x,imu_y,"g-+");
+    plt::plot(imu_x, imu_y, "g-+");
     plt::plot(online_gx, online_gy, "b-+");
     plt::plot(gx, gy, "r-+");
     plt::show();

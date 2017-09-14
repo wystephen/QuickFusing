@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
     double turn_threshold = 1.0;
     double corner_ratio = 10.0;
 
-    int max_optimize_times = 4000;
+    int max_optimize_times = 40;
 
     double time_offset = 0.0;
 
@@ -347,81 +347,84 @@ int main(int argc, char *argv[]) {
             zupt_v.push_back(zupt_flag ? 1.0 : 0.0);
 
 
-            auto ekf_output = myekf.GetPosition(
-                    imu_data.block(imu_data_index, 1, 1, 6).transpose(),
-                    (zupt_flag ? 1.0 : 0.0)
-            );
+            if (zupt_flag && !last_zupt_flag) {
 
-            auto the_transform = myekf.getTransformation();
+
+                auto ekf_output = myekf.GetPosition(
+                        imu_data.block(imu_data_index, 1, 1, 6).transpose(),
+                        (zupt_flag ? 1.0 : 0.0)
+                );
+
+                auto the_transform = myekf.getTransformation();
 /// generate better estimate
 
-            Eigen::Isometry3d before_state = Eigen::Isometry3d::Identity();
-            if (imu_data_index > 0) {
-                double before_data[10] = {0};
-                globalOptimizer.vertex(trace_id - 1)->getEstimateData(before_data);
+                Eigen::Isometry3d before_state = Eigen::Isometry3d::Identity();
+                if (imu_data_index > 0) {
+                    double before_data[10] = {0};
+                    globalOptimizer.vertex(trace_id - 1)->getEstimateData(before_data);
 
-                Eigen::Vector3d offset(before_data[0], before_data[1], before_data[2]);
+                    Eigen::Vector3d offset(before_data[0], before_data[1], before_data[2]);
 
-                Eigen::Quaterniond qq(before_data[6], before_data[3], before_data[4], before_data[5]);
+                    Eigen::Quaterniond qq(before_data[6], before_data[3], before_data[4], before_data[5]);
 
-                before_state = tq2Transform(offset, qq);
+                    before_state = tq2Transform(offset, qq);
 
-            }
+                }
 
-            /// add vertex
-            auto *v = new g2o::VertexSE3();
-            v->setId(trace_id);
-            v->setEstimate(before_state * last_transform.inverse() * the_transform);
+                /// add vertex
+                auto *v = new g2o::VertexSE3();
+                v->setId(trace_id);
+                v->setEstimate(before_state * last_transform.inverse() * the_transform);
 
-            globalOptimizer.addVertex(v);
+                globalOptimizer.addVertex(v);
 
-            /// get delta theta
-            double the_theta(myekf.getOriente());
-            double delta_ori = the_theta - last_theta;
+                /// get delta theta
+                double the_theta(myekf.getOriente());
+                double delta_ori = the_theta - last_theta;
 
-            if (delta_ori > M_PI) {
-                delta_ori -= (2 * M_PI);
-            } else if (delta_ori < -M_PI) {
-                delta_ori += (2.0 * M_PI);
-            }
-            if (std::isnan(delta_ori)) {
-                delta_ori = 0.0;
-            }
+                if (delta_ori > M_PI) {
+                    delta_ori -= (2 * M_PI);
+                } else if (delta_ori < -M_PI) {
+                    delta_ori += (2.0 * M_PI);
+                }
+                if (std::isnan(delta_ori)) {
+                    delta_ori = 0.0;
+                }
 //                gekf.getDeltaOrientation();
-            bool is_corner(false);
+                bool is_corner(false);
 //                if(std::abs(the_theta-))
-            if (std::abs(delta_ori) > turn_threshold) {
-                is_corner = true;
-            }
+                if (std::abs(delta_ori) > turn_threshold) {
+                    is_corner = true;
+                }
 
-            last_theta = the_theta;
-            std::cout << "current delta theta : " << delta_ori << std::endl;
+                last_theta = the_theta;
+                std::cout << "current delta theta : " << delta_ori << std::endl;
 
 //                std::cout << trace_id << " " << delta_ori << "   " << is_corner
 //                          << is_corner << is_corner << is_corner << std::endl;
 
-            ///add transform edge
+                ///add transform edge
 
-            if (trace_id > 0) {
-                auto *edge_se3 = new g2o::EdgeSE3();
+                if (trace_id > 0) {
+                    auto *edge_se3 = new g2o::EdgeSE3();
 
-                edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
-                edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
+                    edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
+                    edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
+                    Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
 
 
-                information(0, 0) = information(1, 1) = information(2, 2) = first_info;
-                information(3, 3) = information(4, 4) = information(5, 5) = second_info;
+                    information(0, 0) = information(1, 1) = information(2, 2) = first_info;
+                    information(3, 3) = information(4, 4) = information(5, 5) = second_info;
 
-                if (is_corner) {
-                    information(0, 0) = information(1, 1) = information(2, 2) = first_info / corner_ratio;
-                    information(3, 3) = information(4, 4) = information(5, 5) = second_info / corner_ratio;
-                }
+                    if (is_corner) {
+                        information(0, 0) = information(1, 1) = information(2, 2) = first_info / corner_ratio;
+                        information(3, 3) = information(4, 4) = information(5, 5) = second_info / corner_ratio;
+                    }
 
-                edge_se3->setInformation(information);
+                    edge_se3->setInformation(information);
 
-                edge_se3->setMeasurement(last_transform.inverse() * the_transform);
+                    edge_se3->setMeasurement(last_transform.inverse() * the_transform);
 
 //                edge_vector.push_back(latest_transform.inverse() * the_transform);
 
@@ -436,84 +439,81 @@ int main(int argc, char *argv[]) {
 
 //                out_v_before << delta_ori / 180.0 * M_PI << std::endl;
 
-                globalOptimizer.addEdge(edge_se3);
+                    globalOptimizer.addEdge(edge_se3);
 
 
-            }
-
-            /// add range edge
-
-            //  get measurement
-            if (std::abs(uwb_raw(uwb_data_index, 0) - imu_data(imu_data_index, 0)) < 1.0) {
-
-                Eigen::VectorXd uwb_measure;
-
-                uwb_measure.resize(uwb_raw.cols() - 1);
-                uwb_measure.setZero();
-
-
-                if (uwb_data_index == 0 || uwb_data_index > uwb_raw.rows() - 3) {
-                    uwb_measure = uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
-                } else {
-                    uwb_measure += uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
-                    uwb_measure += uwb_raw.block(uwb_data_index + 1, 1, 1, uwb_measure.rows()).transpose();
-
-                    uwb_measure /= 2.0;
                 }
 
-                // build and add edge
+                /// add range edge
 
-                for (int bi(0); bi < uwb_measure.rows(); ++bi) {
-                    if (bi == 10
+                //  get measurement
+                if (std::abs(uwb_raw(uwb_data_index, 0) - imu_data(imu_data_index, 0)) < 1.0) {
 
-                            ) {
-                        break;
+                    Eigen::VectorXd uwb_measure;
+
+                    uwb_measure.resize(uwb_raw.cols() - 1);
+                    uwb_measure.setZero();
+
+
+                    if (uwb_data_index == 0 || uwb_data_index > uwb_raw.rows() - 3) {
+                        uwb_measure = uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
+                    } else {
+                        uwb_measure += uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
+                        uwb_measure += uwb_raw.block(uwb_data_index + 1, 1, 1, uwb_measure.rows()).transpose();
+
+                        uwb_measure /= 2.0;
                     }
-                    auto *dist_edge = new DistanceEdge();
-                    dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + bi);
-                    dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                    dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
+                    // build and add edge
 
-                    Eigen::Matrix<double, 1, 1> information;
-                    information(0, 0) = distance_info;
+                    for (int bi(0); bi < uwb_measure.rows(); ++bi) {
+                        if (bi == 10) {
+                            break;
+                        }
+                        auto *dist_edge = new DistanceEdge();
+                        dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + bi);
+                        dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                    dist_edge->setInformation(information);
-                    dist_edge->setSigma(distance_sigma);
-                    dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
+                        dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
 
-                    globalOptimizer.addEdge(dist_edge);
-                }
+                        Eigen::Matrix<double, 1, 1> information;
+                        information(0, 0) = distance_info;
 
-                /// try online optimize
+                        dist_edge->setInformation(information);
+                        dist_edge->setSigma(distance_sigma);
+                        dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
 
-                int last_offset(delay_times);
-                if (trace_id > last_offset) {
-                    globalOptimizer.vertex(trace_id - last_offset + 1)->setFixed(true);
+                        globalOptimizer.addEdge(dist_edge);
+                    }
 
-                }
+                    /// try online optimize
 
-                if (trace_id >= out_delay_times) {
-                    double td[10] = {0};
-                    globalOptimizer.vertex(trace_id - out_delay_times)->getEstimateData(td);
-                    online_gx.push_back(td[0]);
-                    online_gy.push_back(td[1]);
-                }
+                    int last_offset(delay_times);
+                    if (trace_id > last_offset) {
+                        globalOptimizer.vertex(trace_id - last_offset + 1)->setFixed(true);
 
-                if (trace_id > 10) {
-                    double time_before(TimeStamp::now());
-                    globalOptimizer.initializeOptimization();
-                    globalOptimizer.optimize(max_optimize_times);
+                    }
+
+                    if (trace_id >= out_delay_times) {
+                        double td[10] = {0};
+                        globalOptimizer.vertex(trace_id - out_delay_times)->getEstimateData(td);
+                        online_gx.push_back(td[0]);
+                        online_gy.push_back(td[1]);
+                    }
+
+                    if (trace_id > 10) {
+                        double time_before(TimeStamp::now());
+                        globalOptimizer.initializeOptimization();
+                        globalOptimizer.optimize(max_optimize_times);
 //                        std::cout << "One step optimize" << TimeStamp::now() - time_before << std::endl;
 
+                    }
                 }
+
+                /// updata transform matrix
+                last_transform = the_transform;
+                trace_id++;
             }
-
-            /// updata transform matrix
-            last_transform = the_transform;
-
-            /// increase trace id
-            trace_id++;
 
 
             imu_data_index++;
@@ -532,8 +532,16 @@ int main(int argc, char *argv[]) {
     /**
      * Save and show
      */
+    for (int vid(0); vid < trace_id; ++vid) {
+        double data[10] = {0};
+        globalOptimizer.vertex(vid)->getEstimateData(data);
+        gx.push_back(data[0]);
+        gy.push_back(data[1]);
+    }
 
-    plt::plot(zupt_v, "r-+");
+//    plt::plot(zupt_v, "r-+");
+    plt::plot(online_gx, online_gy, "b-+");
+    plt::plot(gx, gy, "r-+");
     plt::show();
 
 

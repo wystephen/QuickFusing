@@ -84,7 +84,7 @@ public:
         double para1((x - miu) * (x - miu) / 2 / sigma / sigma);
         double para2(1 / std::sqrt(2 * sigma * sigma * M_PI));
 
-        return std::log(para2 + 1e-10) / para1;
+        return std::log(para2 + 1e-10) / (para1+1e-10);
     }
 
     inline double NormalPdf(double x,

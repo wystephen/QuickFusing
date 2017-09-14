@@ -181,19 +181,11 @@ int main(int argc, char *argv[]) {
             uwb_raw(i, j) = *(UwbRawReader.GetMatrix()(i, j));
         }
     }
-//    CppExtent::CSVReader BeaconsetReader(dir_name + "beaconset.data.csv");
-//    Eigen::MatrixXd beaconset;
-//    beaconset.resize(BeaconsetReader.GetMatrix().GetRows(),
-//                     BeaconsetReader.GetMatrix().GetCols());
-//    for (int i(0); i < beaconset.rows(); ++i) {
-//        for (int j(0); j < beaconset.cols(); ++j) {
-//            beaconset(i, j) = *BeaconsetReader.GetMatrix()(i, j);
-//        }
-//    }
+
 
     CppExtent::CSVReader ImuDataReader(dir_name + "sim_imu.csv");
 
-    auto ImuDataTmp(ImuDataReader.GetMatrix());//, ZuptTmp(ZuptReader.GetMatrix());
+    auto ImuDataTmp(ImuDataReader.GetMatrix());
 
     Eigen::MatrixXd imu_data, Zupt;
     imu_data.resize(ImuDataTmp.GetRows(), ImuDataTmp.GetCols());
@@ -207,7 +199,6 @@ int main(int argc, char *argv[]) {
                 imu_data(i, j) *= (M_PI / 180.0f);
             }
         }
-//        Zupt(i, 0) = int(*ZuptTmp(i, 0));
     }
 
 
@@ -218,8 +209,8 @@ int main(int argc, char *argv[]) {
 
 
     typedef g2o::BlockSolverX SlamBlockSolver;
-//    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
-    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+//    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
     // Initial solver
     SlamLinearSolver *linearSolver = new SlamLinearSolver();
@@ -314,6 +305,7 @@ int main(int argc, char *argv[]) {
     while (tmp_set_bool) {
         //
         if (uwb_data_index >= uwb_raw.rows() || imu_data_index >= imu_data.rows()) {
+            tmp_set_bool=false;
 
             break;
         }
@@ -386,6 +378,8 @@ int main(int argc, char *argv[]) {
 
                     edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
                     edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+                    std::cout << "traid and before id :"<< trace_id << "--"<< trace_id-1 << std::endl;
 
                     Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
 

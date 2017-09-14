@@ -209,13 +209,13 @@ int main(int argc, char *argv[]) {
 
 
     typedef g2o::BlockSolverX SlamBlockSolver;
-//    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
-    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+//    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
     // Initial solver
     SlamLinearSolver *linearSolver = new SlamLinearSolver();
 //    linearSolver->setBlockOrdering(false);
-    linearSolver->setWriteDebug(true);
+//    linearSolver->setWriteDebug(true);
     SlamBlockSolver *blockSolver = new SlamBlockSolver(linearSolver);
     g2o::OptimizationAlgorithmLevenberg *solver =
             new g2o::OptimizationAlgorithmLevenberg(blockSolver);
@@ -373,6 +373,7 @@ int main(int argc, char *argv[]) {
 
                 last_theta = the_theta;
 
+
                 ///add transform edge
 
                 if (trace_id > 0) {
@@ -402,6 +403,7 @@ int main(int argc, char *argv[]) {
 
 
                     globalOptimizer.addEdge(edge_se3);
+                    edge_se3= nullptr;
 
 
                 }

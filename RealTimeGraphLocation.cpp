@@ -446,7 +446,6 @@ int main(int argc, char *argv[]) {
 
                 /// add range edge
 
-                //  get measurement
                 if (std::abs(uwb_raw(uwb_data_index, 0) - imu_data(imu_data_index, 0)) < 1.0) {
 
                     Eigen::VectorXd uwb_measure;
@@ -467,8 +466,12 @@ int main(int argc, char *argv[]) {
                     // build and add edge
 
                     for (int bi(0); bi < uwb_measure.rows(); ++bi) {
-                        if (bi == 10) {
-                            break;
+//                        if (bi == 10) {
+//                            break;
+//                        }
+                        if(uwb_measure(bi)<0.3)
+                        {
+                            continue;
                         }
                         auto *dist_edge = new DistanceEdge();
                         dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + bi);
@@ -486,28 +489,30 @@ int main(int argc, char *argv[]) {
                         globalOptimizer.addEdge(dist_edge);
                     }
 
-                    /// try online optimize
 
-                    int last_offset(delay_times);
-                    if (trace_id > last_offset) {
-                        globalOptimizer.vertex(trace_id - last_offset + 1)->setFixed(true);
+                }
 
-                    }
+                /// try online optimize
 
-                    if (trace_id >= out_delay_times) {
-                        double td[10] = {0};
-                        globalOptimizer.vertex(trace_id - out_delay_times)->getEstimateData(td);
-                        online_gx.push_back(td[0]);
-                        online_gy.push_back(td[1]);
-                    }
+                int last_offset(delay_times);
+                if (trace_id > last_offset) {
+                    globalOptimizer.vertex(trace_id - last_offset + 1)->setFixed(true);
 
-                    if (trace_id > 10) {
-                        double time_before(TimeStamp::now());
-                        globalOptimizer.initializeOptimization();
-                        globalOptimizer.optimize(max_optimize_times);
+                }
+
+                if (trace_id >= out_delay_times) {
+                    double td[10] = {0};
+                    globalOptimizer.vertex(trace_id - out_delay_times)->getEstimateData(td);
+                    online_gx.push_back(td[0]);
+                    online_gy.push_back(td[1]);
+                }
+
+                if (trace_id > 10) {
+                    double time_before(TimeStamp::now());
+                    globalOptimizer.initializeOptimization();
+                    globalOptimizer.optimize(max_optimize_times);
 //                        std::cout << "One step optimize" << TimeStamp::now() - time_before << std::endl;
 
-                    }
                 }
 
                 /// updata transform matrix

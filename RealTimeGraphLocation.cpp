@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
     double second_info = 1000.0;
 
 
-    double distance_info = 5.0;
+    double distance_info = 1.0;
     double distance_sigma = 3.0;
 
 
@@ -265,7 +265,7 @@ int main(int argc, char *argv[]) {
     /**
      * Main loop
      */
-    int beacon_id_offset = 8000;// beacon_offset
+    int beacon_id_offset = 80000;// beacon_offset
 
     int trace_id = 0;
 
@@ -413,7 +413,7 @@ int main(int argc, char *argv[]) {
                     uwb_measure = uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
 
                     for (int bi(0); bi < uwb_measure.rows(); ++bi) {
-                        if ((uwb_measure(bi) - z_offset) < 0.1) {
+                        if ((uwb_measure(bi) - z_offset) < 0.0) {
                             continue;
                         } else {
                             auto *dist_edge = new DistanceEdge();
@@ -432,7 +432,7 @@ int main(int argc, char *argv[]) {
                             dist_edge->setSigma(distance_sigma);
 //                            dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
 
-                            globalOptimizer.addEdge(dist_edge);
+//                            globalOptimizer.addEdge(dist_edge);
                         }
 
                     }
@@ -475,9 +475,11 @@ int main(int argc, char *argv[]) {
     }
 
 //    plt::plot(zupt_v, "r-+");
-    plt::plot(imu_x, imu_y, "g-+");
-    plt::plot(online_gx, online_gy, "b-+");
-    plt::plot(gx, gy, "r-+");
+    plt::named_plot("imu",imu_x, imu_y, "g-+");
+    plt::named_plot("online graph",online_gx, online_gy, "b-+");
+    plt::named_plot("graph",gx, gy, "r-+");
+    plt::legend();
+    plt::grid(true);
     plt::show();
 
 

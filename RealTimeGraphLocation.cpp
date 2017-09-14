@@ -159,7 +159,15 @@ int main(int argc, char *argv[]) {
             uwb_raw(i, j) = *(UwbRawReader.GetMatrix()(i, j));
         }
     }
-
+    CppExtent::CSVReader BeaconsetReader(dir_name + "beaconset.data.csv");
+    Eigen::MatrixXd beaconset;
+    beaconset.resize(BeaconsetReader.GetMatrix().GetRows(),
+                     BeaconsetReader.GetMatrix().GetCols());
+    for (int i(0); i < beaconset.rows(); ++i) {
+        for (int j(0); j < beaconset.cols(); ++j) {
+            beaconset(i, j) = *BeaconsetReader.GetMatrix()(i, j);
+        }
+    }
 
     CppExtent::CSVReader ImuDataReader(dir_name + "sim_imu.csv");
 
@@ -242,7 +250,7 @@ int main(int argc, char *argv[]) {
     /**
      * Main loop
      */
-    int beacon_offset = 100000;// beacon_offset
+    int beacon_id_offset = 100000;// beacon_offset
 
     int trace_id = 0;
 
@@ -251,19 +259,56 @@ int main(int argc, char *argv[]) {
         double p[6] = {0};
         v->setEstimateData(p);
         v->setFixed(false);
-        v->setId(beacon_offset + beacon_id);
+        v->setId(beacon_id_offset + beacon_id);
         globalOptimizer.addVertex(v);
 
     }
 
-    bool last_zupt_flag = false;
 
-    for (int index(0); index < imu_data.rows(); ++index) {
+    int uwb_data_index(0);
+    int imu_data_index(0);
+
+
+    bool last_zupt_flag = false;
+    double last_theta = 0.0;
+
+    Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
+
+
+    /**
+  * Spacial preprocess !!!!
+  * set z of beaconset to zero
+  */
+    for (int i(0); i < beaconset.rows(); ++i) {
+        beaconset(i, 2) = 0.0;
+    }
+
+
+
+    /// add beacon vertex
+    for (int i(0); i < beaconset.rows(); ++i) {
+        auto *v = new g2o::VertexSE3();
+        double p[6] = {0};
+//        for (int j(0); j < 3; ++j) {
+//            p[j] = beaconset(i, j);
+//        }
+        v->setEstimateData(p);
+        v->setFixed(false);
+        v->setId(beacon_id_offset + i);
+        globalOptimizer.addVertex(v);
+    }
+
+    bool tmp_set_bool(true);// avoid the warning given by IDE...
+    while (tmp_set_bool) {
+        //
+
+
+
         bool zupt_flag = true;
 
-        if (index > init_para.ZeroDetectorWindowSize_) {
-//            std::cout << "index :" << index << std::endl;
-            zupt_flag = GLRT_Detector(imu_data.block(index - init_para.ZeroDetectorWindowSize_, 1,
+        if (imu_data_index > init_para.ZeroDetectorWindowSize_) {
+//            std::cout << "imu_data_index :" << imu_data_index << std::endl;
+            zupt_flag = GLRT_Detector(imu_data.block(imu_data_index - init_para.ZeroDetectorWindowSize_, 1,
                                                      init_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
                                       init_para);
         }
@@ -271,6 +316,7 @@ int main(int argc, char *argv[]) {
         zupt_v.push_back(zupt_flag ? 1.0 : 0.0);
 
 
+        ///
 
 
 

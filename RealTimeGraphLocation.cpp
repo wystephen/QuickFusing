@@ -274,7 +274,7 @@ int main(int argc, char *argv[]) {
     /**
      * Main loop
      */
-    int beacon_id_offset = 100000;// beacon_offset
+    int beacon_id_offset = 200000;// beacon_offset
 
     int trace_id = 0;
 
@@ -348,30 +348,19 @@ int main(int argc, char *argv[]) {
 //        std::cout << "zupt flag:" << zupt_flag << std::endl;
             zupt_v.push_back(zupt_flag ? 1.0 : 0.0);
 
-
+            auto ekf_output = myekf.GetPosition(
+                    imu_data.block(imu_data_index, 1, 1, 6).transpose(),
+                    (zupt_flag ? 1.0 : 0.0)
+            );
             if (zupt_flag && !last_zupt_flag) {
 
 
-                auto ekf_output = myekf.GetPosition(
-                        imu_data.block(imu_data_index, 1, 1, 6).transpose(),
-                        (zupt_flag ? 1.0 : 0.0)
-                );
+                imu_x.push_back(ekf_output(0));
+                imu_y.push_back(ekf_output(1));
+
 
                 auto the_transform = myekf.getTransformation();
-/// generate better estimate
 
-                Eigen::Isometry3d before_state = Eigen::Isometry3d::Identity();
-                if (imu_data_index > 0) {
-                    double before_data[10] = {0};
-                    globalOptimizer.vertex(trace_id - 1)->getEstimateData(before_data);
-
-                    Eigen::Vector3d offset(before_data[0], before_data[1], before_data[2]);
-
-                    Eigen::Quaterniond qq(before_data[6], before_data[3], before_data[4], before_data[5]);
-
-                    before_state = tq2Transform(offset, qq);
-
-                }
 
                 /// add vertex
                 auto *v = new g2o::VertexSE3();
@@ -441,58 +430,60 @@ int main(int argc, char *argv[]) {
 
 //                out_v_before << delta_ori / 180.0 * M_PI << std::endl;
 
-                    globalOptimizer.addEdge(edge_se3);
+//                    globalOptimizer.addEdge(edge_se3);
 
 
                 }
 
                 /// add range edge
 
-//                if (std::abs(uwb_raw(uwb_data_index, 0) - imu_data(imu_data_index, 0)) < 1.0) {
+                if (std::abs(uwb_raw(uwb_data_index, 0) - imu_data(imu_data_index, 0)) < 1.0) {
 
-                Eigen::VectorXd uwb_measure;
+                    Eigen::VectorXd uwb_measure;
 
-                uwb_measure.resize(uwb_raw.cols() - 1);
-                uwb_measure.setZero();
+                    uwb_measure.resize(uwb_raw.cols() - 1);
+                    uwb_measure.setZero();
 
 
-                if (uwb_data_index == 0 || uwb_data_index > uwb_raw.rows() - 3) {
-                    uwb_measure = uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
-                } else {
-                    uwb_measure += uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
-                    uwb_measure += uwb_raw.block(uwb_data_index + 1, 1, 1, uwb_measure.rows()).transpose();
+                    if (uwb_data_index == 0 || uwb_data_index > uwb_raw.rows() - 3) {
+                        uwb_measure = uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
+                    } else {
+                        uwb_measure += uwb_raw.block(uwb_data_index, 1, 1, uwb_measure.rows()).transpose();
+                        uwb_measure += uwb_raw.block(uwb_data_index + 1, 1, 1, uwb_measure.rows()).transpose();
 
-                    uwb_measure /= 2.0;
-                }
+                        uwb_measure /= 2.0;
+                    }
 
-                // build and add edge
+                    // build and add edge
 
-                for (int bi(0); bi < uwb_measure.rows(); ++bi) {
+                    for (int bi(0); bi < uwb_measure.rows(); ++bi) {
 //                        if (bi == 10) {
 //                            break;
 //                        }
-                    if (uwb_measure(bi)-z_offset < 0.1) {
-                        continue;
-                    }
-                    auto *dist_edge = new DistanceEdge();
-                    dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + bi);
-                    dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+                        if ((uwb_measure(bi) - z_offset) < 0.1) {
+                            continue;
+                        }else{
+                            auto *dist_edge = new DistanceEdge();
+                            dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + bi);
+                            dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
 //                    if(uwb_measure(bi)>z_offset)
-                        dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
+                            dist_edge->setMeasurement(std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
 
-                    Eigen::Matrix<double, 1, 1> information;
-                    information(0, 0) = distance_info;
+                            Eigen::Matrix<double, 1, 1> information;
+                            information(0, 0) = distance_info;
 
-                    dist_edge->setInformation(information);
-                    dist_edge->setSigma(distance_sigma);
-//                        dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
+                            dist_edge->setInformation(information);
+                            dist_edge->setSigma(distance_sigma);
+                        dist_edge->setRobustKernel(new g2o::RobustKernelHuber());
 
-                    globalOptimizer.addEdge(dist_edge);
+                            globalOptimizer.addEdge(dist_edge);
+                        }
+
+                    }
+
+
                 }
-
-
-//                }
 
                 /// try online optimize
 
@@ -550,6 +541,7 @@ int main(int argc, char *argv[]) {
     }
 
 //    plt::plot(zupt_v, "r-+");
+    plt::plot(imu_x,imu_y,"g-+");
     plt::plot(online_gx, online_gy, "b-+");
     plt::plot(gx, gy, "r-+");
     plt::show();

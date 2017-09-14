@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) {
     int trace_id = 0;
 
     for (int beacon_id(0); beacon_id < uwb_raw.cols() - 1; ++beacon_id) {
-        auto *v = new g2o::VertexSE3();
+        auto *  v = new g2o::VertexSE3();
         double p[6] = {0};
         v->setEstimateData(p);
         v->setFixed(false);
@@ -332,7 +332,7 @@ int main(int argc, char *argv[]) {
                     imu_data.block(imu_data_index, 1, 1, 6).transpose(),
                     (zupt_flag ? 1.0 : 0.0)
             );
-            if (zupt_flag && !last_zupt_flag) {
+            if (!zupt_flag && last_zupt_flag) {
 
 
                 imu_x.push_back(ekf_output(0));
@@ -349,6 +349,8 @@ int main(int argc, char *argv[]) {
                 v->setFixed(false);
                 v->setEstimate(the_transform);
                 globalOptimizer.addVertex(v);
+
+
 
                 /// get delta theta
                 double the_theta(myekf.getOriente());
@@ -474,11 +476,11 @@ int main(int argc, char *argv[]) {
         gy.push_back(data[1]);
     }
 
-//    plt::plot(zupt_v, "r-+");
-    plt::named_plot("imu",imu_x, imu_y, "g-+");
-    plt::named_plot("online graph",online_gx, online_gy, "b-+");
-    plt::named_plot("graph",gx, gy, "r-+");
-    plt::legend();
+    plt::plot(zupt_v, "r-+");
+//    plt::named_plot("imu",imu_x, imu_y, "g-+");
+//    plt::named_plot("online graph",online_gx, online_gy, "b-+");
+//    plt::named_plot("graph",gx, gy, "r-+");
+//    plt::legend();
     plt::grid(true);
     plt::show();
 

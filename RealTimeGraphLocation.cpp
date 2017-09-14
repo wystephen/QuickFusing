@@ -209,8 +209,8 @@ int main(int argc, char *argv[]) {
 
 
     typedef g2o::BlockSolverX SlamBlockSolver;
-    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
-//    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+//    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
     // Initial solver
     SlamLinearSolver *linearSolver = new SlamLinearSolver();
@@ -480,11 +480,12 @@ int main(int argc, char *argv[]) {
         gy.push_back(data[1]);
     }
 
-    plt::plot(zupt_v, "r-+");
-//    plt::named_plot("imu",imu_x, imu_y, "g-+");
-//    plt::named_plot("online graph",online_gx, online_gy, "b-+");
-//    plt::named_plot("graph",gx, gy, "r-+");
-//    plt::legend();
+
+//    plt::plot(zupt_v, "r-+");
+    plt::named_plot("imu",imu_x, imu_y, "g-+");
+    plt::named_plot("online graph",online_gx, online_gy, "b-+");
+    plt::named_plot("graph",gx, gy, "r-+");
+    plt::legend();
     plt::grid(true);
     plt::show();
 

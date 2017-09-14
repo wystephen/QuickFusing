@@ -378,9 +378,11 @@ int main(int argc, char *argv[]) {
                 if (trace_id > 0) {
                     auto *edge_se3 = new g2o::EdgeSE3();
 
-                    edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
+                    edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id-1);
                     edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
 
+                    std::cout << "trace id:" << trace_id<<
+                    "address:" << globalOptimizer.vertex(trace_id)<< ":" << globalOptimizer.vertex(trace_id-1)<<std::endl;
                     std::cout << "traid and before id :"<< trace_id << "--"<< trace_id-1 << std::endl;
 
                     Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
@@ -396,6 +398,7 @@ int main(int argc, char *argv[]) {
 
                     edge_se3->setInformation(information);
                     edge_se3->setMeasurement(last_transform.inverse() * the_transform);
+                    std::cout << "trace id:"<<trace_id << "edge address:"<<edge_se3 << std::endl;
 
 
                     globalOptimizer.addEdge(edge_se3);
@@ -421,6 +424,7 @@ int main(int argc, char *argv[]) {
                             auto *dist_edge = new DistanceEdge();
                             dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + bi);
                             dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+//                            std::cout << globalOptimizer.vertex()
 
                             std::cout << "trace id:"<<trace_id << "beaconid:" << bi << std::endl;
 

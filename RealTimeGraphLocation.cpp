@@ -347,7 +347,7 @@ int main(int argc, char *argv[]) {
                 double p[6] = {0};
                 v->setId(trace_id);
                 v->setFixed(false);
-                v->setEstimateData(p);
+                v->setEstimate(the_transform);
                 globalOptimizer.addVertex(v);
 
                 /// get delta theta

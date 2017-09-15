@@ -348,6 +348,11 @@ int main(int argc, char *argv[]) {
 
                 globalOptimizer.addVertex(v);
 
+                if(std::isnan(the_transform.matrix().mean()))
+                {
+                    std::cout << "index " << trace_id << std::endl;
+                }
+
 
 
                 /// get delta theta
@@ -400,6 +405,10 @@ int main(int argc, char *argv[]) {
                     edge_se3->setMeasurement(last_transform.inverse() * the_transform);
                     std::cout << "trace id:" << trace_id << "edge address:" << edge_se3 << std::endl;
 
+                    if(std::isnan(last_transform.inverse().matrix().mean()))
+                    {
+                        std::cout << "trace id :" << trace_id << std::endl;
+                    }
 
                     globalOptimizer.addEdge(edge_se3);
                     edge_se3 = nullptr;

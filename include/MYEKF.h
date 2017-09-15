@@ -673,6 +673,11 @@ public:
             transform(ix, 3) = offset(ix);
         }
 
+        if(std::isnan(transform.matrix().mean()))
+        {
+            std::cout << ""
+        }
+
         return transform;
     }
 

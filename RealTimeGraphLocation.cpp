@@ -47,6 +47,7 @@
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #include "g2o/core/linear_solver.h"
+#include "g2o/core/optimization_algorithm_gauss_newton.h"
 
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_impl.h"
@@ -208,12 +209,12 @@ int main(int argc, char *argv[]) {
      */
     g2o::SparseOptimizer globalOptimizer;
     typedef g2o::BlockSolverX SlamBlockSolver;
-    typedef g2o::LinearSolverCCS<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
-    SlamLinearSolver *linearSolver = new SlamLinearSolver();
+    SlamLinearSolver* linearSolver= new SlamLinearSolver();
 //    linearSolver->setBlockOrdering(true);
-    SlamBlockSolver *blockSolver = new SlamBlockSolver(linearSolver);
-    g2o::OptimizationAlgorithmLevenberg *solver = new g2o::OptimizationAlgorithmLevenberg(blockSolver);
+    SlamBlockSolver* blockSolver= new SlamBlockSolver(linearSolver);
+    g2o::OptimizationAlgorithmLevenberg *solver = new g2o::OptimizationAlgorithmLevenberg((g2o::Solver*)blockSolver);
 
     globalOptimizer.setAlgorithm(solver);
 

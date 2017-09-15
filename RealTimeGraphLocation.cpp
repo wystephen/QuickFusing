@@ -345,6 +345,7 @@ int main(int argc, char *argv[]) {
                 v->setId(trace_id);
                 v->setFixed(false);
                 v->setEstimate(the_transform);
+
                 globalOptimizer.addVertex(v);
 
 

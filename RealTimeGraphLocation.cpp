@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
     // Initial solver
     SlamLinearSolver *linearSolver = new SlamLinearSolver();
 //    linearSolver->setBlockOrdering(false);
-//    linearSolver->setWriteDebug(true);
+    linearSolver->setWriteDebug(true);
     SlamBlockSolver *blockSolver = new SlamBlockSolver(linearSolver);
     g2o::OptimizationAlgorithmLevenberg *solver =
             new g2o::OptimizationAlgorithmLevenberg(blockSolver);

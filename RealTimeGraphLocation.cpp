@@ -46,6 +46,7 @@
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#include "g2o/core/linear_solver.h"
 
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_impl.h"
@@ -206,19 +207,14 @@ int main(int argc, char *argv[]) {
      * Build graph and optimizer
      */
     g2o::SparseOptimizer globalOptimizer;
-
-
     typedef g2o::BlockSolverX SlamBlockSolver;
-    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
-//    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCCS<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
-    // Initial solver
     SlamLinearSolver *linearSolver = new SlamLinearSolver();
-//    linearSolver->setBlockOrdering(false);
-    linearSolver->setWriteDebug(true);
+//    linearSolver->setBlockOrdering(true);
     SlamBlockSolver *blockSolver = new SlamBlockSolver(linearSolver);
-    g2o::OptimizationAlgorithmLevenberg *solver =
-            new g2o::OptimizationAlgorithmLevenberg(blockSolver);
+    g2o::OptimizationAlgorithmLevenberg *solver = new g2o::OptimizationAlgorithmLevenberg(blockSolver);
+
     globalOptimizer.setAlgorithm(solver);
 
 
@@ -270,7 +266,7 @@ int main(int argc, char *argv[]) {
     int trace_id = 0;
 
     for (int beacon_id(0); beacon_id < uwb_raw.cols() - 1; ++beacon_id) {
-        auto *  v = new g2o::VertexSE3();
+        auto *v = new g2o::VertexSE3();
         double p[6] = {0};
         v->setEstimateData(p);
         v->setFixed(false);
@@ -305,7 +301,7 @@ int main(int argc, char *argv[]) {
     while (tmp_set_bool) {
         //
         if (uwb_data_index >= uwb_raw.rows() || imu_data_index >= imu_data.rows()) {
-            tmp_set_bool=false;
+            tmp_set_bool = false;
 
             break;
         }
@@ -379,12 +375,13 @@ int main(int argc, char *argv[]) {
                 if (trace_id > 0) {
                     auto *edge_se3 = new g2o::EdgeSE3();
 
-                    edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+                    edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
                     edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                    std::cout << "trace id:" << trace_id<<
-                    "address:" << globalOptimizer.vertex(trace_id)<< ":" << globalOptimizer.vertex(trace_id-1)<<std::endl;
-                    std::cout << "traid and before id :"<< trace_id << "--"<< trace_id-1 << std::endl;
+                    std::cout << "trace id:" << trace_id <<
+                              "address:" << globalOptimizer.vertex(trace_id) << ":"
+                              << globalOptimizer.vertex(trace_id - 1) << std::endl;
+                    std::cout << "traid and before id :" << trace_id << "--" << trace_id - 1 << std::endl;
 
                     Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
 
@@ -399,11 +396,11 @@ int main(int argc, char *argv[]) {
 
                     edge_se3->setInformation(information);
                     edge_se3->setMeasurement(last_transform.inverse() * the_transform);
-                    std::cout << "trace id:"<<trace_id << "edge address:"<<edge_se3 << std::endl;
+                    std::cout << "trace id:" << trace_id << "edge address:" << edge_se3 << std::endl;
 
 
                     globalOptimizer.addEdge(edge_se3);
-                    edge_se3= nullptr;
+                    edge_se3 = nullptr;
 
 
                 }
@@ -428,7 +425,7 @@ int main(int argc, char *argv[]) {
                             dist_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 //                            std::cout << globalOptimizer.vertex()
 
-                            std::cout << "trace id:"<<trace_id << "beaconid:" << bi << std::endl;
+                            std::cout << "trace id:" << trace_id << "beaconid:" << bi << std::endl;
 
                             dist_edge->setMeasurement(
                                     std::sqrt(uwb_measure(bi) * uwb_measure(bi) - z_offset * z_offset));
@@ -484,9 +481,9 @@ int main(int argc, char *argv[]) {
 
 
 //    plt::plot(zupt_v, "r-+");
-    plt::named_plot("imu",imu_x, imu_y, "g-+");
-    plt::named_plot("online graph",online_gx, online_gy, "b-+");
-    plt::named_plot("graph",gx, gy, "r-+");
+    plt::named_plot("imu", imu_x, imu_y, "g-+");
+    plt::named_plot("online graph", online_gx, online_gy, "b-+");
+    plt::named_plot("graph", gx, gy, "r-+");
     plt::legend();
     plt::grid(true);
     plt::show();

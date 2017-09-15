@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.4)
 project(QuickFusing)
 
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
 
 set(CMAKE_BUILD_TOOL Release)
@@ -136,7 +136,6 @@ target_link_libraries(ImuHighHZ
 add_executable(dw DemoUseResult.cpp)
 #target_link_libraries(dw ${G2O_LIBS} ${Cholmod_LIBRARIES} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )
 target_link_libraries(dw ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )
-
 
 
 # For test

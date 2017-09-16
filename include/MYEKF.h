@@ -215,7 +215,7 @@ public:
 
         try {
             // 1e-3  ==>>>  fabs(T) != 0
-            if (fabs(T) > 1e-3) {
+            if (fabs(T) > 1e-8) {
                 S = 0.5 / sqrt(fabs(T));
 
                 qw = 0.25 / S;
@@ -710,6 +710,7 @@ private:
 
 
     Eigen::Vector4d quat_;
+    Eigen::Vector4d last_quat_;
 
     Eigen::MatrixXd dx_;
 

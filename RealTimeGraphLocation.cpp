@@ -492,7 +492,11 @@ int main(int argc, char *argv[]) {
 
     for(int i(0);i<imu_x.size();++i)
     {
-        std::cout << imu_x[i]<< ";"<< imu_y[i] << std::endl;
+//        std::cout << imu_x[i]<< ";"<< imu_y[i] << std::endl;
+        if(std::isnan(imu_x[i]))
+        {
+            std::cout << "i:"<<i << "is nan " << std::endl;
+        }
     }
 
 

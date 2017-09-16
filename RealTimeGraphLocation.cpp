@@ -490,6 +490,11 @@ int main(int argc, char *argv[]) {
         gy.push_back(data[1]);
     }
 
+    for(int i(0);i<imu_x.size();++i)
+    {
+        std::cout << imu_x[i]<< ";"<< imu_y[i] << std::endl;
+    }
+
 
 //    plt::plot(zupt_v, "r-+");
     plt::named_plot("imu", imu_x, imu_y, "g-+");

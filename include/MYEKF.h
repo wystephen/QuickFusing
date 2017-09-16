@@ -675,7 +675,13 @@ public:
 
         if(std::isnan(transform.matrix().mean()))
         {
-            std::cout << ""
+            std::cout << "transform.matrix is nan:"
+                      << __FUNCTION__
+                      <<":"
+                      <<__FILE__
+                      <<":"
+                      <<__LINE__
+                      <<std::endl;
         }
 
         return transform;

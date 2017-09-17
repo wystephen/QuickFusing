@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/tmp/test/45/";
     std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/";
 
-    double offset_cov(0.001), rotation_cov(0.002), range_cov(5.0);
+    double offset_cov(0.001), rotation_cov(0.002), range_cov(0.01);
     double max_iterators(0.0);//defualt paramet35s.
 
     double valid_range(4.0), range_sigma(5.0), z0_info(5.0);
@@ -143,6 +143,7 @@ int main(int argc, char *argv[]) {
 
 
     dir_name = dir_name + std::to_string(tmp_dir_num) + "/";
+    dir_name="/home/steve/Data/IU/16/";
 
 
     int trace_id = 0;
@@ -205,22 +206,22 @@ int main(int argc, char *argv[]) {
     CppExtent::CSVReader QuatReader(dir_name + "all_quat.csv");
     CppExtent::CSVReader VertexTime(dir_name + "vertex_time.csv");
 
-    Eigen::MatrixXd v_high(1, 1);
-
-    if (with_high) {
-        CppExtent::CSVReader VertexHigh(dir_name + "vertex_high_modified.csv");
-
-        v_high.resize(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
-//        v_high.setZero(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
-
-        auto v_high_matrix = VertexHigh.GetMatrix();
-
-        for (int i(0); i < v_high.rows(); ++i) {
-            for (int j(0); j < v_high.cols(); ++j) {
-                v_high(i, j) = *v_high_matrix(i, j);
-            }
-        }
-    }
+//    Eigen::MatrixXd v_high(1, 1);
+//
+//    if (with_high) {
+//        CppExtent::CSVReader VertexHigh(dir_name + "vertex_high_modified.csv");
+//
+//        v_high.resize(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
+////        v_high.setZero(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
+//
+//        auto v_high_matrix = VertexHigh.GetMatrix();
+//
+//        for (int i(0); i < v_high.rows(); ++i) {
+//            for (int j(0); j < v_high.cols(); ++j) {
+//                v_high(i, j) = *v_high_matrix(i, j);
+//            }
+//        }
+//    }
 
     Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(), ZuptResultReader.GetMatrix().GetCols());
     Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(), QuatReader.GetMatrix().GetCols());
@@ -269,43 +270,43 @@ int main(int argc, char *argv[]) {
      * SPECIALL
      * // TODO: REMOVE It!!!!
      */
-
-    std::vector<int> low_b{0, 4, 6, 7, 8, 9, 0};
-    std::vector<int> high_b{6, 5, 1, 3, 2, 6};
-
-    double *beacon_high = new double[uwb_raw.cols()];
-
-    if (with_high) {
-        for (int i(0); i < low_b.size() - 1; ++i) {
-            auto *e = new Z0Edge();
-            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
-            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
-
-            Eigen::Matrix<double, 1, 1> info;
-            info(0, 0) = 0.00010;
-
-            beacon_high[low_b[i]] = 3.5;
-            e->setMeasurement(3.5);
-//                e->setRobustKernel(robustKernel);
-            globalOptimizer.addEdge(e);
-        }
-
-        for (int i(0); i < high_b.size() - 1; ++i) {
-            auto *e = new Z0Edge();
-            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + high_b[i]);
-            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
-
-            Eigen::Matrix<double, 1, 1> info;
-            info(0, 0) = 0.00010;
-
-            beacon_high[high_b[i]] = -1.5;
-            e->setMeasurement(-1.5);
-//                e->setRobustKernel(robustKernel);
-            globalOptimizer.addEdge(e);
-        }
-
-
-    }
+//
+//    std::vector<int> low_b{0, 4, 6, 7, 8, 9, 0};
+//    std::vector<int> high_b{6, 5, 1, 3, 2, 6};
+//
+//    double *beacon_high = new double[uwb_raw.cols()];
+//
+//    if (with_high) {
+//        for (int i(0); i < low_b.size() - 1; ++i) {
+//            auto *e = new Z0Edge();
+//            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
+//            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
+//
+//            Eigen::Matrix<double, 1, 1> info;
+//            info(0, 0) = 0.00010;
+//
+//            beacon_high[low_b[i]] = 3.5;
+//            e->setMeasurement(3.5);
+////                e->setRobustKernel(robustKernel);
+//            globalOptimizer.addEdge(e);
+//        }
+//
+//        for (int i(0); i < high_b.size() - 1; ++i) {
+//            auto *e = new Z0Edge();
+//            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + high_b[i]);
+//            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
+//
+//            Eigen::Matrix<double, 1, 1> info;
+//            info(0, 0) = 0.00010;
+//
+//            beacon_high[high_b[i]] = -1.5;
+//            e->setMeasurement(-1.5);
+////                e->setRobustKernel(robustKernel);
+//            globalOptimizer.addEdge(e);
+//        }
+//
+//
+//    }
 
 //    if(uwb_raw.cols()==6)
 //    {
@@ -388,15 +389,16 @@ int main(int argc, char *argv[]) {
             Eigen::Matrix<double, 1, 1> info;
             info(0, 0) = z0_info;
             edge_zo->setInformation(info);
-            if (with_high) {
-                edge_zo->setMeasurement(v_high(index, 0));
-                if (v_high(index, 0) > -1.0) {
-                    globalOptimizer.addEdge(edge_zo);
-                }
-            }
+            edge_zo->setMeasurement(0.0);
+//            if (with_high) {
+//                edge_zo->setMeasurement(v_high(index, 0));
+//                if (v_high(index, 0) > -1.0) {
+//                    globalOptimizer.addEdge(edge_zo);
+//                }
+//            }
 //            edge_zo->setMeasurement(0.0);
 
-//            globalOptimizer.addEdge(edge_zo);
+            globalOptimizer.addEdge(edge_zo);
 
 
             /// ZUPT EDGE
@@ -529,10 +531,10 @@ int main(int argc, char *argv[]) {
                             dist_edge->setRobustKernel(robustKernel);
 
                             if (with_high) {
-                                if (fabs(v_high(zupt_index) - beacon_high[bi]) < 1.2) {
-
-                                    globalOptimizer.addEdge(dist_edge);
-                                }
+//                                if (fabs(v_high(zupt_index) - beacon_high[bi]) < 1.2) {
+//
+//                                    globalOptimizer.addEdge(dist_edge);
+//                                }
                             } else {
                                 globalOptimizer.addEdge(dist_edge);
                             }
@@ -574,6 +576,7 @@ int main(int argc, char *argv[]) {
     if (max_iterators > 0) {
         globalOptimizer.optimize(max_iterators);
     }
+    globalOptimizer.optimize(3000);
 
 
     /**

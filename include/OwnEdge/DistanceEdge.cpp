@@ -44,8 +44,8 @@ void DistanceEdge::computeError() {
 //    std::cout << vertices()[1]->id()<<" : " << vertices()[0]->id() << "-" << dis <<"-"<<_measurement<< std::endl;
 //    _error(0, 0) = std::log(NormalPdf(dis, _measurement, sigma_));
     try{
-        _error(0,0)=NormalPdf(dis,_measurement,sigma_);
-        //    _error(0, 0) = std::log(NormalPdf(dis, _measurement, sigma_));
+//        _error(0,0)=NormalPdf(dis,_measurement,sigma_);
+            _error(0, 0) = std::log(NormalPdf(dis, _measurement, sigma_));
     }catch(std::exception &e)
     {
         std::cout << e.what() << __FILE__<< ":"<< __LINE__ <<":"<<__FUNCTION__ << std::endl;

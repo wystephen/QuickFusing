@@ -99,10 +99,12 @@ int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/tmp/test/45/";
     std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/";
 
-    double offset_cov(0.001), rotation_cov(0.002), range_cov(0.01);
-    double max_iterators(0.0);//defualt paramet35s.
+//    std::ofstream for_debug("/home/steve/Code/")
 
-    double valid_range(4.0), range_sigma(5.0), z0_info(5.0);
+    double offset_cov(0.001), rotation_cov(0.002), range_cov(0.5);
+    double max_iterators(1000.0);//defualt paramet35s.
+
+    double valid_range(10.0), range_sigma(10.0), z0_info(5.0);
 
 
     if (argc >= 2) {
@@ -143,7 +145,7 @@ int main(int argc, char *argv[]) {
 
 
     dir_name = dir_name + std::to_string(tmp_dir_num) + "/";
-    dir_name="/home/steve/Data/IU/16/";
+    dir_name="/home/steve/Data/IU/74/";
 
 
     int trace_id = 0;
@@ -157,8 +159,8 @@ int main(int argc, char *argv[]) {
 
 
     typedef g2o::BlockSolverX SlamBlockSolver;
-//    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
-    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+    typedef g2o::LinearSolverCholmod<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+//    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
     // Initial solver
     SlamLinearSolver *linearSolver = new SlamLinearSolver();
@@ -508,7 +510,7 @@ int main(int argc, char *argv[]) {
                     last_time = zupt_time;
 
                     for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
-                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 55.0) {
+                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 75.0) {
                             double range = uwb_raw(uwb_index, bi + 1);
                             int beacon_id = bi + beacon_id_offset;
 
@@ -576,7 +578,7 @@ int main(int argc, char *argv[]) {
     if (max_iterators > 0) {
         globalOptimizer.optimize(max_iterators);
     }
-    globalOptimizer.optimize(3000);
+    globalOptimizer.optimize(6000);
 
 
     /**

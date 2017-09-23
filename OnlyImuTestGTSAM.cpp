@@ -233,10 +233,13 @@ int main(int argc, char *argv[]) {
 
     int trace_id(0);
     Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
+
+    Eigen::Isometry3d the_transform;
     double last_theta = 0.0;
 
 
     int add_vertex_counter = 0;
+
 
     for (int index(0); index < imudata.rows(); ++index) {
         /**ZUPT DETECTOR FIRST*/
@@ -257,7 +260,7 @@ int main(int argc, char *argv[]) {
             std::cout << "index: " << index << "key step"
                       << "ori:" << myekf.getOriente() << std::endl;
 
-            auto the_transform = myekf.getTransformation();
+            the_transform = myekf.getTransformation();
 
             ix.push_back(tx(0));
             iy.push_back(tx(1));
@@ -311,7 +314,11 @@ int main(int argc, char *argv[]) {
 
 // / last moment of zupt detected
                 prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
-                initial_values.insert(X(trace_id), prop_state.pose());
+                NavState zupt_output_state;
+                zupt_output_state.t() = the_transform.matrix().block(0,3,3,1);
+                zupt_output_state.R() = the_transform.matrix().block(0,0,3,3);
+
+                initial_values.insert(X(trace_id), zupt_output_state);
                 initial_values.insert(V(trace_id), Vector3(0,0,0));
                 initial_values.insert(B(trace_id), prev_bias);
                 prev_state = prop_state;

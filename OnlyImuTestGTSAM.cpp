@@ -277,9 +277,9 @@ int main(int argc, char *argv[]) {
 
             try {
 
-                std::cout << "prev state :" << prev_state << std::endl;
-                std::cout << " pre bias: " << prev_bias << std::endl;
-                std::cout << "derect output:" << preint_imu->predict(prev_state, prev_bias);
+//                std::cout << "prev state :" << prev_state << std::endl;
+//                std::cout << " pre bias: " << prev_bias << std::endl;
+//                std::cout << "derect output:" << preint_imu->predict(prev_state, prev_bias);
 
                 ImuFactor imu_factor(
                         X(trace_id - 1), V(trace_id - 1),
@@ -425,11 +425,12 @@ int main(int argc, char *argv[]) {
 //    out_iterations.detach();
 //
 //    auto result = optimizer.optimizeSafely();
-    for(int i(0);i<10000;i++)
-    {
-        optimizer.iterate();
-        if(i%100==0) std::cout << "i :'" << i << std::endl;
-    }
+//    for(int i(0);i<10000;i++)
+//    {
+//        optimizer.iterate();
+//        if(i%100==0) std::cout << "i :'" << i << std::endl;
+//    }
+    optimizer.optimize();
     auto result = optimizer.values();
 
     std::cout << "trace id :" << trace_id << std::endl;

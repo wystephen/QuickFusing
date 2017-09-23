@@ -306,7 +306,7 @@ int main(int argc, char *argv[]) {
 //                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));
 //                graph->add(BetweenFactor<G)
 //                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
-                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,0.000001);
+                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,0.001);
                 PriorFactor<Vector3> zero_velocity(V(trace_id),Vector3(0.0,0.0,0.0),
                                                    velocity_noise);
                 graph->add(zero_velocity);
@@ -417,12 +417,14 @@ int main(int argc, char *argv[]) {
 //    op_para.setMaxIterations(10000);
 //    optimizer.params().setMaxIterations(10000);
 
-    gtsam::Value result;
+//    gtsam::Value result;
 //    auto it_times = optimizer.getInnerIterations();
     std::thread out_iterations([&] {
         while (1) {
-            std::cout << optimizer.getInnerIterations() << std::endl;
+            std::cout << optimizer.getInnerIterations() << ":";//std::endl;
             sleep(1);
+//            if(optimizer.)
+            std::cout << "error :" << optimizer.error()<<std::endl;
 
 //            if(optimizer.getInnerIterations()>1000)
 //            {
@@ -432,13 +434,12 @@ int main(int argc, char *argv[]) {
     });
     out_iterations.detach();
 //
-    auto result = optimizer.optimizeSafely();
-    for(int i(0);i<1000;i++)
-    {
-        optimizer.iterate();
-        if(i%100==0) std::cout << "i :'" << i << std::endl;
-    }
-//    optimizer.optimize();
+//    for(int i(0);i<1000;i++)
+//    {
+//        optimizer.iterate();
+//        if(i%100==0) std::cout << "i :'" << i << std::endl;
+//    }
+    optimizer.optimize();
     auto result = optimizer.values();
 
     std::cout << "trace id :" << trace_id << std::endl;

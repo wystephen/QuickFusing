@@ -315,10 +315,11 @@ int main(int argc, char *argv[]) {
 // / last moment of zupt detected
                 prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
                 NavState zupt_output_state;
-                zupt_output_state.t() = the_transform.matrix().block(0,3,3,1);
+//                zupt_output_state.se
                 zupt_output_state.R() = the_transform.matrix().block(0,0,3,3);
+                zupt_output_state.t()  = the_transform.matrix().block(0,3,3,1);
 
-                initial_values.insert(X(trace_id), zupt_output_state);
+                initial_values.insert(X(trace_id), zupt_output_state.pose());
                 initial_values.insert(V(trace_id), Vector3(0,0,0));
                 initial_values.insert(B(trace_id), prev_bias);
                 prev_state = prop_state;
@@ -416,28 +417,28 @@ int main(int argc, char *argv[]) {
 //    op_para.setMaxIterations(10000);
 //    optimizer.params().setMaxIterations(10000);
 
-//    gtsam::Value result;
-//    auto it_times = optimizer.getInnerIterations()
-//    std::thread out_iterations([&] {
-//        while (1) {
-//            std::cout << optimizer.getInnerIterations() << std::endl;
-//            sleep(1);
+    gtsam::Value result;
+//    auto it_times = optimizer.getInnerIterations();
+    std::thread out_iterations([&] {
+        while (1) {
+            std::cout << optimizer.getInnerIterations() << std::endl;
+            sleep(1);
+
+//            if(optimizer.getInnerIterations()>1000)
+//            {
+//                optimizer
+//            }
+        }
+    });
+    out_iterations.detach();
 //
-////            if(optimizer.getInnerIterations()>10000)
-////            {
-////                optimizer.params()
-////            }
-//        }
-//    });
-//    out_iterations.detach();
-//
-//    auto result = optimizer.optimizeSafely();
-//    for(int i(0);i<10000;i++)
-//    {
-//        optimizer.iterate();
-//        if(i%100==0) std::cout << "i :'" << i << std::endl;
-//    }
-    optimizer.optimize();
+    auto result = optimizer.optimizeSafely();
+    for(int i(0);i<1000;i++)
+    {
+        optimizer.iterate();
+        if(i%100==0) std::cout << "i :'" << i << std::endl;
+    }
+//    optimizer.optimize();
     auto result = optimizer.values();
 
     std::cout << "trace id :" << trace_id << std::endl;

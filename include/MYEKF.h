@@ -544,7 +544,7 @@ public:
                                          <<":"
                                          <<__LINE__
                                          << " cov of state(P_) is too large"
-                                         << std:endl;
+                                         << std::endl;
             }
 
             x_h_ = ComputeInternalState(x_h_, dx, quat_);

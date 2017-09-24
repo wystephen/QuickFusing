@@ -268,7 +268,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
 //add_vertex_counter++;
-        if ((zupt_flag > 0.5 && last_zupt_flag < 0.5)){//||add_vertex_counter>10) {
+        if ((zupt_flag > 0.5 && last_zupt_flag < 0.5)) {//||add_vertex_counter>10) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -316,11 +316,11 @@ int main(int argc, char *argv[]) {
                 prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
                 NavState zupt_output_state;
 //                zupt_output_state.se
-                zupt_output_state.R() = the_transform.matrix().block(0,0,3,3);
-                zupt_output_state.t()  = the_transform.matrix().block(0,3,3,1);
+                zupt_output_state.R() = the_transform.matrix().block(0, 0, 3, 3);
+                zupt_output_state.t() = the_transform.matrix().block(0, 3, 3, 1);
 
                 initial_values.insert(X(trace_id), zupt_output_state.pose());
-                initial_values.insert(V(trace_id), Vector3(0,0,0));
+                initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                 initial_values.insert(B(trace_id), prev_bias);
                 prev_state = prop_state;
 
@@ -328,8 +328,7 @@ int main(int argc, char *argv[]) {
 
                 //optimize
                 LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
-                for(int i(0);i<100;++i)
-                {
+                for (int i(0); i < 100; ++i) {
                     optimizer.iterate();
                 }
                 initial_values = optimizer.values();
@@ -412,7 +411,7 @@ int main(int argc, char *argv[]) {
     LevenbergMarquardtParams lm_para;
     lm_para.setMaxIterations(10000);
 //    lm_para.iterativeParams.
-    LevenbergMarquardtOptimizer optimizer(*graph, initial_values,lm_para);
+    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
 //    NonlinearOptimizerParams op_para;
 //    op_para.setMaxIterations(10000);
 //    optimizer.params().setMaxIterations(10000);
@@ -424,7 +423,7 @@ int main(int argc, char *argv[]) {
             std::cout << optimizer.getInnerIterations() << ":";//std::endl;
             sleep(1);
 //            if(optimizer.)
-            std::cout << "error :" << optimizer.error()<<std::endl;
+            std::cout << "error :" << optimizer.error() << std::endl;
 
 //            if(optimizer.getInnerIterations()>1000)
 //            {

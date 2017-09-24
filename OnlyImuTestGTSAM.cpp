@@ -439,6 +439,7 @@ int main(int argc, char *argv[]) {
             {
                 std::cout << optimizer.getInnerIterations() << ": graph is nan..."
                           <<  optimizer.values().at<Pose3>(X(0)).matrix()<< std::endl;
+                return 0;
             }
         }
     });

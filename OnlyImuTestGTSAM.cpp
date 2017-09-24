@@ -257,8 +257,8 @@ int main(int argc, char *argv[]) {
         /** ZUPT METHOD **/
         auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6).transpose(), zupt_flag);
         if (0 == index || (zupt_flag < 0.5 & last_zupt_flag > 0.5)) {
-            std::cout << "index: " << index << "key step"
-                      << "ori:" << myekf.getOriente() << std::endl;
+//            std::cout << "index: " << index << "key step"
+//                      << "ori:" << myekf.getOriente() << std::endl;
 
             the_transform = myekf.getTransformation();
 
@@ -291,9 +291,9 @@ int main(int argc, char *argv[]) {
                 );
 
 
-                std::cout << "after built imu factor " << std::endl;
+//                std::cout << "after built imu factor " << std::endl;
                 graph->add(imu_factor);
-                std::cout << " after added imu factor " << std::endl;
+//                std::cout << " after added imu factor " << std::endl;
                 imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
 //
                 graph->add(BetweenFactor<imuBias::ConstantBias>(
@@ -326,12 +326,12 @@ int main(int argc, char *argv[]) {
 
                 preint_imu->resetIntegration();
 
-                //optimize
-                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
-                for (int i(0); i < 100; ++i) {
-                    optimizer.iterate();
-                }
-                initial_values = optimizer.values();
+//                //optimize
+//                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+//                for (int i(0); i < 100; ++i) {
+//                    optimizer.iterate();
+//                }
+//                initial_values = optimizer.values();
 
             } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
@@ -391,6 +391,8 @@ int main(int argc, char *argv[]) {
 //
 //
 //        }
+
+        std::cout << imudata.block(index,0,1,7) << std::endl;
 
         imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
                                                  imudata.block(index, 3, 1, 3).transpose(),

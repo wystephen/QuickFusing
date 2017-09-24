@@ -319,7 +319,10 @@ int main(int argc, char *argv[]) {
                 zupt_output_state.R() = the_transform.matrix().block(0, 0, 3, 3);
                 zupt_output_state.t() = the_transform.matrix().block(0, 3, 3, 1);
 
-                initial_values.insert(X(trace_id), zupt_output_state.pose());
+                Pose3 tmp_pose3;
+                tmp_pose3.matrix() = the_transform.matrix();
+
+                initial_values.insert(X(trace_id), tmp_pose3);
                 initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                 initial_values.insert(B(trace_id), prev_bias);
                 prev_state = prop_state;

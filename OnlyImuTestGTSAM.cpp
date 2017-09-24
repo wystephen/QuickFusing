@@ -22,6 +22,7 @@
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/PriorFactor.h>
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
+#include <gtsam/nonlinear/GaussNewtonOptimizer.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/inference/Symbol.h>
 #include <gtsam_unstable/dynamics/VelocityConstraint3.h>
@@ -413,10 +414,11 @@ int main(int argc, char *argv[]) {
     ///optimization
 
     std::cout << "begin to optimization" << std::endl;
-    LevenbergMarquardtParams lm_para;
-    lm_para.setMaxIterations(10000);
+//    LevenbergMarquardtParams lm_para;
+//    lm_para.setMaxIterations(10000);
+//    lm_para.set
 //    lm_para.iterativeParams.
-    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
+    GaussNewtonOptimizer optimizer(*graph, initial_values);//, lm_para);
 //    NonlinearOptimizerParams op_para;
 //    op_para.setMaxIterations(10000);
 //    optimizer.params().setMaxIterations(10000);
@@ -425,7 +427,7 @@ int main(int argc, char *argv[]) {
 //    auto it_times = optimizer.getInnerIterations();
     std::thread out_iterations([&] {
         while (1) {
-            std::cout << optimizer.getInnerIterations() << ":";//std::endl;
+            std::cout << optimizer.iterations() << ":";//std::endl;
             sleep(2);
 //            if(optimizer.)
             std::cout << "error :" << optimizer.error() << std::endl;
@@ -441,7 +443,7 @@ int main(int argc, char *argv[]) {
     std::thread out_iterations_t([&] {
         while (1) {
             if (std::isnan(optimizer.error())) {
-                std::cout << optimizer.getInnerIterations() << ": graph is nan..."
+                std::cout << optimizer.iterations() << ": graph is nan..."
                           << optimizer.values().at<Pose3>(X(0)).matrix() << std::endl;
                 return 0;
             }
@@ -454,7 +456,7 @@ int main(int argc, char *argv[]) {
         optimizer.iterate();
         if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
     }
-//    optimizer.optimize();
+    optimizer.optimize();
     auto result = optimizer.values();
 //    auto result = initial_values;
 
@@ -465,6 +467,7 @@ int main(int argc, char *argv[]) {
         auto pose_result = result.at<Pose3>(X(k));
         t_data[0] = pose_result.matrix()(0, 3);
         t_data[1] = pose_result.matrix()(1, 3);
+
 
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);

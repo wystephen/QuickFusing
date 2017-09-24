@@ -306,10 +306,10 @@ int main(int argc, char *argv[]) {
 //                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));
 //                graph->add(BetweenFactor<G)
 //                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
-//                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,0.001);
-//                PriorFactor<Vector3> zero_velocity(V(trace_id),Vector3(0.0,0.0,0.0),
-//                                                   velocity_noise);
-//                graph->add(zero_velocity);
+                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,0.001);
+                PriorFactor<Vector3> zero_velocity(V(trace_id),Vector3(0.0,0.0,0.0),
+                                                   velocity_noise);
+                graph->add(zero_velocity);
 
 
 // / last moment of zupt detected
@@ -344,11 +344,11 @@ int main(int argc, char *argv[]) {
 
             /// Use zupt result as gps
             try {
-//                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
-//                GPSFactor gps_factor(X(correction_count),
-//                                     Point3(tx(0),tx(1),tx(2)),
-//                                     correction_noise);
-//                graph->add(gps_factor);
+                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+                GPSFactor gps_factor(X(correction_count),
+                                     Point3(tx(0),tx(1),tx(2)),
+                                     correction_noise);
+                graph->add(gps_factor);
 
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__

@@ -421,7 +421,7 @@ int main(int argc, char *argv[]) {
     std::thread out_iterations([&] {
         while (1) {
             std::cout << optimizer.getInnerIterations() << ":";//std::endl;
-            sleep(1);
+            sleep(2);
 //            if(optimizer.)
             std::cout << "error :" << optimizer.error() << std::endl;
 
@@ -433,6 +433,15 @@ int main(int argc, char *argv[]) {
     });
     out_iterations.detach();
 //
+    std::thread out_iterations([&]{
+        while(1){
+            if(std::isnan(optimizer.error()))
+            {
+                std::cout << optimizer.getInnerIterations() << ": graph is nan..."
+                          <<  optimizer.values().at<Pose3>(X(0)).matrix()<< std::endl;
+            }
+        }
+    })
 //    for(int i(0);i<1000;i++)
 //    {
 //        optimizer.iterate();

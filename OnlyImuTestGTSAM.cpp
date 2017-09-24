@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
     Values initial_values;
     int correction_count = 0;
     initial_values.insert(X(correction_count), prior_pose);
-    initial_values.insert(V(correction_count), prior_velocity);
+    initial_values.insert(V(correction_count), Eigen::Vector3d(0.0,0.0,0.0));
     initial_values.insert(B(correction_count), prior_imu_bias);
 
     // Assemble prior noise model and add it the graph.
@@ -326,7 +326,7 @@ int main(int argc, char *argv[]) {
                 initial_values.insert(X(trace_id), tmp_pose3);
                 initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                 initial_values.insert(B(trace_id), prev_bias);
-                prev_state = prop_state;
+                prev_state = NavState(tmp_pose3,Eigen::Vector3d(0,0,0));
 
                 preint_imu->resetIntegration();
 

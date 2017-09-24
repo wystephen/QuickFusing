@@ -382,19 +382,19 @@ int main(int argc, char *argv[]) {
 
         }
 
-        if (zupt_flag > 0.5) {
-            /// zero velocity
+//        if (zupt_flag > 0.5) {
+//            /// zero velocity
+//
+//
+//        } else {
+//            ///
+//
+//
+//        }
 
-
-        } else {
-            ///
-            imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
-                                                     imudata.block(index, 3, 1, 3).transpose(),
-                                                     initial_para.Ts_);
-
-        }
-
-
+        imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
+                                                 imudata.block(index, 3, 1, 3).transpose(),
+                                                 initial_para.Ts_);
         /**
          * updata data
          */

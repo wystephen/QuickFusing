@@ -455,9 +455,9 @@ int main(int argc, char *argv[]) {
 //        optimizer.iterate();
 //        if(i%100==0) std::cout << "i :'" << i << std::endl;
 //    }
-//    optimizer.optimize();
-//    auto result = optimizer.values();
-    auto result = initial_values;
+    optimizer.optimize();
+    auto result = optimizer.values();
+//    auto result = initial_values;
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(0); k < trace_id; ++k) {
@@ -470,7 +470,7 @@ int main(int argc, char *argv[]) {
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);
 
-        std::cout << k << ":" << pose_result.matrix() << std::endl;
+//        std::cout << k << ":" << pose_result.matrix() << std::endl;
     }
 
 

@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
     });
     out_iterations.detach();
 //
-    std::thread out_iterations([&]{
+    std::thread out_iterations_t([&]{
         while(1){
             if(std::isnan(optimizer.error()))
             {
@@ -441,7 +441,10 @@ int main(int argc, char *argv[]) {
                           <<  optimizer.values().at<Pose3>(X(0)).matrix()<< std::endl;
             }
         }
-    })
+    });
+
+    out_iterations_t.detach();
+
 //    for(int i(0);i<1000;i++)
 //    {
 //        optimizer.iterate();
@@ -461,6 +464,7 @@ int main(int argc, char *argv[]) {
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);
     }
+
 
 
     plt::plot(gx, gy, "r-+");

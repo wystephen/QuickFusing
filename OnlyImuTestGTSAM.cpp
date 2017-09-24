@@ -314,13 +314,12 @@ int main(int argc, char *argv[]) {
 
 // / last moment of zupt detected
                 prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
-                NavState zupt_output_state;
+//                NavState zupt_output_state;
 //                zupt_output_state.se
-                zupt_output_state.R() = the_transform.matrix().block(0, 0, 3, 3);
-                zupt_output_state.t() = the_transform.matrix().block(0, 3, 3, 1);
+//                zupt_output_state.R() = the_transform.matrix().block(0, 0, 3, 3);
+//                zupt_output_state.t() = the_transform.matrix().block(0, 3, 3, 1);
 
-                Pose3 tmp_pose3;
-                tmp_pose3.matrix() = the_transform.matrix();
+                Pose3 tmp_pose3(Rot3(the_transform.matrix().block(0,0,3,3)),the_transform.matrix().block(0,3,3,1));
 
                 initial_values.insert(X(trace_id), tmp_pose3);
                 initial_values.insert(V(trace_id), Vector3(0, 0, 0));

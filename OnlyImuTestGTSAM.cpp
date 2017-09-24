@@ -306,8 +306,8 @@ int main(int argc, char *argv[]) {
 //                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));
 //                graph->add(BetweenFactor<G)
 //                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
-                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,0.001);
-                PriorFactor<Vector3> zero_velocity(V(trace_id),Vector3(0.0,0.0,0.0),
+                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.001);
+                PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
                                                    velocity_noise);
                 graph->add(zero_velocity);
 
@@ -319,7 +319,8 @@ int main(int argc, char *argv[]) {
 //                zupt_output_state.R() = the_transform.matrix().block(0, 0, 3, 3);
 //                zupt_output_state.t() = the_transform.matrix().block(0, 3, 3, 1);
 
-                Pose3 tmp_pose3(Rot3(the_transform.matrix().block(0,0,3,3)),the_transform.matrix().block(0,3,3,1));
+                Pose3 tmp_pose3(Rot3(the_transform.matrix().block(0, 0, 3, 3)),
+                                the_transform.matrix().block(0, 3, 3, 1));
 
                 initial_values.insert(X(trace_id), tmp_pose3);
                 initial_values.insert(V(trace_id), Vector3(0, 0, 0));
@@ -437,12 +438,11 @@ int main(int argc, char *argv[]) {
     });
     out_iterations.detach();
 //
-    std::thread out_iterations_t([&]{
-        while(1){
-            if(std::isnan(optimizer.error()))
-            {
+    std::thread out_iterations_t([&] {
+        while (1) {
+            if (std::isnan(optimizer.error())) {
                 std::cout << optimizer.getInnerIterations() << ": graph is nan..."
-                          <<  optimizer.values().at<Pose3>(X(0)).matrix()<< std::endl;
+                          << optimizer.values().at<Pose3>(X(0)).matrix() << std::endl;
                 return 0;
             }
         }
@@ -450,12 +450,11 @@ int main(int argc, char *argv[]) {
 
     out_iterations_t.detach();
 
-//    for(int i(0);i<1000;i++)
-//    {
-//        optimizer.iterate();
-//        if(i%100==0) std::cout << "i :'" << i << std::endl;
-//    }
-    optimizer.optimize();
+    for (int i(0); i < 1000; i++) {
+        optimizer.iterate();
+        if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
+    }
+//    optimizer.optimize();
     auto result = optimizer.values();
 //    auto result = initial_values;
 
@@ -472,7 +471,6 @@ int main(int argc, char *argv[]) {
 
 //        std::cout << k << ":" << pose_result.matrix() << std::endl;
     }
-
 
 
     plt::plot(gx, gy, "r-+");

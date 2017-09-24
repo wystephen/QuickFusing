@@ -467,6 +467,8 @@ int main(int argc, char *argv[]) {
 
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);
+
+        std::cout << k << ":" << pose_result.matrix() << std::endl;
     }
 
 

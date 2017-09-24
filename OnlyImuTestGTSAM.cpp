@@ -392,7 +392,7 @@ int main(int argc, char *argv[]) {
 //
 //        }
 
-        std::cout << imudata.block(index,0,1,7) << std::endl;
+//        std::cout << imudata.block(index,0,1,7) << std::endl;
 
         imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
                                                  imudata.block(index, 3, 1, 3).transpose(),
@@ -454,7 +454,8 @@ int main(int argc, char *argv[]) {
 //        if(i%100==0) std::cout << "i :'" << i << std::endl;
 //    }
 //    optimizer.optimize();
-    auto result = optimizer.values();
+//    auto result = optimizer.values();
+    auto result = initial_values;
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(0); k < trace_id; ++k) {

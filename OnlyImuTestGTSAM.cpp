@@ -456,9 +456,9 @@ int main(int argc, char *argv[]) {
 //        optimizer.iterate();
 //        if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
 //    }
-//    optimizer.optimize();
-//    auto result = optimizer.values();
-    auto result = initial_values;
+    optimizer.optimize();
+    auto result = optimizer.values();
+//    auto result = initial_values;
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(0); k < trace_id; ++k) {

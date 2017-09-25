@@ -307,10 +307,10 @@ int main(int argc, char *argv[]) {
 //                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));
 //                graph->add(BetweenFactor<G)
 //                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
-                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.001);
-                PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
-                                                   velocity_noise);
-                graph->add(zero_velocity);
+//                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.001);
+//                PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
+//                                                   velocity_noise);
+//                graph->add(zero_velocity);
 
 
 // / last moment of zupt detected
@@ -452,13 +452,13 @@ int main(int argc, char *argv[]) {
 
     out_iterations_t.detach();
 
-    for (int i(0); i < 1000; i++) {
-        optimizer.iterate();
-        if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
-    }
-    optimizer.optimize();
-    auto result = optimizer.values();
-//    auto result = initial_values;
+//    for (int i(0); i < 1000; i++) {
+//        optimizer.iterate();
+//        if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
+//    }
+//    optimizer.optimize();
+//    auto result = optimizer.values();
+    auto result = initial_values;
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(0); k < trace_id; ++k) {
@@ -471,6 +471,8 @@ int main(int argc, char *argv[]) {
 
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);
+
+        std::cout << k << ":" << result.at<Eigen::Vector3d>(V(k)).transpose() << std::endl;
 
 //        std::cout << k << ":" << pose_result.matrix() << std::endl;
     }

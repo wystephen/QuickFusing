@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
     initial_para.Ts_ = 1.0f / 128.0f;
 
     initial_para.sigma_a_ = 1.1;
-    initial_para.sigma_g_ = 2.0/180.0*M_PI;
+    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
 //    initial_para.sigma_a_ /= 3.0;
 //    initial_para.sigma_g_ /= 3.0;
 

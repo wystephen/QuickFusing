@@ -456,7 +456,7 @@ int main(int argc, char *argv[]) {
 //        optimizer.iterate();
 //        if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
 //    }
-    optimizer.optimize();
+//    optimizer.optimize();
     auto result = optimizer.values();
 //    auto result = initial_values;
 

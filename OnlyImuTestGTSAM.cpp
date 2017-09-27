@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
     // Assemble prior noise model and add it the graph.
     noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
             (Vector(6) << 0.01, 0.01, 0.01, 0.05, 0.05, 0.05).finished()); // rad,rad,rad,m, m, m
-    noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.1); // m/s
+    noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.01); // m/s
     noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
 
     // Add all prior factors (pose, velocity, bias) to the graph.
@@ -302,6 +302,7 @@ int main(int argc, char *argv[]) {
                         B(trace_id),
                         zero_bias, bias_noise_model
                 ));
+
 
                 // velocity constraint
 //                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));

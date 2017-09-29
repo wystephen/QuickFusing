@@ -308,10 +308,10 @@ int main(int argc, char *argv[]) {
 //                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));
 //                graph->add(BetweenFactor<G)
 //                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
-//                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.001);
-//                PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
-//                                                   velocity_noise);
-//                graph->add(zero_velocity);
+                noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.001);
+                PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
+                                                   velocity_noise);
+                graph->add(zero_velocity);
 
 
 // / last moment of zupt detected

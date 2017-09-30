@@ -419,7 +419,8 @@ int main(int argc, char *argv[]) {
 //    lm_para.setMaxIterations(10000);
 //    lm_para.set
 //    lm_para.iterativeParams.
-    GaussNewtonOptimizer optimizer(*graph, initial_values);//, lm_para);
+//    GaussNewtonOptimizer optimizer(*graph, initial_values);//, lm_para);
+    LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
 //    NonlinearOptimizerParams op_para;
 //    op_para.setMaxIterations(10000);
 //    optimizer.params().setMaxIterations(10000);

@@ -242,6 +242,17 @@ int main(int argc, char *argv[]) {
     int add_vertex_counter = 0;
 
 
+
+    /**
+     * gps factor for trace id == 0
+     */
+    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+    GPSFactor gps_factor(X(trace_id),
+                         Point3(0.0,0.0,0.0),
+                         correction_noise);
+    graph->add(gps_factor);
+
+
     for (int index(0); index < imudata.rows(); ++index) {
         /**ZUPT DETECTOR FIRST*/
         double zupt_flag = 0.0;
@@ -454,10 +465,10 @@ int main(int argc, char *argv[]) {
 
     out_iterations_t.detach();
 
-//    for (int i(0); i < 1000; i++) {
-//        optimizer.iterate();
-//        if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
-//    }
+    for (int i(0); i < 1000; i++) {
+        optimizer.iterate();
+        if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
+    }
     optimizer.optimize();
     auto result = optimizer.values();
 //    auto result = initial_values;

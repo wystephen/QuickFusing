@@ -361,7 +361,7 @@ int main(int argc, char *argv[]) {
             /// Use zupt result as gps
             try {
                 noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
-                GPSFactor gps_factor(X(correction_count),
+                GPSFactor gps_factor(X(trace_id),
                                      Point3(tx(0), tx(1), tx(2)),
                                      correction_noise);
                 graph->add(gps_factor);
@@ -430,8 +430,8 @@ int main(int argc, char *argv[]) {
 //    lm_para.setMaxIterations(10000);
 //    lm_para.set
 //    lm_para.iterativeParams.
-//    GaussNewtonOptimizer optimizer(*graph, initial_values);//, lm_para);
-    LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
+    GaussNewtonOptimizer optimizer(*graph, initial_values);//, lm_para);
+//    LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
 //    NonlinearOptimizerParams op_para;
 //    op_para.setMaxIterations(10000);
 //    optimizer.params().setMaxIterations(10000);

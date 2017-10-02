@@ -444,6 +444,7 @@ int main(int argc, char *argv[]) {
 
     } catch (std::exception &e) {
         std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
+        return 0;
 
     }
 //    std::cout << "trace id :" << trace_id << std::endl;
@@ -460,14 +461,14 @@ int main(int argc, char *argv[]) {
             gy.push_back(t_data[1]);
             }catch(std::exception &e)
             {
-                std::cout  << "error when get value :" << e.what() << std::endl;
+//                std::cout  << "error when get value :" << e.what() << std::endl;
             }
 
         }
 
 
     } catch (std::exception &e) {
-        std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
+//        std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
 
     }
 

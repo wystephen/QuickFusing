@@ -22,6 +22,7 @@
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/PriorFactor.h>
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
+#include <gtsam/nonlinear/GaussNewtonOptimizer.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/inference/Symbol.h>
 #include <gtsam_unstable/dynamics/VelocityConstraint3.h>
@@ -340,11 +341,11 @@ int main(int argc, char *argv[]) {
 
             /// Use zupt result as gps
             try {
-//                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
-//                GPSFactor gps_factor(X(correction_count),
-//                                     Point3(tx(0),tx(1),tx(2)),
-//                                     correction_noise);
-//                graph->add(gps_factor);
+                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+                GPSFactor gps_factor(X(trace_id),
+                                     Point3(tx(0),tx(1),tx(2)),
+                                     correction_noise);
+                graph->add(gps_factor);
 
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
@@ -406,7 +407,8 @@ int main(int argc, char *argv[]) {
     std::cout << "begin to optimization" << std::endl;
 //    LevenbergMarquardtParams lm_para;
 //    lm_para.setMaxIterations(10000);
-    LevenbergMarquardtOptimizer optimizer(*graph, initial_values);//, lm_para);
+//    LevenbergMarquardtOptimizer optimizer(*graph, initial_values);//, lm_para);
+    GaussNewtonOptimizer optimizer(*graph,initial_values);
 
 //    for (int i(0); i < 50000; i++) {
 //        optimizer.iterate();

@@ -305,7 +305,7 @@ int main(int argc, char *argv[]) {
 //                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));
 //                graph->add(BetweenFactor<G)
 //                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
-                if(zupt_flag>0.5){
+                if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.0001);
                     PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
                                                        velocity_noise);
@@ -408,7 +408,7 @@ int main(int argc, char *argv[]) {
 //    LevenbergMarquardtParams lm_para;
 //    lm_para.setMaxIterations(10000);
 //    LevenbergMarquardtOptimizer optimizer(*graph, initial_values);//, lm_para);
-    GaussNewtonOptimizer optimizer(*graph,initial_values);
+    GaussNewtonOptimizer optimizer(*graph, initial_values);
 
 //    for (int i(0); i < 50000; i++) {
 //        optimizer.iterate();
@@ -416,36 +416,40 @@ int main(int argc, char *argv[]) {
 //    }
 //    auto result = optimizer.values();
 
-    std::thread thread1([&]{
-        while(1)
-        {
+    std::thread thread1([&] {
+        while (1) {
             sleep(1);
-            std::cout  << "i :"  << optimizer.iterations() << std::endl;
+            std::cout << "i :" << optimizer.iterations() << std::endl;
         }
     });
 
     auto result = initial_values;
-    try{
+    try {
 
         result = optimizer.optimizeSafely();
 
-    }catch (std::exception &e){
+    } catch (std::exception &e) {
         std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
 
     }
-    std::cout << "trace id :" << trace_id << std::endl;
-    for (int k(1); k < trace_id; ++k) {
-        double t_data[10] = {0};
+//    std::cout << "trace id :" << trace_id << std::endl;
+    try {
+        for (int k(1); k < trace_id; ++k) {
+            double t_data[10] = {0};
 
-        auto pose_result = result.at<Pose3>(X(k));
-        t_data[0] = pose_result.matrix()(0, 3);
-        t_data[1] = pose_result.matrix()(1, 3);
+            auto pose_result = result.at<Pose3>(X(k));
+            t_data[0] = pose_result.matrix()(0, 3);
+            t_data[1] = pose_result.matrix()(1, 3);
 
-        gx.push_back(t_data[0]);
-        gy.push_back(t_data[1]);
+            gx.push_back(t_data[0]);
+            gy.push_back(t_data[1]);
+        }
+
+
+    } catch (std::exception &e) {
+        std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
+
     }
-
-
 
     plt::plot(gx, gy, "r-+");
     plt::plot(ix, iy, "b-");

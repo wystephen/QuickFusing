@@ -286,7 +286,7 @@ int main(int argc, char *argv[]) {
                 ImuFactor imu_factor(
                         X(trace_id - 1), V(trace_id - 1),
                         X(trace_id), V(trace_id),
-                        B(trace_id - 1), *preint_imu
+                        B(trace_id), *preint_imu
                 );
 
 
@@ -423,7 +423,13 @@ int main(int argc, char *argv[]) {
             std::cout  << "i :"  << optimizer.iterations() << std::endl;
         }
     });
-    auto result = optimizer.optimizeSafely();
+    try{
+
+        auto result = optimizer.optimizeSafely();
+    }catch (std::exception &e){
+        std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
+
+    }
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(1); k < trace_id; ++k) {

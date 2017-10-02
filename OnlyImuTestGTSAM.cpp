@@ -248,7 +248,7 @@ int main(int argc, char *argv[]) {
      */
     noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
     GPSFactor gps_factor(X(trace_id),
-                         Point3(0.0,0.0,0.0),
+                         Point3(0.0, 0.0, 0.0),
                          correction_noise);
     graph->add(gps_factor);
 
@@ -424,6 +424,7 @@ int main(int argc, char *argv[]) {
 
 
     ///optimization
+
 
     std::cout << "begin to optimization" << std::endl;
 //    LevenbergMarquardtParams lm_para;

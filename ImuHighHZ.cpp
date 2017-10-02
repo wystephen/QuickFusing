@@ -423,14 +423,16 @@ int main(int argc, char *argv[]) {
             std::cout  << "i :"  << optimizer.iterations() << std::endl;
         }
     });
+
+    auto result = initial_values;
     try{
 
-        auto result = optimizer.optimizeSafely();
+        result = optimizer.optimizeSafely();
+
     }catch (std::exception &e){
         std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
 
     }
-
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(1); k < trace_id; ++k) {
         double t_data[10] = {0};
@@ -442,6 +444,7 @@ int main(int argc, char *argv[]) {
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);
     }
+
 
 
     plt::plot(gx, gy, "r-+");

@@ -415,6 +415,14 @@ int main(int argc, char *argv[]) {
 //        if (i % 100 == 0) std::cout << "i :'" << i << std::endl;
 //    }
 //    auto result = optimizer.values();
+
+    std::thread thread1([&]{
+        while(1)
+        {
+            sleep(1);
+            std::cout  << "i :"  << optimizer.iterations() << std::endl;
+        }
+    })
     auto result = optimizer.optimizeSafely();
 
     std::cout << "trace id :" << trace_id << std::endl;

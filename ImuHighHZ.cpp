@@ -437,12 +437,18 @@ int main(int argc, char *argv[]) {
         for (int k(1); k < trace_id; ++k) {
             double t_data[10] = {0};
 
+            try{
             auto pose_result = result.at<Pose3>(X(k));
             t_data[0] = pose_result.matrix()(0, 3);
             t_data[1] = pose_result.matrix()(1, 3);
 
             gx.push_back(t_data[0]);
             gy.push_back(t_data[1]);
+            }catch(std::exception &e)
+            {
+                std::cout  << "error when get value :" << e.what() << std::endl;
+            }
+
         }
 
 

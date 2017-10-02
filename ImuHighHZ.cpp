@@ -417,9 +417,23 @@ int main(int argc, char *argv[]) {
 //    auto result = optimizer.values();
 
     std::thread thread1([&] {
+        int last_index = 0;
+        int counter = 0;
         while (1) {
             sleep(1);
             std::cout << "i :" << optimizer.iterations() << std::endl;
+            last_index = int(optimizer.iterations());
+            if(last_index>= optimizer.iterations())
+            {
+                counter +=1;
+            }else{
+                counter = 0;
+            }
+
+            if(counter>10){
+                break;
+            }
+
         }
     });
 

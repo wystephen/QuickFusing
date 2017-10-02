@@ -341,11 +341,11 @@ int main(int argc, char *argv[]) {
 
             /// Use zupt result as gps
             try {
-                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 5.1);
-                GPSFactor gps_factor(X(trace_id),
-                                     Point3(tx(0),tx(1),tx(2)),
-                                     correction_noise);
-                graph->add(gps_factor);
+//                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 5.1);
+//                GPSFactor gps_factor(X(trace_id),
+//                                     Point3(tx(0),tx(1),tx(2)),
+//                                     correction_noise);
+//                graph->add(gps_factor);
 
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
@@ -423,7 +423,7 @@ int main(int argc, char *argv[]) {
             std::cout  << "i :"  << optimizer.iterations() << std::endl;
         }
     });
-    auto result = optimizer.optimize();
+    auto result = optimizer.optimizeSafely();
 
     std::cout << "trace id :" << trace_id << std::endl;
     for (int k(1); k < trace_id; ++k) {

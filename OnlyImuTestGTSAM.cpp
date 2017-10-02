@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
 
     // Assemble prior noise model and add it the graph.
     noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
-            (Vector(6) << 0.01, 0.01, 0.01, 0.05, 0.05, 0.05).finished()); // rad,rad,rad,m, m, m
+            (Vector(6) << 0.01, 0.01, 0.01, 0.05, 0.05, 0.05)); // rad,rad,rad,m, m, m
     noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.01); // m/s
     noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
 
@@ -431,8 +431,10 @@ int main(int argc, char *argv[]) {
 //    lm_para.setMaxIterations(10000);
 //    lm_para.set
 //    lm_para.iterativeParams.
-    GaussNewtonOptimizer optimizer(*graph, initial_values);//, lm_para);
-//    LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
+//    GaussNewtonOptimizer optimizer(*graph, initial_values);//, lm_para);
+//    optimizer.
+    LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
+    optimizer.linearize();
 //    NonlinearOptimizerParams op_para;
 //    op_para.setMaxIterations(10000);
 //    optimizer.params().setMaxIterations(10000);

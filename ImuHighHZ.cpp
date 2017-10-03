@@ -266,8 +266,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 15 ||
-            std::fabs(last_zupt_flag - zupt_flag) > 0.5) {
+        if (add_vertex_counter > 15 ){
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -362,18 +361,7 @@ int main(int argc, char *argv[]) {
 
         }
 
-        if (zupt_flag > 0.5) {
-            /// zero velocity
 
-
-
-
-
-        } else {
-            ///
-
-
-        }
         imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
                                                  imudata.block(index, 3, 1, 3).transpose(),
                                                  initial_para.Ts_);
@@ -402,6 +390,7 @@ int main(int argc, char *argv[]) {
 //    }
 //    auto result = optimizer.values();
 
+    /// Show itereation times ~
     std::thread thread1([&] {
         int last_index = 0;
         int counter = 0;
@@ -435,7 +424,7 @@ int main(int argc, char *argv[]) {
 //    }
 //    std::cout << "trace id :" << trace_id << std::endl;
     try {
-        for (int k(1); k < trace_id; ++k) {
+        for (int k(0); k < trace_id; ++k) {
             double t_data[10] = {0};
 
             try {
@@ -446,7 +435,7 @@ int main(int argc, char *argv[]) {
                 gx.push_back(t_data[0]);
                 gy.push_back(t_data[1]);
             } catch (std::exception &e) {
-//                std::cout  << "error when get value :" << e.what() << std::endl;
+                std::cout  << "error when get value :" << e.what() << std::endl;
             }
 
         }

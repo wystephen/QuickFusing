@@ -555,6 +555,13 @@ public:
 
 
         /**
+         * against nan and inf
+         */
+
+        assert(!std::isinf(P_.sum()) && !std::isnan(P_.sum()) && !std::isnan(x_h_.sum())&& !std::isinf(x_h_.sum()));
+
+
+        /**
          * Plugin module....
          */
         Eigen::Vector3d xaxis(1.0, 0.0, 0.0);

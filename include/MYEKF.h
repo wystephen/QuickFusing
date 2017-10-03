@@ -558,6 +558,15 @@ public:
          * against nan and inf
          */
 
+        if(std::nan(x_h_.block(6,0,3,1).sum()))
+        {
+            x_h_.block(6,0,3,1) = Eigen::Vector3d(0,0,0);
+        }
+        if(!(!std::isinf(P_.sum()) && !std::isnan(P_.sum()) ))
+        {
+            std::cout << P_ << std::endl << x_h_ << std::endl;
+        }
+
         assert(!std::isinf(P_.sum()) && !std::isnan(P_.sum()) && !std::isnan(x_h_.sum())&& !std::isinf(x_h_.sum()));
 
 

@@ -12,6 +12,7 @@
 
 
 #include <deque>
+
 class SettingPara; // forward declaration
 class MyEkf {
 public:
@@ -496,7 +497,7 @@ public:
 
 //        std::cout << "current R:" << R << std::endl;
         //std::cout << "delta theta :" << get
-            
+
 
         quat_ = dcm2q(R);
 
@@ -537,14 +538,13 @@ public:
 
             P_ = (Id - K * H_) * P_;
 
-            if(P_.block(0,0,3,3).mean()>1e4)
-            {
-                P_.block(0,0,3,3) /= 1e2;
-                std::cerr << "error at :"<< __FILE__
-                                         <<":"
-                                         <<__LINE__
-                                         << " cov of state(P_) is too large"
-                                         << std::endl;
+            if (P_.block(0, 0, 3, 3).mean() > 1e4) {
+                P_.block(0, 0, 3, 3) /= 1e2;
+                std::cerr << "error at :" << __FILE__
+                          << ":"
+                          << __LINE__
+                          << " cov of state(P_) is too large"
+                          << std::endl;
             }
 
             x_h_ = ComputeInternalState(x_h_, dx, quat_);
@@ -558,16 +558,14 @@ public:
          * against nan and inf
          */
 
-        if(std::isnan(x_h_.block(6,0,3,1).sum()))
-        {
-            x_h_.block(6,0,3,1) = Eigen::Vector3d(0,0,0);
+        if (std::isnan(x_h_.block(6, 0, 3, 1).sum())) {
+            x_h_.block(6, 0, 3, 1) = Eigen::Vector3d(0, 0, 0);
         }
-        if(!(!std::isinf(P_.sum()) && !std::isnan(P_.sum()) ))
-        {
+        if (!(!std::isinf(P_.sum()) && !std::isnan(P_.sum()))) {
             std::cout << P_ << std::endl << x_h_ << std::endl;
         }
 
-        assert(!std::isinf(P_.sum()) && !std::isnan(P_.sum()) && !std::isnan(x_h_.sum())&& !std::isinf(x_h_.sum()));
+        assert(!std::isinf(P_.sum()) && !std::isnan(P_.sum()) && !std::isnan(x_h_.sum()) && !std::isinf(x_h_.sum()));
 
 
         /**
@@ -675,8 +673,7 @@ public:
 //
 //       return 0.0;
 //    }
-    Eigen::Isometry3d getTransformation()
-    {
+    Eigen::Isometry3d getTransformation() {
         Eigen::Isometry3d transform = (Eigen::Isometry3d::Identity());
 
         Eigen::Quaterniond the_quat;
@@ -685,7 +682,7 @@ public:
         the_quat.z() = quat_(2);
         the_quat.w() = quat_(3);
 
-        Eigen::Vector3d offset(x_h_(0),x_h_(1),x_h_(2));
+        Eigen::Vector3d offset(x_h_(0), x_h_(1), x_h_(2));
 
         Eigen::Matrix3d rotation_matrix = the_quat.toRotationMatrix();
 
@@ -699,15 +696,14 @@ public:
             transform(ix, 3) = offset(ix);
         }
 
-        if(std::isnan(transform.matrix().mean()))
-        {
+        if (std::isnan(transform.matrix().mean())) {
             std::cout << "transform.matrix is nan:"
                       << __FUNCTION__
-                      <<":"
-                      <<__FILE__
-                      <<":"
-                      <<__LINE__
-                      <<std::endl;
+                      << ":"
+                      << __FILE__
+                      << ":"
+                      << __LINE__
+                      << std::endl;
         }
 
         return transform;

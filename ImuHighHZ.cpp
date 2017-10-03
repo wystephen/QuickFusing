@@ -343,7 +343,6 @@ int main(int argc, char *argv[]) {
             try {
                 noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
                 GPSFactor gps_factor(X(trace_id),
-//                                     Point3(tx(0),tx(1),tx(2)),
                                      Point3(0, 0, 0),
                                      correction_noise);
                 graph->add(gps_factor);

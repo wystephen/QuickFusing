@@ -341,11 +341,11 @@ int main(int argc, char *argv[]) {
 
             /// Use zupt result as gps
             try {
-//                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 5.1);
-//                GPSFactor gps_factor(X(trace_id),
-//                                     Point3(tx(0),tx(1),tx(2)),
-//                                     correction_noise);
-//                graph->add(gps_factor);
+                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 5.1);
+                GPSFactor gps_factor(X(trace_id),
+                                     Point3(tx(0),tx(1),tx(2)),
+                                     correction_noise);
+                graph->add(gps_factor);
 
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
@@ -423,14 +423,13 @@ int main(int argc, char *argv[]) {
             sleep(1);
             std::cout << "i :" << optimizer.iterations() << std::endl;
             last_index = int(optimizer.iterations());
-            if(last_index>= optimizer.iterations())
-            {
-                counter +=1;
-            }else{
+            if (last_index >= optimizer.iterations()) {
+                counter += 1;
+            } else {
                 counter = 0;
             }
 
-            if(counter>10){
+            if (counter > 10) {
                 break;
             }
 
@@ -446,21 +445,21 @@ int main(int argc, char *argv[]) {
         std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
         return 0;
 
+
     }
 //    std::cout << "trace id :" << trace_id << std::endl;
     try {
         for (int k(1); k < trace_id; ++k) {
             double t_data[10] = {0};
 
-            try{
-            auto pose_result = result.at<Pose3>(X(k));
-            t_data[0] = pose_result.matrix()(0, 3);
-            t_data[1] = pose_result.matrix()(1, 3);
+            try {
+                auto pose_result = result.at<Pose3>(X(k));
+                t_data[0] = pose_result.matrix()(0, 3);
+                t_data[1] = pose_result.matrix()(1, 3);
 
-            gx.push_back(t_data[0]);
-            gy.push_back(t_data[1]);
-            }catch(std::exception &e)
-            {
+                gx.push_back(t_data[0]);
+                gy.push_back(t_data[1]);
+            } catch (std::exception &e) {
 //                std::cout  << "error when get value :" << e.what() << std::endl;
             }
 

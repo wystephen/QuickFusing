@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 15) {
+        if (add_vertex_counter > 25) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -358,25 +358,6 @@ int main(int argc, char *argv[]) {
 
             /// reset integrated
 //            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
-
-        } else if (zupt_flag < 0.5 && last_zupt_flag > 0.5) {
-            try {
-                /// last moment of zupt detected
-//                prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
-//            initial_values.insert(X(trace_id), prop_state.pose());
-//            initial_values.insert(V(trace_id), prop_state.v());
-//            initial_values.insert(B(trace_id), prev_bias);
-//
-//
-//                imu_preintegrated_->resetIntegration();
-            } catch (std::exception &e) {
-                std::cout << "error at :" << __FILE__
-                          << " " << __LINE__ << " : " << e.what() << std::endl;
-            } catch (...) {
-                std::cout << "error at :" << __FILE__
-                          << " " << __LINE__ << " : unkonw error " << std::endl;
-            }
-
 
         }
 

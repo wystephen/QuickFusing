@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 10) {
+        if (add_vertex_counter > 15) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -306,7 +306,7 @@ int main(int argc, char *argv[]) {
 //                graph->add(BetweenFactor<G)
 //                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
                 if (zupt_flag > 0.5) {
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.0001);
+                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.000001);
                     PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
                                                        velocity_noise);
                     graph->add(zero_velocity);

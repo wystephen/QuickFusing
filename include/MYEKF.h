@@ -558,7 +558,7 @@ public:
          * against nan and inf
          */
 
-        if(std::nan(x_h_.block(6,0,3,1).sum()))
+        if(std::isnan(x_h_.block(6,0,3,1).sum()))
         {
             x_h_.block(6,0,3,1) = Eigen::Vector3d(0,0,0);
         }

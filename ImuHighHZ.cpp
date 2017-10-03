@@ -437,16 +437,16 @@ int main(int argc, char *argv[]) {
     });
 
     auto result = initial_values;
-    try {
+//    try {
 
         result = optimizer.optimizeSafely();
 
-    } catch (std::exception &e) {
-        std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
-        return 0;
-
-
-    }
+//    } catch (std::exception &e) {
+//        std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
+//        return 0;
+//
+//
+//    }
 //    std::cout << "trace id :" << trace_id << std::endl;
     try {
         for (int k(1); k < trace_id; ++k) {

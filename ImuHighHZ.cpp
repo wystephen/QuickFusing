@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
     // Assemble initial quaternion through gtsam constructor ::quaternion(w,x,y,z);
 //    Rot3 prior_rotation = Rot3::Quaternion(initial_state(6), initial_state(3),
 //                                           initial_state(4), initial_state(5));
-    Rot3 prior_rotation= Rot3(myekf.getTransformation().matrix().block(0,0,3,3));
+    Rot3 prior_rotation = Rot3(myekf.getTransformation().matrix().block(0, 0, 3, 3));
     Point3 prior_point(initial_state.head<3>());
     Pose3 prior_pose(prior_rotation, prior_point);
     Vector3 prior_velocity(initial_state.tail<3>());
@@ -219,8 +219,8 @@ int main(int argc, char *argv[]) {
             trace_id++;
 //            std::cout << "trace id : " << trace_id << std::endl;
             ///Added to
-            PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements *>
-            (imu_preintegrated_);
+            PreintegratedImuMeasurements *preint_imu =
+                    dynamic_cast<PreintegratedImuMeasurements *>(imu_preintegrated_);
 
 
             try {
@@ -250,7 +250,8 @@ int main(int argc, char *argv[]) {
 
                 // velocity constraint
                 if (zupt_flag > 0.5) {
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.00000000000000000001);
+                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,
+                                                                                                   0.000000000001);
                     PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
                                                        velocity_noise);
                     graph->add(zero_velocity);
@@ -286,7 +287,7 @@ int main(int argc, char *argv[]) {
 
             /// Use zupt result as gps
             try {
-                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 110050.1);
+                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
                 GPSFactor gps_factor(X(trace_id),
                                      Point3(0, 0, 0),
                                      correction_noise);
@@ -324,11 +325,11 @@ int main(int argc, char *argv[]) {
     }
 
 
-    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
-    GPSFactor gps_factor(X(trace_id),
-                         Point3(0, 0, 0),
-                         correction_noise);
-    graph->add(gps_factor);
+//    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
+//    GPSFactor gps_factor(X(trace_id),
+//                         Point3(0, 0, 0),
+//                         correction_noise);
+//    graph->add(gps_factor);
 
     ///optimization
 

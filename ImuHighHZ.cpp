@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 15) {
+        if (add_vertex_counter > 10) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -345,7 +345,7 @@ int main(int argc, char *argv[]) {
                 GPSFactor gps_factor(X(trace_id),
                                      Point3(0, 0, 0),
                                      correction_noise);
-                graph->add(gps_factor);
+                  if(zupt_flag> 0.5) graph->add(gps_factor);
 
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
@@ -373,7 +373,11 @@ int main(int argc, char *argv[]) {
 
 
 
-
+//noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
+//                GPSFactor gps_factor(X(trace_id),
+//                                     Point3(0, 0, 0),
+//                                     correction_noise);
+//                  graph->add(gps_factor);
 
     ///optimization
 

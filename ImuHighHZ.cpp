@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 5) {
+        if (add_vertex_counter > 45) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 

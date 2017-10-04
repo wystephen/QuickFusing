@@ -100,6 +100,8 @@ int main(int argc, char *argv[]) {
 
     initial_para.ZeroDetectorWindowSize_ = 10;
 
+    MyEkf myekf(initial_para);
+    myekf.InitNavEq(imudata.block(0, 0, 20, 6));
 
     /**
      * Create and prepare for graph
@@ -109,8 +111,9 @@ int main(int argc, char *argv[]) {
     Eigen::Matrix<double, 10, 1> initial_state = Eigen::Matrix<double, 10, 1>::Zero();
     initial_state(6) = 1.0;
     // Assemble initial quaternion through gtsam constructor ::quaternion(w,x,y,z);
-    Rot3 prior_rotation = Rot3::Quaternion(initial_state(6), initial_state(3),
-                                           initial_state(4), initial_state(5));
+//    Rot3 prior_rotation = Rot3::Quaternion(initial_state(6), initial_state(3),
+//                                           initial_state(4), initial_state(5));
+    Rot3 prior_rotation= Rot3(myekf.getTransformation().matrix().block(0,0,3,3));
     Point3 prior_point(initial_state.head<3>());
     Pose3 prior_pose(prior_rotation, prior_point);
     Vector3 prior_velocity(initial_state.tail<3>());
@@ -147,8 +150,8 @@ int main(int argc, char *argv[]) {
     Matrix33 bias_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_bias_rw_sigma, 2);
     Matrix66 bias_acc_omega_int = Matrix::Identity(6, 6) * 1e-5; // error in the bias used for preintegration
 
-    boost::shared_ptr<PreintegratedImuMeasurements::Params> p = PreintegratedImuMeasurements::Params::MakeSharedD(
-            9.81);
+    boost::shared_ptr<PreintegratedImuMeasurements::Params> p = PreintegratedImuMeasurements::Params::MakeSharedD(0.0);
+//            9.81);
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
     p->integrationCovariance = integration_error_cov; // integration uncertainty continuous
@@ -171,8 +174,7 @@ int main(int argc, char *argv[]) {
      */
 
 
-    MyEkf myekf(initial_para);
-    myekf.InitNavEq(imudata.block(0, 0, 20, 6));
+
 
     double last_zupt_flag = 0.0;
 
@@ -248,7 +250,7 @@ int main(int argc, char *argv[]) {
 
                 // velocity constraint
                 if (zupt_flag > 0.5) {
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.00001);
+                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.00000000000000000001);
                     PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
                                                        velocity_noise);
                     graph->add(zero_velocity);

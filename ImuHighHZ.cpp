@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 15 ){
+        if (add_vertex_counter > 15) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -434,7 +434,7 @@ int main(int argc, char *argv[]) {
                 gx.push_back(t_data[0]);
                 gy.push_back(t_data[1]);
             } catch (std::exception &e) {
-                std::cout  << "error when get value :" << e.what() << std::endl;
+                std::cout << "error when get value :" << e.what() << std::endl;
             }
 
         }

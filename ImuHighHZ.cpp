@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
     Matrix66 bias_acc_omega_int = Matrix::Identity(6, 6) * 1e-5; // error in the bias used for preintegration
 
     boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
-            PreintegratedImuMeasurements::Params::MakeSharedD(0.0);
+            PreintegratedImuMeasurements::Params::MakeSharedU(9.81);
 
 
     // PreintegrationBase params:
@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 25) {
+        if (add_vertex_counter > 32) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -259,6 +259,15 @@ int main(int argc, char *argv[]) {
                                                        velocity_noise);
                     graph->add(zero_velocity);
 
+                }else{
+                     noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,
+                                                                                                   1.1);
+
+
+                    PriorFactor<Vector3> zero_velocity(V(trace_id),
+                                                       Vector3(0.0, 0.0, 0.0),
+                                                       velocity_noise);
+                    graph->add(zero_velocity);
                 }
 
 //                PriorFactor<Rot3> orietation_constraint(X)

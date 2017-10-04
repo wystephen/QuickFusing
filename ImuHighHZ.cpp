@@ -42,61 +42,7 @@ PreintegratedImuMeasurements *imu_preintegrated_;
 namespace plt = matplotlibcpp;
 
 
-//bool GLRT_Detector(Eigen::MatrixXd u,
-//                   const SettingPara &para_) {
-//    Eigen::Vector3d ya_m;
-//    double g = para_.gravity_;
-//
-//    double T(0.0);
-////    Eigen::MatrixXd Tmatrix(1, 1);
-////    Tmatrix
-//
-//    for (int i(0); i < 3; ++i) {
-//        ya_m(i) = u.block(i, 0, 1, u.cols()).mean();
-//    }
-//
-//    Eigen::Vector3d tmp;
-//
-//    for (int i(0); i < u.cols(); ++i) {
-//
-//        tmp = u.block(0, i, 3, 1) - g * ya_m / ya_m.norm();
-//        if (std::isnan(tmp.sum())) {
-//            std::cout << "nan at tmp in " << __FUNCTION__ << ":"
-//                      << __FILE__ << ":" << __LINE__ << std::endl;
-//        }
-//
-////        std::cout << " u block size : " << u.block(3,i,3,1).rows()<< std::endl;
-////        std::cout << "tmp size :" << tmp.rows()<< std::endl;
-//
-//        T += (u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / para_.sigma_g_ +
-//              tmp.transpose() * tmp / para_.sigma_a_).sum();
-//
-////        if(std::isnan(Tmatrix.sum()))
-////        {
-////            std::cout << "Tmatrix is nan" << __FILE__
-////                                          << ":"<< __LINE__ << std::endl;
-////        }
-//
-//
-//    }
-//
-////    if (Tmatrix.size() != 1) {
-////        MYERROR("Tmatrxi size is not equal to 1")
-////    }
-//
-//
-//    T = T / double(para_.ZeroDetectorWindowSize_);
-//
-////    std::cout << "T :" << T << std::endl;
-//    if (T < para_.gamma_) {
-//        return true;
-//
-//    } else {
-//
-//        return false;
-//    }
-//
-//}
+
 
 Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
                                Eigen::Quaterniond q) {
@@ -111,7 +57,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/XIMU&UWB/5/";
+    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
 
     /// Global parameters
     double first_info(10), second_info(10 * M_PI / 180.0);
@@ -181,7 +127,7 @@ int main(int argc, char *argv[]) {
     // Assemble prior noise model and add it the graph.
     noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
             (Vector(6) << 0.01, 0.01, 0.01, 0.05, 0.05, 0.05).finished()); // rad,rad,rad,m, m, m
-    noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.1); // m/s
+    noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.01); // m/s
     noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
 
     // Add all prior factors (pose, velocity, bias) to the graph.
@@ -255,8 +201,8 @@ int main(int argc, char *argv[]) {
         /** ZUPT METHOD **/
         auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6).transpose(), zupt_flag);
         if (0 == index || (zupt_flag < 0.5 & last_zupt_flag > 0.5)) {
-            std::cout << "index: " << index << "key step"
-                      << "ori:" << myekf.getOriente() << std::endl;
+//            std::cout << "index: " << index << "key step"
+//                      << "ori:" << myekf.getOriente() << std::endl;
 
             auto the_transform = myekf.getTransformation();
 
@@ -266,7 +212,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 10) {
+        if (add_vertex_counter > 5) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -302,9 +248,6 @@ int main(int argc, char *argv[]) {
                 ));
 
                 // velocity constraint
-//                gtsam::LieVector z_v(Vector3(0.0,0.0,0.0));
-//                graph->add(BetweenFactor<G)
-//                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.00000001);
                     PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
@@ -328,6 +271,7 @@ int main(int argc, char *argv[]) {
 //                for (int i(0); i < 100; ++i) {
 //                    optimizer.iterate();
 //                }
+//                optimizer.optimizeSafely();
 //                initial_values = optimizer.values();
 
             } catch (const std::exception &e) {
@@ -355,6 +299,11 @@ int main(int argc, char *argv[]) {
                           << " " << __LINE__ << " : unkonw error " << std::endl;
             }
 
+//            if(zupt_flag>0.5)
+//            {
+//
+//            }
+
             /// reset integrated
 //            imu_preintegrated_->resetIntegrationAndSetBias(prev_bias);
 
@@ -364,6 +313,8 @@ int main(int argc, char *argv[]) {
         imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
                                                  imudata.block(index, 3, 1, 3).transpose(),
                                                  initial_para.Ts_);
+
+
 
         /**
          * updata data
@@ -384,8 +335,8 @@ int main(int argc, char *argv[]) {
     std::cout << "begin to optimization" << std::endl;
 //    LevenbergMarquardtParams lm_para;
 //    lm_para.setMaxIterations(10000);
-//    LevenbergMarquardtOptimizer optimizer(*graph, initial_values);//, lm_para);
-    GaussNewtonOptimizer optimizer(*graph, initial_values);
+    LevenbergMarquardtOptimizer optimizer(*graph, initial_values);//, lm_para);
+//    GaussNewtonOptimizer optimizer(*graph, initial_values);
 
 //    for (int i(0); i < 50000; i++) {
 //        optimizer.iterate();

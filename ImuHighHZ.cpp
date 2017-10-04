@@ -150,8 +150,10 @@ int main(int argc, char *argv[]) {
     Matrix33 bias_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_bias_rw_sigma, 2);
     Matrix66 bias_acc_omega_int = Matrix::Identity(6, 6) * 1e-5; // error in the bias used for preintegration
 
-    boost::shared_ptr<PreintegratedImuMeasurements::Params> p = PreintegratedImuMeasurements::Params::MakeSharedU(
-            );
+    boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
+            PreintegratedImuMeasurements::Params::MakeSharedD(0.0);
+
+
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
     p->integrationCovariance = integration_error_cov; // integration uncertainty continuous
@@ -173,9 +175,6 @@ int main(int argc, char *argv[]) {
      * Initial ekf
      */
 
-
-
-
     double last_zupt_flag = 0.0;
 
     int trace_id(0);
@@ -191,6 +190,7 @@ int main(int argc, char *argv[]) {
         if (index <= initial_para.ZeroDetectorWindowSize_) {
             zupt_flag = 1.0;
         } else {
+
             if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_,
                                             0, initial_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
                               initial_para)) {
@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
 
         /** GTSAM FOR INTEGRATE **/
         add_vertex_counter++;
-        if (add_vertex_counter > 5) {
+        if (add_vertex_counter > 25) {
             /// first moment of zupt detected
             add_vertex_counter = 0;
 
@@ -251,14 +251,17 @@ int main(int argc, char *argv[]) {
                 // velocity constraint
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,
-                                                                                                   0.001);
-                    PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
+                                                                                                   0.00001);
+
+
+                    PriorFactor<Vector3> zero_velocity(V(trace_id),
+                                                       Vector3(0.0, 0.0, 0.0),
                                                        velocity_noise);
                     graph->add(zero_velocity);
+
                 }
 
 //                PriorFactor<Rot3> orietation_constraint(X)
-
 
 
 // / last moment of zupt detected
@@ -289,6 +292,7 @@ int main(int argc, char *argv[]) {
 
             /// Use zupt result as gps
             try {
+
                 noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
                 GPSFactor gps_factor(X(trace_id),
                                      Point3(0, 0, 0),
@@ -396,7 +400,8 @@ int main(int argc, char *argv[]) {
                 gx.push_back(t_data[0]);
                 gy.push_back(t_data[1]);
 
-                test_out_put << t_data[0] << "," << t_data[1] << ","
+                test_out_put << t_data[0] << ","
+                             << t_data[1] << ","
                              << t_data[2] << std::endl;
 
                 auto velocity_result = result.at<Vector3>(V(k));

@@ -423,6 +423,9 @@ int main(int argc, char *argv[]) {
 //    }
 //    std::cout << "trace id :" << trace_id << std::endl;
     try {
+
+        ofstream test_out_put("./ResultData/test.txt");
+
         for (int k(0); k < trace_id; ++k) {
             double t_data[10] = {0};
 
@@ -433,6 +436,8 @@ int main(int argc, char *argv[]) {
 
                 gx.push_back(t_data[0]);
                 gy.push_back(t_data[1]);
+                test_out_put << t_data[0] << "," << t_data[1] << ","
+                             << t_data[2] << std::endl;
             } catch (std::exception &e) {
                 std::cout << "error when get value :" << e.what() << std::endl;
             }

@@ -398,6 +398,9 @@ int main(int argc, char *argv[]) {
 
                 test_out_put << t_data[0] << "," << t_data[1] << ","
                              << t_data[2] << std::endl;
+
+                auto velocity_result = result.at<Vector3>(V(k));
+                std::cout << velocity_result.transpose() << std::endl;
             } catch (std::exception &e) {
                 std::cout << "error when get value :" << e.what() << std::endl;
             }

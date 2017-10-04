@@ -42,8 +42,6 @@ PreintegratedImuMeasurements *imu_preintegrated_;
 namespace plt = matplotlibcpp;
 
 
-
-
 Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
                                Eigen::Quaterniond q) {
     Eigen::Isometry3d T;
@@ -247,9 +245,10 @@ int main(int argc, char *argv[]) {
                         zero_bias, bias_noise_model
                 ));
 
+
                 // velocity constraint
                 if (zupt_flag > 0.5) {
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.00000001);
+                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.00001);
                     PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
                                                        velocity_noise);
                     graph->add(zero_velocity);
@@ -285,11 +284,11 @@ int main(int argc, char *argv[]) {
 
             /// Use zupt result as gps
             try {
-                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
+                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 110050.1);
                 GPSFactor gps_factor(X(trace_id),
                                      Point3(0, 0, 0),
                                      correction_noise);
-                  if(zupt_flag> 0.5) graph->add(gps_factor);
+                if (zupt_flag > 0.5) graph->add(gps_factor);
 
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__
@@ -323,12 +322,11 @@ int main(int argc, char *argv[]) {
     }
 
 
-
-//noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
-//                GPSFactor gps_factor(X(trace_id),
-//                                     Point3(0, 0, 0),
-//                                     correction_noise);
-//                  graph->add(gps_factor);
+    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
+    GPSFactor gps_factor(X(trace_id),
+                         Point3(0, 0, 0),
+                         correction_noise);
+    graph->add(gps_factor);
 
     ///optimization
 

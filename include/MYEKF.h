@@ -540,11 +540,15 @@ public:
 
             if (P_.block(0, 0, 3, 3).mean() > 1e4) {
                 P_.block(0, 0, 3, 3) /= 1e2;
+                if(!outputted_warning){
                 std::cerr << "error at :" << __FILE__
                           << ":"
                           << __LINE__
                           << " cov of state(P_) is too large"
                           << std::endl;
+                    outputted_warning = true;
+                }
+
             }
 
             x_h_ = ComputeInternalState(x_h_, dx, quat_);
@@ -745,6 +749,7 @@ private:
     Eigen::VectorXd last_chage_state_;
 
     bool last_zupt_ = true;
+    bool outputted_warning = false;// control the output of warning at consider the valid of P_
 
 
 };

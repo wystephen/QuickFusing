@@ -306,7 +306,7 @@ int main(int argc, char *argv[]) {
 //                graph->add(BetweenFactor<G)
 //                graph->add(VelocityConstraint3<0.0,0.0,0.0>)
                 if (zupt_flag > 0.5) {
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.000001);
+                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.00000001);
                     PriorFactor<Vector3> zero_velocity(V(trace_id), Vector3(0.0, 0.0, 0.0),
                                                        velocity_noise);
                     graph->add(zero_velocity);
@@ -436,6 +436,7 @@ int main(int argc, char *argv[]) {
 
                 gx.push_back(t_data[0]);
                 gy.push_back(t_data[1]);
+
                 test_out_put << t_data[0] << "," << t_data[1] << ","
                              << t_data[2] << std::endl;
             } catch (std::exception &e) {

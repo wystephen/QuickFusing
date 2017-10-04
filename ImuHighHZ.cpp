@@ -140,18 +140,18 @@ int main(int argc, char *argv[]) {
     // We use the sensor specs to build the noise model for the IMU factor.
     double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
     double gyro_noise_sigma = initial_para.sigma_gyro_(0);//0.000205689024915;
-    double accel_bias_rw_sigma = 0.04905;
-    double gyro_bias_rw_sigma = 0.001454441043;
+    double accel_bias_rw_sigma = 0.004905;
+    double gyro_bias_rw_sigma = 0.000001454441043;
     Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
     Matrix33 measured_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_noise_sigma, 2);
     Matrix33 integration_error_cov =
-            Matrix33::Identity(3, 3) * 1e-3; // error committed in integrating position from velocities
+            Matrix33::Identity(3, 3) * 1e-8; // error committed in integrating position from velocities
     Matrix33 bias_acc_cov = Matrix33::Identity(3, 3) * pow(accel_bias_rw_sigma, 2);
     Matrix33 bias_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_bias_rw_sigma, 2);
     Matrix66 bias_acc_omega_int = Matrix::Identity(6, 6) * 1e-5; // error in the bias used for preintegration
 
-    boost::shared_ptr<PreintegratedImuMeasurements::Params> p = PreintegratedImuMeasurements::Params::MakeSharedD(0.0);
-//            9.81);
+    boost::shared_ptr<PreintegratedImuMeasurements::Params> p = PreintegratedImuMeasurements::Params::MakeSharedD(
+            0.0);
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
     p->integrationCovariance = integration_error_cov; // integration uncertainty continuous
@@ -350,11 +350,12 @@ int main(int argc, char *argv[]) {
         int counter = 0;
         while (1) {
             sleep(1);
-            std::cout << "i :" << optimizer.iterations() << std::endl;
+
             last_index = int(optimizer.iterations());
             if (last_index >= optimizer.iterations()) {
                 counter += 1;
             } else {
+                std::cout << "i :" << optimizer.iterations() << std::endl;
                 counter = 0;
             }
 

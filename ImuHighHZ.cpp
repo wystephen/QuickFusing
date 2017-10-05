@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
     Matrix66 bias_acc_omega_int = Matrix::Identity(6, 6) * 1e-5; // error in the bias used for preintegration
 
     boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
-            PreintegratedImuMeasurements::Params::MakeSharedU(9.81);
+            PreintegratedImuMeasurements::Params::MakeSharedD(9.81);
 
 
     // PreintegrationBase params:
@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
                 // velocity constraint
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,
-                                                                                                   0.00001);
+                                                                                                   0.0000001);
 
 
                     PriorFactor<Vector3> zero_velocity(V(trace_id),

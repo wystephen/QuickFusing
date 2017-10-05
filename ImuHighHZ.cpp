@@ -257,6 +257,7 @@ int main(int argc, char *argv[]) {
                     PriorFactor<Vector3> zero_velocity(V(trace_id),
                                                        Vector3(0.0, 0.0, 0.0),
                                                        velocity_noise);
+
                     graph->add(zero_velocity);
 
                 } else {
@@ -281,6 +282,7 @@ int main(int argc, char *argv[]) {
                 prev_state = prop_state;
 
                 preint_imu->resetIntegration();
+
 
                 //optimize
 //                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);

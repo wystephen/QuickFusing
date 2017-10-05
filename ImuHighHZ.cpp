@@ -368,12 +368,12 @@ int main(int argc, char *argv[]) {
         int counter = 0;
         while (1) {
             sleep(1);
-
+            std::cout << "i :" << optimizer.iterations() << std::endl;
             last_index = int(optimizer.iterations());
             if (last_index >= optimizer.iterations()) {
                 counter += 1;
             } else {
-                std::cout << "i :" << optimizer.iterations() << std::endl;
+
                 counter = 0;
             }
 
@@ -416,8 +416,8 @@ int main(int argc, char *argv[]) {
                              << t_data[1] << ","
                              << t_data[2] << std::endl;
 
-                auto velocity_result = result.at<Vector3>(V(k));
-                std::cout << velocity_result.transpose() << std::endl;
+//                auto velocity_result = result.at<Vector3>(V(k));
+//                std::cout << velocity_result.transpose() << std::endl;
             } catch (std::exception &e) {
                 std::cout << "error when get value :" << e.what() << std::endl;
             }

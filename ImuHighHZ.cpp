@@ -55,7 +55,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
+    std::string dir_name = "/home/steve/Data/XIMU&UWB/5/";
 
     /// Global parameters
     double first_info(10), second_info(10 * M_PI / 180.0);
@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
                 // velocity constraint
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,
-                                                                                                   0.01);
+                                                                                                   0.00001);
 
 
                     PriorFactor<Vector3> zero_velocity(V(trace_id),
@@ -268,7 +268,7 @@ int main(int argc, char *argv[]) {
                     PriorFactor<Vector3> zero_velocity(V(trace_id),
                                                        Vector3(0.0, 0.0, 0.0),
                                                        velocity_noise);
-                    graph->add(zero_velocity);
+//                    graph->add(zero_velocity);
                 }
 
 //                PriorFactor<Rot3> orietation_constraint(X)
@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
 
 // / last moment of zupt detected
                 prop_state = imu_preintegrated_->predict(prev_state, prev_bias);
-                initial_values.insert(X(trace_id), prop_state.pose());
+                initial_values.insert(X(trace_id), Pose3());
                 initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                 initial_values.insert(B(trace_id), prev_bias);
                 prev_state = prop_state;
@@ -308,7 +308,7 @@ int main(int argc, char *argv[]) {
                 GPSFactor gps_factor(X(trace_id),
                                      Point3(0, 0, 0),
                                      correction_noise);
-                if (zupt_flag > 0.5) graph->add(gps_factor);
+//                if (zupt_flag > 0.5) graph->add(gps_factor);
 
             } catch (std::exception &e) {
                 std::cout << "error at :" << __FILE__

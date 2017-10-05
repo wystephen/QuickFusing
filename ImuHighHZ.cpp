@@ -368,19 +368,20 @@ int main(int argc, char *argv[]) {
         int counter = 0;
         while (1) {
             sleep(1);
-            std::cout << "i :" << optimizer.iterations() << std::endl;
-            last_index = int(optimizer.iterations());
+
+
+
             if (last_index >= optimizer.iterations()) {
                 counter += 1;
             } else {
-
+                std::cout << "i :" << optimizer.iterations() << std::endl;
                 counter = 0;
             }
 
             if (counter > 10) {
                 break;
             }
-
+            last_index = int(optimizer.iterations());
         }
     });
 

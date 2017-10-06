@@ -133,6 +133,11 @@ add_executable(ImuHighHZ ImuHighHZ.cpp)
 target_link_libraries(ImuHighHZ
         ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES}
         -ltbb ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
+###  ISAM2  imu~
+add_executable(ISAMImu ISAMImu.cpp)
+target_link_libraries(ISAMImu
+        ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES}
+        -ltbb ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
 
 add_executable(dw DemoUseResult.cpp)
 #target_link_libraries(dw ${G2O_LIBS} ${Cholmod_LIBRARIES} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )

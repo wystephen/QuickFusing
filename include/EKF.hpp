@@ -64,7 +64,7 @@ public:
 
     }
 
-    bool CopyMatrix(Eigen::MatrixXd in, Eigen::MatrixXd &out) {
+    virtual bool CopyMatrix(Eigen::MatrixXd in, Eigen::MatrixXd &out) {
         out.resize(in.rows(), in.cols());
 
         for (int i(0); i < in.rows(); ++i) {
@@ -77,7 +77,7 @@ public:
     }
 
 
-    bool InitNavEq(Eigen::MatrixXd u) {
+    virtual bool InitNavEq(Eigen::MatrixXd u) {
 
         double f_u(0.0), f_v(0.0), f_w(0.0);
 

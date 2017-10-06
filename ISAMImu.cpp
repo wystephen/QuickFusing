@@ -78,3 +78,33 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
     return T;
 }
 
+int main() {
+    /**
+     * Load Data
+     */
+
+
+    /**
+     * Initial ZUPT
+     */
+
+
+    /**
+     * Initial Graph parameters.
+     */
+
+
+    /**
+     * Start Location
+     */
+
+    /**
+     * Output Result
+     */
+
+
+    /**
+     * Plot Trace
+     */
+}
+

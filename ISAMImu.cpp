@@ -119,7 +119,65 @@ int main() {
      * Initial Graph parameters.
      */
 
-    
+    Eigen::Matrix<double, 10,1> initial_state = Eigen::Matrix<double,10,1>::Zero();
+    initial_state(6) = 1.0;
+
+    Rot3 prior_rotation = Rot3(myekf.getTransformation().matrix().block(0, 0, 3, 3));
+    Point3 prior_point(initial_state.head<3>());
+    Pose3 prior_pose(prior_rotation, prior_point);
+    Vector3 prior_velocity(initial_state.tail<3>());
+    imuBias::ConstantBias prior_imu_bias; // assume zero initial bias
+
+    Values initial_values;
+    int correction_count = 0;
+    initial_values.insert(X(correction_count), prior_pose);
+    initial_values.insert(V(correction_count), prior_velocity);
+    initial_values.insert(B(correction_count), prior_imu_bias);
+
+    // Assemble prior noise model and add it the graph.
+    noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
+            (Vector(6) << 0.01, 0.01, 0.01, 0.05, 0.05, 0.05).finished()); // rad,rad,rad,m, m, m
+    noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.01); // m/s
+    noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
+
+    // Add all prior factors (pose, velocity, bias) to the graph.
+    NonlinearFactorGraph *graph = new NonlinearFactorGraph();
+    graph->add(PriorFactor<Pose3>(X(correction_count), prior_pose, pose_noise_model));
+    graph->add(PriorFactor<Vector3>(V(correction_count), prior_velocity, velocity_noise_model));
+    graph->add(PriorFactor<imuBias::ConstantBias>(B(correction_count), prior_imu_bias, bias_noise_model));
+
+    // We use the sensor specs to build the noise model for the IMU factor.
+    double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
+    double gyro_noise_sigma = initial_para.sigma_gyro_(0);//0.000205689024915;
+    double accel_bias_rw_sigma = 0.004905;
+    double gyro_bias_rw_sigma = 0.000001454441043;
+    Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
+    Matrix33 measured_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_noise_sigma, 2);
+    Matrix33 integration_error_cov =
+            Matrix33::Identity(3, 3) * 1e-8; // error committed in integrating position from velocities
+    Matrix33 bias_acc_cov = Matrix33::Identity(3, 3) * pow(accel_bias_rw_sigma, 2);
+    Matrix33 bias_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_bias_rw_sigma, 2);
+    Matrix66 bias_acc_omega_int = Matrix::Identity(6, 6) * 1e-5; // error in the bias used for preintegration
+
+    boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
+            PreintegratedImuMeasurements::Params::MakeSharedD(9.6);
+
+    // PreintegrationBase params:
+    p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
+    p->integrationCovariance = integration_error_cov; // integration uncertainty continuous
+    // should be using 2nd order integration
+    // PreintegratedRotation params:
+    p->gyroscopeCovariance = measured_omega_cov; // gyro white noise in continuous
+
+
+
+    NavState prev_state(prior_pose, prior_velocity);
+    NavState prop_state = prev_state;
+    imuBias::ConstantBias prev_bias = prior_imu_bias;
+
+    ////Define the imu preintegration
+    imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
+
 
 
 
@@ -127,6 +185,13 @@ int main() {
     /**
      * Start Location
      */
+
+
+
+
+
+
+
 
     /**
      * Output Result

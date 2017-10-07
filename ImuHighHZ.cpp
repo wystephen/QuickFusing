@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
     NavState prop_state = prev_state;
     imuBias::ConstantBias prev_bias = prior_imu_bias;
 
-    ////Define the imu preintegrated
+    ////Define the imu preintegration
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
 
     /**

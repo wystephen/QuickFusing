@@ -215,20 +215,18 @@ int main() {
 
 
         /// IntegratedImu
-        accumulate_preintegra_num ++;
-        if(accumulate_preintegra_num>3)
-        {
+        accumulate_preintegra_num++;
+        if (accumulate_preintegra_num > 3) {
             accumulate_preintegra_num = 0;
-            trace_id ++;
+            trace_id++;
 
             PreintegratedImuMeasurements *preint_imu =
-                    dynamic_cast<PreintegratedImuMeasurements*>(imu_preintegrated_);
+                    dynamic_cast<PreintegratedImuMeasurements *>(imu_preintegrated_);
 
-            try{
+            try {
 
 
-
-            }catch (const std::exception &e) {
+            } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
             } catch (...) {
@@ -237,9 +235,6 @@ int main() {
 
 
         }
-
-
-
 
 
     };

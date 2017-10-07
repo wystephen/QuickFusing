@@ -154,7 +154,6 @@ int main(int argc, char *argv[]) {
     boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
             PreintegratedImuMeasurements::Params::MakeSharedD(9.6);
 
-
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
     p->integrationCovariance = integration_error_cov; // integration uncertainty continuous
@@ -177,6 +176,7 @@ int main(int argc, char *argv[]) {
      */
 
     double last_zupt_flag = 0.0;
+
 
     int trace_id(0);
     Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();

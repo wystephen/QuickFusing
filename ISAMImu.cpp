@@ -119,7 +119,7 @@ int main() {
      * Initial Graph parameters.
      */
 
-    Eigen::Matrix<double, 10,1> initial_state = Eigen::Matrix<double,10,1>::Zero();
+    Eigen::Matrix<double, 10, 1> initial_state = Eigen::Matrix<double, 10, 1>::Zero();
     initial_state(6) = 1.0;
 
     Rot3 prior_rotation = Rot3(myekf.getTransformation().matrix().block(0, 0, 3, 3));
@@ -185,6 +185,31 @@ int main() {
     /**
      * Start Location
      */
+
+    std::vector<double> time_of_each_iteration; // optimization time of ISAM2
+
+    int trace_id(0);
+
+
+    int accumulate_preintegra_num = 0;
+
+
+    for (int index(0); index < imudata.rows(); ++index) {
+        double zupt_flag = 0.0;// probability of be zero-velocity.
+
+        if (index <= initial_para.ZeroDetectorWindowSize_) {
+            // first several data set as zero-velocity state.
+            zupt_flag = 1.0;
+        } else {
+            if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 0,
+                                            initial_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
+                              initial_para)) {
+                zupt_flag = 1.0;
+            }
+        }
+
+    };
+
 
 
 

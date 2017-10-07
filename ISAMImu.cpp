@@ -82,15 +82,40 @@ int main() {
     /**
      * Load Data
      */
+    std::string dir_name = "/home/steve/Data/XIMU&UWB/5/";
+
+    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
+    Eigen::MatrixXd imudata;
+    imudata.resize(imu_data_reader.GetMatrix().GetRows(),
+                   imu_data_reader.GetMatrix().GetCols());
+    imudata.setZero();
+    auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
+
+    for (int i(0); i < imudata.rows(); ++i) {
+        for (int j(0); j < imudata.cols(); ++j) {
+            imudata(i, j) = *(imu_data_tmp_matrix(i, j));
+        }
+    }
+
 
 
     /**
      * Initial ZUPT
      */
+    SettingPara initial_para(true);
+    initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
+    initial_para.init_heading1_ = M_PI / 2.0;
+    initial_para.Ts_ = 1.0f / 128.0f;
 
-    /**
-     *
-     */
+    initial_para.sigma_a_ = 1.1;//zupt detector parameter
+    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
+
+    initial_para.ZeroDetectorWindowSize_ = 10;
+
+    MyEkf myekf(initial_para);
+    myekf.InitNavEq(imudata.block(0, 0, 20, 6));
+
+
 
     /**
      * Initial Graph parameters.

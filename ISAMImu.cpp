@@ -115,8 +115,6 @@ int main() {
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 0, 20, 6));
 
-
-
     /**
      * Initial Graph parameters.
      */

@@ -182,6 +182,9 @@ int main(int argc, char *argv[]) {
     Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
     double last_theta = 0.0;
 
+    std::vector<double> index_score;
+
+
 
     int add_vertex_counter = 0;
 

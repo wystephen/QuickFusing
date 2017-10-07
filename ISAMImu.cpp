@@ -194,7 +194,12 @@ int main() {
     int accumulate_preintegra_num = 0;
 
 
+    /*
+     * Main loop for positioning.
+     */
     for (int index(0); index < imudata.rows(); ++index) {
+
+        /// ZUPT DETECTOR
         double zupt_flag = 0.0;// probability of be zero-velocity.
 
         if (index <= initial_para.ZeroDetectorWindowSize_) {
@@ -207,6 +212,35 @@ int main() {
                 zupt_flag = 1.0;
             }
         }
+
+
+        /// IntegratedImu
+        accumulate_preintegra_num ++;
+        if(accumulate_preintegra_num>3)
+        {
+            accumulate_preintegra_num = 0;
+            trace_id ++;
+
+            PreintegratedImuMeasurements *preint_imu =
+                    dynamic_cast<PreintegratedImuMeasurements*>(imu_preintegrated_);
+
+            try{
+
+
+
+            }catch (const std::exception &e) {
+                std::cout << "error at :" << __FILE__
+                          << " " << __LINE__ << " : " << e.what() << std::endl;
+            } catch (...) {
+                std::cout << "unexpected error " << std::endl;
+            }
+
+
+        }
+
+
+
+
 
     };
 

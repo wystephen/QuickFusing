@@ -250,7 +250,6 @@ int main() {
                 preint_imu->resetIntegration();
 
 
-
             } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;

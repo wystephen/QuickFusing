@@ -254,6 +254,9 @@ int main() {
                 preint_imu->resetIntegration();
 
                 isam2.update(graph,initial_values);
+                
+                Values currentValues = isam2.calculateEstimate();
+                std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0,3,3,1).transpose() << std::endl;
 
 
                 graph.resize(0);

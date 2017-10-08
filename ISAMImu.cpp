@@ -119,6 +119,11 @@ int main() {
      * Initial Graph parameters.
      */
 
+    ISAM2Params isam2Params;
+    isam2Params.relinearizeThreshold = 0.01;
+    isam2Params.relinearizeSkip = 1;
+    ISAM2 isam2(isam2Params);
+
     Eigen::Matrix<double, 10, 1> initial_state = Eigen::Matrix<double, 10, 1>::Zero();
     initial_state(6) = 1.0;
 
@@ -141,10 +146,10 @@ int main() {
     noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
 
     // Add all prior factors (pose, velocity, bias) to the graph.
-    NonlinearFactorGraph *graph = new NonlinearFactorGraph();
-    graph->add(PriorFactor<Pose3>(X(correction_count), prior_pose, pose_noise_model));
-    graph->add(PriorFactor<Vector3>(V(correction_count), prior_velocity, velocity_noise_model));
-    graph->add(PriorFactor<imuBias::ConstantBias>(B(correction_count), prior_imu_bias, bias_noise_model));
+    NonlinearFactorGraph graph;
+    graph.emplace_shared<PriorFactor<Pose3> >(X(correction_count), prior_pose, pose_noise_model));
+    graph.emplace_shared<PriorFactor<Vector3> >(V(correction_count), prior_velocity, velocity_noise_model));
+    graph.emplace_shared<PriorFactor<imuBias::ConstantBias> >(B(correction_count), prior_imu_bias, bias_noise_model));
 
     // We use the sensor specs to build the noise model for the IMU factor.
     double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
@@ -224,6 +229,26 @@ int main() {
                     dynamic_cast<PreintegratedImuMeasurements *>(imu_preintegrated_);
 
             try {
+                ///Add factors
+                graph.emplace_shared<ImuFactor>(X < trace_id - 1 > , V(trace_id - 1),
+                                                X(trace_id), V(trace_id),
+                                                B(trace_id), *preint_imu);
+
+                imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+                graph.emplace_shared<BetweenFactor<imuBias::ConstantBias>>(
+                        B(trace_id - 1),
+                        B(trace_id),
+                        zero_bias, bias_noise_model
+                );
+
+                ///Set intial values
+                initial_values.insert(X(trace_id), Pose3());
+                initial_values.insert(V(trace_id), Vector3(0, 0, 0));
+                initial_values.insert(B(trace_id), prev_bias);
+
+                preint_imu->resetIntegration();
+
 
 
             } catch (const std::exception &e) {

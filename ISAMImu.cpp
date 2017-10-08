@@ -243,12 +243,22 @@ int main() {
                         zero_bias, bias_noise_model
                 );
 
+                // considering gravity constraint...
+
+
                 ///Set intial values
                 initial_values.insert(X(trace_id), Pose3());
                 initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                 initial_values.insert(B(trace_id), prev_bias);
 
                 preint_imu->resetIntegration();
+
+                isam2.update(graph,initial_values);
+
+
+                graph.resize(0);
+                initial_values.clear();
+
 
 
             } catch (const std::exception &e) {

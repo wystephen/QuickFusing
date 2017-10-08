@@ -194,6 +194,7 @@ int main() {
     std::vector<double> time_of_each_iteration; // optimization time of ISAM2
 
     int trace_id(0);
+    double last_zupt_flag = 0.0;
 
 
     int accumulate_preintegra_num = 0;
@@ -259,6 +260,12 @@ int main() {
 
 
         }
+
+        imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
+                                                 imudata.block(index, 3, 1, 3).transpose(),
+                                                 initial_para.Ts_);
+
+        last_zupt_flag = zupt_flag;
 
 
     };

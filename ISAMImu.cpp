@@ -147,9 +147,9 @@ int main() {
 
     // Add all prior factors (pose, velocity, bias) to the graph.
     NonlinearFactorGraph graph;
-    graph.emplace_shared<PriorFactor<Pose3> >(X(correction_count), prior_pose, pose_noise_model));
-    graph.emplace_shared<PriorFactor<Vector3> >(V(correction_count), prior_velocity, velocity_noise_model));
-    graph.emplace_shared<PriorFactor<imuBias::ConstantBias> >(B(correction_count), prior_imu_bias, bias_noise_model));
+    graph.emplace_shared<PriorFactor<Pose3> >(X(correction_count), prior_pose, pose_noise_model);
+    graph.emplace_shared<PriorFactor<Vector3> >(V(correction_count), prior_velocity, velocity_noise_model);
+    graph.emplace_shared<PriorFactor<imuBias::ConstantBias> >(B(correction_count), prior_imu_bias, bias_noise_model);
 
     // We use the sensor specs to build the noise model for the IMU factor.
     double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
@@ -231,7 +231,7 @@ int main() {
 
             try {
                 ///Add factors
-                graph.emplace_shared<ImuFactor>(X < trace_id - 1 > , V(trace_id - 1),
+                graph.emplace_shared<ImuFactor>(X (trace_id - 1 ) , V(trace_id - 1),
                                                 X(trace_id), V(trace_id),
                                                 B(trace_id), *preint_imu);
 
@@ -254,7 +254,7 @@ int main() {
                 preint_imu->resetIntegration();
 
                 isam2.update(graph,initial_values);
-                
+
                 Values currentValues = isam2.calculateEstimate();
                 std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0,3,3,1).transpose() << std::endl;
 

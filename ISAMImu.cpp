@@ -247,9 +247,17 @@ int main() {
 
 
                 ///Set intial values
+                try{
                 initial_values.insert(X(trace_id), Pose3());
                 initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                 initial_values.insert(B(trace_id), prev_bias);
+
+                }catch (const std::exception &e) {
+                std::cout << "error at :" << __FILE__
+                          << " " << __LINE__ << " : " << e.what() << std::endl;
+            } catch (...) {
+                std::cout << "unexpected error " << std::endl;
+            }
 
                 preint_imu->resetIntegration();
 

@@ -231,7 +231,7 @@ int main() {
 
             try {
                 ///Add factors
-                graph.emplace_shared<ImuFactor>(X (trace_id - 1 ) , V(trace_id - 1),
+                graph.emplace_shared<ImuFactor>(X(trace_id - 1), V(trace_id - 1),
                                                 X(trace_id), V(trace_id),
                                                 B(trace_id), *preint_imu);
 
@@ -253,15 +253,14 @@ int main() {
 
                 preint_imu->resetIntegration();
 
-                isam2.update(graph,initial_values);
+                isam2.update(graph, initial_values);
 
                 Values currentValues = isam2.calculateEstimate();
-                std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0,3,3,1).transpose() << std::endl;
+                std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose() << std::endl;
 
 
                 graph.resize(0);
                 initial_values.clear();
-
 
 
             } catch (const std::exception &e) {

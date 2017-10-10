@@ -292,6 +292,7 @@ int main() {
 
 
 //                if (trace_id > 100 && zupt_flag > 0.5) {
+                isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
                 isam2.update(graph, initial_values);
 
                 Values currentValues = isam2.calculateEstimate();

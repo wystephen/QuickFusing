@@ -310,6 +310,8 @@ int main() {
             } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
+
+                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
                 return 0;
             } catch (...) {
                 std::cout << "unexpected error " << std::endl;

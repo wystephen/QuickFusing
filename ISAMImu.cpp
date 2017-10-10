@@ -245,6 +245,13 @@ int main() {
 
                 // considering gravity constraint...
 
+                if (zupt_flag > 0.5) {
+                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.0);
+                    graph.emplace_shared<PriorFactor<Vector3>>(V(trace_id),
+                                                               Vector3(0, 0, 0),
+                                                               velocity_noise);
+                }
+
 
                 ///Set intial values
                 try {
@@ -252,8 +259,10 @@ int main() {
                     initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                     initial_values.insert(B(trace_id), prev_bias);
 
-                    if(trace_id == 33 || trace_id == 34){
-                        std::cout << trace_id << " --- " << initial_values.at<typeof(prev_bias)>(B(trace_id)) << std::endl;
+                    if (trace_id == 33 || trace_id == 34) {
+                        /// TODO : delete following code.!!!
+                        std::cout << trace_id << " --- " << initial_values.at<typeof(prev_bias)>(B(trace_id))
+                                  << std::endl;
                     }
 
                 } catch (const std::exception &e) {

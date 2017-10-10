@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
     Matrix66 bias_acc_omega_int = Matrix::Identity(6, 6) * 1e-5; // error in the bias used for preintegration
 
     boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
-            PreintegratedImuMeasurements::Params::MakeSharedD(9.6);
+            PreintegratedImuMeasurements::Params::MakeSharedD(9.8);
 
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous

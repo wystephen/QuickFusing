@@ -147,9 +147,9 @@ int main() {
 
     // Add all prior factors (pose, velocity, bias) to the graph.
     NonlinearFactorGraph graph;
-    graph.emplace_shared<PriorFactor<Pose3> >(X(correction_count), prior_pose, pose_noise_model);
-    graph.emplace_shared<PriorFactor<Vector3> >(V(correction_count), prior_velocity, velocity_noise_model);
-    graph.emplace_shared<PriorFactor<imuBias::ConstantBias> >(B(correction_count), prior_imu_bias, bias_noise_model);
+    graph.push_back(PriorFactor<Pose3> (X(correction_count), prior_pose, pose_noise_model));
+    graph.push_back(PriorFactor<Vector3> (V(correction_count), prior_velocity, velocity_noise_model));
+    graph.push_back(PriorFactor<imuBias::ConstantBias> (B(correction_count), prior_imu_bias, bias_noise_model));
 
     // We use the sensor specs to build the noise model for the IMU factor.
     double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
@@ -177,7 +177,7 @@ int main() {
 
 
     NavState prev_state(prior_pose, prior_velocity);
-    NavState prop_state = prev_state;
+//    NavState prop_state = prev_state;
     imuBias::ConstantBias prev_bias = prior_imu_bias;
 
     ////Define the imu preintegration
@@ -232,9 +232,9 @@ int main() {
             try {
 
                 ///IMU preintegrate
-                graph.emplace_shared<ImuFactor>(X(trace_id - 1), V(trace_id - 1),
+                graph.push_back(ImuFactor(X(trace_id - 1), V(trace_id - 1),
                                                 X(trace_id), V(trace_id),
-                                                B(trace_id), *preint_imu);
+                                                B(trace_id), *preint_imu));
                 preint_imu->resetIntegration();
 
 
@@ -242,20 +242,20 @@ int main() {
                 ///Imu Bias
                 imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
 
-                graph.emplace_shared<BetweenFactor<imuBias::ConstantBias>>(
+                graph.push_back(BetweenFactor<imuBias::ConstantBias>(
                         B(trace_id - 1),
                         B(trace_id),
                         zero_bias, bias_noise_model
-                );
+                ));
 
                 // considering gravity constraint...
 
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.0);
-                    graph.emplace_shared<PriorFactor<Vector3>>(V(trace_id),
+                    graph.push_back(PriorFactor<Vector3>(V(trace_id),
                                                                Vector3(0, 0, 0),
-                                                               velocity_noise);
+                                                               velocity_noise));
                 }
 
                 noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);

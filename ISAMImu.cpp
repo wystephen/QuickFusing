@@ -312,6 +312,8 @@ int main() {
                           << " " << __LINE__ << " : " << e.what() << std::endl;
 
                 isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
+
+                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
                 return 0;
             } catch (...) {
                 std::cout << "unexpected error " << std::endl;

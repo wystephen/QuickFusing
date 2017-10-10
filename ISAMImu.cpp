@@ -252,6 +252,10 @@ int main() {
                     initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                     initial_values.insert(B(trace_id), prev_bias);
 
+                    if(trace_id == 33 || trace_id == 34){
+                        std::cout << trace_id << " --- " << initial_values.at<Vector3>(B(trace_id)) << std::endl;
+                    }
+
                 } catch (const std::exception &e) {
                     std::cout << "error at :" << __FILE__
                               << " " << __LINE__ << " : " << e.what() << std::endl;
@@ -275,8 +279,10 @@ int main() {
             } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
+                return 0;
             } catch (...) {
                 std::cout << "unexpected error " << std::endl;
+                return 0;
             }
 
 

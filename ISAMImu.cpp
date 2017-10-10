@@ -230,11 +230,16 @@ int main() {
                     dynamic_cast<PreintegratedImuMeasurements *>(imu_preintegrated_);
 
             try {
-                ///Add factors
+
+                ///IMU preintegrate
                 graph.emplace_shared<ImuFactor>(X(trace_id - 1), V(trace_id - 1),
                                                 X(trace_id), V(trace_id),
                                                 B(trace_id), *preint_imu);
+                preint_imu->resetIntegration();
 
+
+
+                ///Imu Bias
                 imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
 
                 graph.emplace_shared<BetweenFactor<imuBias::ConstantBias>>(
@@ -245,6 +250,7 @@ int main() {
 
                 // considering gravity constraint...
 
+                ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.0);
                     graph.emplace_shared<PriorFactor<Vector3>>(V(trace_id),
@@ -258,9 +264,9 @@ int main() {
 //                                     Point3(0, 0, 0),
 //                                     correction_noise);
 
-                graph.emplace_shared<GPSFactor>(X(trace_id),
-                                                Point3(0, 0, 0),
-                                                correction_noise);
+//                graph.emplace_shared<GPSFactor>(X(trace_id),
+//                                                Point3(0, 0, 0),
+//                                                correction_noise);
 
                 ///Set intial values
                 try {
@@ -283,20 +289,21 @@ int main() {
                 }
 
 
-                preint_imu->resetIntegration();
-
-                if (trace_id > 100 && zupt_flag > 0.5) {
-                    isam2.update(graph, initial_values);
-
-                    Values currentValues = isam2.calculateEstimate();
-                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
-                              << std::endl;
 
 
-                    graph.resize(0);
-                    initial_values.clear();
+//                if (trace_id > 100 && zupt_flag > 0.5) {
+                isam2.update(graph, initial_values);
 
-                }
+                Values currentValues = isam2.calculateEstimate();
+//                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
+//                              << std::endl;
+                currentValues.print("current values at " + std::to_string(trace_id) + " is :");
+
+
+                graph.resize(0);
+                initial_values.clear();
+
+//                }
 
 
             } catch (const std::exception &e) {
@@ -338,6 +345,6 @@ int main() {
      */
 
 
-
+    return 0;
 }
 

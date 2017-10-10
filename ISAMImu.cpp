@@ -255,6 +255,7 @@ int main() {
                 } catch (const std::exception &e) {
                     std::cout << "error at :" << __FILE__
                               << " " << __LINE__ << " : " << e.what() << std::endl;
+                    std::cout << initial_values.at<Pose3>(X(trace_id)).matrix() << std::endl;
                 } catch (...) {
                     std::cout << "unexpected error " << std::endl;
                 }

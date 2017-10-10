@@ -253,7 +253,7 @@ int main() {
                     initial_values.insert(B(trace_id), prev_bias);
 
                     if(trace_id == 33 || trace_id == 34){
-                        std::cout << trace_id << " --- " << initial_values.at<Vector3>(B(trace_id)) << std::endl;
+                        std::cout << trace_id << " --- " << initial_values.at<typeof(prev_bias)>(B(trace_id)) << std::endl;
                     }
 
                 } catch (const std::exception &e) {

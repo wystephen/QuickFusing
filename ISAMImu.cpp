@@ -251,7 +251,10 @@ int main() {
                                                                Vector3(0, 0, 0),
                                                                velocity_noise);
                 }
-
+                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
+                GPSFactor gps_factor(X(trace_id),
+                                     Point3(0, 0, 0),
+                                     correction_noise);
 
                 ///Set intial values
                 try {
@@ -273,16 +276,21 @@ int main() {
                     std::cout << "unexpected error " << std::endl;
                 }
 
+
                 preint_imu->resetIntegration();
 
-                isam2.update(graph, initial_values);
+                if (trace_id > 100 && zupt_flag > 0.5) {
+                    isam2.update(graph, initial_values);
 
-                Values currentValues = isam2.calculateEstimate();
-                std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose() << std::endl;
+                    Values currentValues = isam2.calculateEstimate();
+                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
+                              << std::endl;
 
 
-                graph.resize(0);
-                initial_values.clear();
+                    graph.resize(0);
+                    initial_values.clear();
+
+                }
 
 
             } catch (const std::exception &e) {

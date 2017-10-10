@@ -222,7 +222,7 @@ int main() {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 32) {
+        if (accumulate_preintegra_num > 3) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -301,8 +301,8 @@ int main() {
                 currentValues.print("current values at " + std::to_string(trace_id) + " is :");
 
 
-                graph.resize(0);
-                initial_values.clear();
+//                graph.resize(0);
+//                initial_values.clear();
 
 //                }
 

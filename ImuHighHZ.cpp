@@ -185,7 +185,6 @@ int main(int argc, char *argv[]) {
     std::vector<double> index_score;
 
 
-
     int add_vertex_counter = 0;
 
     for (int index(0); index < imudata.rows(); ++index) {
@@ -372,7 +371,6 @@ int main(int argc, char *argv[]) {
         int counter = 0;
         while (1) {
             sleep(1);
-
 
 
             if (last_index >= optimizer.iterations()) {

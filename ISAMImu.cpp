@@ -147,9 +147,9 @@ int main() {
 
     // Add all prior factors (pose, velocity, bias) to the graph.
     NonlinearFactorGraph graph;
-    graph.push_back(PriorFactor<Pose3> (X(correction_count), prior_pose, pose_noise_model));
-    graph.push_back(PriorFactor<Vector3> (V(correction_count), prior_velocity, velocity_noise_model));
-    graph.push_back(PriorFactor<imuBias::ConstantBias> (B(correction_count), prior_imu_bias, bias_noise_model));
+    graph.push_back(PriorFactor<Pose3>(X(correction_count), prior_pose, pose_noise_model));
+    graph.push_back(PriorFactor<Vector3>(V(correction_count), prior_velocity, velocity_noise_model));
+    graph.push_back(PriorFactor<imuBias::ConstantBias>(B(correction_count), prior_imu_bias, bias_noise_model));
 
     // We use the sensor specs to build the noise model for the IMU factor.
     double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
@@ -233,8 +233,8 @@ int main() {
 
                 ///IMU preintegrate
                 graph.push_back(ImuFactor(X(trace_id - 1), V(trace_id - 1),
-                                                X(trace_id), V(trace_id),
-                                                B(trace_id), *preint_imu));
+                                          X(trace_id), V(trace_id),
+                                          B(trace_id), *preint_imu));
                 preint_imu->resetIntegration();
 
 
@@ -254,8 +254,8 @@ int main() {
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.0);
                     graph.push_back(PriorFactor<Vector3>(V(trace_id),
-                                                               Vector3(0, 0, 0),
-                                                               velocity_noise));
+                                                         Vector3(0, 0, 0),
+                                                         velocity_noise));
                 }
 
                 noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);

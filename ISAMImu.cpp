@@ -295,7 +295,11 @@ int main() {
                 if (trace_id > 2000){
                     GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
                     gaussNewtonOptimizer.optimizeSafely();
-                    initial_values = gaussNewtonOptimizer.values();
+                    if(trace_id==2001)
+                    {
+
+                        initial_values = gaussNewtonOptimizer.values();
+                    }
 
 
 //                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
@@ -320,10 +324,10 @@ int main() {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
 
-                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
+//                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
 
-                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
-                return 0;
+//                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
+//                return 0;
             } catch (...) {
                 std::cout << "unexpected error " << std::endl;
                 return 0;

@@ -288,12 +288,12 @@ int main(int argc, char *argv[]) {
 
 
                 //optimize
-//                LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+                GaussNewtonOptimizer optimizer(*graph, initial_values);
 //                for (int i(0); i < 100; ++i) {
 //                    optimizer.iterate();
 //                }
-//                optimizer.optimizeSafely();
-//                initial_values = optimizer.values();
+                optimizer.optimizeSafely();
+                initial_values = optimizer.values();
 
             } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__

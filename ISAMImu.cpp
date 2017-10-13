@@ -119,9 +119,12 @@ int main() {
      * Initial Graph parameters.
      */
 
-    ISAM2Params isam2Params;
-    isam2Params.relinearizeThreshold = 0.01;
-    isam2Params.relinearizeSkip = 1;
+    ISAM2GaussNewtonParams isam2GaussNewtonParams(0.001);
+    ISAM2Params isam2Params(isam2GaussNewtonParams);
+    isam2Params.relinearizeThreshold = 0.0001;
+    isam2Params.relinearizeSkip = 0;
+
+
     ISAM2 isam2(isam2Params);
 
     Eigen::Matrix<double, 10, 1> initial_state = Eigen::Matrix<double, 10, 1>::Zero();
@@ -291,19 +294,19 @@ int main() {
 
                 if (trace_id > 100){
                     isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
-//                    isam2.update(graph, initial_values);
-                    GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
-                    gaussNewtonOptimizer.optimizeSafely();
-                    gaussNewtonOptimizer.values().print("value of " + std::to_string(trace_id) +":");
+                    isam2.update(graph, initial_values);
+//                    GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
+//                    gaussNewtonOptimizer.optimizeSafely();
+//                    gaussNewtonOptimizer.values().print("value of " + std::to_string(trace_id) +":");
 
-//                    Values currentValues = isam2.calculateEstimate();
-//                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
-//                              << std::endl;
-//                    currentValues.print("current values at " + std::to_string(trace_id) + " is :");
+                    Values currentValues = isam2.calculateEstimate();
+                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
+                              << std::endl;
+                    currentValues.print("current values at " + std::to_string(trace_id) + " is :");
 
 
-//                    graph = NonlinearFactorGraph();
-//                    initial_values = Values();
+                    graph = NonlinearFactorGraph();
+                    initial_values = Values();
 //
                 }
 
@@ -312,9 +315,9 @@ int main() {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
 
-//                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
+                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
 
-//                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
+                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
                 return 0;
             } catch (...) {
                 std::cout << "unexpected error " << std::endl;

@@ -121,7 +121,7 @@ int main() {
 
     ISAM2GaussNewtonParams isam2GaussNewtonParams(0.001);
     ISAM2Params isam2Params(isam2GaussNewtonParams);
-    isam2Params.relinearizeThreshold = 0.0001;
+    isam2Params.relinearizeThreshold = 0.0000000000000000000001;
 //    isam2Params.relinearizeSkip = 1;
 
 

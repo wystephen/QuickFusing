@@ -292,9 +292,14 @@ int main() {
                 }
 
 
-                if (trace_id > 2){
-                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
-                    isam2.update(graph, initial_values);
+                if (trace_id > 2000){
+                    GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
+                    gaussNewtonOptimizer.optimizeSafely();
+                    initial_values = gaussNewtonOptimizer.values();
+
+
+//                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
+                    isam2.update(graph,initial_values);
 //                    GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
 //                    gaussNewtonOptimizer.optimizeSafely();
 //                    gaussNewtonOptimizer.values().print("value of " + std::to_string(trace_id) +":");

@@ -289,20 +289,18 @@ int main() {
                 }
 
 
+                if (trace_id > 10) {
+                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
+                    isam2.update(graph, initial_values);
 
-
-                if (trace_id>10) {
-                isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
-                isam2.update(graph, initial_values);
-
-                Values currentValues = isam2.calculateEstimate();
+                    Values currentValues = isam2.calculateEstimate();
                     std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
                               << std::endl;
-                currentValues.print("current values at " + std::to_string(trace_id) + " is :");
+                    currentValues.print("current values at " + std::to_string(trace_id) + " is :");
 
 
-                graph = NonlinearFactorGraph();
-                initial_values = Values();
+                    graph = NonlinearFactorGraph();
+                    initial_values = Values();
 //
                 }
 

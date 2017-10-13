@@ -258,15 +258,15 @@ int main() {
                                                          velocity_noise));
                 }
 
-//                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
+                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
 
-//                GPSFactor gps_factor(X(trace_id),
-//                                     Point3(0, 0, 0),
-//                                     correction_noise);
+                GPSFactor gps_factor(X(trace_id),
+                                     Point3(0, 0, 0),
+                                     correction_noise);
 
-//                graph.emplace_shared<GPSFactor>(X(trace_id),
-//                                                Point3(0, 0, 0),
-//                                                correction_noise);
+                graph.emplace_shared<GPSFactor>(X(trace_id),
+                                                Point3(0, 0, 0),
+                                                correction_noise);
 
                 ///Set intial values
                 try {

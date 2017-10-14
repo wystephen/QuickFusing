@@ -43,6 +43,7 @@
 #include <gtsam/slam/dataset.h>
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/PriorFactor.h>
+#include <gtsam/slam/PoseRotationPrior.h>
 
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 #include <gtsam/nonlinear/GaussNewtonOptimizer.h>
@@ -247,6 +248,8 @@ int main() {
                 preint_imu->resetIntegration();
 
 
+
+
                 ///Imu Bias
                 imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
 //
@@ -257,6 +260,9 @@ int main() {
                 ));
 
                 // considering gravity constraint...
+
+
+
 
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
@@ -269,6 +275,17 @@ int main() {
                                                        velocity_noise);
 
                     graph->add(zero_velocity);
+
+                    ///Mag constraint
+                    noiseModel::Diagonal::shared_ptr mag_noise=
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI,M_PI,M_PI/10.0));
+
+                    graph->add(PoseRotationPrior<Pose3>(
+                            X(trace_id),
+                            Rot3::yaw(imudata(index,12)*M_PI),
+                            mag_noise
+
+                    ));
                 }
 
 

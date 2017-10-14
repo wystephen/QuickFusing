@@ -43,7 +43,6 @@
 #include <gtsam/slam/dataset.h>
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/PriorFactor.h>
-
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 #include <gtsam/nonlinear/GaussNewtonOptimizer.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
@@ -290,8 +289,10 @@ int main() {
                 }
 
 
-                if (trace_id % 20 == 0 && zupt_flag>0.5) {//&&last_zupt_flag>0.5||index==imudata.rows()-1){
+//                if (trace_id % 20 == 0 && zupt_flag>0.5) {//&&last_zupt_flag>0.5||index==imudata.rows()-1){
+                if(zupt_flag>0.5){
 
+                    
 
 
                     isam2.update(graph, initial_values);

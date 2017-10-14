@@ -261,7 +261,7 @@ int main() {
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise =
-                            noiseModel::Isotropic::Sigma(3, 0.00001);
+                            noiseModel::Isotropic::Sigma(3, 0.0000001);
 
 
                     PriorFactor<Vector3> zero_velocity(V(trace_id),
@@ -298,12 +298,6 @@ int main() {
                 }
 
 
-                if (trace_id > 2000) {
-
-
-
-
-                }
 
 
             } catch (const std::exception &e) {
@@ -340,7 +334,7 @@ int main() {
 
     std::cout << "begin optimizer" << std::endl;
 //    graph.print("before optimize");
-    GaussNewtonOptimizer optimizer(*graph, initial_values);
+    LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
 
 
     /// Show itereation times ~

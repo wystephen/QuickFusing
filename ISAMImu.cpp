@@ -120,8 +120,8 @@ int main() {
      * Initial Graph parameters.
      */
 
-    ISAM2GaussNewtonParams isam2GaussNewtonParams();
-    ISAM2Params isam2Params(isam2GaussNewtonParams);
+//    ISAM2GaussNewtonParams isam2GaussNewtonParams();
+    ISAM2Params isam2Params;
     isam2Params.relinearizeThreshold = 0.000001;
     isam2Params.relinearizeSkip = 1;
 

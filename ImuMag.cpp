@@ -230,7 +230,7 @@ int main() {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 3) {
+        if (accumulate_preintegra_num > 10) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -278,14 +278,14 @@ int main() {
 
                     ///Mag constraint
                     noiseModel::Diagonal::shared_ptr mag_noise=
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI,M_PI,M_PI/10.0));
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI,M_PI,M_PI/5.0));
 
-//                    graph->add(PoseRotationPrior<Pose3>(
-//                            X(trace_id),
-//                            Rot3::yaw(-imudata(index,12)*M_PI),
-//                            mag_noise
-//
-//                    ));
+                    graph->add(PoseRotationPrior<Pose3>(
+                            X(trace_id),
+                            Rot3::yaw(-imudata(index,12)*M_PI),
+                            mag_noise
+
+                    ));
                 }
 
 

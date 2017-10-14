@@ -28,7 +28,7 @@ import scipy as sp
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
-    dir_name = "/home/steve/Data/XIMU&UWB/5/"
+    dir_name = "/home/steve/Data/XIMU&UWB/3/"
 
     imu_data = np.loadtxt(dir_name + "ImuData.csv",delimiter=',')
     print(imu_data.shape)
@@ -37,4 +37,7 @@ if __name__ == '__main__':
     # for i in range(3):
     #     plt.plot(imu_data[:,i+9]/np.pi * 180.0,'-')
     plt.plot(imu_data[:,12]*180.0 ,'-')
+
+    plt.figure()
+    plt.plot(imu_data[:,9]*180.0,'r+-')
     plt.show()

@@ -259,10 +259,15 @@ int main() {
 
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.0);
-                    graph.push_back(PriorFactor<Vector3>(V(trace_id),
-                                                         Vector3(0, 0, 0),
-                                                         velocity_noise));
+                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.001);
+//                    graph.push_back(PriorFactor<Vector3>(V(trace_id),
+//                                                         Vector3(0, 0, 0),
+//                                                         velocity_noise));
+                    PriorFactor<Vector3> zero_velocity(V(trace_id),
+                                                       Vector3(0.0, 0.0, 0.0),
+                                                       velocity_noise);
+
+                    graph.add(zero_velocity);
                 }
 
 
@@ -309,7 +314,7 @@ int main() {
 
 //                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
                     isam2.update(graph,initial_values);
-                    isam2.print("isam at " + std::to_string(trace_id) + " :" );
+//                    isam2.print("isam at " + std::to_string(trace_id) + " :" );
 
                     Values currentValues = isam2.calculateEstimate();
                     std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
@@ -335,7 +340,7 @@ int main() {
 //                              << std::endl;
 
 
-                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
+//                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
 //
                 graph.print("Error graph at " + std::to_string(trace_id) + " is :");
 

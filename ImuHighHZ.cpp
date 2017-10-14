@@ -288,12 +288,12 @@ int main(int argc, char *argv[]) {
 
 
                 //optimize
-                GaussNewtonOptimizer optimizer(*graph, initial_values);
+//                GaussNewtonOptimizer optimizer(*graph, initial_values);
 //                for (int i(0); i < 100; ++i) {
 //                    optimizer.iterate();
 //                }
-                optimizer.optimizeSafely();
-                std::cout << "after : " << trace_id << std::endl;
+//                optimizer.optimizeSafely();
+//                std::cout << "after : " << trace_id << std::endl;
 //                initial_values = optimizer.values();
 
             } catch (const std::exception &e) {

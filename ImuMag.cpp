@@ -151,10 +151,10 @@ int main() {
     noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
 
     // Add all prior factors (pose, velocity, bias) to the graph.
-    NonlinearFactorGraph graph;
-    graph.push_back(PriorFactor<Pose3>(X(correction_count), prior_pose, pose_noise_model));
-    graph.push_back(PriorFactor<Vector3>(V(correction_count), prior_velocity, velocity_noise_model));
-    graph.push_back(PriorFactor<imuBias::ConstantBias>(B(correction_count), prior_imu_bias, bias_noise_model));
+    NonlinearFactorGraph *graph = new NonlinearFactorGraph();
+    graph->add(PriorFactor<Pose3>(X(correction_count), prior_pose, pose_noise_model));
+    graph->add(PriorFactor<Vector3>(V(correction_count), prior_velocity, velocity_noise_model));
+    graph->add(PriorFactor<imuBias::ConstantBias>(B(correction_count), prior_imu_bias, bias_noise_model));
 
     // We use the sensor specs to build the noise model for the IMU factor.
     double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
@@ -229,7 +229,7 @@ int main() {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 3) {
+        if (accumulate_preintegra_num > 30) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -239,17 +239,18 @@ int main() {
             try {
 
                 ///IMU preintegrate
-                graph.add(ImuFactor(X(trace_id - 1), V(trace_id - 1),
+                graph->add(ImuFactor(X(trace_id - 1), V(trace_id - 1),
                                           X(trace_id), V(trace_id),
                                           B(trace_id), *preint_imu));
 
 
+                preint_imu->resetIntegration();
 
 
                 ///Imu Bias
                 imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
-
-                graph.add(BetweenFactor<imuBias::ConstantBias>(
+//
+                graph->add(BetweenFactor<imuBias::ConstantBias>(
                         B(trace_id - 1),
                         B(trace_id),
                         zero_bias, bias_noise_model
@@ -259,23 +260,28 @@ int main() {
 
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.0);
-                    graph.add(PriorFactor<Vector3>(V(trace_id),
-                                                         Vector3(0, 0, 0),
-                                                         velocity_noise));
+                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,
+                                                                                                   0.0000001);
+
+
+                    PriorFactor<Vector3> zero_velocity(V(trace_id),
+                                                       Vector3(0.0, 0.0, 0.0),
+                                                       velocity_noise);
+
+                    graph->add(zero_velocity);
                 }
 
 
 
 
-                if (trace_id == 1) {
-
-                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
-                    graph.push_back(GPSFactor(X(trace_id),
-                                              prior_pose.matrix().block(0, 3, 3, 1),
-                                              correction_noise));
-
-                }
+//                if (trace_id == 1) {
+//
+//                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+//                    graph->add(GPSFactor(X(trace_id),
+//                                              prior_pose.matrix().block(0, 3, 3, 1),
+//                                              correction_noise));
+//
+//                }
                 ///Set intial values
                 try {
                     initial_values.insert(X(trace_id), Pose3());
@@ -312,7 +318,7 @@ int main() {
 
 
             // only reset after optimization.
-            preint_imu->resetIntegration();
+
 
         }
 
@@ -331,10 +337,10 @@ int main() {
      * Optimzation
      */
 
+
     std::cout << "begin optimizer" << std::endl;
 //    graph.print("before optimize");
-    LevenbergMarquardtOptimizer optimizer(graph, initial_values);
-    optimizer.optimizeSafely();
+    GaussNewtonOptimizer optimizer(*graph, initial_values);
 
 
     /// Show itereation times ~
@@ -360,6 +366,13 @@ int main() {
     });
     thread1.detach();
 
+    auto result = initial_values;
+
+    result = optimizer.optimize();
+
+
+
+
 
 
 
@@ -369,7 +382,6 @@ int main() {
     /**
      * Output Result
      */
-    auto result = optimizer.values();
     std::vector<double> gx, gy;
     try {
 

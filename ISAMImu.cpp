@@ -120,10 +120,10 @@ int main() {
      * Initial Graph parameters.
      */
 
-    ISAM2GaussNewtonParams isam2GaussNewtonParams(0.001);
+    ISAM2GaussNewtonParams isam2GaussNewtonParams();
     ISAM2Params isam2Params(isam2GaussNewtonParams);
-    isam2Params.relinearizeThreshold = 0.0001;
-//    isam2Params.relinearizeSkip = 1;
+    isam2Params.relinearizeThreshold = 0.000001;
+    isam2Params.relinearizeSkip = 1;
 
 
     ISAM2 isam2(isam2Params);
@@ -230,7 +230,7 @@ int main() {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 3) {
+        if (accumulate_preintegra_num > 10) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -261,7 +261,7 @@ int main() {
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise =
-                            noiseModel::Isotropic::Sigma(3, 0.00000001);
+                            noiseModel::Isotropic::Sigma(3, 0.0000001);
 //                    graph.push_back(PriorFactor<Vector3>(V(trace_id),
 //                                                         Vector3(0, 0, 0),
 //                                                         velocity_noise));
@@ -273,19 +273,7 @@ int main() {
                 }
 
 
-//                GPSFactor gps_factor(X(trace_id),
-//                                     Point3(0, 0, 0),
-//                                     correction_noise);
 
-
-//                if(trace_id==1){
-//
-//                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
-//                  graph.push_back(GPSFactor(X(trace_id),
-//                                                prior_pose.matrix().block(0,3,3,1),
-//                                                correction_noise));
-//
-//                }
                 ///Set intial values
                 try {
                     initial_values.insert(X(trace_id), Pose3());
@@ -302,7 +290,7 @@ int main() {
                 }
 
 
-                if (trace_id % 20 == 0) {//&&last_zupt_flag>0.5||index==imudata.rows()-1){
+                if (trace_id % 20 == 0 && zupt_flag>0.5) {//&&last_zupt_flag>0.5||index==imudata.rows()-1){
 
 
 
@@ -356,6 +344,10 @@ int main() {
 
 
 
+    if(graph.size()>0)
+    {
+        isam2.update(graph,initial_values);
+    }
 
 
 

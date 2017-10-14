@@ -308,10 +308,10 @@ int main() {
 
 
 //                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
-                    isam2.update(graph,initial_values);
-                    isam2.print("isam at " + std::to_string(trace_id) + " :" );
+//                    isam2.update(graph,initial_values);
+//                    isam2.print("isam at " + std::to_string(trace_id) + " :" );
 
-                    Values currentValues = isam2.calculateEstimate();
+//                    Values currentValues = isam2.calculateEstimate();
                     std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
                               << std::endl;
                     currentValues.print("current values at " + std::to_string(trace_id) + " is :");
@@ -319,8 +319,8 @@ int main() {
 
 //                    graph = NonlinearFactorGraph();
 //                    initial_values = Values();
-                    graph.resize(0);
-                    initial_values.clear();
+//                    graph.resize(0);
+//                    initial_values.clear();
 //
                 }
 
@@ -335,13 +335,13 @@ int main() {
 //                              << std::endl;
 
 
-                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
+//                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
 //
-                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
+//                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
 
-                graph.resize(0);
-                initial_values.clear();
-                return 0;
+//                graph.resize(0);
+//                initial_values.clear();
+//                return 0;
             } catch (...) {
                 std::cout << "unexpected error " << std::endl;
                 return 0;
@@ -364,6 +364,36 @@ int main() {
 
 
 
+    /**
+     * Optimzation
+     */
+
+    GaussNewtonOptimizer optimizer(graph,initial_values);
+    optimizer.optimizeSafely();
+
+
+    /// Show itereation times ~
+    std::thread thread1([&] {
+        int last_index = 0;
+        int counter = 0;
+        while (1) {
+            sleep(1);
+
+
+            if (last_index >= optimizer.iterations()) {
+                counter += 1;
+            } else {
+                std::cout << "i :" << optimizer.iterations() << std::endl;
+                counter = 0;
+            }
+
+            if (counter > 10) {
+                break;
+            }
+            last_index = int(optimizer.iterations());
+        }
+    });
+
 
 
 
@@ -373,11 +403,48 @@ int main() {
     /**
      * Output Result
      */
+    auto result = optimizer.values();
+    std::vector<double> gx,gy;
+    try {
 
+        ofstream test_out_put("./ResultData/test.txt");
+
+        for (int k(0); k < trace_id; ++k) {
+            double t_data[10] = {0};
+
+            try {
+                auto pose_result = result.at<Pose3>(X(k));
+                t_data[0] = pose_result.matrix()(0, 3);
+                t_data[1] = pose_result.matrix()(1, 3);
+                t_data[2] = pose_result.matrix()(2, 3);
+
+                gx.push_back(t_data[0]);
+                gy.push_back(t_data[1]);
+
+                test_out_put << t_data[0] << ","
+                             << t_data[1] << ","
+                             << t_data[2] << std::endl;
+
+//                auto velocity_result = result.at<Vector3>(V(k));
+//                std::cout << velocity_result.transpose() << std::endl;
+            } catch (std::exception &e) {
+                std::cout << "error when get value :" << e.what() << std::endl;
+            }
+
+        }
+
+
+    } catch (std::exception &e) {
+        std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
+
+    }
 
     /**
      * Plot Trace
      */
+    plt::plot(gx,gy,"r-+");
+    plt::title("show");
+    plt::show();
 
 
     return 0;

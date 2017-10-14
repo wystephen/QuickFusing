@@ -239,7 +239,7 @@ int main() {
             try {
 
                 ///IMU preintegrate
-                graph.push_back(ImuFactor(X(trace_id - 1), V(trace_id - 1),
+                graph.add(ImuFactor(X(trace_id - 1), V(trace_id - 1),
                                           X(trace_id), V(trace_id),
                                           B(trace_id), *preint_imu));
 
@@ -249,7 +249,7 @@ int main() {
                 ///Imu Bias
                 imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
 
-                graph.push_back(BetweenFactor<imuBias::ConstantBias>(
+                graph.add(BetweenFactor<imuBias::ConstantBias>(
                         B(trace_id - 1),
                         B(trace_id),
                         zero_bias, bias_noise_model
@@ -260,23 +260,20 @@ int main() {
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.0);
-                    graph.push_back(PriorFactor<Vector3>(V(trace_id),
+                    graph.add(PriorFactor<Vector3>(V(trace_id),
                                                          Vector3(0, 0, 0),
                                                          velocity_noise));
                 }
 
 
-//                GPSFactor gps_factor(X(trace_id),
-//                                     Point3(0, 0, 0),
-//                                     correction_noise);
 
 
-                if(trace_id==1){
+                if (trace_id == 1) {
 
                     noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
-                  graph.push_back(GPSFactor(X(trace_id),
-                                                prior_pose.matrix().block(0,3,3,1),
-                                                correction_noise));
+                    graph.push_back(GPSFactor(X(trace_id),
+                                              prior_pose.matrix().block(0, 3, 3, 1),
+                                              correction_noise));
 
                 }
                 ///Set intial values
@@ -284,7 +281,6 @@ int main() {
                     initial_values.insert(X(trace_id), Pose3());
                     initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                     initial_values.insert(B(trace_id), prev_bias);
-
 
 
                 } catch (const std::exception &e) {
@@ -296,32 +292,11 @@ int main() {
                 }
 
 
-                if (trace_id > 2000){
-
-                    if(trace_id==2001)
-                    {
-                        GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
-                        gaussNewtonOptimizer.optimizeSafely();
-                        initial_values = gaussNewtonOptimizer.values();
-                        std::cout << "after initial optimizer" << std::endl;
-                    }
+                if (trace_id > 2000) {
 
 
-//                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
-//                    isam2.update(graph,initial_values);
-//                    isam2.print("isam at " + std::to_string(trace_id) + " :" );
-
-//                    Values currentValues = isam2.calculateEstimate();
-                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
-                              << std::endl;
-                    currentValues.print("current values at " + std::to_string(trace_id) + " is :");
 
 
-//                    graph = NonlinearFactorGraph();
-//                    initial_values = Values();
-//                    graph.resize(0);
-//                    initial_values.clear();
-//
                 }
 
 
@@ -329,19 +304,7 @@ int main() {
 
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
-//                isam2.calculateBestEstimate();
-//                 Values currentValues = isam2.calculateBestEstimate();
-//                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
-//                              << std::endl;
-
-
-//                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
-//
-//                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
-
-//                graph.resize(0);
-//                initial_values.clear();
-//                return 0;
+                return 0;
             } catch (...) {
                 std::cout << "unexpected error " << std::endl;
                 return 0;
@@ -368,7 +331,9 @@ int main() {
      * Optimzation
      */
 
-    GaussNewtonOptimizer optimizer(graph,initial_values);
+    std::cout << "begin optimizer" << std::endl;
+//    graph.print("before optimize");
+    LevenbergMarquardtOptimizer optimizer(graph, initial_values);
     optimizer.optimizeSafely();
 
 
@@ -393,6 +358,7 @@ int main() {
             last_index = int(optimizer.iterations());
         }
     });
+    thread1.detach();
 
 
 
@@ -404,7 +370,7 @@ int main() {
      * Output Result
      */
     auto result = optimizer.values();
-    std::vector<double> gx,gy;
+    std::vector<double> gx, gy;
     try {
 
         ofstream test_out_put("./ResultData/test.txt");
@@ -442,7 +408,7 @@ int main() {
     /**
      * Plot Trace
      */
-    plt::plot(gx,gy,"r-+");
+    plt::plot(gx, gy, "r-+");
     plt::title("show");
     plt::show();
 

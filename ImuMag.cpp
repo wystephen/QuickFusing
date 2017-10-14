@@ -84,7 +84,7 @@ int main() {
     /**
      * Load Data
      */
-    std::string dir_name = "/home/steve/Data/XIMU&UWB/5/";
+    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
 
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
     Eigen::MatrixXd imudata;
@@ -106,7 +106,7 @@ int main() {
      */
     SettingPara initial_para(true);
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
-    initial_para.init_heading1_ = M_PI / 2.0;
+    initial_para.init_heading1_ = imudata.block(0,11,20,1).mean()*M_PI;
     initial_para.Ts_ = 1.0f / 128.0f;
 
     initial_para.sigma_a_ = 1.1;//zupt detector parameter
@@ -230,7 +230,7 @@ int main() {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 30) {
+        if (accumulate_preintegra_num > 3) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -280,12 +280,12 @@ int main() {
                     noiseModel::Diagonal::shared_ptr mag_noise=
                             noiseModel::Diagonal::Sigmas(Vector3(M_PI,M_PI,M_PI/10.0));
 
-                    graph->add(PoseRotationPrior<Pose3>(
-                            X(trace_id),
-                            Rot3::yaw(imudata(index,12)*M_PI),
-                            mag_noise
-
-                    ));
+//                    graph->add(PoseRotationPrior<Pose3>(
+//                            X(trace_id),
+//                            Rot3::yaw(-imudata(index,12)*M_PI),
+//                            mag_noise
+//
+//                    ));
                 }
 
 

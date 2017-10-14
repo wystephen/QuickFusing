@@ -50,6 +50,7 @@
 #include <gtsam/inference/Symbol.h>
 
 #include <gtsam/nonlinear/ISAM2.h>
+#include <gtsam/nonlinear/NonlinearISAM.h>
 
 
 #include <thread>
@@ -125,7 +126,8 @@ int main() {
 //    isam2Params.relinearizeSkip = 1;
 
 
-    ISAM2 isam2(isam2Params);
+//    ISAM isam2(isam2Params);
+    NonlinearISAM isam2(3);
 
     Eigen::Matrix<double, 10, 1> initial_state = Eigen::Matrix<double, 10, 1>::Zero();
     initial_state(6) = 1.0;
@@ -305,7 +307,7 @@ int main() {
 //                    gaussNewtonOptimizer.optimizeSafely();
 //                    gaussNewtonOptimizer.values().print("value of " + std::to_string(trace_id) +":");
 
-                    Values currentValues = isam2.calculateEstimate();
+                    Values currentValues = isam2.estimate();
                     std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
                               << std::endl;
                     currentValues.print("current values at " + std::to_string(trace_id) + " is :");
@@ -324,16 +326,16 @@ int main() {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
 //                isam2.calculateBestEstimate();
-                 Values currentValues = isam2.calculateBestEstimate();
-                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
-                              << std::endl;
+//                 Values currentValues = isam2.calculateBestEstimate();
+//                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
+//                              << std::endl;
                 graph.resize(0);
                 initial_values.clear();
 
-//                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
-
-//                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
-//                return 0;
+                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
+//
+                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
+                return 0;
             } catch (...) {
                 std::cout << "unexpected error " << std::endl;
                 return 0;

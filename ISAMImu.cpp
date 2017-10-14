@@ -259,7 +259,7 @@ int main() {
 
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.001);
+                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.00000001);
 //                    graph.push_back(PriorFactor<Vector3>(V(trace_id),
 //                                                         Vector3(0, 0, 0),
 //                                                         velocity_noise));
@@ -276,14 +276,14 @@ int main() {
 //                                     correction_noise);
 
 
-                if(trace_id==1){
-
-                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
-                  graph.push_back(GPSFactor(X(trace_id),
-                                                prior_pose.matrix().block(0,3,3,1),
-                                                correction_noise));
-
-                }
+//                if(trace_id==1){
+//
+//                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+//                  graph.push_back(GPSFactor(X(trace_id),
+//                                                prior_pose.matrix().block(0,3,3,1),
+//                                                correction_noise));
+//
+//                }
                 ///Set intial values
                 try {
                     initial_values.insert(X(trace_id), Pose3());
@@ -301,15 +301,15 @@ int main() {
                 }
 
 
-                if (trace_id > 2000){
+                if (trace_id > 1){
 
-                    if(trace_id==2001)
-                    {
-                        GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
-                        gaussNewtonOptimizer.optimizeSafely();
-                        initial_values = gaussNewtonOptimizer.values();
-                        std::cout << "after initial optimizer" << std::endl;
-                    }
+//                    if(trace_id==2001)
+//                    {
+//                        GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
+//                        gaussNewtonOptimizer.optimizeSafely();
+//                        initial_values = gaussNewtonOptimizer.values();
+//                        std::cout << "after initial optimizer" << std::endl;
+//                    }
 
 
 //                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
@@ -319,7 +319,7 @@ int main() {
                     Values currentValues = isam2.calculateEstimate();
                     std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
                               << std::endl;
-                    currentValues.print("current values at " + std::to_string(trace_id) + " is :");
+//                    currentValues.print("current values at " + std::to_string(trace_id) + " is :");
 
 
 //                    graph = NonlinearFactorGraph();

@@ -277,11 +277,7 @@ int main() {
                     initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                     initial_values.insert(B(trace_id), prev_bias);
 
-                    if (trace_id == 33 || trace_id == 34) {
-                        /// TODO : delete following code.!!!
-                        std::cout << trace_id << " --- " << initial_values.at<typeof(prev_bias)>(B(trace_id))
-                                  << std::endl;
-                    }
+
 
                 } catch (const std::exception &e) {
                     std::cout << "error at :" << __FILE__
@@ -293,12 +289,13 @@ int main() {
 
 
                 if (trace_id > 2000){
-                    GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
-                    gaussNewtonOptimizer.optimizeSafely();
+
                     if(trace_id==2001)
                     {
-
+                        GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
+                        gaussNewtonOptimizer.optimizeSafely();
                         initial_values = gaussNewtonOptimizer.values();
+                        std::cout << "after initial optimizer" << std::endl;
                     }
 
 
@@ -314,8 +311,10 @@ int main() {
                     currentValues.print("current values at " + std::to_string(trace_id) + " is :");
 
 
-                    graph = NonlinearFactorGraph();
-                    initial_values = Values();
+//                    graph = NonlinearFactorGraph();
+//                    initial_values = Values();
+                    graph.resize(0);
+                    initial_values.clear();
 //
                 }
 
@@ -323,6 +322,8 @@ int main() {
             } catch (const std::exception &e) {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
+                graph.resize(0);
+                initial_values.clear();
 
 //                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
 

@@ -323,7 +323,10 @@ int main() {
 
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
-                isam2.calculateBestEstimate();
+//                isam2.calculateBestEstimate();
+                 Values currentValues = isam2.calculateBestEstimate();
+                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
+                              << std::endl;
                 graph.resize(0);
                 initial_values.clear();
 

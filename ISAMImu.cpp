@@ -206,6 +206,7 @@ int main() {
 
     int accumulate_preintegra_num = 0;
 
+    std::vector<double> ix,iy;
 
     /*
      * Main loop for positioning.
@@ -229,7 +230,7 @@ int main() {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 3) {
+        if (accumulate_preintegra_num > 30) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -301,29 +302,21 @@ int main() {
                 }
 
 
-                if (trace_id > 1){
-
-//                    if(trace_id==2001)
-//                    {
-//                        GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
-//                        gaussNewtonOptimizer.optimizeSafely();
-//                        initial_values = gaussNewtonOptimizer.values();
-//                        std::cout << "after initial optimizer" << std::endl;
-//                    }
+                if (zupt_flag<0.5 && last_zupt_flag > 0.5){
 
 
-//                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
+
                     isam2.update(graph,initial_values);
-//                    isam2.print("isam at " + std::to_string(trace_id) + " :" );
 
                     Values currentValues = isam2.calculateEstimate();
                     std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
                               << std::endl;
-//                    currentValues.print("current values at " + std::to_string(trace_id) + " is :");
+
+                    auto tmp_pose = Eigen::Vector3d(currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1));
+                    ix.push_back(tmp_pose(0));
+                    iy.push_back(tmp_pose(1));
 
 
-//                    graph = NonlinearFactorGraph();
-//                    initial_values = Values();
                     graph.resize(0);
                     initial_values.clear();
 //
@@ -334,13 +327,6 @@ int main() {
 
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
-//                isam2.calculateBestEstimate();
-//                 Values currentValues = isam2.calculateBestEstimate();
-//                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
-//                              << std::endl;
-
-
-//                isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
 //
                 graph.print("Error graph at " + std::to_string(trace_id) + " is :");
 
@@ -378,13 +364,53 @@ int main() {
     /**
      * Output Result
      */
+std::vector<double> gx,gy;
+    auto result = isam2.calculateEstimate();
+
+    try {
+
+        ofstream test_out_put("./ResultData/test.txt");
+
+        for (int k(0); k < trace_id; ++k) {
+            double t_data[10] = {0};
+
+            try {
+                auto pose_result = result.at<Pose3>(X(k));
+                t_data[0] = pose_result.matrix()(0, 3);
+                t_data[1] = pose_result.matrix()(1, 3);
+                t_data[2] = pose_result.matrix()(2, 3);
+
+                gx.push_back(t_data[0]);
+                gy.push_back(t_data[1]);
+
+                test_out_put << t_data[0] << ","
+                             << t_data[1] << ","
+                             << t_data[2] << std::endl;
+
+//                auto velocity_result = result.at<Vector3>(V(k));
+//                std::cout << velocity_result.transpose() << std::endl;
+            } catch (std::exception &e) {
+                std::cout << "error when get value :" << e.what() << std::endl;
+            }
+
+        }
 
 
+    } catch (std::exception &e) {
+        std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
+
+    }
     /**
      * Plot Trace
      */
 
-
+    plt::plot(gx, gy, "r-+");
+    plt::plot(ix,iy,"b-+");
+//    plt::plot(ori_1,"r-+");
+//    plt::plot(ori_2,"b-+");
+//    plt::plot(ori_3,"g-+");
+    plt::title("show");
+    plt::show();
     return 0;
 }
 

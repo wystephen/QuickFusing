@@ -253,8 +253,8 @@ int main(int argc, char *argv[]) {
 
                 // velocity constraint
                 if (zupt_flag > 0.5) {
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3,
-                                                                                                   0.0000001);
+                    noiseModel::Diagonal::shared_ptr velocity_noise =
+                            noiseModel::Isotropic::Sigma(3, 0.0000001);
 
 
                     PriorFactor<Vector3> zero_velocity(V(trace_id),

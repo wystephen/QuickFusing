@@ -206,7 +206,7 @@ int main() {
 
     int accumulate_preintegra_num = 0;
 
-    std::vector<double> ix,iy;
+    std::vector<double> ix, iy;
 
     /*
      * Main loop for positioning.
@@ -230,7 +230,7 @@ int main() {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 30) {
+        if (accumulate_preintegra_num > 3) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -260,7 +260,8 @@ int main() {
 
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
-                    noiseModel::Diagonal::shared_ptr velocity_noise = noiseModel::Isotropic::Sigma(3, 0.00000001);
+                    noiseModel::Diagonal::shared_ptr velocity_noise =
+                            noiseModel::Isotropic::Sigma(3, 0.00000001);
 //                    graph.push_back(PriorFactor<Vector3>(V(trace_id),
 //                                                         Vector3(0, 0, 0),
 //                                                         velocity_noise));
@@ -292,7 +293,6 @@ int main() {
                     initial_values.insert(B(trace_id), prev_bias);
 
 
-
                 } catch (const std::exception &e) {
                     std::cout << "error at :" << __FILE__
                               << " " << __LINE__ << " : " << e.what() << std::endl;
@@ -302,14 +302,15 @@ int main() {
                 }
 
 
-                if (zupt_flag<0.5 && last_zupt_flag > 0.5){
+                if (trace_id % 20 == 0) {//&&last_zupt_flag>0.5||index==imudata.rows()-1){
 
 
 
-                    isam2.update(graph,initial_values);
+                    isam2.update(graph, initial_values);
 
                     Values currentValues = isam2.calculateEstimate();
-                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
+                    std::cout << trace_id << ":"
+                              << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
                               << std::endl;
 
                     auto tmp_pose = Eigen::Vector3d(currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1));
@@ -328,7 +329,7 @@ int main() {
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
 //
-                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
+//                graph.print("Error graph at " + std::to_string(trace_id) + " is :");
 
                 graph.resize(0);
                 initial_values.clear();
@@ -364,7 +365,7 @@ int main() {
     /**
      * Output Result
      */
-std::vector<double> gx,gy;
+    std::vector<double> gx, gy;
     auto result = isam2.calculateEstimate();
 
     try {
@@ -405,7 +406,7 @@ std::vector<double> gx,gy;
      */
 
     plt::plot(gx, gy, "r-+");
-    plt::plot(ix,iy,"b-+");
+    plt::plot(ix, iy, "b-+");
 //    plt::plot(ori_1,"r-+");
 //    plt::plot(ori_2,"b-+");
 //    plt::plot(ori_3,"g-+");

@@ -303,7 +303,7 @@ int main() {
 
 //                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
                     isam2.update(graph,initial_values);
-                    isam2.printStats();
+                    isam2.print("isam at " + std::to_string(trace_id) + " :" );
 
                     Values currentValues = isam2.calculateEstimate();
                     std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
@@ -327,12 +327,14 @@ int main() {
 //                 Values currentValues = isam2.calculateBestEstimate();
 //                    std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
 //                              << std::endl;
-                graph.resize(0);
-                initial_values.clear();
+
 
                 isam2.calculateEstimate().print("Error values at " + std::to_string(trace_id) + " is :");
 //
                 graph.print("Error graph at " + std::to_string(trace_id) + " is :");
+
+                graph.resize(0);
+                initial_values.clear();
                 return 0;
             } catch (...) {
                 std::cout << "unexpected error " << std::endl;

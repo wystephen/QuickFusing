@@ -122,12 +122,12 @@ int main() {
 
     ISAM2GaussNewtonParams isam2GaussNewtonParams(0.001);
     ISAM2Params isam2Params(isam2GaussNewtonParams);
-    isam2Params.relinearizeThreshold = 0.0000000000000000000001;
+    isam2Params.relinearizeThreshold = 0.0001;
 //    isam2Params.relinearizeSkip = 1;
 
 
-//    ISAM isam2(isam2Params);
-    NonlinearISAM isam2(3);
+    ISAM2 isam2(isam2Params);
+//    NonlinearISAM isam2(3);
 
     Eigen::Matrix<double, 10, 1> initial_state = Eigen::Matrix<double, 10, 1>::Zero();
     initial_state(6) = 1.0;
@@ -240,7 +240,7 @@ int main() {
                 graph.push_back(ImuFactor(X(trace_id - 1), V(trace_id - 1),
                                           X(trace_id), V(trace_id),
                                           B(trace_id), *preint_imu));
-                preint_imu->resetIntegration();
+
 
 
 
@@ -303,11 +303,9 @@ int main() {
 
 //                    isam2.calculateEstimate().print("before update values at " + std::to_string(trace_id) + " is :");
                     isam2.update(graph,initial_values);
-//                    GaussNewtonOptimizer gaussNewtonOptimizer(graph,initial_values);
-//                    gaussNewtonOptimizer.optimizeSafely();
-//                    gaussNewtonOptimizer.values().print("value of " + std::to_string(trace_id) +":");
+                    isam2.printStats();
 
-                    Values currentValues = isam2.estimate();
+                    Values currentValues = isam2.calculateEstimate();
                     std::cout << currentValues.at<Pose3>(X(trace_id)).matrix().block(0, 3, 3, 1).transpose()
                               << std::endl;
                     currentValues.print("current values at " + std::to_string(trace_id) + " is :");
@@ -341,6 +339,9 @@ int main() {
                 return 0;
             }
 
+
+            // only reset after optimization.
+            preint_imu->resetIntegration();
 
         }
 

@@ -320,8 +320,10 @@ int main() {
 
 
             } catch (const std::exception &e) {
+
                 std::cout << "error at :" << __FILE__
                           << " " << __LINE__ << " : " << e.what() << std::endl;
+                isam2.calculateBestEstimate();
                 graph.resize(0);
                 initial_values.clear();
 

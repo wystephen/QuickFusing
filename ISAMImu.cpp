@@ -169,8 +169,10 @@ int main() {
     Matrix33 bias_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_bias_rw_sigma, 2);
     Matrix66 bias_acc_omega_int = Matrix::Identity(6, 6) * 1e-5; // error in the bias used for preintegration
 
+
+    //error gravity...!!!
     boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
-            PreintegratedImuMeasurements::Params::MakeSharedD(9.6);
+            PreintegratedImuMeasurements::Params::MakeSharedD(9.81);
 
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
@@ -263,16 +265,20 @@ int main() {
                                                          velocity_noise));
                 }
 
-                noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 11005.1);
 
-                GPSFactor gps_factor(X(trace_id),
-                                     Point3(0, 0, 0),
-                                     correction_noise);
+//                GPSFactor gps_factor(X(trace_id),
+//                                     Point3(0, 0, 0),
+//                                     correction_noise);
 
-                graph.emplace_shared<GPSFactor>(X(trace_id),
-                                                Point3(0, 0, 0),
-                                                correction_noise);
 
+                if(trace_id==1){
+
+                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+                  graph.push_back(GPSFactor(X(trace_id),
+                                                prior_pose.matrix().block(0,3,3,1),
+                                                correction_noise));
+
+                }
                 ///Set intial values
                 try {
                     initial_values.insert(X(trace_id), Pose3());

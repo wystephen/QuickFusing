@@ -233,7 +233,7 @@ int main() {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 10) {
+        if (accumulate_preintegra_num > 100) {
             accumulate_preintegra_num = 0;
             trace_id++;
 

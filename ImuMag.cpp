@@ -282,7 +282,7 @@ int main() {
 
                     graph->add(PoseRotationPrior<Pose3>(
                             X(trace_id),
-                            Rot3((1-imudata(index,12))*M_PI),
+                            Rot3((M_PI * imudata(index,12))),
                             mag_noise
 
                     ));

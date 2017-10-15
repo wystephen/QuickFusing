@@ -41,4 +41,8 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(imu_data[:,2],'b-')
     plt.plot(imu_data[:,9]*180.0,'r+-')
+
+
+    #
+
     plt.show()

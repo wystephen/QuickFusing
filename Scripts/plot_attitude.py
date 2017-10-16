@@ -22,7 +22,6 @@
          佛祖保佑       永无BUG 
 '''
 
-
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
@@ -32,7 +31,7 @@ if __name__ == '__main__':
     dir_name = "/home/steve/Data/IU/74/"
 
     # imu_data = np.loadtxt(dir_name + "ImuData.csv",delimiter=',')
-    imu_data = np.loadtxt(dir_name + "imu.txt",delimiter=',')
+    imu_data = np.loadtxt(dir_name + "imu.txt", delimiter=',')
     print(imu_data.shape)
 
     plt.figure()
@@ -41,13 +40,12 @@ if __name__ == '__main__':
     # plt.plot(imu_data[:,12]*180.0 ,'-')
 
     plt.figure()
-    plt.plot(imu_data[:,2],'b-')
-    plt.plot(imu_data[:,9]*180.0,'r+-')
-
+    plt.plot(imu_data[:, 2], 'b-')
+    plt.plot(imu_data[:, 9] * 180.0, 'r+-')
 
     # hist
 
     plt.figure()
-    plt.hist(imu_data[:,9]*180,60)
+    plt.hist(imu_data[:, 9] * 180, 60)
 
     plt.show()

@@ -118,6 +118,8 @@ int main() {
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 0, 20, 6));
 
+    std::vector<double> ekfx,ekfy;
+
     /**
      * Initial Graph parameters.
      */
@@ -229,6 +231,11 @@ int main() {
                 zupt_flag = 1.0;
             }
         }
+
+        /// ekf test
+        auto result_x = myekf.GetPosition(imudata.block(index,1,1,6),zupt_flag);
+        ekfx.push_back(result_x(0));
+        ekfy.push_back(result_x(1));
 
 
         /// IntegratedImu
@@ -436,6 +443,7 @@ int main() {
      * Plot Trace
      */
     plt::plot(gx, gy, "r-+");
+    plt::plot(ekfx,ekfy,"b-");
     plt::title("show");
     plt::show();
 

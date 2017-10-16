@@ -539,7 +539,7 @@ public:
             P_ = (Id - K * H_) * P_;
 
             if (P_.block(0, 0, 3, 3).mean() > 1e4) {
-                P_.block(0, 0, 3, 3) /= 1e2;
+                P_.block(0, 0, 3, 3) /= 1e5;
                 if(!outputted_warning){
                 std::cerr << "error at :" << __FILE__
                           << ":"

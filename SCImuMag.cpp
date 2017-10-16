@@ -233,9 +233,9 @@ int main() {
         }
 
         /// ekf test
-        auto result_x = myekf.GetPosition(imudata.block(index,1,1,6).transpose(),zupt_flag);
-        ekfx.push_back(result_x(0));
-        ekfy.push_back(result_x(1));
+//        auto result_x = myekf.GetPosition(imudata.block(index,1,1,6).transpose(),zupt_flag);
+//        ekfx.push_back(result_x(0));
+//        ekfy.push_back(result_x(1));
 
 
         /// IntegratedImu

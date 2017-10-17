@@ -260,7 +260,7 @@ int main() {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 25) {
+        if (accumulate_preintegra_num > 5) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -311,11 +311,11 @@ int main() {
 
                     graph->add(PoseRotationPrior<Pose3>(
                             X(trace_id),
-                            Rot3::Yaw(( imudata(index,7))),
+                            Rot3::Yaw(( imudata(index,7)/180.0 * M_PI)),
                             mag_noise
 
                     ));
-//                    std::cout << imudata(index,7) << std::endl;
+                    std::cout << imudata(index,7) << std::endl;
                 }
 
 

@@ -37,6 +37,9 @@ if __name__ == '__main__':
     plt.figure()
     for i in range(3):
         plt.plot(imu_data[:,i+6]/np.pi * 180.0,'-')
+
+    plt.figure()
+    plt.plot(np.linalg.norm(imu_data[:,6:10],axis=1))
     # plt.plot(imu_data[:,12]*180.0 ,'-')
 
     # plt.figure()

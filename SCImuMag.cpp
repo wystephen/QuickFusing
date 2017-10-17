@@ -24,6 +24,8 @@
 // Created by steve on 17-10-6.
 //
 
+//#define _GLIBCXX_DEBUG
+
 #include "CSVReader.h"
 #include "matplotlib_interface.h"
 #include "time_stamp.h"
@@ -84,11 +86,11 @@ int main() {
     /**
      * Load Data
      */
-//    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
+    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
+//    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
 
-//    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
+//    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
@@ -98,11 +100,11 @@ int main() {
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
-            if (0 < j&& j < 4) {
-                imudata(i, j) *= 9.81;
-            } else if (4 <= j && j< 7) {
-                imudata(i,j) *= (M_PI/180.0f);
-            }
+//            if (0 < j&& j < 4) {
+//                imudata(i, j) *= 9.81;
+//            } else if (4 <= j && j< 7) {
+//                imudata(i,j) *= (M_PI/180.0f);
+//            }
         }
     }
 
@@ -115,7 +117,7 @@ int main() {
     SettingPara initial_para(true);
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
     initial_para.init_heading1_ = imudata.block(0,8,20,1).mean()*M_PI;
-    initial_para.Ts_ = 1.0f / 200.0f;
+    initial_para.Ts_ = 1.0f / 100.0f;
 
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
 //    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
@@ -162,7 +164,7 @@ int main() {
 
     // Assemble prior noise model and add it the graph.
     noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
-            (Vector(6) << 0.01, 0.01, 0.01, 0.05, 0.05, 0.05).finished()); // rad,rad,rad,m, m, m
+            (Vector(6) << 0.1, 0.1, 0.1, 0.5, 0.5, 0.5).finished()); // rad,rad,rad,m, m, m
     noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.01); // m/s
     noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
 
@@ -188,7 +190,7 @@ int main() {
 
     //error gravity...!!!
     boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
-            PreintegratedImuMeasurements::Params::MakeSharedD(9.81);
+            PreintegratedImuMeasurements::Params::MakeSharedD(9.6);
 
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
@@ -257,7 +259,7 @@ int main() {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 5) {
+        if (accumulate_preintegra_num > 25) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -328,7 +330,9 @@ int main() {
                 }
                 ///Set intial values
                 try {
-                    initial_values.insert(X(trace_id), Pose3());
+                    Pose3 p;
+//                    p.matrix() = myekf.getTransformation().matrix();
+                    initial_values.insert(X(trace_id), p);
                     initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                     initial_values.insert(B(trace_id), prev_bias);
 
@@ -380,7 +384,7 @@ int main() {
 //    graph.print("before optimize");
 //    GaussNewtonOptimizer optimizer(*graph, initial_values);
     LevenbergMarquardtParams lm_para;
-    lm_para.setMaxIterations(20);
+    lm_para.setMaxIterations(2000);
     LevenbergMarquardtOptimizer optimizer(*graph,initial_values,lm_para);
 
 

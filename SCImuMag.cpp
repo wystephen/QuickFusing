@@ -165,7 +165,7 @@ int main() {
 
     // Assemble prior noise model and add it the graph.
     noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
-            (Vector(6) << 0.1, 0.1, 0.1, 0.5, 0.5, 0.5).finished()); // rad,rad,rad,m, m, m
+            (Vector(6) << 1110.1, 11110.1, 11110.1, 0.5, 0.5, 0.5).finished()); // rad,rad,rad,m, m, m
     noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.01); // m/s
     noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
 
@@ -323,7 +323,7 @@ int main() {
                             X(trace_id),
                             Rot3::RzRyRx(Vector3(imudata(index,9)/180.0*M_PI,
                             imudata(index,8)/180.0*M_PI,
-                                 -imudata(index,7)/180.0*M_PI)),
+                                 imudata(index,7)/180.0*M_PI)),
                             mag_all_noise
                     ));
                     std::cout << imudata(index,7) << std::endl;

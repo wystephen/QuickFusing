@@ -117,6 +117,8 @@ int main() {
     initial_para.sigma_a_ = 1.1;//zupt detector parameter
     initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
 
+    std::vector<double> ax,ay,az,zupt_v;
+
     initial_para.ZeroDetectorWindowSize_ = 5;
 
     MyEkf myekf(initial_para);
@@ -235,7 +237,11 @@ int main() {
                 zupt_flag = 1.0;
             }
         }
-        std::cout << "zupt flag :" << zupt_flag << std::endl;
+//        std::cout << "zupt flag :" << zupt_flag << std::endl;
+        ax.push_back(imudata(index,1));
+        ay.push_back(imudata(index,2));
+        az.push_back(imudata(index,3));
+        zupt_v.push_back(zupt_flag);
 
 
         /// ekf test
@@ -447,9 +453,16 @@ int main() {
     /**
      * Plot Trace
      */
-    plt::plot(gx, gy, "r-+");
-    plt::plot(ekfx,ekfy,"b-");
-    plt::title("show");
+//    plt::plot(gx, gy, "r-+");
+//    plt::plot(ekfx,ekfy,"b-");
+//    plt::title("show");
+
+
+
+    plt::plot(ax);
+    plt::plot(ay);
+    plt::plot(az);
+    plt::plot(zupt_v);
     plt::show();
 
 

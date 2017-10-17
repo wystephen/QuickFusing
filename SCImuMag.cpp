@@ -307,13 +307,24 @@ int main() {
 
                     ///Mag constraint
                     noiseModel::Diagonal::shared_ptr mag_noise=
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI*1000.0,M_PI*1000.0,M_PI*1.0));
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI*1000000.0,M_PI*1000000.0,M_PI*1.5));
 
+//                    graph->add(PoseRotationPrior<Pose3>(
+//                            X(trace_id),
+//                            Rot3::Yaw(( imudata(index,7)/180.0 * M_PI)),
+//                            mag_noise
+//
+//                    ));
+
+
+                    noiseModel::Diagonal::shared_ptr mag_all_noise=
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI,M_PI,M_PI));
                     graph->add(PoseRotationPrior<Pose3>(
                             X(trace_id),
-                            Rot3::Yaw(( imudata(index,7)/180.0 * M_PI)),
-                            mag_noise
-
+                            Rot3::RzRyRx(Vector3(imudata(index,9)/180.0*M_PI,
+                            imudata(index,8)/180.0*M_PI,
+                                 -imudata(index,7)/180.0*M_PI)),
+                            mag_all_noise
                     ));
                     std::cout << imudata(index,7) << std::endl;
                 }

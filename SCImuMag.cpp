@@ -87,7 +87,8 @@ int main() {
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
     std::string dir_name = "/home/steve/Data/IU/74/";
 
-    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
+//    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
+    CppExtent::CSVReader imu_data_reader(dir_name + "sim_imu.csv");
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
@@ -109,7 +110,7 @@ int main() {
     SettingPara initial_para(true);
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
     initial_para.init_heading1_ = imudata.block(0,8,20,1).mean()*M_PI;
-    initial_para.Ts_ = 1.0f / 100.0f;
+    initial_para.Ts_ = 1.0f / 200.0f;
 
     initial_para.sigma_a_ = 1.1;//zupt detector parameter
     initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
@@ -291,12 +292,12 @@ int main() {
                     noiseModel::Diagonal::shared_ptr mag_noise=
                             noiseModel::Diagonal::Sigmas(Vector3(M_PI*1000.0,M_PI*1000.0,M_PI*100));
 
-                    graph->add(PoseRotationPrior<Pose3>(
-                            X(trace_id),
-                            Rot3::Yaw(( imudata(index,7))),
-                            mag_noise
-
-                    ));
+//                    graph->add(PoseRotationPrior<Pose3>(
+//                            X(trace_id),
+//                            Rot3::Yaw(( imudata(index,7))),
+//                            mag_noise
+//
+//                    ));
                     std::cout << imudata(index,7) << std::endl;
                 }
 

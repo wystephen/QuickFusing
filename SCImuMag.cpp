@@ -85,10 +85,10 @@ int main() {
      * Load Data
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
-    std::string dir_name = "/home/steve/Data/IU/74/";
+    std::string dir_name = "/home/steve/Data/IU/70/";
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
-    CppExtent::CSVReader imu_data_reader(dir_name + "sim_imu.csv");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
@@ -234,10 +234,11 @@ int main() {
             }
         }
 
+
         /// ekf test
-//        auto result_x = myekf.GetPosition(imudata.block(index,1,1,6).transpose(),zupt_flag);
-//        ekfx.push_back(result_x(0));
-//        ekfy.push_back(result_x(1));
+        auto result_x = myekf.GetPosition(imudata.block(index,1,1,6).transpose(),zupt_flag);
+        ekfx.push_back(result_x(0));
+        ekfy.push_back(result_x(1));
 
 
         /// IntegratedImu
@@ -272,7 +273,6 @@ int main() {
                 ));
 
                 // considering gravity constraint...
-
 
 
 

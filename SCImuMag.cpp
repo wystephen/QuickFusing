@@ -98,6 +98,11 @@ int main() {
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
+            if (0 < j&& j < 4) {
+                imudata(i, j) *= 9.81;
+            } else if (4 <= j && j< 7) {
+                imudata(i,j) *= (M_PI/180.0f);
+            }
         }
     }
 
@@ -307,7 +312,7 @@ int main() {
 //                            mag_noise
 //
 //                    ));
-                    std::cout << imudata(index,7) << std::endl;
+//                    std::cout << imudata(index,7) << std::endl;
                 }
 
 
@@ -373,7 +378,7 @@ int main() {
 
     std::cout << "begin optimizer" << std::endl;
 //    graph.print("before optimize");
-    LevenbergMarquardtOptimizer optimizer(*graph, initial_values);
+    GaussNewtonOptimizer optimizer(*graph, initial_values);
 
 
     /// Show itereation times ~
@@ -453,16 +458,16 @@ int main() {
     /**
      * Plot Trace
      */
-//    plt::plot(gx, gy, "r-+");
-//    plt::plot(ekfx,ekfy,"b-");
-//    plt::title("show");
+    plt::plot(gx, gy, "r-+");
+    plt::plot(ekfx,ekfy,"b-");
+    plt::title("show");
 
 
 
-    plt::plot(ax);
-    plt::plot(ay);
-    plt::plot(az);
-    plt::plot(zupt_v);
+//    plt::plot(ax);
+//    plt::plot(ay);
+//    plt::plot(az);
+//    plt::plot(zupt_v);
     plt::show();
 
 

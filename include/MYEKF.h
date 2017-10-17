@@ -540,12 +540,12 @@ public:
 
             if (P_.block(0, 0, 3, 3).mean() > 1e4) {
                 P_.block(0, 0, 3, 3) /= 1e5;
-                if(!outputted_warning){
-                std::cerr << "error at :" << __FILE__
-                          << ":"
-                          << __LINE__
-                          << " cov of state(P_) is too large"
-                          << std::endl;
+                if (!outputted_warning) {
+                    std::cerr << "error at :" << __FILE__
+                              << ":"
+                              << __LINE__
+                              << " cov of state(P_) is too large"
+                              << std::endl;
                     outputted_warning = true;
                 }
 
@@ -565,7 +565,7 @@ public:
         if (std::isnan(x_h_.block(6, 0, 3, 1).sum())) {
             x_h_.block(6, 0, 3, 1) = Eigen::Vector3d(0, 0, 0);
         }
-        if (!(!std::isinf(P_.sum()) && !std::isnan(P_.sum()))) {
+        if (std::isinf(P_.sum()) || std::isnan(P_.sum())) {
             std::cout << P_ << std::endl << x_h_ << std::endl;
         }
 

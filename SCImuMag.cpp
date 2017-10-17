@@ -84,11 +84,11 @@ int main() {
     /**
      * Load Data
      */
-    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
-//    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
+//    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
 
-    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
-//    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+//    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
@@ -115,7 +115,7 @@ int main() {
     SettingPara initial_para(true);
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
     initial_para.init_heading1_ = imudata.block(0,8,20,1).mean()*M_PI;
-    initial_para.Ts_ = 1.0f / 100.0f;
+    initial_para.Ts_ = 1.0f / 200.0f;
 
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
 //    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
@@ -380,7 +380,7 @@ int main() {
 //    graph.print("before optimize");
 //    GaussNewtonOptimizer optimizer(*graph, initial_values);
     LevenbergMarquardtParams lm_para;
-    lm_para.setMaxIterations(20000);
+    lm_para.setMaxIterations(20);
     LevenbergMarquardtOptimizer optimizer(*graph,initial_values,lm_para);
 
 

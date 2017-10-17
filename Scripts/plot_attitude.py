@@ -28,24 +28,24 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     # dir_name = "/home/steve/Data/XIMU&UWB/5/"
-    dir_name = "/home/steve/Data/IU/74/"
+    dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/"
 
     # imu_data = np.loadtxt(dir_name + "ImuData.csv",delimiter=',')
     imu_data = np.loadtxt(dir_name + "imu.txt", delimiter=',')
     print(imu_data.shape)
 
     plt.figure()
-    # for i in range(3):
-    #     plt.plot(imu_data[:,i+9]/np.pi * 180.0,'-')
+    for i in range(3):
+        plt.plot(imu_data[:,i+6]/np.pi * 180.0,'-')
     # plt.plot(imu_data[:,12]*180.0 ,'-')
 
-    plt.figure()
-    plt.plot(imu_data[:, 2], 'b-')
-    plt.plot(imu_data[:, 9] * 180.0, 'r+-')
+    # plt.figure()
+    # plt.plot(imu_data[:, 2], 'b-')
+    # plt.plot(imu_data[:, 9] * 180.0, 'r+-')
 
     # hist
 
     plt.figure()
-    plt.hist(imu_data[:, 9] * 180, 60)
+    plt.hist(imu_data[:, 9], 60)
 
     plt.show()

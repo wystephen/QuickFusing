@@ -85,7 +85,7 @@ int main() {
      * Load Data
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
-    std::string dir_name = "/home/steve/Data/IU/91/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
     CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
@@ -114,10 +114,10 @@ int main() {
 
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
 //    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
-    initial_para.sigma_a_ = 1.1;//zupt detector parameter
-    initial_para.sigma_g_ = 1.0 / 180.0 * M_PI;
+    initial_para.sigma_a_ = 500.1;//zupt detector parameter
+    initial_para.sigma_g_ = 500.0 / 180.0 * M_PI;
 
-    initial_para.ZeroDetectorWindowSize_ = 10;
+    initial_para.ZeroDetectorWindowSize_ = 5;
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 0, 20, 6));

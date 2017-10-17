@@ -38,8 +38,8 @@ bool GLRT_Detector(Eigen::MatrixXd u,
 //            throw(std::expe)
         }
 
-        std::cout << " u block size : " << u.block(3,i,3,1).rows()<< std::endl;
-        std::cout << "tmp size :" << tmp.rows()<< std::endl;
+//        std::cout << " u block size : " << u.block(3,i,3,1).rows()<< std::endl;
+//        std::cout << "tmp size :" << tmp.rows()<< std::endl;
 
         T += (u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / para_.sigma_g_ +
               tmp.transpose() * tmp / para_.sigma_a_).sum();

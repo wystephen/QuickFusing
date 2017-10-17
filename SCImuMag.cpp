@@ -114,8 +114,8 @@ int main() {
 
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
 //    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
-    initial_para.sigma_a_ = 500.1;//zupt detector parameter
-    initial_para.sigma_g_ = 500.0 / 180.0 * M_PI;
+    initial_para.sigma_a_ = 1.1;//zupt detector parameter
+    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
 
     initial_para.ZeroDetectorWindowSize_ = 5;
 
@@ -229,7 +229,7 @@ int main() {
             // first several data set as zero-velocity state.
             zupt_flag = 1.0;
         } else {
-            if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 0,
+            if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 1,
                                             initial_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
                               initial_para)) {
                 zupt_flag = 1.0;

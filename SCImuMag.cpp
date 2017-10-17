@@ -84,7 +84,8 @@ int main() {
     /**
      * Load Data
      */
-    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
+//    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
+    std::string dir_name = "/home/steve/Data/IU/74/";
 
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
     Eigen::MatrixXd imudata;
@@ -302,14 +303,14 @@ int main() {
 
 
 
-//                if (trace_id == 1) {
-//
-//                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
-//                    graph->add(GPSFactor(X(trace_id),
-//                                              prior_pose.matrix().block(0, 3, 3, 1),
-//                                              correction_noise));
-//
-//                }
+                if (trace_id == 1) {
+
+                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+                    graph->add(GPSFactor(X(trace_id),
+                                              prior_pose.matrix().block(0, 3, 3, 1),
+                                              correction_noise));
+
+                }
                 ///Set intial values
                 try {
                     initial_values.insert(X(trace_id), Pose3());

@@ -44,11 +44,11 @@ bool GLRT_Detector(Eigen::MatrixXd u,
         T += (u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / para_.sigma_g_ +
               tmp.transpose() * tmp / para_.sigma_a_).sum();
 
-        if(std::isnan(Tmatrix.sum()))
-        {
-            std::cout << "Tmatrix is nan" << __FILE__
-                                          << ":"<< __LINE__ << std::endl;
-        }
+//        if(std::isnan(Tmatrix.sum()))
+//        {
+//            std::cout << "Tmatrix is nan" << __FILE__
+//                                          << ":"<< __LINE__ << std::endl;
+//        }
 
 
     }

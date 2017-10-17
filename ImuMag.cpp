@@ -220,7 +220,7 @@ int main() {
             // first several data set as zero-velocity state.
             zupt_flag = 1.0;
         } else {
-            if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 1,
+            if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 0,
                                             initial_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
                               initial_para)) {
                 zupt_flag = 1.0;

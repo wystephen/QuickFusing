@@ -360,8 +360,8 @@ int main() {
 
         }
 
-        imu_preintegrated_->integrateMeasurement(imudata.block(index, 0, 1, 3).transpose(),
-                                                 imudata.block(index, 3, 1, 3).transpose(),
+        imu_preintegrated_->integrateMeasurement(imudata.block(index, 1, 1, 3).transpose(),
+                                                 imudata.block(index, 4, 1, 3).transpose(),
                                                  initial_para.Ts_);
 
         last_zupt_flag = zupt_flag;
@@ -378,7 +378,8 @@ int main() {
 
     std::cout << "begin optimizer" << std::endl;
 //    graph.print("before optimize");
-    GaussNewtonOptimizer optimizer(*graph, initial_values);
+//    GaussNewtonOptimizer optimizer(*graph, initial_values);
+    LevenbergMarquardtOptimizer optimizer(*graph,initial_values);
 
 
     /// Show itereation times ~

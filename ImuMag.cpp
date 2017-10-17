@@ -84,7 +84,7 @@ int main() {
     /**
      * Load Data
      */
-    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
+    std::string dir_name = "/home/steve/Data/XIMU&UWB/5/";
 
     CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
     Eigen::MatrixXd imudata;
@@ -220,7 +220,7 @@ int main() {
             // first several data set as zero-velocity state.
             zupt_flag = 1.0;
         } else {
-            if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 0,
+            if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 1,
                                             initial_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
                               initial_para)) {
                 zupt_flag = 1.0;
@@ -280,13 +280,13 @@ int main() {
                     noiseModel::Diagonal::shared_ptr mag_noise=
                             noiseModel::Diagonal::Sigmas(Vector3(M_PI*1000.0,M_PI*1000.0,M_PI));
 
-                    graph->add(PoseRotationPrior<Pose3>(
-                            X(trace_id),
-                            Rot3((M_PI * imudata(index,12))),
-                            mag_noise
-
-                    ));
-                    std::cout << imudata(index,12) * M_PI << std::endl;
+//                    graph->add(PoseRotationPrior<Pose3>(
+//                            X(trace_id),
+//                            Rot3((M_PI * imudata(index,12))),
+//                            mag_noise
+//
+//                    ));
+//                    std::cout << imudata(index,12) * M_PI << std::endl;
                 }
 
 

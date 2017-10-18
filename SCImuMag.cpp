@@ -419,6 +419,7 @@ int main() {
     });
     thread1.detach();
 
+
     auto result = initial_values;
 
     result = optimizer.optimize();

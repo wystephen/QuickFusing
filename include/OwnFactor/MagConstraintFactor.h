@@ -82,9 +82,9 @@ public:
      */
     gtsam::Vector3 evaluateError(const gtsam::Pose3 &pose,
                                  const gtsam::Point3 &bias,
-    boost::optional<gtsam::Matrix&> H = boost::none) const {
-        gtsam::Point3 rotated_M = pose.rotation().unrotate(nM_,H,boost::none) + bias;
-        return (rotated_M-measured_);
+                                 boost::optional<gtsam::Matrix &> H = boost::none) const {
+        gtsam::Point3 rotated_M = pose.rotation().unrotate(nM_, H, boost::none) + bias;
+        return (rotated_M - measured_);
     }
 
 

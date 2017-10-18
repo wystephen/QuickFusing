@@ -117,7 +117,7 @@ int main() {
     std::cout << "start initial ZUPT" << std::endl;
     SettingPara initial_para(true);
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
-    initial_para.init_heading1_ = imudata.block(0,8,20,1).mean()*M_PI;
+    initial_para.init_heading1_ = imudata.block(0, 8, 20, 1).mean() * M_PI;
     initial_para.Ts_ = 1.0f / 100.0f;
 
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
@@ -125,14 +125,14 @@ int main() {
     initial_para.sigma_a_ = 1.1;//zupt detector parameter
     initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
 
-    std::vector<double> ax,ay,az,zupt_v;
+    std::vector<double> ax, ay, az, zupt_v;
 
     initial_para.ZeroDetectorWindowSize_ = 5;
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 0, 20, 6));
 
-    std::vector<double> ekfx,ekfy;
+    std::vector<double> ekfx, ekfy;
 
     /**
      * Initial Graph parameters.
@@ -246,14 +246,14 @@ int main() {
             }
         }
 //        std::cout << "zupt flag :" << zupt_flag << std::endl;
-        ax.push_back(imudata(index,1));
-        ay.push_back(imudata(index,2));
-        az.push_back(imudata(index,3));
+        ax.push_back(imudata(index, 1));
+        ay.push_back(imudata(index, 2));
+        az.push_back(imudata(index, 3));
         zupt_v.push_back(zupt_flag);
 
 
         /// ekf test
-        auto result_x = myekf.GetPosition(imudata.block(index,1,1,6).transpose(),zupt_flag);
+        auto result_x = myekf.GetPosition(imudata.block(index, 1, 1, 6).transpose(), zupt_flag);
         ekfx.push_back(result_x(0));
         ekfy.push_back(result_x(1));
 
@@ -271,8 +271,8 @@ int main() {
 
                 ///IMU preintegrate
                 graph->add(ImuFactor(X(trace_id - 1), V(trace_id - 1),
-                                          X(trace_id), V(trace_id),
-                                          B(trace_id), *preint_imu));
+                                     X(trace_id), V(trace_id),
+                                     B(trace_id), *preint_imu));
 
 
                 preint_imu->resetIntegration();
@@ -306,8 +306,8 @@ int main() {
                     graph->add(zero_velocity);
 
                     ///Mag constraint
-                    noiseModel::Diagonal::shared_ptr mag_noise=
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI*1000000.0,M_PI*1000000.0,M_PI*1.5));
+                    noiseModel::Diagonal::shared_ptr mag_noise =
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI * 1000000.0, M_PI * 1000000.0, M_PI * 1.5));
 
 //                    graph->add(PoseRotationPrior<Pose3>(
 //                            X(trace_id),
@@ -317,27 +317,25 @@ int main() {
 //                    ));
 
 
-                    noiseModel::Diagonal::shared_ptr mag_all_noise=
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI,M_PI,M_PI));
+                    noiseModel::Diagonal::shared_ptr mag_all_noise =
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI, M_PI, M_PI));
                     graph->add(PoseRotationPrior<Pose3>(
                             X(trace_id),
-                            Rot3::RzRyRx(Vector3(imudata(index,9)/180.0*M_PI,
-                            imudata(index,8)/180.0*M_PI,
-                                 imudata(index,7)/180.0*M_PI)),
+                            Rot3::RzRyRx(Vector3(imudata(index, 9) / 180.0 * M_PI,
+                                                 imudata(index, 8) / 180.0 * M_PI,
+                                                 imudata(index, 7) / 180.0 * M_PI)),
                             mag_all_noise
                     ));
-                    std::cout << imudata(index,7) << std::endl;
+                    std::cout << imudata(index, 7) << std::endl;
                 }
-
-
 
 
                 if (trace_id == 1) {
 
                     noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
                     graph->add(GPSFactor(X(trace_id),
-                                              prior_pose.matrix().block(0, 3, 3, 1),
-                                              correction_noise));
+                                         prior_pose.matrix().block(0, 3, 3, 1),
+                                         correction_noise));
 
                 }
                 ///Set intial values
@@ -356,8 +354,6 @@ int main() {
                 } catch (...) {
                     std::cout << "unexpected error " << std::endl;
                 }
-
-
 
 
             } catch (const std::exception &e) {
@@ -397,7 +393,7 @@ int main() {
 //    GaussNewtonOptimizer optimizer(*graph, initial_values);
     LevenbergMarquardtParams lm_para;
     lm_para.setMaxIterations(2000);
-    LevenbergMarquardtOptimizer optimizer(*graph,initial_values,lm_para);
+    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
 
 
     /// Show itereation times ~
@@ -478,7 +474,7 @@ int main() {
      * Plot Trace
      */
     plt::plot(gx, gy, "r-+");
-    plt::plot(ekfx,ekfy,"b-");
+    plt::plot(ekfx, ekfy, "b-");
     plt::title("show");
 
 

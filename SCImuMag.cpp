@@ -82,7 +82,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
     return T;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     /**
      * Load Data
      */
@@ -120,9 +120,18 @@ int main() {
     initial_para.init_heading1_ = imudata.block(0, 8, 20, 1).mean() * M_PI;
     initial_para.Ts_ = 1.0f / 100.0f;
 
-    initial_para.sigma_vel_ = Eigen::Vector3d(0.1,0.1,0.1);
-    initial_para.sigma_acc_ = Eigen::Vector3d(0.1,0.1,0.1);
-    initial_para.sigma_gyro_ = Eigen::Vector3d(1,1,1)/180.0 * M_PI;
+
+    std::cout << 'argc:' << argc << std::endl;
+    double sv, sa, sg;
+    if (argc == 4) {
+        sv = std::stod(argv[1]);
+        sa = std::stod(argv[2]);
+        sg = std::stod(argv[3]);
+    initial_para.sigma_vel_ = Eigen::Vector3d(sv,sv,sv);
+    initial_para.sigma_acc_ = Eigen::Vector3d(sa,sa,sa);
+    initial_para.sigma_gyro_ = Eigen::Vector3d(sg,sg,sg) / 180.0 * M_PI;
+
+    }
 
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
 //    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;

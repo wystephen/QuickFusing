@@ -120,6 +120,10 @@ int main() {
     initial_para.init_heading1_ = imudata.block(0, 8, 20, 1).mean() * M_PI;
     initial_para.Ts_ = 1.0f / 100.0f;
 
+    initial_para.sigma_vel_ = Eigen::Vector3d(0.1,0.1,0.1);
+    initial_para.sigma_acc_ = Eigen::Vector3d(0.1,0.1,0.1);
+    initial_para.sigma_gyro_ = Eigen::Vector3d(1,1,1)/180.0 * M_PI;
+
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
 //    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
     initial_para.sigma_a_ = 1.1;//zupt detector parameter
@@ -392,7 +396,7 @@ int main() {
 //    graph.print("before optimize");
 //    GaussNewtonOptimizer optimizer(*graph, initial_values);
     LevenbergMarquardtParams lm_para;
-    lm_para.setMaxIterations(2000);
+    lm_para.setMaxIterations(2);
     LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
 
 
@@ -422,7 +426,7 @@ int main() {
 
     auto result = initial_values;
 
-    result = optimizer.optimize();
+//    result = optimizer.optimize();
 
 
 
@@ -474,7 +478,7 @@ int main() {
     /**
      * Plot Trace
      */
-    plt::plot(gx, gy, "r-+");
+//    plt::plot(gx, gy, "r-+");
     plt::plot(ekfx, ekfy, "b-");
     plt::title("show");
 

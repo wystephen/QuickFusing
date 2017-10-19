@@ -86,11 +86,11 @@ int main() {
     /**
      * Load Data
      */
-    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
-//    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
+//    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
 
-    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
-//    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+//    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
@@ -100,11 +100,11 @@ int main() {
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
-//            if (0 < j&& j < 4) {
-//                imudata(i, j) *= 9.81;
-//            } else if (4 <= j && j< 7) {
-//                imudata(i,j) *= (M_PI/180.0f);
-//            }
+            if (0 < j&& j < 4) {
+                imudata(i, j) *= 9.81;
+            } else if (4 <= j && j< 7) {
+                imudata(i,j) *= (M_PI/180.0f);
+            }
 
         }
     }
@@ -118,7 +118,7 @@ int main() {
     SettingPara initial_para(true);
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
     initial_para.init_heading1_ = imudata.block(0, 8, 20, 1).mean() * M_PI;
-    initial_para.Ts_ = 1.0f / 100.0f;
+    initial_para.Ts_ = 1.0f / 200.0f;
 
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
 //    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
@@ -191,7 +191,7 @@ int main() {
 
     //error gravity...!!!
     boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
-            PreintegratedImuMeasurements::Params::MakeSharedD(9.6);
+            PreintegratedImuMeasurements::Params::MakeSharedD(9.8);
 
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
@@ -317,16 +317,17 @@ int main() {
 //                    ));
 
 
-                    noiseModel::Diagonal::shared_ptr mag_all_noise =
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI, M_PI, M_PI));
-                    graph->add(PoseRotationPrior<Pose3>(
-                            X(trace_id),
-                            Rot3::RzRyRx(Vector3(imudata(index, 9) / 180.0 * M_PI,
-                                                 imudata(index, 8) / 180.0 * M_PI,
-                                                 imudata(index, 7) / 180.0 * M_PI)),
-                            mag_all_noise
-                    ));
-                    std::cout << imudata(index, 7) << std::endl;
+//                    noiseModel::Diagonal::shared_ptr mag_all_noise =
+//                            noiseModel::Diagonal::Sigmas(Vector3(M_PI, M_PI, M_PI));
+//                    graph->add(PoseRotationPrior<Pose3>(
+//                            X(trace_id),
+//                            Rot3::RzRyRx(Vector3(imudata(index, 9) / 180.0 * M_PI,
+//                                                 imudata(index, 8) / 180.0 * M_PI,
+//                                                 imudata(index, 7) / 180.0 * M_PI)),
+//                            mag_all_noise
+//                    ));
+//                    std::cout << imudata(index, 7) << std::endl;
+
                 }
 
 

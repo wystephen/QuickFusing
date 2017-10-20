@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
 
 
     dir_name = dir_name + std::to_string(tmp_dir_num) + "/";
-    dir_name="/home/steve/Data/IU/76/";
+    dir_name="/home/steve/Data/IU/85/";
 
 
     int trace_id = 0;
@@ -689,10 +689,10 @@ int main(int argc, char *argv[]) {
                + std::to_string(valid_range) + ":" + std::to_string(range_sigma) +
                ":" + std::to_string(z0_info));
 
-    plt::save(std::to_string(TimeStamp::now())
-
-              + "test.jpg");
-//    plt::show();
+//    plt::save(std::to_string(TimeStamp::now())
+//
+//              + "test.jpg");
+    plt::show();
 
 
 }

@@ -487,7 +487,7 @@ int main(int argc, char *argv[]) {
     /**
      * Plot Trace
      */
-//    plt::plot(gx, gy, "r-+");
+    plt::plot(gx, gy, "r-+");
     plt::plot(ekfx, ekfy, "b-");
     plt::title("show");
 

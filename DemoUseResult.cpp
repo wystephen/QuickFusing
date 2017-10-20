@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
 
 
     dir_name = dir_name + std::to_string(tmp_dir_num) + "/";
-    dir_name="/home/steve/Data/IU/85/";
+    dir_name="/home/steve/Data/IU/92/";
 
 
     int trace_id = 0;
@@ -510,7 +510,7 @@ int main(int argc, char *argv[]) {
                     last_time = zupt_time;
 
                     for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
-                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 75.0) {
+                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 10.0) {
                             double range = uwb_raw(uwb_index, bi + 1);
                             int beacon_id = bi + beacon_id_offset;
 

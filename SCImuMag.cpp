@@ -497,10 +497,10 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ay);
 //    plt::plot(az);
 //    plt::plot(zupt_v);
-    plt::show();
-//    plt::save("img"+std::to_string(sa)+"-"+
-//    std::to_string(sg)+"-"+
-//    std::to_string(sv)+".png");
+//    plt::show();
+    plt::save("img-sa:"+std::to_string(sa)+"-sg:"+
+    std::to_string(sg)+
+    ".png");
 
 
     return 0;

@@ -38,6 +38,29 @@ class MagConstraintFactor :
 
     /**
      *  find local magnetic field at http://www.ngdc.noaa.gov/geomag-web/#igrfwmm
+     *
+     *  ############################################################
+        #              Magnetic Field Components
+        ############################################################
+        #   8 Fields
+        #     (1) Date in decimal years
+        #     (2) Declination in decimal degrees
+        #     (3) Inclination in decimal degrees
+        #     (4) Horintensity in nanoTesla (nT)
+        #     (5) Totalintensity in nanoTesla (nT)
+        #     (6) Xcomponent in nanoTesla (nT)
+        #     (7) Ycomponent in nanoTesla (nT)
+        #     (8) Zcomponent in nanoTesla (nT)
+        # NOTE: The first row is change per year in degrees or nanoTesla (nT);
+        # NOTE: The second row is uncertainty in degrees or nanoTesla (nT):
+        #
+        #   Magnetic Model: WMM2015 (calculator version 0.5.0.7)
+        #   Elevation: 0.00000 km Mean Sea Level
+        #   Latitude: 39.90611 degrees, Longitude: 116.38806 degrees
+        ############################################################
+        change/year,-0.06105,0.07734,-46.7,32.2,-49.9,-24.1,65.5
+        uncertainty,0.31,0.22,133,152,89,138,165
+        2017.80274,-6.84582,59.09488,28049.0,54610.6,27849.0,-3343.4,46856.9
      */
     const gtsam::Point3 measured_; /// < the measured magnetomeer values
     const gtsam::Point3 nM_; /// < local magnetic field (mag output units)

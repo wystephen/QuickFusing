@@ -33,7 +33,8 @@
 
 #include <gtsam/geometry/Pose3.h>
 
-class MagConstraintFactor : public gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Point3> {
+class MagConstraintFactor :
+        public gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Point3> {
 
     /**
      *  find local magnetic field at http://www.ngdc.noaa.gov/geomag-web/#igrfwmm

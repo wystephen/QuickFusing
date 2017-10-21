@@ -177,8 +177,8 @@ int main() {
     graph->add(PriorFactor<imuBias::ConstantBias>(B(correction_count), prior_imu_bias, bias_noise_model));
 
     // We use the sensor specs to build the noise model for the IMU factor.
-    double accel_noise_sigma = 0.0001;// initial_para.sigma_acc_(0);// 0.0003924;
-    double gyro_noise_sigma = 0.002 / 180.0 * M_PI; //initial_para.sigma_gyro_(0);//0.000205689024915;
+    double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
+    double gyro_noise_sigma =  initial_para.sigma_gyro_(0);//0.000205689024915;
     double accel_bias_rw_sigma = 0.004905;
     double gyro_bias_rw_sigma = 0.000001454441043;
     Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
@@ -394,7 +394,7 @@ int main() {
 //    graph.print("before optimize");
 //    GaussNewtonOptimizer optimizer(*graph, initial_values);
     LevenbergMarquardtParams lm_para;
-    lm_para.setMaxIterations(2000);
+    lm_para.setMaxIterations(100);
     LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
 
 

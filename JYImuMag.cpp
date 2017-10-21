@@ -57,6 +57,7 @@
 
 
 #include <thread>
+#include <OwnFactor/MagConstraintFactor.h>
 
 using namespace gtsam;
 using namespace std;
@@ -65,6 +66,7 @@ using namespace std;
 using symbol_shorthand::X; // Pose3 (x,y,z,r,p,y)
 using symbol_shorthand::V; // Vel   (xdot,ydot,zdot)
 using symbol_shorthand::B; // Bias  (ax,ay,az,gx,gy,gz)
+using symbol_shorthand::M; // Bias of Magconstraint
 
 PreintegratedImuMeasurements *imu_preintegrated_;
 
@@ -177,8 +179,8 @@ int main() {
     graph->add(PriorFactor<imuBias::ConstantBias>(B(correction_count), prior_imu_bias, bias_noise_model));
 
     // We use the sensor specs to build the noise model for the IMU factor.
-    double accel_noise_sigma = initial_para.sigma_acc_(0) * 1.1;// 0.0003924;
-    double gyro_noise_sigma =  initial_para.sigma_gyro_(0) * 1.1;//0.000205689024915;
+    double accel_noise_sigma = initial_para.sigma_acc_(0) ;// 0.0003924;
+    double gyro_noise_sigma =  initial_para.sigma_gyro_(0) * 1.5;//0.000205689024915;
     double accel_bias_rw_sigma = 0.004905;
     double gyro_bias_rw_sigma = 0.000001454441043;
     Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
@@ -328,6 +330,13 @@ int main() {
 //                            mag_all_noise
 //                    ));
 //                    std::cout << imudata(index, 7) << std::endl;
+                    noiseModel::Diagonal::shared_ptr mag_constraint_noise =
+                            noiseModel::Diagonal::Sigmas(Vector3(20,20,20));
+//                    graph->add(MagConstraintFactor(
+//                            X(trace_id),
+//
+//
+//                    ))
 
                 }
 

@@ -333,6 +333,7 @@ int main() {
                     //// 27849 nT -3343.4 nT 46856.9 nT
                     noiseModel::Diagonal::shared_ptr mag_constraint_noise =
                             noiseModel::Diagonal::Sigmas(Vector3(20,20,20));
+
 //                    graph->add(MagConstraintFactor(
 //                            X(trace_id),
 //

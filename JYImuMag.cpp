@@ -334,6 +334,12 @@ int main() {
                     noiseModel::Diagonal::shared_ptr mag_constraint_noise =
                             noiseModel::Diagonal::Sigmas(Vector3(20,20,20));
 
+                    std::cout <<  "mag :" << imudata(index,7)
+                                          << ","
+                                          << imudata(index,8)
+                                          << ","
+                                          << imudata(index,9)<<std::endl;
+
 //                    graph->add(MagConstraintFactor(
 //                            X(trace_id),
 //

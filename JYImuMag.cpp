@@ -89,7 +89,7 @@ int main() {
      * Load Data
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/94/";
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
     CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
@@ -208,6 +208,16 @@ int main() {
     NavState prev_state(prior_pose, prior_velocity);
 //    NavState prop_state = prev_state;
     imuBias::ConstantBias prev_bias = prior_imu_bias;
+
+
+    Eigen::Vector3d vec3_nM(0,0,0);
+
+    bool first_added_mag(true);
+
+    for(int i(0);i<3;++i)
+    {
+        vec3_nM(i) = imudata.block(0,i+7,10,1).mean();
+    }
 
     ////Define the imu preintegration
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
@@ -340,11 +350,18 @@ int main() {
                                           << ","
                                           << imudata(index,9)<<std::endl;
 
-//                    graph->add(MagConstraintFactor(
-//                            X(trace_id),
-//
-//
-//                    ))
+                    graph->add(MagConstraintFactor(
+                            X(trace_id),
+                            M(0),
+                            Point3(imudata.block(index,7,1,3).transpose()),
+                            vec3_nM,
+                            mag_constraint_noise
+                    ));
+                    if(first_added_mag)
+                    {
+                        initial_values.insert(M(0),Point3(Vector3(0,0,0)));
+                        first_added_mag = false;
+                    }
 
                 }
 

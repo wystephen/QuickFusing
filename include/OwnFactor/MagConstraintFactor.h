@@ -115,7 +115,7 @@ public:
             return (rotated_M - measured_);
         } catch (std::exception &e) {
             std::cout << "exception :"
-                      << __FUNCTION__<<":"
+                      << __FUNCTION__ << ":"
                       << __LINE__ << ":"
                       << __FILE__ << ":"
                       << std::endl;

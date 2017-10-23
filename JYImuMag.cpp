@@ -179,8 +179,8 @@ int main() {
     graph->add(PriorFactor<imuBias::ConstantBias>(B(correction_count), prior_imu_bias, bias_noise_model));
 
     // We use the sensor specs to build the noise model for the IMU factor.
-    double accel_noise_sigma = initial_para.sigma_acc_(0) ;// 0.0003924;
-    double gyro_noise_sigma =  initial_para.sigma_gyro_(0) * 1.5;//0.000205689024915;
+    double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
+    double gyro_noise_sigma = initial_para.sigma_gyro_(0) * 1.5;//0.000205689024915;
     double accel_bias_rw_sigma = 0.004905;
     double gyro_bias_rw_sigma = 0.000001454441043;
     Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
@@ -210,13 +210,12 @@ int main() {
     imuBias::ConstantBias prev_bias = prior_imu_bias;
 
 
-    Eigen::Vector3d vec3_nM(0,0,0);
+    Eigen::Vector3d vec3_nM(0, 0, 0);
 
     bool first_added_mag(true);
 
-    for(int i(0);i<3;++i)
-    {
-        vec3_nM(i) = imudata.block(0,i+7,10,1).mean();
+    for (int i(0); i < 3; ++i) {
+        vec3_nM(i) = imudata.block(0, i + 7, 10, 1).mean();
     }
 
     ////Define the imu preintegration
@@ -342,24 +341,23 @@ int main() {
 //                    std::cout << imudata(index, 7) << std::endl;
                     //// 27849 nT -3343.4 nT 46856.9 nT
                     noiseModel::Diagonal::shared_ptr mag_constraint_noise =
-                            noiseModel::Diagonal::Sigmas(Vector3(20,20,20));
+                            noiseModel::Diagonal::Sigmas(Vector3(20, 20, 20));
 
-                    std::cout <<  "mag :" << imudata(index,7)
-                                          << ","
-                                          << imudata(index,8)
-                                          << ","
-                                          << imudata(index,9)<<std::endl;
+                    std::cout << "mag :" << imudata(index, 7)
+                              << ","
+                              << imudata(index, 8)
+                              << ","
+                              << imudata(index, 9) << std::endl;
 
                     graph->add(MagConstraintFactor(
                             X(trace_id),
                             M(0),
-                            Point3(imudata.block(index,7,1,3).transpose()),
+                            Point3(imudata.block(index, 7, 1, 3).transpose()),
                             vec3_nM,
                             mag_constraint_noise
                     ));
-                    if(first_added_mag)
-                    {
-                        initial_values.insert(M(0),Point3(Vector3(0,0,0)));
+                    if (first_added_mag) {
+                        initial_values.insert(M(0), Point3(Vector3(0, 0, 0)));
                         first_added_mag = false;
                     }
 

@@ -89,7 +89,7 @@ int main() {
      * Load Data
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/94/";
+    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
     CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");

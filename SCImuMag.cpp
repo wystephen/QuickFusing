@@ -331,12 +331,12 @@ int main(int argc, char *argv[]) {
 
 
                     noiseModel::Diagonal::shared_ptr mag_all_noise =
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI, M_PI, M_PI));
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI*20, M_PI*20, M_PI));
                     graph->add(PoseRotationPrior<Pose3>(
                             X(trace_id),
                             Rot3::RzRyRx(Vector3(imudata(index, 9) / 180.0 * M_PI,
-                                                 imudata(index, 8) / 180.0 * M_PI,
-                                                 imudata(index, 7) / 180.0 * M_PI)),
+                                                 0.0,//imudata(index, 8) / 180.0 * M_PI,
+                                                 0.0)),//imudata(index, 7) / 180.0 * M_PI)),
                             mag_all_noise
                     ));
                     std::cout << imudata(index, 7) << std::endl;

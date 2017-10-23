@@ -330,16 +330,16 @@ int main(int argc, char *argv[]) {
 //                    ));
 
 
-//                    noiseModel::Diagonal::shared_ptr mag_all_noise =
-//                            noiseModel::Diagonal::Sigmas(Vector3(M_PI, M_PI, M_PI));
-//                    graph->add(PoseRotationPrior<Pose3>(
-//                            X(trace_id),
-//                            Rot3::RzRyRx(Vector3(imudata(index, 9) / 180.0 * M_PI,
-//                                                 imudata(index, 8) / 180.0 * M_PI,
-//                                                 imudata(index, 7) / 180.0 * M_PI)),
-//                            mag_all_noise
-//                    ));
-//                    std::cout << imudata(index, 7) << std::endl;
+                    noiseModel::Diagonal::shared_ptr mag_all_noise =
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI, M_PI, M_PI));
+                    graph->add(PoseRotationPrior<Pose3>(
+                            X(trace_id),
+                            Rot3::RzRyRx(Vector3(imudata(index, 9) / 180.0 * M_PI,
+                                                 imudata(index, 8) / 180.0 * M_PI,
+                                                 imudata(index, 7) / 180.0 * M_PI)),
+                            mag_all_noise
+                    ));
+                    std::cout << imudata(index, 7) << std::endl;
                 }
 
 
@@ -497,10 +497,10 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ay);
 //    plt::plot(az);
 //    plt::plot(zupt_v);
-//    plt::show();
-    plt::save("img-sa:"+std::to_string(sa)+"-sg:"+
-    std::to_string(sg)+
-    ".png");
+    plt::show();
+//    plt::save("img-sa:"+std::to_string(sa)+"-sg:"+
+//    std::to_string(sg)+
+//    ".png");
 
 
     return 0;

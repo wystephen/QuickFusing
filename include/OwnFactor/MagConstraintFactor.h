@@ -106,7 +106,6 @@ public:
      * @param H
      * @return
      */
-
     gtsam::Vector evaluateError(const gtsam::Pose3 &Pose,
                                 const gtsam::Point3 &bias,
                                 boost::optional<gtsam::Matrix &> H1 = boost::none,

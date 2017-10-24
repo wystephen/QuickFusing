@@ -350,29 +350,29 @@ int main() {
                               << ","
                               << imudata(index, 9) << std::endl;
 
-                    graph->add(MagConstraintFactor(
-                            X(trace_id),
-                            M(0),
-                            Point3(imudata.block(index, 7, 1, 3).transpose()),
-                            vec3_nM,
-                            mag_constraint_noise
-                    ));
-                    if (first_added_mag) {
-                        initial_values.insert(M(0), Point3(Vector3(0, 0, 0)));
-                        first_added_mag = false;
-                    }
+//                    graph->add(MagConstraintFactor(
+//                            X(trace_id),
+//                            M(0),
+//                            Point3(imudata.block(index, 7, 1, 3).transpose()),
+//                            vec3_nM,
+//                            mag_constraint_noise
+//                    ));
+//                    if (first_added_mag) {
+//                        initial_values.insert(M(0), Point3(Vector3(0, 0, 0)));
+//                        first_added_mag = false;
+//                    }
 
                 }
 
 
-                if (trace_id == 1) {
-
-                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
-                    graph->add(GPSFactor(X(trace_id),
-                                         prior_pose.matrix().block(0, 3, 3, 1),
-                                         correction_noise));
-
-                }
+//                if (trace_id == 1) {
+//
+//                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+//                    graph->add(GPSFactor(X(trace_id),
+//                                         prior_pose.matrix().block(0, 3, 3, 1),
+//                                         correction_noise));
+//
+//                }
                 ///Set intial values
                 try {
                     Pose3 p;

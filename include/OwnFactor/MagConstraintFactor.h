@@ -104,12 +104,12 @@ public:
      * @param H
      * @return
      */
-    gtsam::Vector evaluateError(const gtsam::Pose3 &pose,
+    gtsam::Vector evaluateError(const gtsam::Pose3 &nM,
                                 const gtsam::Point3 &bias,
                                 boost::optional<gtsam::Matrix &> H1 =
                                 boost::none, boost::optional<gtsam::Matrix &> H2 = boost::none) const {
         try {
-            gtsam::Point3 rotated_M = pose.rotation().unrotate(nM_, H1, boost::none); //+ bias;
+            gtsam::Point3 rotated_M = pose_.rotation().rotate(nM_,boost::none,H1); //+ bias;
             if (H2)
                 *H2 = gtsam::I_3x3;
             return (rotated_M - measured_);

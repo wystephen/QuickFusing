@@ -489,7 +489,8 @@ int main(int argc, char *argv[]) {
      */
     plt::plot(gx, gy, "r-+");
     plt::plot(ekfx, ekfy, "b-");
-    plt::title("show");
+    plt::title("img-sa:"+std::to_string(sa)+"-sg:"+
+    std::to_string(sg));
 
 
 

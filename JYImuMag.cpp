@@ -417,7 +417,6 @@ int main(int argc, char * argv[]) {
 
             // only reset after optimization.
 
-
         }
 
         imu_preintegrated_->integrateMeasurement(imudata.block(index, 1, 1, 3).transpose(),
@@ -430,11 +429,9 @@ int main(int argc, char * argv[]) {
     };
 
 
-
     /**
      * Optimzation
      */
-
 
     std::cout << "begin optimizer" << std::endl;
 //    graph.print("before optimize");
@@ -470,14 +467,6 @@ int main(int argc, char * argv[]) {
     auto result = initial_values;
 
     result = optimizer.optimize();
-
-
-
-
-
-
-
-
 
 
     /**

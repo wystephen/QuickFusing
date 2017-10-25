@@ -109,21 +109,11 @@ public:
                                 const gtsam::Point3 &bias,
                                 boost::optional<gtsam::Matrix &> H1 = boost::none,
                                 boost::optional<gtsam::Matrix &> H2 = boost::none) const {
-//        try {
-        gtsam::Point3 rotated_M = Pose.rotation().rotate(nM_, boost::none, H1);// + bias;
-//        std::cout << "computed error of mag constraint factor " << std::endl;
+        gtsam::Point3 rotated_M = Pose.rotation().rotate(nM_, boost::none, H1) + bias;
         if (H2)
             *H2 = gtsam::I_3x3;
 
         return (rotated_M - measured_);
-//        } catch (std::exception &e) {
-//            std::cout << "exception :"
-//                      << __FUNCTION__ << ":"
-//                      << __LINE__ << ":"
-//                      << __FILE__ << ":"
-//                      << std::endl;
-//            std::cout << e.what() << std::endl;
-//        }
 
 
     }

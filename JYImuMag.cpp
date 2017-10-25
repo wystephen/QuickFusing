@@ -112,6 +112,14 @@ int main(int argc, char * argv[]) {
     }
 
 
+    double sa(0.01),sg(0.01),sv(0.01);
+    if(argc >= 4)
+    {
+        sv = std::stod(argv[1]);
+        sa = std::stod(argv[2]);
+        sg = std::stod(argv[3]);
+    }
+
 
     /**
      * Initial ZUPT
@@ -121,6 +129,11 @@ int main(int argc, char * argv[]) {
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
     initial_para.init_heading1_ = imudata.block(0, 8, 20, 1).mean() * M_PI;
     initial_para.Ts_ = 1.0f / 200.0f;
+
+
+    initial_para.sigma_vel_ = Eigen::Vector3d(sv,sv,sv);
+    initial_para.sigma_acc_ = Eigen::Vector3d(sa,sa,sa);
+    initial_para.sigma_gyro_ = Eigen::Vector3d(sg,sg,sg);
 
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
 //    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
@@ -180,7 +193,7 @@ int main(int argc, char * argv[]) {
 
     // We use the sensor specs to build the noise model for the IMU factor.
     double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
-    double gyro_noise_sigma = initial_para.sigma_gyro_(0) * 1.5;//0.000205689024915;
+    double gyro_noise_sigma = initial_para.sigma_gyro_(0) ;//0.000205689024915;
     double accel_bias_rw_sigma = 0.004905;
     double gyro_bias_rw_sigma = 0.000001454441043;
     Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
@@ -309,7 +322,7 @@ int main(int argc, char * argv[]) {
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise =
-                            noiseModel::Isotropic::Sigma(3, 0.0000001);
+                            noiseModel::Isotropic::Sigma(3, sv);
 
 
                     PriorFactor<Vector3> zero_velocity(V(trace_id),

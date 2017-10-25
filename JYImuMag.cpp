@@ -84,7 +84,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
     return T;
 }
 
-int main() {
+int main(int argc, char * argv[]) {
     /**
      * Load Data
      */

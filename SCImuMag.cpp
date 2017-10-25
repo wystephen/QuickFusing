@@ -309,7 +309,7 @@ int main(int argc, char *argv[]) {
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise =
-                            noiseModel::Isotropic::Sigma(3, 0.0000001);
+                            noiseModel::Isotropic::Sigma(3, sv);
 
 
                     PriorFactor<Vector3> zero_velocity(V(trace_id),
@@ -319,8 +319,8 @@ int main(int argc, char *argv[]) {
                     graph->add(zero_velocity);
 
                     ///Mag constraint
-                    noiseModel::Diagonal::shared_ptr mag_noise =
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI * 1000000.0, M_PI * 1000000.0, M_PI * 1.5));
+//                    noiseModel::Diagonal::shared_ptr mag_noise =
+//                            noiseModel::Diagonal::Sigmas(Vector3(M_PI * 1000000.0, M_PI * 1000000.0, M_PI * 1.5));
 
 //                    graph->add(PoseRotationPrior<Pose3>(
 //                            X(trace_id),
@@ -489,7 +489,7 @@ int main(int argc, char *argv[]) {
      */
     plt::plot(gx, gy, "r-+");
     plt::plot(ekfx, ekfy, "b-");
-    plt::title("img-sa:"+std::to_string(sa)+"-sg:"+
+    plt::title("img-sv:"+std::to_string(sv)+"sa:"+std::to_string(sa)+"-sg:"+
     std::to_string(sg));
 
 

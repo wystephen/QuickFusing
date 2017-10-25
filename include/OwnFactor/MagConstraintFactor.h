@@ -33,6 +33,42 @@
 
 #include <gtsam/geometry/Pose3.h>
 
+namespace gtsam {
+    class MagConstrainPoseFactor : public NoiseModelFactor1<Pose3> {
+
+        const Point3 measured_; ///< The measured magnetometer values
+        const Point3 nM_; ///< Local magnetic field (mag output units)
+        const Point3 bias_; ///< bias
+
+    public:
+
+        /** Constructor */
+        MagConstrainPoseFactor(Key key, const Point3 &measured, double scale,
+                               const Unit3 &direction, const Point3 &bias,
+                               const SharedNoiseModel &model) :
+                NoiseModelFactor1<Rot3>(model, key), //
+                measured_(measured), nM_(scale * direction), bias_(bias) {
+        }
+
+        /// @return a deep copy of this factor
+        virtual NonlinearFactor::shared_ptr clone() const {
+            return boost::static_pointer_cast<NonlinearFactor>(
+                    NonlinearFactor::shared_ptr(new MagConstrainPoseFactor(*this)));
+        }
+
+        /**
+         * @brief vector of errors
+         */
+        Vector evaluateError(const Pose3 &nRb,
+                             boost::optional<Matrix &> H = boost::none) const {
+            // measured bM = nRb� * nM + b
+            Point3 hx = nRb.rotation().unrotate(nM_, H, boost::none) + bias_;
+            return (hx - measured_);
+        }
+    };
+}
+
+
 class MagConstraintFactor :
         public gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Point3> {
 

@@ -117,7 +117,7 @@ int main(int argc, char * argv[]) {
     {
         sv = std::stod(argv[1]);
         sa = std::stod(argv[2]);
-        sg = std::stod(argv[3]);
+        sg = std::stod(argv[3])/180.0*M_PI;
     }
 
 
@@ -440,7 +440,7 @@ int main(int argc, char * argv[]) {
 //    graph.print("before optimize");
 //    GaussNewtonOptimizer optimizer(*graph, initial_values);
     LevenbergMarquardtParams lm_para;
-    lm_para.setMaxIterations(10);
+    lm_para.setMaxIterations(100);
     LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
 
 

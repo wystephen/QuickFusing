@@ -54,6 +54,9 @@
 
 #include <thread>
 
+#define GTSAM_TANGENT_PREINTEGRATION OFF
+
+
 using namespace gtsam;
 using namespace std;
 

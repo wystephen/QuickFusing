@@ -438,17 +438,17 @@ int main(int argc, char * argv[]) {
 
     std::cout << "begin optimizer" << std::endl;
 //    graph.print("before optimize");
-    GaussNewtonOptimizer optimizer(*graph, initial_values);
-//    LevenbergMarquardtParams lm_para;
-//    lm_para.setMaxIterations(100);
-//    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
+//    GaussNewtonOptimizer optimizer(*graph, initial_values);
+    LevenbergMarquardtParams lm_para;
+    lm_para.setMaxIterations(10);
+    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
 
 
     /// Show itereation times ~
     std::thread thread1([&] {
         int last_index = 0;
         int counter = 0;
-        while (1) {
+        while (true) {
             sleep(1);
 
 

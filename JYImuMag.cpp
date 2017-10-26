@@ -84,7 +84,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
     return T;
 }
 
-int main(int argc, char * argv[]) {
+int main(int argc, char *argv[]) {
     /**
      * Load Data
      */
@@ -112,12 +112,11 @@ int main(int argc, char * argv[]) {
     }
 
 
-    double sa(10.0),sg(0.3),sv(0.000001);
-    if(argc >= 4)
-    {
+    double sa(10.0), sg(0.3), sv(0.000001);
+    if (argc >= 4) {
         sv = std::stod(argv[1]);
         sa = std::stod(argv[2]);
-        sg = std::stod(argv[3])/180.0*M_PI;
+        sg = std::stod(argv[3]) / 180.0 * M_PI;
     }
 
 
@@ -131,9 +130,9 @@ int main(int argc, char * argv[]) {
     initial_para.Ts_ = 1.0f / 200.0f;
 
 
-    initial_para.sigma_vel_ = Eigen::Vector3d(sv,sv,sv);
-    initial_para.sigma_acc_ = Eigen::Vector3d(sa,sa,sa);
-    initial_para.sigma_gyro_ = Eigen::Vector3d(sg,sg,sg);
+    initial_para.sigma_vel_ = Eigen::Vector3d(sv, sv, sv);
+    initial_para.sigma_acc_ = Eigen::Vector3d(sa, sa, sa);
+    initial_para.sigma_gyro_ = Eigen::Vector3d(sg, sg, sg);
 
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
 //    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
@@ -193,7 +192,7 @@ int main(int argc, char * argv[]) {
 
     // We use the sensor specs to build the noise model for the IMU factor.
     double accel_noise_sigma = initial_para.sigma_acc_(0);// 0.0003924;
-    double gyro_noise_sigma = initial_para.sigma_gyro_(0) ;//0.000205689024915;
+    double gyro_noise_sigma = initial_para.sigma_gyro_(0);//0.000205689024915;
     double accel_bias_rw_sigma = 0.004905;
     double gyro_bias_rw_sigma = 0.000001454441043;
     Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
@@ -229,6 +228,7 @@ int main(int argc, char * argv[]) {
     for (int i(0); i < 3; ++i) {
         vec3_nM(i) = imudata.block(0, i + 7, 10, 1).mean();
     }
+    vec3_nM /= vec3_nM.norm();
 
     ////Define the imu preintegration
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
@@ -366,16 +366,16 @@ int main(int argc, char * argv[]) {
 //                            vec3_nM,
 //                            mag_constraint_noise
 //                    ));
-                    std::cout << "mag :" <<imudata.block(index,7,1,3)<<std::endl;
-//                    graph->add(MagConstrainPoseFactor(
-//                            X(trace_id),
-//                            Point3(imudata.block(index,7,1,3).transpose()),
-//                            vec3_nM.norm(),
-//                            Unit3(vec3_nM),
-//                            Point3(Vector3(0,0,0)),
-//                            mag_constraint_noise
-//
-//                    ));
+                    std::cout << "mag :" << imudata.block(index, 7, 1, 3) << std::endl;
+                    graph->add(MagConstrainPoseFactor(
+                            X(trace_id),
+                            Point3(imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
+                            vec3_nM.norm(),
+                            Unit3(vec3_nM),
+                            Point3(Vector3(0, 0, 0)),
+                            mag_constraint_noise
+
+                    ));
                     if (first_added_mag) {
 //                        initial_values.insert(M(0), Point3(Vector3(0, 0, 0)));
                         first_added_mag = false;
@@ -441,10 +441,10 @@ int main(int argc, char * argv[]) {
 
     std::cout << "begin optimizer" << std::endl;
 //    graph.print("before optimize");
-//    GaussNewtonOptimizer optimizer(*graph, initial_values);
-    LevenbergMarquardtParams lm_para;
-    lm_para.setMaxIterations(1000);
-    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
+    GaussNewtonOptimizer optimizer(*graph, initial_values);
+//    LevenbergMarquardtParams lm_para;
+//    lm_para.setMaxIterations(1000);
+//    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
 
 
     /// Show itereation times ~
@@ -518,7 +518,7 @@ int main(int argc, char * argv[]) {
      */
     plt::plot(gx, gy, "r-+");
     plt::plot(ekfx, ekfy, "b-");
-    plt::title("img-sv:"+std::to_string(sv)+"sa:"+std::to_string(sa)+"-sg:"+
+    plt::title("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
                std::to_string(sg));
 
 //    plt::save("img-sv:"+std::to_string(sv)+"sa:"+std::to_string(sa)+"-sg:"+

@@ -43,8 +43,11 @@ namespace gtsam {
     public:
 
         /** Constructor */
-        MagConstrainPoseFactor(Key key, const Point3 &measured, double scale,
-                               const Unit3 &direction, const Point3 &bias,
+        MagConstrainPoseFactor(Key key,
+                               const Point3 &measured,
+                               double scale,
+                               const Unit3 &direction,
+                               const Point3 &bias,
                                const SharedNoiseModel &model) :
                 NoiseModelFactor1<Pose3>(model, key), //
                 measured_(measured), nM_(scale * direction), bias_(bias) {

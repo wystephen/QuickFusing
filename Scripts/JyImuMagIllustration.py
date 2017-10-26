@@ -59,10 +59,9 @@ if __name__ == '__main__':
     fig = plt.figure()
     ax = Axes3D(fig)
 
-    ax.plot_surface(imu_data[:,7]/np.linalg.norm(imu_data[:, 7:10], axis=1),
+    ax.scatter(imu_data[:,7]/np.linalg.norm(imu_data[:, 7:10], axis=1),
             imu_data[:,8]/np.linalg.norm(imu_data[:, 7:10], axis=1),
-            imu_data[:,9]/np.linalg.norm(imu_data[:, 7:10], axis=1),
-                    rstride=1,cstride=1,cmap='rainbow')
+            imu_data[:,9]/np.linalg.norm(imu_data[:, 7:10], axis=1))
 
 
 

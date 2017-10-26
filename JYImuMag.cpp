@@ -511,8 +511,8 @@ int main(int argc, char * argv[]) {
     plt::title("img-sv:"+std::to_string(sv)+"sa:"+std::to_string(sa)+"-sg:"+
                std::to_string(sg));
 
-    plt::save("img-sv:"+std::to_string(sv)+"sa:"+std::to_string(sa)+"-sg:"+
-               std::to_string(sg)+".png");
+//    plt::save("img-sv:"+std::to_string(sv)+"sa:"+std::to_string(sa)+"-sg:"+
+//               std::to_string(sg)+".png");
 
 
 
@@ -520,7 +520,7 @@ int main(int argc, char * argv[]) {
 //    plt::plot(ay);
 //    plt::plot(az);
 //    plt::plot(zupt_v);
-//    plt::show();
+    plt::show();
 
 
     return 0;

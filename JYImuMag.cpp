@@ -364,15 +364,15 @@ int main(int argc, char *argv[]) {
 //                            mag_constraint_noise
 //                    ));
                     std::cout << "mag :" << imudata.block(index, 7, 1, 3)/imudata.block(index, 7, 1, 3).norm() << std::endl;
-//                    graph->add(MagConstrainPoseFactor(
-//                            X(trace_id),
-//                            Point3(imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
-//                            1.0,
-//                            Unit3(vec3_nM),
-//                            Point3(Vector3(0, 0, 0)),
-//                            mag_constraint_noise
-//
-//                    ));
+                    graph->add(MagConstrainPoseFactor(
+                            X(trace_id),
+                            Point3(imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
+                            vec3_nM/Unit3(vec3_nM),
+                            Unit3(vec3_nM),
+                            Point3(Vector3(0, 0, 0)),
+                            mag_constraint_noise
+
+                    ));
                     if (first_added_mag) {
 //                        initial_values.insert(M(0), Point3(Vector3(0, 0, 0)));
                         first_added_mag = false;

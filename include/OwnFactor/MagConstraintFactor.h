@@ -36,9 +36,9 @@
 namespace gtsam {
     class MagConstrainPoseFactor : public NoiseModelFactor1<Pose3> {
 
-        const Point3 measured_; ///< The measured magnetometer values
-        const Point3 nM_; ///< Local magnetic field (mag output units)
-        const Point3 bias_; ///< bias
+        const Vector3 measured_; ///< The measured magnetometer values
+        const Vector3 nM_; ///< Local magnetic field (mag output units)
+        const Vector3 bias_; ///< bias
 
     public:
 
@@ -46,8 +46,8 @@ namespace gtsam {
         MagConstrainPoseFactor(Key key,
                                const Point3 &measured,
                                double scale,
-                               const Unit3 &direction,
-                               const Point3 &bias,
+                               const Vector3 &direction,
+                               const Vector3 &bias,
                                const SharedNoiseModel &model) :
                 NoiseModelFactor1<Pose3>(model, key), //
                 measured_(measured), nM_(scale * direction), bias_(bias) {
@@ -65,7 +65,8 @@ namespace gtsam {
         Vector evaluateError(const Pose3 &nPb,
                              boost::optional<Matrix &> H = boost::none) const {
             // measured bM = nRb� * nM + b
-            Point3 hx = nPb.rotation().unrotate(nM_, H, boost::none) + bias_;
+            Vector3 hx = nPb.rotation().rotate(nM_, H, boost::none) + bias_;
+            std::cout << (hx-measured_).transpose() << std::endl;
             return (hx - measured_);
         }
     };

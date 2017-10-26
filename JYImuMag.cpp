@@ -364,14 +364,15 @@ int main(int argc, char *argv[]) {
 //                            mag_constraint_noise
 //                    ));
                     std::cout << "mag :" << imudata.block(index, 7, 1, 3) / imudata.block(index, 7, 1, 3).norm()
-                              << std::endl;
-                    std::cout << "Unit3 :" << Unit3(vec3_nM) << " vec3: " << vec3_nM << std::endl;
+                              << "vec3: " << vec3_nM.transpose() << std::endl;
+//                    std::cout << "Unit3 :" << Unit3(vec3_nM) << " vec3: " << vec3_nM << std::endl;
+
                     graph->add(MagConstrainPoseFactor(
                             X(trace_id),
-                            Point3(imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
+                            (imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
                             1.0,
-                            Unit3(vec3_nM),
-                            Point3(Vector3(0, 0, 0)),
+                            (vec3_nM),
+                            Vector3(0, 0, 0),
                             mag_constraint_noise
 
                     ));

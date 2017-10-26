@@ -50,7 +50,7 @@ namespace gtsam {
                                const Vector3 &bias,
                                const SharedNoiseModel &model) :
                 NoiseModelFactor1<Pose3>(model, key), //
-                measured_(measured), nM_(scale * direction), bias_(bias) {
+                measured_(measured), nM_( direction), bias_(bias) {
         }
 
         /// @return a deep copy of this factor
@@ -65,8 +65,9 @@ namespace gtsam {
         Vector evaluateError(const Pose3 &nPb,
                              boost::optional<Matrix &> H = boost::none) const {
             // measured bM = nRb� * nM + b
-            Vector3 hx = nPb.rotation().unrotate(nM_, H, boost::none) + bias_;
-//            std::cout << (hx-measured_).transpose() << std::endl;
+            Vector3 hx = nPb.rotation().unrotate(nM_,H,boost::none) + bias_;
+            std::cout << (hx-measured_).transpose() << std::endl;
+
             return (hx - measured_);
 //            return Vector3(0,0,0);
         }
@@ -150,7 +151,9 @@ public:
                                 const gtsam::Point3 &bias,
                                 boost::optional<gtsam::Matrix &> H1 = boost::none,
                                 boost::optional<gtsam::Matrix &> H2 = boost::none) const {
-        gtsam::Point3 rotated_M = Pose.rotation().rotate(nM_, boost::none, H1) + bias;
+        gtsam::Point3 rotated_M =
+                Pose.rotation().unrotate(nM_, boost::none, H1) +
+                bias;
         if (H2)
             *H2 = gtsam::I_3x3;
 

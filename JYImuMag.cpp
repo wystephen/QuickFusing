@@ -112,7 +112,7 @@ int main(int argc, char * argv[]) {
     }
 
 
-    double sa(0.01),sg(0.01),sv(0.01);
+    double sa(10.0),sg(0.3),sv(0.000001);
     if(argc >= 4)
     {
         sv = std::stod(argv[1]);
@@ -366,15 +366,16 @@ int main(int argc, char * argv[]) {
 //                            vec3_nM,
 //                            mag_constraint_noise
 //                    ));
-                    graph->add(MagConstrainPoseFactor(
-                            X(trace_id),
-                            Point3(imudata.block(index,7,1,3).transpose()),
-                            vec3_nM.norm(),
-                            Unit3(vec3_nM),
-                            Point3(Vector3(0,0,0)),
-                            mag_constraint_noise
-
-                    ));
+                    std::cout << "mag :" <<imudata.block(index,7,1,3)<<std::endl;
+//                    graph->add(MagConstrainPoseFactor(
+//                            X(trace_id),
+//                            Point3(imudata.block(index,7,1,3).transpose()),
+//                            vec3_nM.norm(),
+//                            Unit3(vec3_nM),
+//                            Point3(Vector3(0,0,0)),
+//                            mag_constraint_noise
+//
+//                    ));
                     if (first_added_mag) {
 //                        initial_values.insert(M(0), Point3(Vector3(0, 0, 0)));
                         first_added_mag = false;
@@ -442,7 +443,7 @@ int main(int argc, char * argv[]) {
 //    graph.print("before optimize");
 //    GaussNewtonOptimizer optimizer(*graph, initial_values);
     LevenbergMarquardtParams lm_para;
-    lm_para.setMaxIterations(100);
+    lm_para.setMaxIterations(1000);
     LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
 
 

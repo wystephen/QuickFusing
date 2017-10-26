@@ -62,10 +62,10 @@ namespace gtsam {
         /**
          * @brief vector of errors
          */
-        Vector evaluateError(const Pose3 &nRb,
+        Vector evaluateError(const Pose3 &nPb,
                              boost::optional<Matrix &> H = boost::none) const {
             // measured bM = nRb� * nM + b
-            Point3 hx = nRb.rotation().unrotate(nM_, H, boost::none) + bias_;
+            Point3 hx = nPb.rotation().unrotate(nM_, H, boost::none) + bias_;
             return (hx - measured_);
         }
     };

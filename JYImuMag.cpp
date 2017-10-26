@@ -282,7 +282,7 @@ int main(int argc, char *argv[]) {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 5) {
+        if (accumulate_preintegra_num > 15) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -300,8 +300,6 @@ int main(int argc, char *argv[]) {
                 preint_imu->resetIntegration();
 
 
-
-
                 ///Imu Bias
                 imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
 //
@@ -312,7 +310,6 @@ int main(int argc, char *argv[]) {
                 ));
 
                 // considering gravity constraint...
-
 
 
                 ///Zero-velocity constraint
@@ -366,11 +363,11 @@ int main(int argc, char *argv[]) {
 //                            vec3_nM,
 //                            mag_constraint_noise
 //                    ));
-                    std::cout << "mag :" << imudata.block(index, 7, 1, 3) << std::endl;
+                    std::cout << "mag :" << imudata.block(index, 7, 1, 3)/imudata.block(index, 7, 1, 3).norm() << std::endl;
                     graph->add(MagConstrainPoseFactor(
                             X(trace_id),
                             Point3(imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
-                            vec3_nM.norm(),
+                            1.0,
                             Unit3(vec3_nM),
                             Point3(Vector3(0, 0, 0)),
                             mag_constraint_noise

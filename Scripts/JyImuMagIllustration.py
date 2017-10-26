@@ -53,4 +53,8 @@ if __name__ == '__main__':
                  label='mag:' + str(i - 6))
     plt.legend()
 
+
+
+    ### The last moment for compute...
+
     plt.show()

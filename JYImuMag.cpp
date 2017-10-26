@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
     }
     vec3_nM /= vec3_nM.norm();
 
-    vec3_nM = prev_state.R().inverse()*vec3_nM;
+    vec3_nM = prev_state.R().inverse() * vec3_nM;
 
     ////Define the imu preintegration
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
@@ -376,16 +376,16 @@ int main(int argc, char *argv[]) {
 //                              << ","
 //                              << imudata(index, 9) << std::endl;
                     noiseModel::Diagonal::shared_ptr mag_constraint_noise =
-                            noiseModel::Isotropic::Sigma(3,0.1);
+                            noiseModel::Isotropic::Sigma(3, 0.1);
                     graph->add(MagConstraintFactor(
                             X(trace_id),
                             M(0),
-                            Point3(imudata.block(index, 7, 1, 3).transpose()/imudata.block(index,7,1,3).norm()),
+                            Point3(imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
                             vec3_nM,
                             mag_constraint_noise
                     ));
-                    std::cout << "mag :" << imudata.block(index, 7, 1, 3) / imudata.block(index, 7, 1, 3).norm()
-                              << "vec3: " << vec3_nM.transpose() << std::endl;
+//                    std::cout << "mag :" << imudata.block(index, 7, 1, 3) / imudata.block(index, 7, 1, 3).norm()
+//                              << " vec3: " << vec3_nM.transpose() << std::endl;
 //                    std::cout << "Unit3 :" << Unit3(vec3_nM) << " vec3: " << vec3_nM << std::endl;
 
 

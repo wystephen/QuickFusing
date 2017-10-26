@@ -50,7 +50,7 @@ namespace gtsam {
                                const Vector3 &bias,
                                const SharedNoiseModel &model) :
                 NoiseModelFactor1<Pose3>(model, key), //
-                measured_(measured), nM_( direction), bias_(bias) {
+                measured_(measured), nM_(direction), bias_(bias) {
         }
 
         /// @return a deep copy of this factor
@@ -65,14 +65,14 @@ namespace gtsam {
         Vector evaluateError(const Pose3 &nPb,
                              boost::optional<Matrix &> H = boost::none) const {
             // measured bM = nRb� * nM + b
-            Vector3 hx = nPb.rotation().unrotate(nM_,H,boost::none) + bias_;
-            std::cout << (hx-measured_).transpose() << std::endl;
+            Vector3 hx = nPb.rotation().unrotate(nM_, H, boost::none) + bias_;
+            std::cout << (hx - measured_).transpose() << std::endl;
 
             return (hx - measured_);
 //            return Vector3(0,0,0);
         }
     };
-}
+
 
 
 class MagConstraintFactor :
@@ -122,7 +122,9 @@ public:
                         const gtsam::Point3 &measured,
                         const gtsam::Point3 &nM,
                         const gtsam::SharedNoiseModel &model) :
-            gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Point3>(model, key_pose, key_bias),
+            gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Point3>(model,
+                                                                  key_pose,
+                                                                  key_bias),
             measured_(measured), nM_(nM) {
 
 
@@ -147,22 +149,25 @@ public:
      * @param H
      * @return
      */
-    gtsam::Vector evaluateError(const gtsam::Pose3 &Pose,
-                                const gtsam::Point3 &bias,
+    Vector evaluateError(const Pose3 &Pose,
+                                const Point3 &bias,
                                 boost::optional<gtsam::Matrix &> H1 = boost::none,
                                 boost::optional<gtsam::Matrix &> H2 = boost::none) const {
-        gtsam::Point3 rotated_M =
+        Vector3 rotated_M =
                 Pose.rotation().unrotate(nM_, boost::none, H1) +
                 bias;
         if (H2)
             *H2 = gtsam::I_3x3;
+//        std::cout << "rotated _M - measured_ :"
+//                  << (rotated_M-measured_).transpose()
+//                  << std::endl;
 
-        return (rotated_M - measured_);
+        return Vector(rotated_M - measured_);
 
 
     }
 
 
-};
+};}
 
 #endif //QUICKFUSING_MAGCONSTRAINTFACTOR_H

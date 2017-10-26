@@ -366,10 +366,19 @@ int main(int argc, char * argv[]) {
 //                            vec3_nM,
 //                            mag_constraint_noise
 //                    ));
-//                    if (first_added_mag) {
+//                    graph->add(MagConstrainPoseFactor(
+//                            X(trace_id),
+//                            Point3(imudata.block(index,7,1,3).transpose()),
+//                            vec3_nM.norm(),
+//                            Unit3(vec3_nM),
+//                            Point3(Vector3(0,0,0)),
+//                            mag_constraint_noise
+//
+//                    ));
+                    if (first_added_mag) {
 //                        initial_values.insert(M(0), Point3(Vector3(0, 0, 0)));
-//                        first_added_mag = false;
-//                    }
+                        first_added_mag = false;
+                    }
 
                 }
 

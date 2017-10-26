@@ -351,7 +351,7 @@ int main(int argc, char *argv[]) {
 //                    std::cout << imudata(index, 7) << std::endl;
                     //// 27849 nT -3343.4 nT 46856.9 nT
                     noiseModel::Diagonal::shared_ptr mag_constraint_noise =
-                            noiseModel::Diagonal::Sigmas(Vector3(20, 20, 20));
+                            noiseModel::Diagonal::Sigmas(Vector3(0.1, 0.1, 0.1));
 
 //                    std::cout << "mag :" << imudata(index, 7)
 //                              << ","

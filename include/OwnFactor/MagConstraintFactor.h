@@ -74,100 +74,100 @@ namespace gtsam {
     };
 
 
+    class MagConstraintFactor :
+            public gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Point3> {
 
-class MagConstraintFactor :
-        public gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Point3> {
-
-    /**
-     *  find local magnetic field at http://www.ngdc.noaa.gov/geomag-web/#igrfwmm
-     *
-     *  ############################################################
-        #              Magnetic Field Components
-        ############################################################
-        #   8 Fields
-        #     (1) Date in decimal years
-        #     (2) Declination in decimal degrees
-        #     (3) Inclination in decimal degrees
-        #     (4) Horintensity in nanoTesla (nT)
-        #     (5) Totalintensity in nanoTesla (nT)
-        #     (6) Xcomponent in nanoTesla (nT)
-        #     (7) Ycomponent in nanoTesla (nT)
-        #     (8) Zcomponent in nanoTesla (nT)
-        # NOTE: The first row is change per year in degrees or nanoTesla (nT);
-        # NOTE: The second row is uncertainty in degrees or nanoTesla (nT):
-        #
-        #   Magnetic Model: WMM2015 (calculator version 0.5.0.7)
-        #   Elevation: 0.00000 km Mean Sea Level
-        #   Latitude: 39.90611 degrees, Longitude: 116.38806 degrees
-        ############################################################
-        change/year,-0.06105,0.07734,-46.7,32.2,-49.9,-24.1,65.5
-        uncertainty,0.31,0.22,133,152,89,138,165
-        2017.80274,-6.84582,59.09488,28049.0,54610.6,27849.0,-3343.4,46856.9
-     */
-    const gtsam::Point3 measured_; /// < the measured magnetomeer values
-    const gtsam::Point3 nM_; /// < local magnetic field (mag output units)
+        /**
+         *  find local magnetic field at http://www.ngdc.noaa.gov/geomag-web/#igrfwmm
+         *
+         *  ############################################################
+            #              Magnetic Field Components
+            ############################################################
+            #   8 Fields
+            #     (1) Date in decimal years
+            #     (2) Declination in decimal degrees
+            #     (3) Inclination in decimal degrees
+            #     (4) Horintensity in nanoTesla (nT)
+            #     (5) Totalintensity in nanoTesla (nT)
+            #     (6) Xcomponent in nanoTesla (nT)
+            #     (7) Ycomponent in nanoTesla (nT)
+            #     (8) Zcomponent in nanoTesla (nT)
+            # NOTE: The first row is change per year in degrees or nanoTesla (nT);
+            # NOTE: The second row is uncertainty in degrees or nanoTesla (nT):
+            #
+            #   Magnetic Model: WMM2015 (calculator version 0.5.0.7)
+            #   Elevation: 0.00000 km Mean Sea Level
+            #   Latitude: 39.90611 degrees, Longitude: 116.38806 degrees
+            ############################################################
+            change/year,-0.06105,0.07734,-46.7,32.2,-49.9,-24.1,65.5
+            uncertainty,0.31,0.22,133,152,89,138,165
+            2017.80274,-6.84582,59.09488,28049.0,54610.6,27849.0,-3343.4,46856.9
+         */
+        const gtsam::Point3 measured_; /// < the measured magnetomeer values
+        const gtsam::Point3 nM_; /// < local magnetic field (mag output units)
 //    const gtsam::Point3 bias_; /// < bias
 
-public:
-    /**
-     * measured = Pose3.Rot3.rotation(nM) + bias
-     * @param key_pose  a pose3,
-     * @param key_bias  bias
-     * @param measured
-     * @param nM
-     * @param model
-     */
-    MagConstraintFactor(gtsam::Key key_pose,
-                        gtsam::Key key_bias,
-                        const gtsam::Point3 &measured,
-                        const gtsam::Point3 &nM,
-                        const gtsam::SharedNoiseModel &model) :
-            gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Point3>(model,
-                                                                  key_pose,
-                                                                  key_bias),
-            measured_(measured), nM_(nM) {
+    public:
+        /**
+         * measured = Pose3.Rot3.rotation(nM) + bias
+         * @param key_pose  a pose3,
+         * @param key_bias  bias
+         * @param measured
+         * @param nM
+         * @param model
+         */
+        MagConstraintFactor(gtsam::Key key_pose,
+                            gtsam::Key key_bias,
+                            const Point3 &measured,
+                            const Point3 &nM,
+                            const SharedNoiseModel &model) :
+                NoiseModelFactor2<Pose3, gtsam::Point3>(model,
+                                                        key_pose,
+                                                        key_bias),
+                measured_(measured), nM_(nM) {
 
 
-    }
+        }
 
-    /**
-     *
-     * @return  deep copy of this factor
-     */
-    virtual gtsam::NonlinearFactor::shared_ptr clone() const {
-        return boost::static_pointer_cast<NonlinearFactor>(
-                gtsam::NonlinearFactor::shared_ptr(new MagConstraintFactor(*this))
-        );
+        /**
+         *
+         * @return  deep copy of this factor
+         */
+        virtual gtsam::NonlinearFactor::shared_ptr clone() const {
+            return boost::static_pointer_cast<NonlinearFactor>(
+                    gtsam::NonlinearFactor::shared_ptr(new MagConstraintFactor(*this))
+            );
 
-    }
+        }
 
-    /**
-     *
-     * @brief vector of errors(vec 3)
-     * @param pose
-     * @param bias
-     * @param H
-     * @return
-     */
-    Vector evaluateError(const Pose3 &Pose,
-                                const Point3 &bias,
-                                boost::optional<gtsam::Matrix &> H1 = boost::none,
-                                boost::optional<gtsam::Matrix &> H2 = boost::none) const {
-        Vector3 rotated_M =
-                Pose.rotation().unrotate(nM_, boost::none, H1) +
-                bias;
-        if (H2)
-            *H2 = gtsam::I_3x3;
+        /**
+         *
+         * @brief vector of errors(vec 3)
+         * @param pose
+         * @param bias
+         * @param H
+         * @return
+         */
+        Vector evaluateError(const Pose3 &Pose,
+                             const Point3 &bias,
+                             boost::optional<gtsam::Matrix &> H1 = boost::none,
+                             boost::optional<gtsam::Matrix &> H2 = boost::none) const {
+            Vector3 rotated_M =
+                    Pose.rotation().unrotate(nM_, boost::none, H1) +
+                    bias;
+            if (H2)
+                *H2 = gtsam::I_3x3;
 //        std::cout << "rotated _M - measured_ :"
 //                  << (rotated_M-measured_).transpose()
 //                  << std::endl;
 
-        return Vector(rotated_M - measured_);
+            return Vector(rotated_M - measured_);
 
 
-    }
+        }
 
 
-};}
+    };
+}
 
 #endif //QUICKFUSING_MAGCONSTRAINTFACTOR_H

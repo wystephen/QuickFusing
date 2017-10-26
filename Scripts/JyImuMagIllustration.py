@@ -26,6 +26,8 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 
+from  mpl_toolkits.mplot3d import Axes3D
+
 if __name__ == '__main__':
     imu_data = np.loadtxt('/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/imu.txt',
                           delimiter=',')
@@ -52,6 +54,16 @@ if __name__ == '__main__':
                  '.-',
                  label='mag:' + str(i - 6))
     plt.legend()
+
+
+    fig = plt.figure()
+    ax = Axes3D(fig)
+
+    ax.plot_surface(imu_data[:,7]/np.linalg.norm(imu_data[:, 7:10], axis=1),
+            imu_data[:,8]/np.linalg.norm(imu_data[:, 7:10], axis=1),
+            imu_data[:,9]/np.linalg.norm(imu_data[:, 7:10], axis=1),
+                    rstride=1,cstride=1,cmap='rainbow')
+
 
 
 

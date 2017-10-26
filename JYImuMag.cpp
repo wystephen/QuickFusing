@@ -217,7 +217,6 @@ int main(int argc, char * argv[]) {
     p->gyroscopeCovariance = measured_omega_cov; // gyro white noise in continuous
 
 
-
     NavState prev_state(prior_pose, prior_velocity);
 //    NavState prop_state = prev_state;
     imuBias::ConstantBias prev_bias = prior_imu_bias;
@@ -233,9 +232,6 @@ int main(int argc, char * argv[]) {
 
     ////Define the imu preintegration
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
-
-
-
 
 
     /**

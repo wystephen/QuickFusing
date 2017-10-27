@@ -73,19 +73,29 @@ if __name__ == '__main__':
                              imu_data[:, 8],  # @ / mag_norm,
                              imu_data[:, 9])  # / mag_norm)
 
-    print('before error:', e_equation.errorFunction([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]))
-    res_x = minimize(e_equation.errorFunction, x0=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0], method='L-BFGS-B',
-                     bounds=[
-                         [0, 1000],
-                         [0, 1000],
-                         [0, 1000],
-                         [0, 1000],
-                         [0, 1000],
-                         [0, 1000]
-                     ])
-    print(res_x)
-    tx = res_x.x
-    print(res_x.x)
+    mag_central = [-25.0,-128.0,80.0]
+    mag_scale = [238.0,263.0,271.0]
+
+    all_mag = (imu_data[:,7:10]-mag_central)/mag_scale
+
+    fig_normed_mag = plt.figure()
+    ax_normed_mag = Axes3D(fig_normed_mag)
+
+    ax.scatter(all_mag[:,0],all_mag[:,1],all_mag[:,2])
+
+    # print('before error:', e_equation.errorFunction([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]))
+    # res_x = minimize(e_equation.errorFunction, x0=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0], method='L-BFGS-B',
+    #                  bounds=[
+    #                      [0, 1000],
+    #                      [0, 1000],
+    #                      [0, 1000],
+    #                      [0, 1000],
+    #                      [0, 1000],
+    #                      [0, 1000]
+    #                  ])
+    # print(res_x)
+    # tx = res_x.x
+    # print(res_x.x)
     # ax.contour(imu_data[:,8],imu_data[:,])
     # print('after error:', e_equation.errorFunction(tx))
     # print('central x,y:', (np.max(imu_data[:, 7:10], axis=0) - np.min(imu_data[:, 7:10], axis=0)) / 2)

@@ -24,9 +24,12 @@
 
 import numpy as np
 import scipy as sp
+from scipy.optimize import  minimize
 import matplotlib.pyplot as plt
 
-from  mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import Axes3D
+
+from Scripts.EllipsoidEq import EllipsoidEq
 
 if __name__ == '__main__':
     imu_data = np.loadtxt('/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/imu.txt',
@@ -64,7 +67,10 @@ if __name__ == '__main__':
             imu_data[:,9]/np.linalg.norm(imu_data[:, 7:10], axis=1))
 
 
+    e_equation = EllipsoidEq(imu_data[:,7],imu_data[:,8],imu_data[:,9])
 
+    res_x = minimize(e_equation.errorFunction,x0=[1.0,1.0,1.0,1.0,1.0,1.0]))
+    print(res_x)
 
     ### The last moment for compute...
 

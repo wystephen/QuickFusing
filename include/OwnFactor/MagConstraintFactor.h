@@ -153,15 +153,14 @@ namespace gtsam {
                              boost::optional<gtsam::Matrix &> H1 = boost::none,
                              boost::optional<gtsam::Matrix &> H2 = boost::none) const {
             Vector3 rotated_M =
-                    Pose.rotation().unrotate(nM_, boost::none, H1) +
-                    bias;
+                    Pose.rotation().unrotate(nM_+bias, boost::none, H1) ;
             if (H2)
                 *H2 = gtsam::I_3x3;
 //        std::cout << "rotated _M - measured_ :"
 //                  << (rotated_M-measured_).transpose()
 //                  << std::endl;
 
-            return Vector(rotated_M - measured_);
+            return Vector(rotated_M - measured_-bias);
 
 
         }

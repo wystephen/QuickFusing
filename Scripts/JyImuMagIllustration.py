@@ -69,9 +69,9 @@ if __name__ == '__main__':
                imu_data[:, 9])
     mag_norm = np.linalg.norm(imu_data[:, 7:10], axis=1)
 
-    e_equation = EllipsoidEq(imu_data[:, 7] / mag_norm,
-                             imu_data[:, 8] / mag_norm,
-                             imu_data[:, 9] / mag_norm)
+    e_equation = EllipsoidEq(imu_data[:, 7],# / mag_norm,
+                             imu_data[:, 8],#@ / mag_norm,
+                             imu_data[:, 9])# / mag_norm)
 
     print('before error:', e_equation.errorFunction([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]))
     res_x = minimize(e_equation.errorFunction, x0=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0], method='L-BFGS-B',

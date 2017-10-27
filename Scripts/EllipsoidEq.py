@@ -31,7 +31,7 @@ class EllipsoidEq:
         self.z = z
 
     def errorFunction(self, para):
-        result = ((self.x - para[0]) ** 2.0) / para[1] + \
-                 ((self.y - para[2]) ** 2.0) / para[3] + \
-                 ((self.z - para[4]) ** 2.0) / para[5] - 1.0
+        result = ((self.x - para[0]) ** 2.0) / (para[1]**2.0) + \
+                 ((self.y - para[2]) ** 2.0) / (para[3]**2.0) + \
+                 ((self.z - para[4]) ** 2.0) / (para[5]**2.0) - 1.0
         return np.abs(result).sum()

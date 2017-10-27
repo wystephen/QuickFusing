@@ -244,7 +244,7 @@ int main(int argc, char *argv[]) {
     for (int i(0); i < 3; ++i) {
         vec3_nM(i) = imudata.block(0, i + 7, 10, 1).mean();
     }
-    vec3_nM /= vec3_nM.norm();
+//    vec3_nM /= vec3_nM.norm();
 
     vec3_nM = prev_state.R().inverse() * vec3_nM;
 
@@ -375,24 +375,24 @@ int main(int argc, char *argv[]) {
 //                    ));
 //                    std::cout << imudata(index, 7) << std::endl;
                     //// 27849 nT -3343.4 nT 46856.9 nT
-//                    noiseModel::Diagonal::shared_ptr mag_constraint_noise =
-//                            noiseModel::Isotropic::Sigma(3,0.01);
-//                    graph->add(MagConstrainPoseFactor(
-//                            X(trace_id),
-//                            (imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
-//                            1.0,
-//                            (vec3_nM),
-//                            Vector3(0, 0, 0),
-//                            mag_constraint_noise
-//
-//                    ));
-                    std::cout << "mag :" << imudata(index, 7)
-                              << ","
-                              << imudata(index, 8)
-                              << ","
-                              << imudata(index, 9) << std::endl;
                     noiseModel::Diagonal::shared_ptr mag_constraint_noise =
-                            noiseModel::Isotropic::Sigma(3, 0.1);
+                            noiseModel::Isotropic::Sigma(3,0.01);
+                    graph->add(MagConstrainPoseFactor(
+                            X(trace_id),
+                            imudata.block(index, 7, 1, 3).transpose() ,
+                            1.0,
+                            (vec3_nM),
+                            Vector3(0, 0, 0),
+                            mag_constraint_noise
+
+                            ));
+//                    std::cout << "mag :" << imudata(index, 7)
+//                              << ","
+//                              << imudata(index, 8)
+//                              << ","
+//                              << imudata(index, 9) << std::endl;
+//                    noiseModel::Diagonal::shared_ptr mag_constraint_noise =
+//                            noiseModel::Isotropic::Sigma(3, 0.1);
 //                    graph->add(MagConstraintFactor(
 //                            X(trace_id),
 //                            M(0),
@@ -400,8 +400,8 @@ int main(int argc, char *argv[]) {
 //                            vec3_nM,
 //                            mag_constraint_noise
 //                    ));
-//                    std::cout << "mag :" << imudata.block(index, 7, 1, 3) / imudata.block(index, 7, 1, 3).norm()
-//                              << " vec3: " << vec3_nM.transpose() << std::endl;
+                    std::cout << "mag :" << imudata.block(index, 7, 1, 3) / imudata.block(index, 7, 1, 3).norm()
+                              << " vec3: " << vec3_nM.transpose() << std::endl;
 //                    std::cout << "Unit3 :" << Unit3(vec3_nM) << " vec3: " << vec3_nM << std::endl;
 
 

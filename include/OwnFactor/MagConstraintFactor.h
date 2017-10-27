@@ -44,7 +44,7 @@ namespace gtsam {
 
         /** Constructor */
         MagConstrainPoseFactor(Key key,
-                               const Point3 &measured,
+                               const Vector3 &measured,
                                double scale,
                                const Vector3 &direction,
                                const Vector3 &bias,

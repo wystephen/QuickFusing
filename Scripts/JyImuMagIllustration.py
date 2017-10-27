@@ -87,9 +87,9 @@ if __name__ == '__main__':
     tx = res_x.x
     print(res_x.x)
     # ax.contour(imu_data[:,8],imu_data[:,])
-    print('after error:', e_equation.errorFunction(tx))
-    print('central x,y:', (np.max(imu_data[:, 7:10], axis=0) - np.min(imu_data[:, 7:10], axis=0)) / 2)
-    print('central x y z :', tx[0], tx[2], tx[4])
+    # print('after error:', e_equation.errorFunction(tx))
+    # print('central x,y:', (np.max(imu_data[:, 7:10], axis=0) - np.min(imu_data[:, 7:10], axis=0)) / 2)
+    # print('central x y z :', tx[0], tx[2], tx[4])
     ### The last moment for compute...
 
     plt.show()

@@ -24,7 +24,7 @@
 
 import numpy as np
 import scipy as sp
-from scipy.optimize import  minimize
+from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
 from mpl_toolkits.mplot3d import Axes3D
@@ -58,20 +58,38 @@ if __name__ == '__main__':
                  label='mag:' + str(i - 6))
     plt.legend()
 
-
     fig = plt.figure()
     ax = Axes3D(fig)
+    # ax.scatter(imu_data[:,7]/np.linalg.norm(imu_data[:, 7:10], axis=1),
+    #         imu_data[:,8]/np.linalg.norm(imu_data[:, 7:10], axis=1),
+    #         imu_data[:,9]/np.linalg.norm(imu_data[:, 7:10], axis=1))
 
-    ax.scatter(imu_data[:,7]/np.linalg.norm(imu_data[:, 7:10], axis=1),
-            imu_data[:,8]/np.linalg.norm(imu_data[:, 7:10], axis=1),
-            imu_data[:,9]/np.linalg.norm(imu_data[:, 7:10], axis=1))
+    ax.scatter(imu_data[:, 7],
+               imu_data[:, 8],
+               imu_data[:, 9])
+    mag_norm = np.linalg.norm(imu_data[:, 7:10], axis=1)
 
+    e_equation = EllipsoidEq(imu_data[:, 7] / mag_norm,
+                             imu_data[:, 8] / mag_norm,
+                             imu_data[:, 9] / mag_norm)
 
-    e_equation = EllipsoidEq(imu_data[:,7],imu_data[:,8],imu_data[:,9])
-
-    res_x = minimize(e_equation.errorFunction,x0=[1.0,1.0,1.0,1.0,1.0,1.0]))
+    print('before error:', e_equation.errorFunction([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]))
+    res_x = minimize(e_equation.errorFunction, x0=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0], method='L-BFGS-B',
+                     bounds=[
+                         [0, 1000],
+                         [0, 1000],
+                         [0, 1000],
+                         [0, 1000],
+                         [0, 1000],
+                         [0, 1000]
+                     ])
     print(res_x)
-
+    tx = res_x.x
+    print(res_x.x)
+    # ax.contour(imu_data[:,8],imu_data[:,])
+    print('after error:', e_equation.errorFunction(tx))
+    print('central x,y:', (np.max(imu_data[:, 7:10], axis=0) - np.min(imu_data[:, 7:10], axis=0)) / 2)
+    print('central x y z :', tx[0], tx[2], tx[4])
     ### The last moment for compute...
 
     plt.show()

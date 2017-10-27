@@ -89,7 +89,9 @@ int main(int argc, char *argv[]) {
      * Load Data
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
+//    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
+    std::string dir_name = "/home/steve/Data/IU/91/";
+
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
     CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
@@ -98,7 +100,17 @@ int main(int argc, char *argv[]) {
                    imu_data_reader.GetMatrix().GetCols());
     imudata.setZero();
     auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
-
+    // for imu mag
+//    central =
+//
+//            -25  -128    80
+//
+//
+//    Scale_axis =
+//
+//            238   263   271
+    Eigen::Vector3d central(-25,-128,80);
+    Eigen::Vector3d scale_axis(238,263,271);
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
@@ -106,10 +118,14 @@ int main(int argc, char *argv[]) {
                 imudata(i, j) *= 9.81;
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
+            } else if ( 7 <= j && j < 10){
+                imudata(i,j) = (imudata(i,j) - central(j-7))/scale_axis(j-7);
             }
 
         }
     }
+
+
 
 
     double sa(10.0), sg(0.3), sv(0.000001);
@@ -370,27 +386,27 @@ int main(int argc, char *argv[]) {
 //                            mag_constraint_noise
 //
 //                    ));
-//                    std::cout << "mag :" << imudata(index, 7)
-//                              << ","
-//                              << imudata(index, 8)
-//                              << ","
-//                              << imudata(index, 9) << std::endl;
+                    std::cout << "mag :" << imudata(index, 7)
+                              << ","
+                              << imudata(index, 8)
+                              << ","
+                              << imudata(index, 9) << std::endl;
                     noiseModel::Diagonal::shared_ptr mag_constraint_noise =
                             noiseModel::Isotropic::Sigma(3, 0.1);
-                    graph->add(MagConstraintFactor(
-                            X(trace_id),
-                            M(0),
-                            Point3(imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
-                            vec3_nM,
-                            mag_constraint_noise
-                    ));
+//                    graph->add(MagConstraintFactor(
+//                            X(trace_id),
+//                            M(0),
+//                            Point3(imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
+//                            vec3_nM,
+//                            mag_constraint_noise
+//                    ));
 //                    std::cout << "mag :" << imudata.block(index, 7, 1, 3) / imudata.block(index, 7, 1, 3).norm()
 //                              << " vec3: " << vec3_nM.transpose() << std::endl;
 //                    std::cout << "Unit3 :" << Unit3(vec3_nM) << " vec3: " << vec3_nM << std::endl;
 
 
                     if (first_added_mag) {
-                        initial_values.insert(M(0), Point3(Vector3(0, 0, 0)));
+//                        initial_values.insert(M(0), Point3(Vector3(0, 0, 0)));
                         first_added_mag = false;
                     }
 

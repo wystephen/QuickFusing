@@ -160,7 +160,7 @@ namespace gtsam {
 //                  << (rotated_M-measured_).transpose()
 //                  << std::endl;
 
-            return Vector(rotated_M - measured_-bias);
+            return Vector(rotated_M - (measured_+bias));
 
 
         }

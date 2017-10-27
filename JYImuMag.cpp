@@ -377,15 +377,16 @@ int main(int argc, char *argv[]) {
                     //// 27849 nT -3343.4 nT 46856.9 nT
                     noiseModel::Diagonal::shared_ptr mag_constraint_noise =
                             noiseModel::Isotropic::Sigma(3,0.01);
-                    graph->add(MagConstrainPoseFactor(
-                            X(trace_id),
-                            imudata.block(index, 7, 1, 3).transpose() ,
-                            1.0,
-                            (vec3_nM),
-                            Vector3(0, 0, 0),
-                            mag_constraint_noise
+//                    graph->add(MagConstrainPoseFactor(
+//                            X(trace_id),
+//                            imudata.block(index, 7, 1, 3).transpose() ,
+//                            1.0,
+//                            (vec3_nM),
+//                            Vector3(0, 0, 0),
+//                            mag_constraint_noise
+//                            ));
 
-                            ));
+
 //                    std::cout << "mag :" << imudata(index, 7)
 //                              << ","
 //                              << imudata(index, 8)

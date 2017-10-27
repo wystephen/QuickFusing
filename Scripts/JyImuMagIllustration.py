@@ -81,7 +81,7 @@ if __name__ == '__main__':
     fig_normed_mag = plt.figure()
     ax_normed_mag = Axes3D(fig_normed_mag)
 
-    ax.scatter(all_mag[:,0],all_mag[:,1],all_mag[:,2])
+    ax_normed_mag.plot(all_mag[:,0],all_mag[:,1],all_mag[:,2],'.y')
 
     # print('before error:', e_equation.errorFunction([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]))
     # res_x = minimize(e_equation.errorFunction, x0=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0], method='L-BFGS-B',

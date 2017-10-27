@@ -32,9 +32,10 @@ from mpl_toolkits.mplot3d import Axes3D
 from Scripts.EllipsoidEq import EllipsoidEq
 
 if __name__ == '__main__':
-    imu_data = np.loadtxt('/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/imu.txt',
+    # imu_data = np.loadtxt('/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/imu.txt',
+    #                       delimiter=',')
+    imu_data = np.loadtxt('/home/steve/Data/IU/86/imu.txt',
                           delimiter=',')
-
     plt.figure()
     plt.title('mag x y z ')
     plt.grid()
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     plt.plot(np.linalg.norm(imu_data[:, 7:10], axis=1))
 
     plt.figure()
-    plt.title('mag normalized x y z')
+    plt.title('mag normalized direct x y z')
     plt.grid()
     for i in range(7, imu_data.shape[1] - 1):
         plt.plot(imu_data[:, i] / np.linalg.norm(imu_data[:, 7:10], axis=1),
@@ -82,6 +83,27 @@ if __name__ == '__main__':
     ax_normed_mag = Axes3D(fig_normed_mag)
 
     ax_normed_mag.plot(all_mag[:,0],all_mag[:,1],all_mag[:,2],'.y')
+
+
+    plt.figure()
+    plt.title('normed mag')
+    for i in range(all_mag.shape[1]):
+        plt.plot(all_mag[:,i],'-+',label=str(i))
+    plt.plot(np.linalg.norm(all_mag,axis=1),label='norm')
+    plt.legend()
+    plt.grid()
+
+    plt.figure()
+    plt.title('really normed mag')
+
+    div_norm =  np.linalg.norm(all_mag,axis=1)
+    for i in range(all_mag.shape[1]):
+        all_mag[:,i] /= div_norm
+        plt.plot(all_mag[:,i],'-+',label=str(i))
+    plt.legend()
+    plt.grid()
+
+
 
     # print('before error:', e_equation.errorFunction([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]))
     # res_x = minimize(e_equation.errorFunction, x0=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0], method='L-BFGS-B',

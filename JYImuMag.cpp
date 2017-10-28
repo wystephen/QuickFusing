@@ -153,6 +153,7 @@ int main(int argc, char *argv[]) {
     initial_para.Ts_ = 1.0f / 200.0f;
 
 
+
     initial_para.sigma_vel_ = Eigen::Vector3d(sv, sv, sv);
     initial_para.sigma_acc_ = Eigen::Vector3d(sa, sa, sa);
     initial_para.sigma_gyro_ = Eigen::Vector3d(sg, sg, sg);

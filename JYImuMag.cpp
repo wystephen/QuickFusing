@@ -46,6 +46,7 @@
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/PriorFactor.h>
 #include <gtsam/slam/PoseRotationPrior.h>
+#include <gtsam/navigation/AttitudeFactor.h>
 
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 #include <gtsam/nonlinear/GaussNewtonOptimizer.h>
@@ -109,8 +110,8 @@ int main(int argc, char *argv[]) {
 //    Scale_axis =
 //
 //            238   263   271
-    Eigen::Vector3d central(-25,-128,80);
-    Eigen::Vector3d scale_axis(238,263,271);
+    Eigen::Vector3d central(-25, -128, 80);
+    Eigen::Vector3d scale_axis(238, 263, 271);
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
@@ -118,14 +119,12 @@ int main(int argc, char *argv[]) {
                 imudata(i, j) *= 9.81;
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
-            } else if ( 7 <= j && j < 10){
+            } else if (7 <= j && j < 10) {
 //                imudata(i,j) = (imudata(i,j) - central(j-7))/scale_axis(j-7);
             }
 
         }
     }
-
-
 
 
     double sa(10.0), sg(0.3), sv(0.000001);
@@ -246,7 +245,7 @@ int main(int argc, char *argv[]) {
     }
     vec3_nM /= vec3_nM.norm();
 
-    vec3_nM = prev_state.R().inverse() * vec3_nM;
+//    vec3_nM = prev_state.R().inverse() * vec3_nM;
 
     ////Define the imu preintegration
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
@@ -376,15 +375,24 @@ int main(int argc, char *argv[]) {
 //                    std::cout << imudata(index, 7) << std::endl;
                     //// 27849 nT -3343.4 nT 46856.9 nT
                     noiseModel::Diagonal::shared_ptr mag_constraint_noise =
-                            noiseModel::Isotropic::Sigma(3,0.01);
-                    graph->add(MagConstrainPoseFactor(
+                            noiseModel::Isotropic::Sigma(3, 0.01);
+//                    graph->add(MagConstrainPoseFactor(
+//                            X(trace_id),
+//                            imudata.block(index, 7, 1, 3).transpose()/imudata.block(index,7,1,3).norm() ,
+//                            1.0,
+//                            (vec3_nM),
+//                            Vector3(0, 0, 0),
+//                            mag_constraint_noise
+//                            ));
+                    noiseModel::Diagonal::shared_ptr attitude_noise =
+                            noiseModel::Isotropic::Sigma(2, 0.5);
+                    graph->add(Pose3AttitudeFactor(
                             X(trace_id),
-                            imudata.block(index, 7, 1, 3).transpose()/imudata.block(index,7,1,3).norm() ,
-                            1.0,
-                            (vec3_nM),
-                            Vector3(0, 0, 0),
-                            mag_constraint_noise
-                            ));
+                            Unit3(imudata.block(index, 7, 1, 3).transpose()),
+                            attitude_noise,
+                            Unit3(vec3_nM)
+
+                    ));
 
 
 //                    std::cout << "mag :" << imudata(index, 7)

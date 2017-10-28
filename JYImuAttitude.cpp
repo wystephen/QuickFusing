@@ -380,7 +380,6 @@ int main(int argc, char *argv[]) {
                             X(trace_id),
                             Unit3(imudata.block(index,1,1,3).transpose()),
                             gravity_noise
-
                     ));
                     std::cout << imudata(index, 7) << std::endl;
                     //// 27849 nT -3343.4 nT 46856.9 nT

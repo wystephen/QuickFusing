@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
 //    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
-    std::string dir_name = "/home/steve/Data/IU/86/";
+    std::string dir_name = "/home/steve/Data/IU/92/";
 
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
@@ -366,21 +366,21 @@ int main(int argc, char *argv[]) {
                     noiseModel::Diagonal::shared_ptr mag_all_noise =
                             noiseModel::Diagonal::Sigmas(Vector3(M_PI * 10, M_PI * 10, M_PI * 10));
 //                    if(trace_id>10)
-//                    graph->add(PoseRotationPrior<Pose3>(
-//                            X(trace_id),
-//                            Rot3::RzRyRx(Vector3(imudata(index, 9) ,
-//                                                 -imudata(index, 8) ,
-//                                                 imudata(index, 7) )),
-//                            mag_all_noise
-//                    ));
-
-                    noiseModel::Diagonal::shared_ptr gravity_noise = noiseModel::Diagonal::Sigmas(
-                            Vector2(0.05,0.05));
-                    graph->add(Pose3AttitudeFactor(
+                    graph->add(PoseRotationPrior<Pose3>(
                             X(trace_id),
-                            Unit3(imudata.block(index,1,1,3).transpose()),
-                            gravity_noise
+                            Rot3::RzRyRx(Vector3(imudata(index, 9) ,
+                                                 imudata(index, 8) ,
+                                                 imudata(index, 7) )),
+                            mag_all_noise
                     ));
+
+//                    noiseModel::Diagonal::shared_ptr gravity_noise = noiseModel::Diagonal::Sigmas(
+//                            Vector2(0.05,0.05));
+//                    graph->add(Pose3AttitudeFactor(
+//                            X(trace_id),
+//                            Unit3(imudata.block(index,1,1,3).transpose()),
+//                            gravity_noise
+//                    ));
                     std::cout << imudata(index, 7) << std::endl;
                     //// 27849 nT -3343.4 nT 46856.9 nT
 //                    noiseModel::Diagonal::shared_ptr mag_constraint_noise =

@@ -129,4 +129,13 @@ if __name__ == '__main__':
     #    Scale_axis =
     #
     #            238   263   271
+
+    plt.figure()
+    plt.grid()
+
+    plt.title('all compara with mag z')
+    for i in range(7,imu_data.shape[1]-1):
+        plt.plot(imu_data[:,i]/imu_data[:,9],'-+',label=str(i-6))
+    plt.legend()
+
     plt.show()

@@ -374,20 +374,20 @@ int main(int argc, char *argv[]) {
                     noiseModel::Diagonal::shared_ptr mag_all_noise ;
 //                            noiseModel::Diagonal::Sigmas(Vector3(M_PI / 15, M_PI / 15, M_PI / 5));
 //                    if(trace_id>10)
-                    if(attitude_vec.size()>2&&std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,7))<10/180.0*M_PI&&
-                            std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,7))<10/180.0*M_PI)
-                    {
-                        mag_all_noise = noiseModel::Isotropic::Sigma(3,M_PI/10);
-                    }else{
-
-                        mag_all_noise = noiseModel::Isotropic::Sigma(3,M_PI/5);
-                    }
+//                    if(attitude_vec.size()>2&&std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,7))<10/180.0*M_PI&&
+//                            std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,7))<10/180.0*M_PI)
+//                    {
+//                        mag_all_noise = noiseModel::Isotropic::Sigma(3,M_PI/10);
+//                    }else{
+//
+//                        mag_all_noise = noiseModel::Isotropic::Sigma(3,M_PI);
+//                    }
 //                    if(attitude_vec.size()>2&&std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,7))<0.05)
 //                    if(attitude_vec.size() == )
 //                    if(last_angle_vec.size()>2&&std::abs(myekf.getOriente()-last_angle_vec[last_angle_vec.size()-1])<0.1)
 
 
-
+                    mag_all_noise = noiseModel::Isotropic::Sigma(3,M_PI/10);
                     graph->add(PoseRotationPrior<Pose3>(
                             X(trace_id),
                             Rot3::RzRyRx(Vector3(imudata(index, 9),
@@ -598,10 +598,12 @@ int main(int argc, char *argv[]) {
     /**
      * Plot Trace
      */
-    plt::plot(gx, gy, "r-+");
-    plt::plot(ekfx, ekfy, "b-");
-    plt::title("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
-               std::to_string(sg));
+//    plt::plot(gx, gy, "r-+");
+//    plt::plot(ekfx, ekfy, "b-");
+//    plt::title("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
+//               std::to_string(sg));
+    plt::plot(last_angle_vec,"r-+");
+    plt::plot(attitude_vec,"b-+");
 
 //    plt::save("img-sv:"+std::to_string(sv)+"sa:"+std::to_string(sa)+"-sg:"+
 //               std::to_string(sg)+".png");

@@ -264,7 +264,9 @@ int main(int argc, char *argv[]) {
     }
     vec3_nM /= vec3_nM.norm();
 
-    vec3_nM = prev_state.R().inverse() * vec3_nM;
+    Rot3 tr = Rot3::RzRyRx(0.0,Rot3(prev_state.R()).pitch(),Rot3(prev_state.R()).roll());
+
+    vec3_nM = prev_state.R().matrix() * vec3_nM;
     std::cout << "initial gravity display : "
               << prev_state.R() * imudata.block(0, 1, 1, 3).transpose()
               << std::endl;
@@ -615,11 +617,11 @@ int main(int argc, char *argv[]) {
                + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
                "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading));
 
-//    plt::save("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
-//              std::to_string(sg)
-//              + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
-//              "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading) +
-//              ".png");
+    plt::save("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
+              std::to_string(sg)
+              + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
+              "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading) +
+              ".png");
 
 
 
@@ -627,7 +629,7 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ay);
 //    plt::plot(az);
 //    plt::plot(zupt_v);
-    plt::show();
+//    plt::show();
 
 
     return 0;

@@ -247,7 +247,7 @@ int main(int argc, char *argv[]) {
 
     vec3_nM = prev_state.R().inverse() * vec3_nM;
     std::cout << "initial gravity display : "
-              << prev_state.R() * imudata.block(0,1,1,3).transpose()
+              << prev_state.R().inverse() * imudata.block(0,1,1,3).transpose()
               << std::endl;
 
     ////Define the imu preintegration

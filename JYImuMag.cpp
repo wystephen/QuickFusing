@@ -328,17 +328,17 @@ int main(int argc, char *argv[]) {
                 ));
 
                 // considering gravity constraint...
-                noiseModel::Diagonal::shared_ptr mag_constraint_noise =
-                        noiseModel::Isotropic::Sigma(3,0.01);
-                graph->add(MagConstrainPoseFactor(
-                        X(trace_id),
-                        (imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
-                        1.0,
-                        (vec3_nM),
-                        Vector3(0, 0, 0),
-                        mag_constraint_noise
-
-                ));
+//                noiseModel::Diagonal::shared_ptr mag_constraint_noise =
+//                        noiseModel::Isotropic::Sigma(3,0.21);
+//                graph->add(MagConstrainPoseFactor(
+//                        X(trace_id),
+//                        (imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
+//                        1.0,
+//                        (vec3_nM),
+//                        Vector3(0, 0, 0),
+//                        mag_constraint_noise
+//
+//                ));
 
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {

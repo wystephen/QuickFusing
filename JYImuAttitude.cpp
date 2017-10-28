@@ -264,6 +264,8 @@ int main(int argc, char *argv[]) {
     int accumulate_preintegra_num = 0;
     std::vector<double> attitude_vec;
 
+    std::vector<double> last_angle_vec;
+
 
     /*
      * Main loop for positioning.
@@ -271,12 +273,15 @@ int main(int argc, char *argv[]) {
     std::cout << "start Main Loop" << std::endl;
     for (int index(0); index < imudata.rows(); ++index) {
 
+
+
         /// ZUPT DETECTOR
         double zupt_flag = 0.0;// probability of be zero-velocity.
 
         if (index <= initial_para.ZeroDetectorWindowSize_) {
             // first several data set as zero-velocity state.
             zupt_flag = 1.0;
+
         } else {
             if (GLRT_Detector(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 1,
                                             initial_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
@@ -366,11 +371,23 @@ int main(int argc, char *argv[]) {
 //                    ));
 
 
-                    noiseModel::Diagonal::shared_ptr mag_all_noise =
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI / 15, M_PI / 15, M_PI / 15));
+                    noiseModel::Diagonal::shared_ptr mag_all_noise ;
+//                            noiseModel::Diagonal::Sigmas(Vector3(M_PI / 15, M_PI / 15, M_PI / 5));
 //                    if(trace_id>10)
-                    if(attitude_vec.size()>2&&std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,9))<10/180.0*M_PI&&
-                            std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,9))<10/180.0*M_PI)
+                    if(attitude_vec.size()>2&&std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,7))<10/180.0*M_PI&&
+                            std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,7))<10/180.0*M_PI)
+                    {
+                        mag_all_noise = noiseModel::Isotropic::Sigma(3,M_PI/10);
+                    }else{
+
+                        mag_all_noise = noiseModel::Isotropic::Sigma(3,M_PI/5);
+                    }
+//                    if(attitude_vec.size()>2&&std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,7))<0.05)
+//                    if(attitude_vec.size() == )
+//                    if(last_angle_vec.size()>2&&std::abs(myekf.getOriente()-last_angle_vec[last_angle_vec.size()-1])<0.1)
+
+
+
                     graph->add(PoseRotationPrior<Pose3>(
                             X(trace_id),
                             Rot3::RzRyRx(Vector3(imudata(index, 9),
@@ -481,9 +498,17 @@ int main(int argc, char *argv[]) {
 
         if(last_zupt_flag>0.5&& zupt_flag<0.5)
         {
+            last_angle_vec.push_back(myekf.getOriente());
+            std::cout << myekf.getOriente() << std::endl;
             attitude_vec.push_back(imudata(index,7));
 
-            std::cout << "atttude: " << imudata(index,7) << std::endl;
+            std::cout << "atttude: " << imudata(index,7) ;//<< std::endl;
+            if(std::abs(attitude_vec[attitude_vec.size()-1]-attitude_vec[attitude_vec.size()-2])<0.05)
+            {
+                std::cout << "-----" << std::endl;
+            }else{
+                std::cout << std::endl;
+            }
         }
 
         last_zupt_flag = zupt_flag;

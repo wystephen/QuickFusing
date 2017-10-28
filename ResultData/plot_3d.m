@@ -4,6 +4,7 @@ test=load('test.txt');
 save_trace = test;
 plot3(save_trace(:,1),save_trace(:,2),save_trace(:,3),'*r-');
 grid on;hold on;
+axis equal;
 
 
 

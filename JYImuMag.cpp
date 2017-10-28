@@ -394,11 +394,12 @@ int main(int argc, char *argv[]) {
 //
 //                    ));
                      noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
-                            noiseModel::Isotropic::Sigma(2, 0.15);
+                            noiseModel::Isotropic::Sigma(2, 1.115);
                     graph->add(Pose3AttitudeFactor(
                             X(trace_id),
                             Unit3(imudata.block(index,1,1,3).transpose()),
                             gravity_attitude_noise
+//                            Unit3(imudata.block(0,1,1,3).transpose())
                     ));
 
 

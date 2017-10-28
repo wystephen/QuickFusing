@@ -299,7 +299,7 @@ int main(int argc, char *argv[]) {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 35) {
+        if (accumulate_preintegra_num > 5) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -394,7 +394,7 @@ int main(int argc, char *argv[]) {
 //
 //                    ));
                      noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
-                            noiseModel::Isotropic::Sigma(2, 0.5);
+                            noiseModel::Isotropic::Sigma(2, 0.15);
                     graph->add(Pose3AttitudeFactor(
                             X(trace_id),
                             Unit3(imudata.block(index,1,1,3).transpose()),

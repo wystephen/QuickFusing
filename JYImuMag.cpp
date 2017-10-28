@@ -47,6 +47,10 @@
 #include <gtsam/slam/PriorFactor.h>
 #include <gtsam/slam/PoseRotationPrior.h>
 #include <gtsam/navigation/AttitudeFactor.h>
+#include <gtsam/navigation/AHRSFactor.h>
+#include <gtsam/navigation/ManifoldPreintegration.h>
+#include <gtsam/navigation/TangentPreintegration.h>
+
 
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 #include <gtsam/nonlinear/GaussNewtonOptimizer.h>
@@ -70,6 +74,8 @@ using symbol_shorthand::B; // Bias  (ax,ay,az,gx,gy,gz)
 using symbol_shorthand::M; // Bias of Magconstraint
 
 PreintegratedImuMeasurements *imu_preintegrated_;
+//ManifoldPreintegration *imu_preintegrated_;
+//TangentPreintegration *imu_preintegrated_;
 
 namespace plt = matplotlibcpp;
 
@@ -127,8 +133,8 @@ int main(int argc, char *argv[]) {
     }
 
 
-    double sa(10.0), sg(0.3), sv(0.000001);
-    double gravity(9.81), smag_attitude(1.7), sgravity_attitude(1.7);
+    double sa(0.01), sg(0.02/180.0*M_PI), sv(0.000001);
+    double gravity(9.6), smag_attitude(0.1), sgravity_attitude(-1.7);
     if (argc >= 4) {
         sv = std::stod(argv[1]);
         sa = std::stod(argv[2]);
@@ -204,7 +210,7 @@ int main(int argc, char *argv[]) {
 
     // Assemble prior noise model and add it the graph.
     noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
-            (Vector(6) << 1110.1, 11110.1, 11110.1, 0.5, 0.5, 0.5).finished()); // rad,rad,rad,m, m, m
+            (Vector(6) << 11100000.1, 11100010.1, 11100010.1, 0.5, 0.5, 0.5).finished()); // rad,rad,rad,m, m, m
     noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.01); // m/s
     noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
 
@@ -259,8 +265,21 @@ int main(int argc, char *argv[]) {
               << prev_state.R() * imudata.block(0, 1, 1, 3).transpose()
               << std::endl;
 
+    if (smag_attitude > 0) {
+        noiseModel::Diagonal::shared_ptr attitude_noise =
+                noiseModel::Isotropic::Sigma(2, smag_attitude);
+        graph->add(Pose3AttitudeFactor(
+                X(0),
+                Unit3(imudata.block(2, 7, 1, 3).transpose()),
+                attitude_noise,
+                Unit3(vec3_nM)
+
+        ));
+    }
+
     ////Define the imu preintegration
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
+//    imu_preintegrated_  = new TangentPreintegration(p,prior_imu_bias);
 
 
     /**

@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
             } else if ( 7 <= j && j < 10){
-                imudata(i,j) = (imudata(i,j) - central(j-7))/scale_axis(j-7);
+//                imudata(i,j) = (imudata(i,j) - central(j-7))/scale_axis(j-7);
             }
 
         }

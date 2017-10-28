@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
 //    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
-    std::string dir_name = "/home/steve/Data/IU/86/";
+    std::string dir_name = "/home/steve/Data/IU/92/";
 
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
@@ -128,10 +128,18 @@ int main(int argc, char *argv[]) {
 
 
     double sa(10.0), sg(0.3), sv(0.000001);
+    double gravity(9.81), smag_attitude(1.7), sgravity_attitude(1.7);
     if (argc >= 4) {
         sv = std::stod(argv[1]);
         sa = std::stod(argv[2]);
         sg = std::stod(argv[3]) / 180.0 * M_PI;
+    }
+
+    if (argc >= 7) {
+        gravity = std::stod(argv[4]);
+        smag_attitude = std::stod(argv[5]);
+        sgravity_attitude = std::stod(argv[6]);
+
     }
 
 
@@ -221,7 +229,7 @@ int main(int argc, char *argv[]) {
 
     //error gravity...!!!
     boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
-            PreintegratedImuMeasurements::Params::MakeSharedU(9.3);
+            PreintegratedImuMeasurements::Params::MakeSharedU(gravity);
 
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
@@ -245,9 +253,9 @@ int main(int argc, char *argv[]) {
     }
     vec3_nM /= vec3_nM.norm();
 
-    vec3_nM = prev_state.R().inverse()   * vec3_nM;
+    vec3_nM = prev_state.R().inverse() * vec3_nM;
     std::cout << "initial gravity display : "
-              << prev_state.R() * imudata.block(0,1,1,3).transpose()
+              << prev_state.R() * imudata.block(0, 1, 1, 3).transpose()
               << std::endl;
 
     ////Define the imu preintegration
@@ -377,33 +385,42 @@ int main(int argc, char *argv[]) {
 //                    ));
 //                    std::cout << imudata(index, 7) << std::endl;
                     //// 27849 nT -3343.4 nT 46856.9 nT
-                    noiseModel::Diagonal::shared_ptr mag_constraint_noise =
-                            noiseModel::Isotropic::Sigma(3, 0.01);
+//                    noiseModel::Diagonal::shared_ptr mag_constraint_noise =
+//                            noiseModel::Isotropic::Sigma(3, smag_attitude);
 //                    graph->add(MagConstrainPoseFactor(
 //                            X(trace_id),
-//                            imudata.block(index, 7, 1, 3).transpose()/imudata.block(index,7,1,3).norm() ,
+//                            imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm(),
 //                            1.0,
 //                            (vec3_nM),
 //                            Vector3(0, 0, 0),
 //                            mag_constraint_noise
-//                            ));
-                    noiseModel::Diagonal::shared_ptr attitude_noise =
-                            noiseModel::Isotropic::Sigma(2, 0.705);
-                    graph->add(Pose3AttitudeFactor(
-                            X(trace_id),
-                            Unit3(imudata.block(index, 7, 1, 3).transpose()),
-                            attitude_noise,
-                            Unit3(vec3_nM)
+//                    ));
 
-                    ));
-                     noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
-                            noiseModel::Isotropic::Sigma(2, 0.7115);
-                    graph->add(Pose3AttitudeFactor(
-                            X(trace_id),
-                            Unit3(imudata.block(index,1,1,3).transpose()),
-                            gravity_attitude_noise,
-                            Unit3(0,0,1)
-                    ));
+                    if (smag_attitude > 0) {
+                        noiseModel::Diagonal::shared_ptr attitude_noise =
+                                noiseModel::Isotropic::Sigma(2, smag_attitude);
+                        graph->add(Pose3AttitudeFactor(
+                                X(trace_id),
+                                Unit3(imudata.block(index, 7, 1, 3).transpose()),
+                                attitude_noise,
+                                Unit3(vec3_nM)
+
+                        ));
+                    }
+
+
+                    if (sgravity_attitude > 0) {
+                        noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
+                                noiseModel::Isotropic::Sigma(2, sgravity_attitude);
+                        graph->add(Pose3AttitudeFactor(
+                                X(trace_id),
+                                Unit3(imudata.block(index, 1, 1, 3).transpose()),
+                                gravity_attitude_noise,
+                                Unit3(0, 0, 1)
+                        ));
+                    }
+
+
 
 
 
@@ -570,10 +587,14 @@ int main(int argc, char *argv[]) {
     plt::plot(gx, gy, "r-+");
     plt::plot(ekfx, ekfy, "b-");
     plt::title("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
-               std::to_string(sg));
+               std::to_string(sg)
+    +"g:"+std::to_string(gravity)+"s_mag_att:"+std::to_string(smag_attitude)+
+    "s_g_att:"+std::to_string(sgravity_attitude));
 
-//    plt::save("img-sv:"+std::to_string(sv)+"sa:"+std::to_string(sa)+"-sg:"+
-//               std::to_string(sg)+".png");
+    plt::save("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
+               std::to_string(sg)
+    +"g:"+std::to_string(gravity)+"s_mag_att:"+std::to_string(smag_attitude)+
+    "s_g_att:"+std::to_string(sgravity_attitude)+".png");
 
 
 
@@ -581,7 +602,7 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ay);
 //    plt::plot(az);
 //    plt::plot(zupt_v);
-    plt::show();
+//    plt::show();
 
 
     return 0;

@@ -50,6 +50,7 @@ if __name__ == '__main__':
     # print('imu shape',imu_data[:,7:10].shape)
     plt.plot(np.linalg.norm(imu_data[:, 7:10], axis=1))
 
+
     plt.figure()
     plt.title('mag normalized direct x y z')
     plt.grid()
@@ -137,5 +138,9 @@ if __name__ == '__main__':
     for i in range(7,imu_data.shape[1]-1):
         plt.plot(imu_data[:,i]/imu_data[:,9],'-+',label=str(i-6))
     plt.legend()
+
+    print('acc:', imu_data[1,1:4])
+    print('gyr:', imu_data[1,4:7])
+    print('mag:',imu_data[1,7:10])
 
     plt.show()

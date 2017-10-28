@@ -66,7 +66,7 @@ namespace gtsam {
                              boost::optional<Matrix &> H = boost::none) const {
             // measured bM = nRb� * nM + b
             Vector3 hx = nPb.rotation().unrotate(nM_, H, boost::none) + bias_;
-            std::cout << (hx - measured_).transpose() << std::endl;
+//            std::cout << (hx - measured_).transpose() << std::endl;
 
             return (hx - measured_);
 //            return Vector3(0,0,0);

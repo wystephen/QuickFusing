@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
     initial_para.ZeroDetectorWindowSize_ = 5;
 
     MyEkf myekf(initial_para);
-    myekf.InitNavEq(imudata.block(0, 0, 20, 6));
+    myekf.InitNavEq(imudata.block(0, 1, 20, 6));
 
     std::vector<double> ekfx, ekfy;
 
@@ -245,7 +245,10 @@ int main(int argc, char *argv[]) {
     }
 //    vec3_nM /= vec3_nM.norm();
 
-    vec3_nM = prev_state.R() * vec3_nM;
+    vec3_nM = prev_state.R().inverse() * vec3_nM;
+    std::cout << "initial gravity display : "
+              << prev_state.R() * imudata.block(0,1,1,3).transpose()
+              << std::endl;
 
     ////Define the imu preintegration
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
@@ -385,7 +388,7 @@ int main(int argc, char *argv[]) {
 //                            mag_constraint_noise
 //                            ));
                     noiseModel::Diagonal::shared_ptr attitude_noise =
-                            noiseModel::Isotropic::Sigma(2, 0.505);
+                            noiseModel::Isotropic::Sigma(2, 0.905);
                     graph->add(Pose3AttitudeFactor(
                             X(trace_id),
                             Unit3(imudata.block(index, 7, 1, 3).transpose()),
@@ -393,14 +396,15 @@ int main(int argc, char *argv[]) {
                             Unit3(vec3_nM)
 
                     ));
-                     noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
-                            noiseModel::Isotropic::Sigma(2, 0.7115);
-                    graph->add(Pose3AttitudeFactor(
-                            X(trace_id),
-                            Unit3(imudata.block(index,1,1,3).transpose()),
-                            gravity_attitude_noise
-//                            Unit3(imudata.block(0,1,1,3).transpose())
-                    ));
+//                     noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
+//                            noiseModel::Isotropic::Sigma(2, 0.7115);
+//                    graph->add(Pose3AttitudeFactor(
+//                            X(trace_id),
+//                            Unit3(imudata.block(index,1,1,3).transpose()),
+//                            gravity_attitude_noise
+////                            Unit3(imudata.block(0,1,1,3).transpose())
+//                    ));
+
 
 
 //                    std::cout << "mag :" << imudata(index, 7)

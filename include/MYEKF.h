@@ -138,6 +138,10 @@ public:
         Eigen::Matrix3d Rb2t = Rt2b(attitude);
         Rb2t.transposeInPlace();
 
+
+//        std::cout << "test gravity in ekf : "
+//                  << Rb2t * u.block
+
         quat_ = dcm2q(Rb2t);
 
         x_h_.block(0, 0, 3, 1) = para_.init_pos1_;

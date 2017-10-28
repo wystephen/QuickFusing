@@ -481,9 +481,9 @@ int main(int argc, char *argv[]) {
 
         if(last_zupt_flag>0.5&& zupt_flag<0.5)
         {
-            attitude_vec.push_back(imudata(index,9));
+            attitude_vec.push_back(imudata(index,7));
 
-            std::cout << "atttude: " << imudata(index,9) << std::endl;
+            std::cout << "atttude: " << imudata(index,7) << std::endl;
         }
 
         last_zupt_flag = zupt_flag;

@@ -126,15 +126,16 @@ int main(int argc, char *argv[]) {
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
             } else if (7 <= j && j < 10) {
-                imudata(i,j) = (imudata(i,j) - central(j-7));///scale_axis(j-7);
+                imudata(i, j) = (imudata(i, j) - central(j - 7));///scale_axis(j-7);
             }
 
         }
     }
 
 
-    double sa(0.01), sg(0.02/180.0*M_PI), sv(0.000001);
+    double sa(0.01), sg(0.02 / 180.0 * M_PI), sv(0.000001);
     double gravity(9.6), smag_attitude(0.1), sgravity_attitude(-1.7);
+    double initial_heading = 180.0 / 180.0 * M_PI;
     if (argc >= 4) {
         sv = std::stod(argv[1]);
         sa = std::stod(argv[2]);
@@ -148,6 +149,10 @@ int main(int argc, char *argv[]) {
 
     }
 
+    if (argc >= 8) {
+        initial_heading = std::stod(argv[7]) / 180.0 * M_PI;
+    }
+
 
     /**
      * Initial ZUPT
@@ -155,9 +160,8 @@ int main(int argc, char *argv[]) {
     std::cout << "start initial ZUPT" << std::endl;
     SettingPara initial_para(true);
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
-    initial_para.init_heading1_ = imudata.block(0, 8, 20, 1).mean() * M_PI;
+    initial_para.init_heading1_ = initial_heading;// imudata.block(0, 8, 20, 1).mean() * M_PI;
     initial_para.Ts_ = 1.0f / 200.0f;
-
 
 
     initial_para.sigma_vel_ = Eigen::Vector3d(sv, sv, sv);
@@ -605,16 +609,17 @@ int main(int argc, char *argv[]) {
      * Plot Trace
      */
     plt::plot(gx, gy, "r-+");
-    plt::plot(ekfx, ekfy, "b-");
+//    plt::plot(ekfx, ekfy, "b-");
     plt::title("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
                std::to_string(sg)
-    +"g:"+std::to_string(gravity)+"s_mag_att:"+std::to_string(smag_attitude)+
-    "s_g_att:"+std::to_string(sgravity_attitude));
+               + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
+               "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading));
 
 //    plt::save("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
-//               std::to_string(sg)
-//    +"g:"+std::to_string(gravity)+"s_mag_att:"+std::to_string(smag_attitude)+
-//    "s_g_att:"+std::to_string(sgravity_attitude)+".png");
+//              std::to_string(sg)
+//              + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
+//              "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading) +
+//              ".png");
 
 
 

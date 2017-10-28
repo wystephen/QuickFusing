@@ -34,7 +34,7 @@ from Scripts.EllipsoidEq import EllipsoidEq
 if __name__ == '__main__':
     # imu_data = np.loadtxt('/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/imu.txt',
     #                       delimiter=',')
-    imu_data = np.loadtxt('/home/steve/Data/IU/86/imu.txt',
+    imu_data = np.loadtxt('/home/steve/Data/IU/92/imu.txt',
                           delimiter=',')
     plt.figure()
     plt.title('mag x y z ')
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     mag_central = [-25.0, -128.0, 80.0]
     mag_scale = [238.0, 263.0, 271.0]
 
-    all_mag = (imu_data[:, 7:10] - mag_central) / mag_scale
+    all_mag = (imu_data[:, 7:10] - mag_central) #/ mag_scale
 
     fig_normed_mag = plt.figure()
     ax_normed_mag = Axes3D(fig_normed_mag)

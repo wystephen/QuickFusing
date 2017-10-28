@@ -58,7 +58,8 @@ if __name__ == '__main__':
     count = 0
     while count < len(all_str_run):
         # print(threading.active_count())
-        if threading.active_count() < 7:
+        time.sleep(0.5)
+        if threading.active_count() < 6:
             t = threading.Thread(target=run_the_str, args=(all_str_run[count], count))
             count += 1
             t.start()

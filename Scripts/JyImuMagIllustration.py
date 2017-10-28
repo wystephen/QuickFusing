@@ -74,36 +74,33 @@ if __name__ == '__main__':
                              imu_data[:, 8],  # @ / mag_norm,
                              imu_data[:, 9])  # / mag_norm)
 
-    mag_central = [-25.0,-128.0,80.0]
-    mag_scale = [238.0,263.0,271.0]
+    mag_central = [-25.0, -128.0, 80.0]
+    mag_scale = [238.0, 263.0, 271.0]
 
-    all_mag = (imu_data[:,7:10]-mag_central)/mag_scale
+    all_mag = (imu_data[:, 7:10] - mag_central) / mag_scale
 
     fig_normed_mag = plt.figure()
     ax_normed_mag = Axes3D(fig_normed_mag)
 
-    ax_normed_mag.plot(all_mag[:,0],all_mag[:,1],all_mag[:,2],'.y')
-
+    ax_normed_mag.plot(all_mag[:, 0], all_mag[:, 1], all_mag[:, 2], '.y')
 
     plt.figure()
     plt.title('normed mag')
     for i in range(all_mag.shape[1]):
-        plt.plot(all_mag[:,i],'-+',label=str(i))
-    plt.plot(np.linalg.norm(all_mag,axis=1),label='norm')
+        plt.plot(all_mag[:, i], '-+', label=str(i))
+    plt.plot(np.linalg.norm(all_mag, axis=1), label='norm')
     plt.legend()
     plt.grid()
 
     plt.figure()
     plt.title('really normed mag')
 
-    div_norm =  np.linalg.norm(all_mag,axis=1)
+    div_norm = np.linalg.norm(all_mag, axis=1)
     for i in range(all_mag.shape[1]):
-        all_mag[:,i] /= div_norm
-        plt.plot(all_mag[:,i],'-+',label=str(i))
+        all_mag[:, i] /= div_norm
+        plt.plot(all_mag[:, i], '-+', label=str(i))
     plt.legend()
     plt.grid()
-
-
 
     # print('before error:', e_equation.errorFunction([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]))
     # res_x = minimize(e_equation.errorFunction, x0=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0], method='L-BFGS-B',

@@ -369,8 +369,8 @@ int main(int argc, char *argv[]) {
                     noiseModel::Diagonal::shared_ptr mag_all_noise =
                             noiseModel::Diagonal::Sigmas(Vector3(M_PI / 15, M_PI / 15, M_PI / 15));
 //                    if(trace_id>10)
-                    if(attitude_vec.size()>2&&std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,9))<0.1&&
-                            std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,9))<0.1)
+                    if(attitude_vec.size()>2&&std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,9))<10/180.0*M_PI&&
+                            std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,9))<10/180.0*M_PI)
                     graph->add(PoseRotationPrior<Pose3>(
                             X(trace_id),
                             Rot3::RzRyRx(Vector3(imudata(index, 9),
@@ -388,7 +388,7 @@ int main(int argc, char *argv[]) {
 //                            Unit3(imudata.block(index,1,1,3).transpose()),
 //                            gravity_noise
 //                    ));
-                    std::cout << imudata(index, 7) << std::endl;
+//                    std::cout << imudata(index, 7) << std::endl;
                     //// 27849 nT -3343.4 nT 46856.9 nT
 //                    noiseModel::Diagonal::shared_ptr mag_constraint_noise =
 //                            noiseModel::Isotropic::Sigma(3,0.01);
@@ -416,8 +416,8 @@ int main(int argc, char *argv[]) {
 //                            vec3_nM,
 //                            mag_constraint_noise
 //                    ));
-                    std::cout << "mag :" << imudata.block(index, 7, 1, 3) / imudata.block(index, 7, 1, 3).norm()
-                              << " vec3: " << vec3_nM.transpose() << std::endl;
+//                    std::cout << "mag :" << imudata.block(index, 7, 1, 3) / imudata.block(index, 7, 1, 3).norm()
+//                              << " vec3: " << vec3_nM.transpose() << std::endl;
 //                    std::cout << "Unit3 :" << Unit3(vec3_nM) << " vec3: " << vec3_nM << std::endl;
 
 
@@ -482,6 +482,8 @@ int main(int argc, char *argv[]) {
         if(last_zupt_flag>0.5&& zupt_flag<0.5)
         {
             attitude_vec.push_back(imudata(index,9));
+
+            std::cout << "atttude: " << imudata(index,9) << std::endl;
         }
 
         last_zupt_flag = zupt_flag;

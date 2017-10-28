@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
             } else if (7 <= j && j < 10) {
-//                imudata(i,j) = (imudata(i,j) - central(j-7))/scale_axis(j-7);
+                imudata(i,j) = (imudata(i,j) - central(j-7))/scale_axis(j-7);
             }
 
         }
@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
 
     //error gravity...!!!
     boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
-            PreintegratedImuMeasurements::Params::MakeSharedU(9.6);
+            PreintegratedImuMeasurements::Params::MakeSharedU(9.81);
 
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
@@ -245,7 +245,7 @@ int main(int argc, char *argv[]) {
     }
 //    vec3_nM /= vec3_nM.norm();
 
-    vec3_nM = prev_state.R().inverse() * vec3_nM;
+    vec3_nM = prev_state.R() * vec3_nM;
 
     ////Define the imu preintegration
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
@@ -385,16 +385,16 @@ int main(int argc, char *argv[]) {
 //                            mag_constraint_noise
 //                            ));
                     noiseModel::Diagonal::shared_ptr attitude_noise =
-                            noiseModel::Isotropic::Sigma(2, 0.05);
-//                    graph->add(Pose3AttitudeFactor(
-//                            X(trace_id),
-//                            Unit3(imudata.block(index, 7, 1, 3).transpose()),
-//                            attitude_noise,
-//                            Unit3(vec3_nM)
-//
-//                    ));
+                            noiseModel::Isotropic::Sigma(2, 0.505);
+                    graph->add(Pose3AttitudeFactor(
+                            X(trace_id),
+                            Unit3(imudata.block(index, 7, 1, 3).transpose()),
+                            attitude_noise,
+                            Unit3(vec3_nM)
+
+                    ));
                      noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
-                            noiseModel::Isotropic::Sigma(2, 1.115);
+                            noiseModel::Isotropic::Sigma(2, 0.7115);
                     graph->add(Pose3AttitudeFactor(
                             X(trace_id),
                             Unit3(imudata.block(index,1,1,3).transpose()),

@@ -364,15 +364,15 @@ int main(int argc, char *argv[]) {
 
 
                     noiseModel::Diagonal::shared_ptr mag_all_noise =
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI * 10, M_PI * 10, M_PI * 10));
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI/10, M_PI, M_PI));
 //                    if(trace_id>10)
-                    graph->add(PoseRotationPrior<Pose3>(
-                            X(trace_id),
-                            Rot3::RzRyRx(Vector3(imudata(index, 9) ,
-                                                 imudata(index, 8) ,
-                                                 imudata(index, 7) )),
-                            mag_all_noise
-                    ));
+//                    graph->add(PoseRotationPrior<Pose3>(
+//                            X(trace_id),
+//                            Rot3::RzRyRx(Vector3(imudata(index, 9) ,
+//                                                 imudata(index, 8) ,
+//                                                 imudata(index, 7) )),
+//                            mag_all_noise
+//                    ));
 
 //                    noiseModel::Diagonal::shared_ptr gravity_noise = noiseModel::Diagonal::Sigmas(
 //                            Vector2(0.05,0.05));

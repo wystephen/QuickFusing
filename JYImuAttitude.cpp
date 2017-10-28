@@ -46,6 +46,7 @@
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/PriorFactor.h>
 #include <gtsam/slam/PoseRotationPrior.h>
+#include <gtsam/navigation/AttitudeFactor.h>
 
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 #include <gtsam/nonlinear/GaussNewtonOptimizer.h>
@@ -90,7 +91,7 @@ int main(int argc, char *argv[]) {
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
 //    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
-    std::string dir_name = "/home/steve/Data/IU/92/";
+    std::string dir_name = "/home/steve/Data/IU/86/";
 
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
@@ -109,8 +110,8 @@ int main(int argc, char *argv[]) {
 //    Scale_axis =
 //
 //            238   263   271
-    Eigen::Vector3d central(-25,-128,80);
-    Eigen::Vector3d scale_axis(238,263,271);
+    Eigen::Vector3d central(-25, -128, 80);
+    Eigen::Vector3d scale_axis(238, 263, 271);
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
@@ -118,14 +119,12 @@ int main(int argc, char *argv[]) {
                 imudata(i, j) *= 9.81;
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
-            } else if ( 7 <= j && j < 10){
+            } else if (7 <= j && j < 10) {
 //                imudata(i,j) = (imudata(i,j) - central(j-7))/scale_axis(j-7);
             }
 
         }
     }
-
-
 
 
     double sa(10.0), sg(0.3), sv(0.000001);
@@ -196,7 +195,7 @@ int main(int argc, char *argv[]) {
 
     // Assemble prior noise model and add it the graph.
     noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
-            (Vector(6) << 1110.1, 11110.1, 11110.1, 0.5, 0.5, 0.5).finished()); // rad,rad,rad,m, m, m
+            (Vector(6) << 11100.1, 111100.1, 111100.1, 0.5, 0.5, 0.5).finished()); // rad,rad,rad,m, m, m
     noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.01); // m/s
     noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-3);
 
@@ -365,13 +364,23 @@ int main(int argc, char *argv[]) {
 
 
                     noiseModel::Diagonal::shared_ptr mag_all_noise =
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI, M_PI, M_PI));
-                    graph->add(PoseRotationPrior<Pose3>(
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI * 10, M_PI * 10, M_PI * 10));
+//                    if(trace_id>10)
+//                    graph->add(PoseRotationPrior<Pose3>(
+//                            X(trace_id),
+//                            Rot3::RzRyRx(Vector3(imudata(index, 9) ,
+//                                                 -imudata(index, 8) ,
+//                                                 imudata(index, 7) )),
+//                            mag_all_noise
+//                    ));
+
+                    noiseModel::Diagonal::shared_ptr gravity_noise = noiseModel::Diagonal::Sigmas(
+                            Vector2(0.05,0.05));
+                    graph->add(Pose3AttitudeFactor(
                             X(trace_id),
-                            Rot3::RzRyRx(Vector3(imudata(index, 9) ,
-                                                 imudata(index, 8) ,
-                                                 imudata(index, 7) )),
-                            mag_all_noise
+                            Unit3(imudata.block(index,1,1,3).transpose()),
+                            gravity_noise
+
                     ));
                     std::cout << imudata(index, 7) << std::endl;
                     //// 27849 nT -3343.4 nT 46856.9 nT

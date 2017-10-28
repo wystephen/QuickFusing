@@ -387,23 +387,23 @@ int main(int argc, char *argv[]) {
 //                            Vector3(0, 0, 0),
 //                            mag_constraint_noise
 //                            ));
-                    noiseModel::Diagonal::shared_ptr attitude_noise =
-                            noiseModel::Isotropic::Sigma(2, 0.105);
-                    graph->add(Pose3AttitudeFactor(
-                            X(trace_id),
-                            Unit3(imudata.block(index, 7, 1, 3).transpose()),
-                            attitude_noise,
-                            Unit3(vec3_nM)
-
-                    ));
-//                     noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
-//                            noiseModel::Isotropic::Sigma(2, 0.7115);
+//                    noiseModel::Diagonal::shared_ptr attitude_noise =
+//                            noiseModel::Isotropic::Sigma(2, 0.105);
 //                    graph->add(Pose3AttitudeFactor(
 //                            X(trace_id),
-//                            Unit3(imudata.block(index,1,1,3).transpose()),
-//                            gravity_attitude_noise
-////                            Unit3(imudata.block(0,1,1,3).transpose())
+//                            Unit3(imudata.block(index, 7, 1, 3).transpose()),
+//                            attitude_noise,
+//                            Unit3(vec3_nM)
+//
 //                    ));
+                     noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
+                            noiseModel::Isotropic::Sigma(2, 0.7115);
+                    graph->add(Pose3AttitudeFactor(
+                            X(trace_id),
+                            Unit3(imudata.block(index,1,1,3).transpose()),
+                            gravity_attitude_noise,
+                            Unit3(0,0,1)
+                    ));
 
 
 

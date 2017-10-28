@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
 
     //error gravity...!!!
     boost::shared_ptr<PreintegratedImuMeasurements::Params> p =
-            PreintegratedImuMeasurements::Params::MakeSharedD(9.8);
+            PreintegratedImuMeasurements::Params::MakeSharedU(9.6);
 
     // PreintegrationBase params:
     p->accelerometerCovariance = measured_acc_cov; // acc white noise in continuous
@@ -243,9 +243,9 @@ int main(int argc, char *argv[]) {
     for (int i(0); i < 3; ++i) {
         vec3_nM(i) = imudata.block(0, i + 7, 10, 1).mean();
     }
-    vec3_nM /= vec3_nM.norm();
+//    vec3_nM /= vec3_nM.norm();
 
-//    vec3_nM = prev_state.R().inverse() * vec3_nM;
+    vec3_nM = prev_state.R().inverse() * vec3_nM;
 
     ////Define the imu preintegration
     imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
@@ -386,12 +386,19 @@ int main(int argc, char *argv[]) {
 //                            ));
                     noiseModel::Diagonal::shared_ptr attitude_noise =
                             noiseModel::Isotropic::Sigma(2, 0.5);
+//                    graph->add(Pose3AttitudeFactor(
+//                            X(trace_id),
+//                            Unit3(imudata.block(index, 7, 1, 3).transpose()),
+//                            attitude_noise,
+//                            Unit3(vec3_nM)
+//
+//                    ));
+                     noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
+                            noiseModel::Isotropic::Sigma(2, 0.5);
                     graph->add(Pose3AttitudeFactor(
                             X(trace_id),
-                            Unit3(imudata.block(index, 7, 1, 3).transpose()),
-                            attitude_noise,
-                            Unit3(vec3_nM)
-
+                            Unit3(imudata.block(index,1,1,3).transpose()),
+                            gravity_attitude_noise
                     ));
 
 

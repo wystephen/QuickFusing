@@ -262,6 +262,7 @@ int main(int argc, char *argv[]) {
 
 
     int accumulate_preintegra_num = 0;
+    std::vector<double> attitude_vec;
 
 
     /*
@@ -299,6 +300,7 @@ int main(int argc, char *argv[]) {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
+
         if (accumulate_preintegra_num > 15) {
             accumulate_preintegra_num = 0;
             trace_id++;
@@ -351,6 +353,7 @@ int main(int argc, char *argv[]) {
 
                     graph->add(zero_velocity);
 
+
                     ///Mag constraint
 //                    noiseModel::Diagonal::shared_ptr mag_noise =
 //                            noiseModel::Diagonal::Sigmas(Vector3(M_PI * 1000000.0, M_PI * 1000000.0, M_PI * 1.5));
@@ -364,15 +367,19 @@ int main(int argc, char *argv[]) {
 
 
                     noiseModel::Diagonal::shared_ptr mag_all_noise =
-                            noiseModel::Diagonal::Sigmas(Vector3(M_PI/10, M_PI, M_PI));
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI / 15, M_PI / 15, M_PI / 15));
 //                    if(trace_id>10)
-//                    graph->add(PoseRotationPrior<Pose3>(
-//                            X(trace_id),
-//                            Rot3::RzRyRx(Vector3(imudata(index, 9) ,
-//                                                 imudata(index, 8) ,
-//                                                 imudata(index, 7) )),
-//                            mag_all_noise
-//                    ));
+                    if(attitude_vec.size()>2&&std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,9))<0.1&&
+                            std::abs(attitude_vec[attitude_vec.size()-1]-imudata(index,9))<0.1)
+                    graph->add(PoseRotationPrior<Pose3>(
+                            X(trace_id),
+                            Rot3::RzRyRx(Vector3(imudata(index, 9),
+                                                 imudata(index, 8),
+                                                 imudata(index, 7))),
+                            mag_all_noise
+                    ));
+
+
 
 //                    noiseModel::Diagonal::shared_ptr gravity_noise = noiseModel::Diagonal::Sigmas(
 //                            Vector2(0.05,0.05));
@@ -423,6 +430,8 @@ int main(int argc, char *argv[]) {
 
 
 
+
+
 //                if (trace_id == 1) {
 //
 //                    noiseModel::Diagonal::shared_ptr correction_noise = noiseModel::Isotropic::Sigma(3, 0.1);
@@ -464,9 +473,16 @@ int main(int argc, char *argv[]) {
 
         }
 
+
+
         imu_preintegrated_->integrateMeasurement(imudata.block(index, 1, 1, 3).transpose(),
                                                  imudata.block(index, 4, 1, 3).transpose(),
                                                  initial_para.Ts_);
+
+        if(last_zupt_flag>0.5&& zupt_flag<0.5)
+        {
+            attitude_vec.push_back(imudata(index,9));
+        }
 
         last_zupt_flag = zupt_flag;
 

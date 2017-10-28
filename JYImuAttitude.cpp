@@ -90,11 +90,11 @@ int main(int argc, char *argv[]) {
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
 //    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
-    std::string dir_name = "/home/steve/Data/IU/86/";
+    std::string dir_name = "/home/steve/Data/IU/92/";
 
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu_att.txt");
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
             } else if ( 7 <= j && j < 10){
-                imudata(i,j) = (imudata(i,j) - central(j-7))/scale_axis(j-7);
+//                imudata(i,j) = (imudata(i,j) - central(j-7))/scale_axis(j-7);
             }
 
         }
@@ -328,17 +328,17 @@ int main(int argc, char *argv[]) {
                 ));
 
                 // considering gravity constraint...
-                noiseModel::Diagonal::shared_ptr mag_constraint_noise =
-                        noiseModel::Isotropic::Sigma(3,0.01);
-                graph->add(MagConstrainPoseFactor(
-                        X(trace_id),
-                        (imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
-                        1.0,
-                        (vec3_nM),
-                        Vector3(0, 0, 0),
-                        mag_constraint_noise
-
-                ));
+//                noiseModel::Diagonal::shared_ptr mag_constraint_noise =
+//                        noiseModel::Isotropic::Sigma(3,0.01);
+//                graph->add(MagConstrainPoseFactor(
+//                        X(trace_id),
+//                        (imudata.block(index, 7, 1, 3).transpose() / imudata.block(index, 7, 1, 3).norm()),
+//                        1.0,
+//                        (vec3_nM),
+//                        Vector3(0, 0, 0),
+//                        mag_constraint_noise
+//
+//                ));
 
                 ///Zero-velocity constraint
                 if (zupt_flag > 0.5) {
@@ -355,7 +355,7 @@ int main(int argc, char *argv[]) {
                     ///Mag constraint
 //                    noiseModel::Diagonal::shared_ptr mag_noise =
 //                            noiseModel::Diagonal::Sigmas(Vector3(M_PI * 1000000.0, M_PI * 1000000.0, M_PI * 1.5));
-
+//
 //                    graph->add(PoseRotationPrior<Pose3>(
 //                            X(trace_id),
 //                            Rot3::Yaw(( imudata(index,7)/180.0 * M_PI)),
@@ -364,27 +364,27 @@ int main(int argc, char *argv[]) {
 //                    ));
 
 
-//                    noiseModel::Diagonal::shared_ptr mag_all_noise =
-//                            noiseModel::Diagonal::Sigmas(Vector3(M_PI, M_PI, M_PI));
-//                    graph->add(PoseRotationPrior<Pose3>(
-//                            X(trace_id),
-//                            Rot3::RzRyRx(Vector3(imudata(index, 9) / 180.0 * M_PI,
-//                                                 imudata(index, 8) / 180.0 * M_PI,
-//                                                 imudata(index, 7) / 180.0 * M_PI)),
-//                            mag_all_noise
-//                    ));
-//                    std::cout << imudata(index, 7) << std::endl;
-                    //// 27849 nT -3343.4 nT 46856.9 nT
-                    noiseModel::Diagonal::shared_ptr mag_constraint_noise =
-                            noiseModel::Isotropic::Sigma(3,0.01);
-                    graph->add(MagConstrainPoseFactor(
+                    noiseModel::Diagonal::shared_ptr mag_all_noise =
+                            noiseModel::Diagonal::Sigmas(Vector3(M_PI, M_PI, M_PI));
+                    graph->add(PoseRotationPrior<Pose3>(
                             X(trace_id),
-                            imudata.block(index, 7, 1, 3).transpose()/imudata.block(index,7,1,3).norm() ,
-                            1.0,
-                            (vec3_nM),
-                            Vector3(0, 0, 0),
-                            mag_constraint_noise
-                            ));
+                            Rot3::RzRyRx(Vector3(imudata(index, 9) ,
+                                                 imudata(index, 8) ,
+                                                 imudata(index, 7) )),
+                            mag_all_noise
+                    ));
+                    std::cout << imudata(index, 7) << std::endl;
+                    //// 27849 nT -3343.4 nT 46856.9 nT
+//                    noiseModel::Diagonal::shared_ptr mag_constraint_noise =
+//                            noiseModel::Isotropic::Sigma(3,0.01);
+//                    graph->add(MagConstrainPoseFactor(
+//                            X(trace_id),
+//                            imudata.block(index, 7, 1, 3).transpose()/imudata.block(index,7,1,3).norm() ,
+//                            1.0,
+//                            (vec3_nM),
+//                            Vector3(0, 0, 0),
+//                            mag_constraint_noise
+//                            ));
 
 
 //                    std::cout << "mag :" << imudata(index, 7)

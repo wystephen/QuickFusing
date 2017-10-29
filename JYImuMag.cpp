@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
 //    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
-    std::string dir_name = "/home/steve/Data/IU/92/";
+    std::string dir_name = "/home/steve/Data/IU/86/";
 
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
@@ -336,7 +336,7 @@ int main(int argc, char *argv[]) {
 
         /// IntegratedImu
         accumulate_preintegra_num++;
-        if (accumulate_preintegra_num > 5) {
+        if (accumulate_preintegra_num > 1) {
             accumulate_preintegra_num = 0;
             trace_id++;
 
@@ -489,7 +489,7 @@ int main(int argc, char *argv[]) {
                 ///Set intial values
                 try {
                     Pose3 p;
-//                    p.matrix() = myekf.getTransformation().matrix();
+                    p.matrix() = myekf.getTransformation().matrix();
                     initial_values.insert(X(trace_id), p);
                     initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                     initial_values.insert(B(trace_id), prev_bias);

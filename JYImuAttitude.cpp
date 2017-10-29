@@ -598,12 +598,12 @@ int main(int argc, char *argv[]) {
     /**
      * Plot Trace
      */
-//    plt::plot(gx, gy, "r-+");
-//    plt::plot(ekfx, ekfy, "b-");
-//    plt::title("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
-//               std::to_string(sg));
-    plt::plot(last_angle_vec,"r-+");
-    plt::plot(attitude_vec,"b-+");
+    plt::plot(gx, gy, "r-+");
+    plt::plot(ekfx, ekfy, "b-");
+    plt::title("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
+               std::to_string(sg));
+//    plt::plot(last_angle_vec,"r-+");
+//    plt::plot(attitude_vec,"b-+");
 
 //    plt::save("img-sv:"+std::to_string(sv)+"sa:"+std::to_string(sa)+"-sg:"+
 //               std::to_string(sg)+".png");

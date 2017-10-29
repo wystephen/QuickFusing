@@ -46,7 +46,7 @@ if __name__ == '__main__':
                     for i5 in [-1.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.5]:
                         for i6 in [-1.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.5]:
                             for i7 in [180.0, 160.0, 140.0, 120.0, 100.0, 80.0, 60.0, 40.0, 20.0, 0.0, -20, -40, -80,
-                                       -100, -120, -140, -160, -180]
+                                       -100, -120, -140, -160, -180]:
                                 all_str_run.append("../cmake-build-debug/JYImuMag {0} {1} {2} {3} {4} {5} {6} ".format(
                                     i1, i2, i3, i4, i5, i6, i7
 
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     while count < len(all_str_run):
         # print(threading.active_count())
         time.sleep(0.5)
-        if threading.active_count() < 6:
+        if threading.active_count() < 7:
             t = threading.Thread(target=run_the_str, args=(all_str_run[count], count))
             count += 1
             t.start()

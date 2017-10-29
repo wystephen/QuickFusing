@@ -26,6 +26,8 @@ import os
 import time
 import random
 
+import numpy as np
+
 import threading
 
 
@@ -55,10 +57,12 @@ if __name__ == '__main__':
         for i2 in [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 3.0, 8.0]:
             for i3 in [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 3.0, 8.0]:
                 for i4 in [-9.8]:
-                    for i5 in [-1.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.5,2.0,3.0,4.0]:
-                        for i6 in [-1.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.5,2.0,3.0,4.0]:
+                    for i5 in [-1.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.5, 2.0, 3.0,
+                               4.0]:
+                        for i6 in [-1.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.5, 2.0,
+                                   3.0, 4.0]:
                             for i7 in [180.0, 160.0, 140.0, 120.0, 100.0, 80.0, 60.0, 40.0, 20.0, 0.0, -20, -40, -80,
-                                                                          -100, -120, -140, -160, -180]:
+                                       -100, -120, -140, -160, -180]:
                                 all_str_run.append("../cmake-build-debug/JYImuMag {0} {1} {2} {3} {4} {5} {6} ".format(
                                     i1, i2, i3, i4, i5, i6, i7
 
@@ -84,10 +88,16 @@ if __name__ == '__main__':
     print('reshuffled list.')
 
     count = 0
+    last_update_time = -1
     while count < len(all_str_run):
         # print(threading.active_count())
-        time.sleep(0.5)
-        if threading.active_count() < 7:
+        time.sleep(1.5)
+
+        para = np.loadtxt('ParaSet.txt')
+        print(para)
+
+
+        if threading.active_count() < para:
             t = threading.Thread(target=run_the_str, args=(all_str_run[count], count))
             count += 1
             t.start()

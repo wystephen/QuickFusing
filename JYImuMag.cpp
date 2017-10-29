@@ -618,11 +618,11 @@ int main(int argc, char *argv[]) {
                + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
                "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading));
 
-    plt::save("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
-              std::to_string(sg)
-              + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
-              "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading) +
-              ".png");
+//    plt::save("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
+//              std::to_string(sg)
+//              + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
+//              "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading) +
+//              ".png");
 
 
 
@@ -630,7 +630,7 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ay);
 //    plt::plot(az);
 //    plt::plot(zupt_v);
-//    plt::show();
+    plt::show();
 
 
     return 0;

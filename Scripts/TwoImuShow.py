@@ -73,6 +73,7 @@ if __name__ == '__main__':
             'b*-',
             label='trace imu2.txt')
     ax.legend()
+    trace_fig.savefig(dir_name+'trace3d.png',dpi=1000)
 
 
     # plt.figure()

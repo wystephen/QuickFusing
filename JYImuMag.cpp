@@ -489,9 +489,9 @@ int main(int argc, char *argv[]) {
 //                }
                 ///Set intial values
                 try {
-                    Pose3 p;
+                    Pose3 pp;
 //                    p.matrix() = myekf.getTransformation().matrix();
-                    initial_values.insert(X(trace_id), p);
+                    initial_values.insert(X(trace_id), pp);
                     initial_values.insert(V(trace_id), Vector3(0, 0, 0));
                     initial_values.insert(B(trace_id), prev_bias);
 

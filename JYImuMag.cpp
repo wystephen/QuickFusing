@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
 //    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
 //    std::string dir_name = "/home/steve/Data/IU/92/";
-    std::string dir_name = "/home/steve/Data/II/18/";
+    std::string dir_name = "/home/steve/Data/II/20/";
 
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");

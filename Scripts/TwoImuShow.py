@@ -36,7 +36,7 @@ import os
 
 if __name__ == '__main__':
     # dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/73/"
-    dir_name = "/home/steve/Data/II/18/"
+    dir_name = "/home/steve/Data/II/19/"
     # dir_name = "/home/steve/Code/Mini-IMU/Scripts/IMUWB/20/"
     # dir_name = "/home/steve/Data/FastUwbDemo/2/"
     # dir_name = "/home/steve/tmp/test/20/"
@@ -73,12 +73,18 @@ if __name__ == '__main__':
             'b*-',
             label='trace imu2.txt')
     ax.legend()
-    trace_fig.savefig(dir_name+'trace3d.png',dpi=1000)
+    trace_fig.savefig(dir_name+'trace3d.png',dpi=2000)
 
-
+    plt.figure()
+    plt.grid()
+    plt.plot(ip.vertics[:,0],ip.vertics[:,1],'r*-',label='trace imu.txt')
+    plt.plot(ip2.vertics[:,0],ip2.vertics[:,1],'b*-',label='traceimu2.txt')
+    plt.legend()
+    plt.savefig(dir_name+'trace2d.png',dpi=2000)
     # plt.figure()
     # plt.plot(ip.vertics_time, 'r')
 
     # ip.findcorner()
     # ip.computeconerfeature()
     plt.show()
+

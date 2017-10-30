@@ -64,6 +64,7 @@
 #include <thread>
 #include <OwnFactor/MagConstraintFactor.h>
 #include <ImuKeyPointInfo.h>
+#include <cmath>
 
 using namespace gtsam;
 using namespace std;
@@ -194,8 +195,8 @@ int main(int argc, char *argv[]) {
     /**
      * Initial graph para
      */
-    int left_offset = 1000000;
-    int right_offset = 2000000;
+    int left_offset = 100000000;
+    int right_offset = 200000000;
 
 
     Rot3 prior_rotation = Rot3(myekf.getTransformation().matrix().block(0, 0, 3, 3));
@@ -389,7 +390,7 @@ int main(int argc, char *argv[]) {
         accumulate_preintegra_num++;
         if (accumulate_preintegra_num > 15) {
             accumulate_preintegra_num = 0;
-            trace_id_l++;
+            trace_id_r++;
 
             PreintegratedImuMeasurements *preint_imu =
                     dynamic_cast<PreintegratedImuMeasurements *> (imu_preintegrated_r_);
@@ -453,6 +454,90 @@ int main(int argc, char *argv[]) {
                 imudata_r.block(index, 1, 1, 3).transpose(),
                 imudata_r.block(index, 4, 1, 3).transpose(),
                 initial_para.Ts_);
+
+
+    }
+
+
+    /**
+     * Add Two-feet constraint
+     */
+    double start_time = std::max(right_info_vec[0].time_, left_info_vec[0].time_);
+    double end_time = std::min(left_info_vec[left_info_vec.size() - 1].time_,
+                               right_info_vec[right_info_vec.size() - 1].time_);
+    int central_point_id = 0;
+
+    int left_index(0);
+    int right_index(1);
+
+    for (int i_t(0); i_t < std::floor(end_time - start_time); ++i_t) {
+        double current_central_time = start_time + i_t * 1.0;
+        central_point_id ++;
+
+        while (true) {
+//            if(left_info_vec[left_index].time_<current_central_time-1.0)
+//            {
+//                left_index++;
+//                continue;
+//            }
+//            if(right_info_vec[right_index].time_<current_central_time-1.0)
+//            {
+//                right_index++;
+//                continue;
+
+//            }
+            if(left_info_vec[left_index].time_<right_info_vec[right_index].time_)
+            {
+                left_index++;
+            }else{
+                right_index++;
+            }
+
+            if (left_index < 0) {
+                left_index = 0;
+            }
+            if (right_index < 0) {
+                right_index = 0;
+            }
+
+            if (left_index >= left_info_vec.size() - 3 ||
+                right_index >= right_info_vec.size() - 3) {
+                break;
+            }
+            if(std::fabs(right_info_vec[right_index].time_-current_central_time)<1.0&&
+                    std::fabs(left_info_vec[left_index].time_-current_central_time)<1.0)
+            {
+
+                noiseModel::Diagonal::shared_ptr range_noise =
+                        noiseModel::Isotropic::Sigma(1,0.01);
+                graph->add(RangeFactor<Pose3,Point3>(
+                        X(left_info_vec[left_index].index_),
+                        C(central_point_id),
+                        0.5,range_noise
+                ));
+
+                graph->add(
+                        RangeFactor<Pose3,Point3>(
+                                X(right_info_vec[right_index].index_),
+                                C(central_point_id),
+                                0.5,range_noise
+                        )
+                );
+
+                initial_values.insert(
+                        C(central_point_id),Point3(Vector3(0,0,0))
+                );
+
+                central_point_id++;
+               right_index=0;
+                left_index=0;
+            }
+
+
+
+        }
+
+
 
 
     }
@@ -534,6 +619,9 @@ int main(int argc, char *argv[]) {
         std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
 
     }
+
+
+
 
     /**
      * Plot Trace

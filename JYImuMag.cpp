@@ -429,15 +429,15 @@ int main(int argc, char *argv[]) {
                     for (auto tmp_iter = zv_info_vec.begin(); tmp_iter != zv_info_vec.end(); ++tmp_iter) {
                         if ((tmp_iter->data_vec_.block(7, 0, 3, 1).transpose() -
                              imudata.block(index, 7, 1, 3)).norm() <
-                            10
-                            && tmp_iter->index_ < trace_id - 100) {
+                            10){
+                           // && tmp_iter->index_ < trace_id - 100) {
 //                            std::cout << tmp_iter->data_vec_.block(7, 0, 3, 1).transpose()
 //                                      << ":"
 //                                      << imudata.block(index, 7, 1, 3)
 //                                      << std::endl;
 
                             noiseModel::Diagonal::shared_ptr mag_unit_noise =
-                                    noiseModel::Isotropic::Sigma(3, 0.5);
+                                    noiseModel::Isotropic::Sigma(3, 0.05);
                             graph->add(
                                     MagConstraintRelativeFactor(
                                             X(tmp_iter->index_),

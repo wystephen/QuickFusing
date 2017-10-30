@@ -33,6 +33,8 @@
 
 #include <gtsam/geometry/Pose3.h>
 
+#include <Eigen/Dense>
+
 namespace gtsam {
     class MagConstrainPoseFactor : public NoiseModelFactor1<Pose3> {
 
@@ -199,12 +201,39 @@ namespace gtsam {
                 boost::optional<Matrix &> H1 = boost::none,
                 boost::optional<Matrix &> H2 = boost::none) const {
 
-            Vector3 src_m = src_Pose.rotation().unrotate(src_nM_);
-            Vector3 target_m = target_Pose.rotation().unrotate(target_nM_);
-            if (H1)
-                *H1 = I_3x3;
-            if (H2)
-                *H2 = I_3x3;
+
+
+            Eigen::Matrix<double,3,3> src_h1;
+             Eigen::Matrix<double,3,3> target_h1;
+            src_h1.setZero();
+            target_h1.setZero();
+
+
+            Vector3 src_m = src_Pose.rotation().unrotate(src_nM_,boost::none,src_h1);
+            Vector3 target_m = target_Pose.rotation().unrotate(target_nM_,boost::none,target_h1);
+            if(H1)
+            {
+                Eigen::Matrix<double,3,6> t;
+                t.block(0,0,3,3) = Eigen::Matrix3d::Zero();
+                t.block(0,3,3,3) = src_h1*1.0;
+                *H1 = t;
+            }
+
+            if(H2)
+            {
+                Eigen::Matrix<double,3,6> t;
+                t.block(0,0,3,3) = Eigen::Matrix3d::Zero();
+                t.block(0,3,3,3) = target_h1 * -1.0;
+                *H2 = t;
+            }
+
+
+
+
+//            if (H1)
+//                *H1 = Matrix33();
+//            if (H2)
+//                *H2 = I_3x3;
 
 //            return Vector3(src_m(0) - target_m(0), src_m(1) - target_m(1),
 //                           src_m(2) - target_m(2));

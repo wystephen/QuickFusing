@@ -63,6 +63,7 @@
 
 #include <thread>
 #include <OwnFactor/MagConstraintFactor.h>
+#include "ImuKeyPointInfo.h
 
 using namespace gtsam;
 using namespace std;
@@ -266,6 +267,9 @@ int main(int argc, char *argv[]) {
 
     int trace_id_l(left_offset);
     int trace_id_r(right_offset);
+
+
+    std::vector<ImuKeyPointInfo> left_info_vec,right_info_vec;
 
     int accumulate_preintegra_num = 0;
 

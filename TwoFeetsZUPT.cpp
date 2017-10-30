@@ -96,7 +96,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/II/19eeks/";
+    std::string dir_name = "/home/steve/Data/II/19/";
 
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");

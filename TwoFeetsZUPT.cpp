@@ -96,7 +96,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/II/20/";
+    std::string dir_name = "/home/steve/Data/II/19eeks/";
 
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
@@ -470,9 +470,9 @@ int main(int argc, char *argv[]) {
     int left_index(0);
     int right_index(1);
 
-    for (int i_t(0); i_t < std::floor(end_time - start_time); i_t+=1) {
+    for (int i_t(0); i_t < std::floor(end_time - start_time); i_t += 1) {
         double current_central_time = start_time + i_t * 1.0;
-        central_point_id ++;
+        central_point_id++;
 
 
         while (true) {
@@ -487,10 +487,9 @@ int main(int argc, char *argv[]) {
 //                continue;
 
 //            }
-            if(left_info_vec[left_index].time_<right_info_vec[right_index].time_)
-            {
+            if (left_info_vec[left_index].time_ < right_info_vec[right_index].time_) {
                 left_index++;
-            }else{
+            } else {
                 right_index++;
             }
 
@@ -505,42 +504,40 @@ int main(int argc, char *argv[]) {
                 right_index >= right_info_vec.size() - 3) {
                 break;
             }
-            if(std::fabs(right_info_vec[right_index].time_-current_central_time)<1.0&&
-                    std::fabs(left_info_vec[left_index].time_-current_central_time)<1.0)
-            {
+            if (std::fabs(right_info_vec[right_index].time_ - current_central_time) < 1.0 &&
+                std::fabs(left_info_vec[left_index].time_ - current_central_time) < 1.0) {
 
                 noiseModel::Diagonal::shared_ptr range_noise =
-                        noiseModel::Isotropic::Sigma(1,0.01);
-                graph->add(RangeFactor<Pose3,Point3>(
+                        noiseModel::Isotropic::Sigma(1, 0.01);
+                graph->add(RangeFactor<Pose3, Point3>(
                         X(left_info_vec[left_index].index_),
                         C(central_point_id),
-                        0.5,range_noise
+                        0.5, range_noise
                 ));
 
                 graph->add(
-                        RangeFactor<Pose3,Point3>(
+                        RangeFactor<Pose3, Point3>(
                                 X(right_info_vec[right_index].index_),
                                 C(central_point_id),
-                                0.5,range_noise
+                                0.5, range_noise
                         )
                 );
 
                 initial_values.insert(
-                        C(central_point_id),Point3(Vector3(0,0,0))
+                        C(central_point_id), Point3(Vector3(0, 0, 0))
                 );
 
                 central_point_id++;
-                std::cout << "central point id :" << central_point_id << std::endl;
+
+                std::cout << "central point id :" << central_point_id << "time diff:"
+                          << left_info_vec[left_index].time_ - right_info_vec[right_index].time_ << std::endl;
 //               right_index=0;
 //                left_index=0;
                 break;
             }
 
 
-
         }
-
-
 
 
     }
@@ -589,6 +586,7 @@ int main(int argc, char *argv[]) {
      * Output Result
      */
     std::vector<double> gx, gy;
+    std::vector<double> rx, ry;
     try {
 
         ofstream test_out_put("./ResultData/test.txt");
@@ -617,6 +615,29 @@ int main(int argc, char *argv[]) {
 
         }
 
+        for (int k(right_offset); k < trace_id_r; ++k) {
+            double t_data[10] = {0};
+
+            try {
+                auto pose_result = result.at<Pose3>(X(k));
+                t_data[0] = pose_result.matrix()(0, 3);
+                t_data[1] = pose_result.matrix()(1, 3);
+                t_data[2] = pose_result.matrix()(2, 3);
+
+                rx.push_back(t_data[0]);
+                ry.push_back(t_data[1]);
+
+                test_out_put << t_data[0] << ","
+                             << t_data[1] << ","
+                             << t_data[2] << std::endl;
+
+//                auto velocity_result = result.at<Vector3>(V(k));
+//                std::cout << velocity_result.transpose() << std::endl;
+            } catch (std::exception &e) {
+                std::cout << "error when get value :" << e.what() << std::endl;
+            }
+        }
+
 
     } catch (std::exception &e) {
         std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
@@ -630,11 +651,16 @@ int main(int argc, char *argv[]) {
      * Plot Trace
      */
     plt::plot(gx, gy, "r-+");
+    plt::plot(rx, ry, "b-+");
     plt::title("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
                std::to_string(sg)
                + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
                "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading));
-    plt::show();
-
+//    plt::show();
+    plt::save("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
+              std::to_string(sg)
+              + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
+              "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading) +
+              ".png");
 
 }

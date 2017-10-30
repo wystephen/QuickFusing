@@ -63,7 +63,7 @@
 
 #include <thread>
 #include <OwnFactor/MagConstraintFactor.h>
-#include "ImuKeyPointInfo.h
+#include <ImuKeyPointInfo.h>
 
 using namespace gtsam;
 using namespace std;
@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
     Pose3 prior_pose(prior_rotation, prior_point);
 
 
-    Vector3 prior_velocity(initial_state.tail<3>());
+    Vector3 prior_velocity(Vector3(0, 0, 0));
     imuBias::ConstantBias prior_imu_bias; // assume zero initial bias
 
     Values initial_values;
@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
     int trace_id_r(right_offset);
 
 
-    std::vector<ImuKeyPointInfo> left_info_vec,right_info_vec;
+    std::vector<ImuKeyPointInfo> left_info_vec, right_info_vec;
 
     int accumulate_preintegra_num = 0;
 
@@ -310,6 +310,31 @@ int main(int argc, char *argv[]) {
                 imuBias::ConstantBias zero_bias(Vector3(0, 0, 0),
                                                 Vector3(0, 0, 0));
 
+                graph->add(BetweenFactor<imuBias::ConstantBias>(
+                        B(trace_id_l - 1),
+                        B(trace_id_l),
+                        zero_bias, bias_noise_model
+                ));
+
+                if (zupt_flag > 0.5) {
+                    noiseModel::Diagonal::shared_ptr velocity_noise =
+                            noiseModel::Isotropic::Sigma(3, sv);
+
+
+                    PriorFactor<Vector3> zero_velocity(V(trace_id_l),
+                                                       Vector3(0.0, 0.0, 0.0),
+                                                       velocity_noise);
+
+                    graph->add(zero_velocity);
+
+
+                    left_info_vec.push_back(ImuKeyPointInfo(
+                            trace_id_l,
+                            imudata_l.block(index, 0, 1, 10).transpose()
+                    ));
+                }
+
+
             } catch (...) {
                 assert(true);
             }
@@ -323,6 +348,170 @@ int main(int argc, char *argv[]) {
 
 
     }
+
+    /**
+     * start add right imu
+     */
+
+    accumulate_preintegra_num = 0;
+    for (int index(0); index < imudata_r.rows(); ++index) {
+        double zupt_flag = 0.0;
+        if (index <= initial_para.ZeroDetectorWindowSize_) {
+            zupt_flag = 1.0;
+        } else {
+            if (GLRT_Detector(
+                    imudata_r.block(index - initial_para.ZeroDetectorWindowSize_, 1,
+                                    initial_para.ZeroDetectorWindowSize_, 6).transpose().eval(),
+                    initial_para)) {
+                zupt_flag = 1.0;
+            }
+        }
+
+        /// Integrated part
+        accumulate_preintegra_num++;
+        if (accumulate_preintegra_num > 15) {
+            accumulate_preintegra_num = 0;
+            trace_id_l++;
+
+            PreintegratedImuMeasurements *preint_imu =
+                    dynamic_cast<PreintegratedImuMeasurements *> (imu_preintegrated_r_);
+            try {
+
+                graph->add(ImuFactor(X(trace_id_r - 1), V(trace_id_r - 1),
+                                     X(trace_id_r), V(trace_id_r),
+                                     B(trace_id_r), *preint_imu));
+
+                preint_imu->resetIntegration();
+
+                imuBias::ConstantBias zero_bias(Vector3(0, 0, 0),
+                                                Vector3(0, 0, 0));
+
+                graph->add(BetweenFactor<imuBias::ConstantBias>(
+                        B(trace_id_r - 1),
+                        B(trace_id_r),
+                        zero_bias, bias_noise_model
+                ));
+
+                if (zupt_flag > 0.5) {
+                    noiseModel::Diagonal::shared_ptr velocity_noise =
+                            noiseModel::Isotropic::Sigma(3, sv);
+
+
+                    PriorFactor<Vector3> zero_velocity(V(trace_id_r),
+                                                       Vector3(0.0, 0.0, 0.0),
+                                                       velocity_noise);
+
+                    graph->add(zero_velocity);
+
+
+                    right_info_vec.push_back(ImuKeyPointInfo(
+                            trace_id_r,
+                            imudata_r.block(index, 0, 1, 10).transpose()
+                    ));
+                }
+
+
+            } catch (...) {
+                assert(true);
+            }
+
+
+        }
+        imu_preintegrated_r_->integrateMeasurement(
+                imudata_r.block(index, 1, 1, 3).transpose(),
+                imudata_r.block(index, 4, 1, 3).transpose(),
+                initial_para.Ts_);
+
+
+    }
+
+
+    /**
+     * Optimzation
+     */
+
+    std::cout << "begin optimizer" << std::endl;
+//    graph.print("before optimize");
+//    GaussNewtonOptimizer optimizer(*graph, initial_values);
+    LevenbergMarquardtParams lm_para;
+    lm_para.setMaxIterations(1000);
+    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
+
+
+    /// Show itereation times ~
+    std::thread thread1([&] {
+        int last_index = 0;
+        int counter = 0;
+        while (true) {
+            sleep(1);
+
+
+            if (last_index >= optimizer.iterations()) {
+                counter += 1;
+            } else {
+                std::cout << "i :" << optimizer.iterations() << std::endl;
+                counter = 0;
+            }
+
+            if (counter > 10) {
+                break;
+            }
+            last_index = int(optimizer.iterations());
+        }
+    });
+    thread1.detach();
+
+    auto result = initial_values;
+
+    result = optimizer.optimize();
+
+    /**
+     * Output Result
+     */
+    std::vector<double> gx, gy;
+    try {
+
+        ofstream test_out_put("./ResultData/test.txt");
+
+        for (int k(left_offset); k < trace_id_l; ++k) {
+            double t_data[10] = {0};
+
+            try {
+                auto pose_result = result.at<Pose3>(X(k));
+                t_data[0] = pose_result.matrix()(0, 3);
+                t_data[1] = pose_result.matrix()(1, 3);
+                t_data[2] = pose_result.matrix()(2, 3);
+
+                gx.push_back(t_data[0]);
+                gy.push_back(t_data[1]);
+
+                test_out_put << t_data[0] << ","
+                             << t_data[1] << ","
+                             << t_data[2] << std::endl;
+
+//                auto velocity_result = result.at<Vector3>(V(k));
+//                std::cout << velocity_result.transpose() << std::endl;
+            } catch (std::exception &e) {
+                std::cout << "error when get value :" << e.what() << std::endl;
+            }
+
+        }
+
+
+    } catch (std::exception &e) {
+        std::cout << e.what() << " :" << __FILE__ << ":" << __LINE__ << std::endl;
+
+    }
+
+    /**
+     * Plot Trace
+     */
+    plt::plot(gx, gy, "r-+");
+    plt::title("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
+               std::to_string(sg)
+               + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
+               "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading));
+    plt::show();
 
 
 }

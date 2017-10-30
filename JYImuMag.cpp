@@ -98,12 +98,12 @@ int main(int argc, char *argv[]) {
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
 //    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
-//    std::string dir_name = "/home/steve/Data/IU/92/";
-    std::string dir_name = "/home/steve/Data/II/20/";
+    std::string dir_name = "/home/steve/Data/IU/92/";
+//    std::string dir_name = "/home/steve/Data/II/20/";
 
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
@@ -427,20 +427,25 @@ int main(int argc, char *argv[]) {
 //                    ));
 
                     for (auto tmp_iter = zv_info_vec.begin(); tmp_iter != zv_info_vec.end(); ++tmp_iter) {
-                        if ((tmp_iter->data_vec_.block(7, 0, 3, 1).transpose() - imudata.block(index, 7, 1, 3)).norm() <
-                            20 && tmp_iter->index_ < trace_id-100) {
-                            std::cout << tmp_iter->data_vec_.block(7, 0, 3, 1).transpose()
-                                      << ":"
-                                      << imudata.block(index, 7, 1, 3)
-                                      << std::endl;
+                        if ((tmp_iter->data_vec_.block(7, 0, 3, 1).transpose() -
+                             imudata.block(index, 7, 1, 3)).norm() <
+                            10
+                            && tmp_iter->index_ < trace_id - 100) {
+//                            std::cout << tmp_iter->data_vec_.block(7, 0, 3, 1).transpose()
+//                                      << ":"
+//                                      << imudata.block(index, 7, 1, 3)
+//                                      << std::endl;
 
-                            noiseModel::Diagonal::shared_ptr mag_unit_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+                            noiseModel::Diagonal::shared_ptr mag_unit_noise =
+                                    noiseModel::Isotropic::Sigma(3, 0.9);
                             graph->add(
                                     MagConstraintRelativeFactor(
                                             X(tmp_iter->index_),
                                             X(trace_id),
-                                            (tmp_iter->data_vec_.block(7, 0, 3, 1)),
-                                            (imudata.block(index, 7, 1, 3).transpose()),
+                                            (tmp_iter->data_vec_.block(7, 0, 3, 1)) /
+                                            (tmp_iter->data_vec_.block(7, 0, 3, 1)).norm(),
+                                            (imudata.block(index, 7, 1, 3).transpose()) /
+                                            (imudata.block(index, 7, 1, 3).transpose()).norm(),
                                             mag_unit_noise
 
                                     )
@@ -469,17 +474,17 @@ int main(int argc, char *argv[]) {
 //                        ));
 //                    }
 
-
-                    if (sgravity_attitude > 0) {
-                        noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
-                                noiseModel::Isotropic::Sigma(2, sgravity_attitude);
-                        graph->add(Pose3AttitudeFactor(
-                                X(trace_id),
-                                Unit3(imudata.block(index, 1, 1, 3).transpose()),
-                                gravity_attitude_noise,
-                                Unit3(0, 0, 1)
-                        ));
-                    }
+//
+//                    if (sgravity_attitude > 0) {
+//                        noiseModel::Diagonal::shared_ptr gravity_attitude_noise =
+//                                noiseModel::Isotropic::Sigma(2, sgravity_attitude);
+//                        graph->add(Pose3AttitudeFactor(
+//                                X(trace_id),
+//                                Unit3(imudata.block(index, 1, 1, 3).transpose()),
+//                                gravity_attitude_noise,
+//                                Unit3(0, 0, 1)
+//                        ));
+//                    }
 
 
 
@@ -652,11 +657,11 @@ int main(int argc, char *argv[]) {
                + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
                "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading));
 
-    plt::save("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
-              std::to_string(sg)
-              + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
-              "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading) +
-              ".png");
+//    plt::save("img-sv:" + std::to_string(sv) + "sa:" + std::to_string(sa) + "-sg:" +
+//              std::to_string(sg)
+//              + "g:" + std::to_string(gravity) + "s_mag_att:" + std::to_string(smag_attitude) +
+//              "s_g_att:" + std::to_string(sgravity_attitude) + "initial_heading:" + std::to_string(initial_heading) +
+//              ".png");
 
 
 
@@ -664,7 +669,7 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ay);
 //    plt::plot(az);
 //    plt::plot(zupt_v);
-//    plt::show();
+    plt::show();
 
 
     return 0;

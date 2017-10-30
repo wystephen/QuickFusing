@@ -170,14 +170,14 @@ namespace gtsam {
 
     class MagConstraintRelativeFactor :
             public NoiseModelFactor2<Pose3, Pose3> {
-        const Unit3 src_nM_, target_nM_;// magnetometer values of source and target pose(3d).
+        const Vector3 src_nM_, target_nM_;// magnetometer values of source and target pose(3d).
 
     public:
         MagConstraintRelativeFactor(
                 Key key_src,
                 Key key_target,
-                const Unit3 &src_nM,
-                const Unit3 &target_nM,
+                const Vector3 &src_nM,
+                const Vector3 &target_nM,
                 const SharedNoiseModel &model) :
                 NoiseModelFactor2<Pose3, Pose3>(
                         model,
@@ -196,22 +196,22 @@ namespace gtsam {
         Vector evaluateError(
                 const Pose3 &src_Pose,
                 const Pose3 &target_Pose,
-                boost::optional<Matrix &> H1=boost::none,
+                boost::optional<Matrix &> H1 = boost::none,
                 boost::optional<Matrix &> H2 = boost::none) const {
 
-            auto src_m = src_Pose.rotation().unrotate(src_nM_);
-            auto target_m = target_m.rotation().unrotate(target_nM_);
-            if(H1)
-                *H1=I_3x3;
-            if(H2)
-                *H2=I_3x3;
+            Vector3 src_m = src_Pose.rotation().unrotate(src_nM_);
+            Vector3 target_m = target_Pose.rotation().unrotate(target_nM_);
+            if (H1)
+                *H1 = I_3x3;
+            if (H2)
+                *H2 = I_3x3;
 
+//            return Vector3(src_m(0) - target_m(0), src_m(1) - target_m(1),
+//                           src_m(2) - target_m(2));
             return src_m-target_m;
 
 
         }
-
-
 
 
     };

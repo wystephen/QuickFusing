@@ -63,6 +63,7 @@
 
 #include <thread>
 #include <OwnFactor/MagConstraintFactor.h>
+#include <ImuKeyPointInfo.h>
 
 using namespace gtsam;
 using namespace std;
@@ -265,7 +266,7 @@ int main(int argc, char *argv[]) {
     }
     vec3_nM /= vec3_nM.norm();
 
-    Rot3 tr = Rot3::RzRyRx(0.0,Rot3(prev_state.R()).pitch(),Rot3(prev_state.R()).roll());
+    Rot3 tr = Rot3::RzRyRx(0.0, Rot3(prev_state.R()).pitch(), Rot3(prev_state.R()).roll());
 
     vec3_nM = prev_state.R().matrix() * vec3_nM;
     std::cout << "initial gravity display : "
@@ -301,6 +302,7 @@ int main(int argc, char *argv[]) {
 
     int accumulate_preintegra_num = 0;
 
+    std::vector<ImuKeyPointInfo> zv_info_vec;
 
     /*
      * Main loop for positioning.
@@ -332,6 +334,7 @@ int main(int argc, char *argv[]) {
         auto result_x = myekf.GetPosition(imudata.block(index, 1, 1, 6).transpose(), zupt_flag);
         ekfx.push_back(result_x(0));
         ekfy.push_back(result_x(1));
+
 
 
 
@@ -423,17 +426,48 @@ int main(int argc, char *argv[]) {
 //                            mag_constraint_noise
 //                    ));
 
-                    if (smag_attitude > 0) {
-                        noiseModel::Diagonal::shared_ptr attitude_noise =
-                                noiseModel::Isotropic::Sigma(2, smag_attitude);
-                        graph->add(Pose3AttitudeFactor(
-                                X(trace_id),
-                                Unit3(imudata.block(index, 7, 1, 3).transpose()),
-                                attitude_noise,
-                                Unit3(vec3_nM)
+                    for (auto tmp_iter = zv_info_vec.begin(); tmp_iter != zv_info_vec.end(); ++tmp_iter) {
+                        if ((tmp_iter->data_vec_.block(7, 0, 3, 1).transpose() - imudata.block(index, 7, 1, 3)).norm() <
+                            20) {
+                            std::cout << tmp_iter->data_vec_.block(7, 0, 3, 1).transpose()
+                                      << ":"
+                                      << imudata.block(index, 7, 1, 3)
+                                      << std::endl;
 
-                        ));
+                            noiseModel::Diagonal::shared_ptr mag_unit_noise = noiseModel::Isotropic::Sigma(3, 0.1);
+                            graph->add(
+                                    MagConstraintRelativeFactor(
+                                            X(tmp_iter->index_),
+                                            X(trace_id),
+                                            Unit3(tmp_iter->data_vec_.block(7, 0, 3, 1)),
+                                            Unit3(imudata.block(index, 7, 1, 3).transpose()),
+                                            mag_unit_noise
+
+                                    )
+                            );
+                        }
                     }
+
+
+                    zv_info_vec.push_back(ImuKeyPointInfo(
+                            trace_id,
+                            imudata.block(index, 0, 1, 10).transpose()
+                    ));
+
+
+
+
+//                    if (smag_attitude > 0) {
+//                        noiseModel::Diagonal::shared_ptr attitude_noise =
+//                                noiseModel::Isotropic::Sigma(2, smag_attitude);
+//                        graph->add(Pose3AttitudeFactor(
+//                                X(trace_id),
+//                                Unit3(imudata.block(index, 7, 1, 3).transpose()),
+//                                attitude_noise,
+//                                Unit3(vec3_nM)
+//
+//                        ));
+//                    }
 
 
                     if (sgravity_attitude > 0) {

@@ -316,6 +316,7 @@ int main(int argc, char *argv[]) {
                         zero_bias, bias_noise_model
                 ));
 
+
                 if (zupt_flag > 0.5) {
                     noiseModel::Diagonal::shared_ptr velocity_noise =
                             noiseModel::Isotropic::Sigma(3, sv);
@@ -338,9 +339,26 @@ int main(int argc, char *argv[]) {
             } catch (...) {
                 assert(true);
             }
+            try {
+                Pose3 pp;
+//                    p.matrix() = myekf.getTransformation().matrix();
+                initial_values.insert(X(trace_id_l), pp);
+                initial_values.insert(V(trace_id_l), Vector3(0, 0, 0));
+                initial_values.insert(B(trace_id_l), prev_bias);
+
+
+            } catch (const std::exception &e) {
+                std::cout << "error at :" << __FILE__
+                          << " " << __LINE__ << " : " << e.what() << std::endl;
+                std::cout << initial_values.at<Pose3>(X(trace_id_l)).matrix() << std::endl;
+            } catch (...) {
+                std::cout << "unexpected error " << std::endl;
+            }
 
 
         }
+
+
         imu_preintegrated_l_->integrateMeasurement(
                 imudata_l.block(index, 1, 1, 3).transpose(),
                 imudata_l.block(index, 4, 1, 3).transpose(),
@@ -414,7 +432,21 @@ int main(int argc, char *argv[]) {
             } catch (...) {
                 assert(true);
             }
+            try {
+                Pose3 pp;
+//                    p.matrix() = myekf.getTransformation().matrix();
+                initial_values.insert(X(trace_id_r), pp);
+                initial_values.insert(V(trace_id_r), Vector3(0, 0, 0));
+                initial_values.insert(B(trace_id_r), prev_bias);
 
+
+            } catch (const std::exception &e) {
+                std::cout << "error at :" << __FILE__
+                          << " " << __LINE__ << " : " << e.what() << std::endl;
+                std::cout << initial_values.at<Pose3>(X(trace_id_r)).matrix() << std::endl;
+            } catch (...) {
+                std::cout << "unexpected error " << std::endl;
+            }
 
         }
         imu_preintegrated_r_->integrateMeasurement(

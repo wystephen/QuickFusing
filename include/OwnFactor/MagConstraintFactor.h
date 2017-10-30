@@ -153,20 +153,68 @@ namespace gtsam {
                              boost::optional<gtsam::Matrix &> H1 = boost::none,
                              boost::optional<gtsam::Matrix &> H2 = boost::none) const {
             Vector3 rotated_M =
-                    Pose.rotation().unrotate(nM_+bias, boost::none, H1) ;
+                    Pose.rotation().unrotate(nM_ + bias, boost::none, H1);
             if (H2)
                 *H2 = gtsam::I_3x3;
 //        std::cout << "rotated _M - measured_ :"
 //                  << (rotated_M-measured_).transpose()
 //                  << std::endl;
 
-            return Vector(rotated_M - (measured_+bias));
+            return Vector(rotated_M - (measured_ + bias));
 
 
         }
 
 
     };
-}
+
+    class MagConstraintRelativeFactor :
+            public NoiseModelFactor2<Pose3, Pose3> {
+        const Unit3 src_nM_, target_nM_;// magnetometer values of source and target pose(3d).
+
+    public:
+        MagConstraintRelativeFactor(
+                Key key_src,
+                Key key_target,
+                const Unit3 &src_nM,
+                const Unit3 &target_nM,
+                const SharedNoiseModel &model) :
+                NoiseModelFactor2<Pose3, Pose3>(
+                        model,
+                        key_src,
+                        key_target
+                ), src_nM_(src_nM), target_nM_(target_nM) {
+
+        }
+
+        virtual gtsam::NonlinearFactor::shared_ptr clone() const {
+            return boost::static_pointer_cast<NonlinearFactor>(
+                    gtsam::NonlinearFactor::shared_ptr(new MagConstraintRelativeFactor(*this))
+            );
+        }
+
+        Vector evaluateError(
+                const Pose3 &src_Pose,
+                const Pose3 &target_Pose,
+                boost::optional<Matrix &> H1=boost::none,
+                boost::optional<Matrix &> H2 = boost::none) const {
+
+            auto src_m = src_Pose.rotation().unrotate(src_nM_);
+            auto target_m = target_m.rotation().unrotate(target_nM_);
+            if(H1)
+                *H1=I_3x3;
+            if(H2)
+                *H2=I_3x3;
+
+            return src_m-target_m;
+
+
+        }
+
+
+
+
+    };
+}/// namespace gtsam
 
 #endif //QUICKFUSING_MAGCONSTRAINTFACTOR_H

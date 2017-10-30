@@ -470,9 +470,10 @@ int main(int argc, char *argv[]) {
     int left_index(0);
     int right_index(1);
 
-    for (int i_t(0); i_t < std::floor(end_time - start_time); ++i_t) {
+    for (int i_t(0); i_t < std::floor(end_time - start_time); i_t+=1) {
         double current_central_time = start_time + i_t * 1.0;
         central_point_id ++;
+
 
         while (true) {
 //            if(left_info_vec[left_index].time_<current_central_time-1.0)
@@ -529,8 +530,10 @@ int main(int argc, char *argv[]) {
                 );
 
                 central_point_id++;
-               right_index=0;
-                left_index=0;
+                std::cout << "central point id :" << central_point_id << std::endl;
+//               right_index=0;
+//                left_index=0;
+                break;
             }
 
 

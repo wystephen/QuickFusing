@@ -209,8 +209,8 @@ namespace gtsam {
             target_h1.setZero();
 
 
-            Vector3 src_m = src_Pose.rotation().unrotate(src_nM_,boost::none,src_h1);
-            Vector3 target_m = target_Pose.rotation().unrotate(target_nM_,boost::none,target_h1);
+            Vector3 src_m = src_Pose.rotation().rotate(src_nM_,boost::none,src_h1);
+            Vector3 target_m = target_Pose.rotation().rotate(target_nM_,boost::none,target_h1);
             if(H1)
             {
                 Eigen::Matrix<double,3,6> t;

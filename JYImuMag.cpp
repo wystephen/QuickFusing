@@ -437,7 +437,7 @@ int main(int argc, char *argv[]) {
 //                                      << std::endl;
 
                             noiseModel::Diagonal::shared_ptr mag_unit_noise =
-                                    noiseModel::Isotropic::Sigma(3, 0.9);
+                                    noiseModel::Isotropic::Sigma(3, 0.5);
                             graph->add(
                                     MagConstraintRelativeFactor(
                                             X(tmp_iter->index_),

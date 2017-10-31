@@ -436,6 +436,7 @@ int main(int argc, char *argv[]) {
 //                                      << imudata.block(index, 7, 1, 3)
 //                                      << std::endl;
 
+
                             noiseModel::Diagonal::shared_ptr mag_unit_noise =
                                     noiseModel::Isotropic::Sigma(3, 0.82);
                             graph->add(

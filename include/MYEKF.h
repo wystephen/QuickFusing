@@ -725,7 +725,7 @@ public:
     }
 
 
-private:
+protected:
     //Parameters in here.
     SettingPara para_;
 

@@ -28,6 +28,7 @@
 /////stamp---------
 
 #include "RangeKF.hpp"
+#include "RangeEKF.h"
 
 #include "PUWBPF.hpp"
 
@@ -36,7 +37,7 @@
 
 #include "MYEKF.h"
 
-#include <RangeEKF.h>
+//#include <RangeEKF.h>
 
 /////stamp---------
 namespace plt = matplotlibcpp;
@@ -310,6 +311,7 @@ int main(int argc, char *argv[]) {
     std::vector<double> fx, fy;
     std::vector<double> ux, uy;
     std::vector<double> sfx, sfy;
+    std::vector<double> Rekfx,Rekfy;
 
     std::cout << TimeStamp::now() - first_t << std::endl;
 
@@ -376,6 +378,11 @@ int main(int argc, char *argv[]) {
     MyEkf mixekf(init_para);
     mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
 
+    /**
+     * Range EKF
+     */
+    RangeEKF rangeEKF(init_para);
+
 
     while (true) {
         if (uwb_index >= UwbData.rows() || imu_index >= ImuData.rows()) {
@@ -432,6 +439,19 @@ int main(int argc, char *argv[]) {
             muwbpf.Evaluation(UwbData.block(uwb_index, 1, 1, UwbData.cols() - 1).transpose(),
                               0);
 
+
+            for(int Ri(1);Ri<UwbData.cols();++Ri)
+            {
+                rangeEKF.CorrectRange(beaconset.block(Ri,0,1,3).transpose(),
+                UwbData(uwb_index,Ri),
+                2.0);
+            }
+
+            auto tmp_result = rangeEKF.getTransformation();
+            Rekfx.push_back(tmp_result(0,3));
+            Rekfx.push_back(tmp_result(1,3));
+
+
             Eigen::VectorXd tmp = muwbpf.GetResult(0);
             muwbpf.Resample(-1, 0);
 
@@ -444,6 +464,9 @@ int main(int argc, char *argv[]) {
              * update imu data
              */
             mixekf.GetPosition(ImuData.block(imu_index, 1, 1, 6).transpose(),
+                               Zupt(imu_index, 0));
+
+            rangeEKF.GetPosition(ImuData.block(imu_index, 1, 1, 6).transpose(),
                                Zupt(imu_index, 0));
 
             imu_index++;
@@ -459,12 +482,13 @@ int main(int argc, char *argv[]) {
      * Show result.
      */
     plt::title(dir_name);
-    plt::named_plot("uwb_only", ux, uy, "r-+");
+    //plt::named_plot("uwb_only", ux, uy, "r-+");
     plt::named_plot("i", ix, iy, "b-+");
     plt::named_plot("mix_ekf", mx, my, "y-+");
     plt::named_plot("fusing", fx, fy, "g-+");
 
     plt::named_plot("Real pose", urx, ury, "m-");
+    plt::named_plot("RangeEKF", Rekfx,Rekfy,"r-");
 
 //    std::cout << urx.size() << ";;;;;;;;;" << irx.size() << std::endl;
 //    plt::named_plot("uwb_only_python", spx, spy, "r-+");

@@ -440,8 +440,13 @@ int main(int argc, char *argv[]) {
                               0);
 
 
-            for(int Ri(1);Ri<UwbData.cols();++Ri)
+            for(int Ri(1);Ri<UwbData.cols()-1;++Ri)
             {
+                std::cout << "uwb data";
+                std::cout.flush();
+                std::cout << Ri << " -- " ;
+                std::cout.flush();
+                std::cout << UwbData(uwb_index,Ri) << std::endl;
                 rangeEKF.CorrectRange(beaconset.block(Ri,0,1,3).transpose(),
                 UwbData(uwb_index,Ri),
                 2.0);

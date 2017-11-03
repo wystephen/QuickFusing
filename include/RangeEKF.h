@@ -45,8 +45,11 @@ public:
     bool CorrectRange(Eigen::Vector3d beacon_position,
                       double range_val, double range_sigma) {
 
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         GR.setZero();
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         GR(0, 0) = range_sigma;
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         G.setZero();
         std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         Eigen::Matrix<double, 1, 1> gfunc_val;

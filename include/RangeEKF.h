@@ -59,9 +59,11 @@ public:
         double distance = (beacon_position - x_h_.block(0, 0, 3, 1)).norm();
 
         std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+        std::cout << "distance :" << distance << " real :" << range_val << std::endl;
         for (int i(0); i < 3; ++i) {
             std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-            G(i) = (x_h_(i) - beacon_position(i)) / distance;
+            G(i) = -(x_h_(i) - beacon_position(i)) / distance;
+
 //            gfunc_val(i,0)
         }
         std::cout << __FILE__ << ":" << __LINE__ << std::endl;

@@ -36,6 +36,8 @@
 
 #include "MYEKF.h"
 
+#include <RangeEKF.h>
+
 /////stamp---------
 namespace plt = matplotlibcpp;
 
@@ -82,11 +84,11 @@ double Pdf(Eigen::Vector2d vecx,
 int main(int argc, char *argv[]) {
 // 3 300 0.2 5.0 10000 0.2 5.0 5
     int only_method = 3;
-    int only_particle_num = 1150;
+    int only_particle_num = 15;
     double only_transpose_sigma = 0.3;
     double only_eval_sigma = 5.0;
 
-    int fus_particle_num = 30000;
+    int fus_particle_num = 30;
     double fus_transpose_sigma = 1.3;
     double fus_eval_sigma = 1.0;
 
@@ -555,9 +557,9 @@ int main(int argc, char *argv[]) {
     fus_dis = fus_dis / double(fus_effect_counter);
 
 //    plt::named_plot("ux1", ux, ux);
-    plt::save(dir_name + std::to_string(TimeStamp::now()) + "-" +
-              std::to_string(only_dis) + "-"
-              + std::to_string(fus_dis) + ".eps");
+//    plt::save(dir_name + std::to_string(TimeStamp::now()) + "-" +
+//              std::to_string(only_dis) + "-"
+//              + std::to_string(fus_dis) + ".eps");
     std::ofstream log_file(dir_name + "log.txt", std::ios::app);
     log_file.precision(20);
     log_file << " time :" << TimeStamp::now()
@@ -588,7 +590,7 @@ int main(int argc, char *argv[]) {
               "fus error:" << fus_dis <<
               "dir name :" << out_dir_name << std::endl;
     plt::grid(true);
-//    plt::show();
+    plt::show();
 
 
 }

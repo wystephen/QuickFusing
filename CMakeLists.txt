@@ -179,6 +179,10 @@ target_link_libraries(fun_test ${PYTHON_LIBRARIES})
 add_executable(pf_test pf_test.cpp)
 target_link_libraries(pf_test ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 #
+add_executable(RangeEkfTest RangeEkfTest.cpp)
+target_link_libraries(RangeEkfTest ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+
+#
 add_executable(SophusTest SophusTest.cpp)
 target_link_libraries(SophusTest ${Sophus_LIBRARIES})
 

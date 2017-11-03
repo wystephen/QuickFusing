@@ -447,9 +447,9 @@ int main(int argc, char *argv[]) {
                 std::cout << Ri << " -- " ;
                 std::cout.flush();
                 std::cout << UwbData(uwb_index,Ri) << std::endl;
-                rangeEKF.CorrectRange(beaconset.block(Ri,0,1,3).transpose(),
-                UwbData(uwb_index,Ri),
-                2.0);
+//                rangeEKF.CorrectRange(beaconset.block(Ri,0,1,3).transpose(),
+//                UwbData(uwb_index,Ri),
+//                2.0);
             }
 
             auto tmp_result = rangeEKF.getTransformation();

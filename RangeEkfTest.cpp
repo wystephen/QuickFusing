@@ -382,6 +382,7 @@ int main(int argc, char *argv[]) {
      * Range EKF
      */
     RangeEKF rangeEKF(init_para);
+    rangeEKF.InitNavEq(ImuData.block(0, 1, 20, 6));
 
 
     while (true) {
@@ -440,21 +441,21 @@ int main(int argc, char *argv[]) {
                               0);
 
 
-            for(int Ri(1);Ri<UwbData.cols()-1;++Ri)
-            {
-                std::cout << "uwb data";
-                std::cout.flush();
-                std::cout << Ri << " -- " ;
-                std::cout.flush();
-                std::cout << UwbData(uwb_index,Ri) << std::endl;
-//                rangeEKF.CorrectRange(beaconset.block(Ri,0,1,3).transpose(),
-//                UwbData(uwb_index,Ri),
-//                2.0);
-            }
+//            for(int Ri(1);Ri<UwbData.cols()-1;++Ri)
+//            {
+//                std::cout << "uwb data";
+//                std::cout.flush();
+//                std::cout << Ri << " -- " ;
+//                std::cout.flush();
+//                std::cout << UwbData(uwb_index,Ri) << std::endl;
+////                rangeEKF.CorrectRange(beaconset.block(Ri,0,1,3).transpose(),
+////                UwbData(uwb_index,Ri),
+////                2.0);
+//            }
 
-            auto tmp_result = rangeEKF.getTransformation();
-            Rekfx.push_back(tmp_result(0,3));
-            Rekfx.push_back(tmp_result(1,3));
+//            auto tmp_result = rangeEKF.getTransformation();
+//            Rekfx.push_back(tmp_result(0,3));
+//            Rekfx.push_back(tmp_result(1,3));
 
 
             Eigen::VectorXd tmp = muwbpf.GetResult(0);

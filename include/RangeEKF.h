@@ -73,7 +73,7 @@ public:
         if (JustDebugging) std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
 
-        Eigen::MatrixXd GK = P_ * G.transpose().eval() * (G * P_ * G.transpose().eval() + GR).inverse();
+        Eigen::MatrixXd GK = tP_ * G.transpose().eval() * (G * tP_ * G.transpose().eval() + GR).inverse();
         if (JustDebugging) std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
 //        x_h_ = x_h_ + GK * (range_val - distance);

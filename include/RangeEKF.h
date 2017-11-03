@@ -47,7 +47,7 @@ public:
                       double range_val, double range_sigma) {
         bool JustDebugging = false;
         tP_.setOnes();
-        tP_ *= 0.1;
+        tP_ *= 0.01;
 
         if (JustDebugging) std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         GR.setZero();
@@ -66,9 +66,7 @@ public:
 
         for (int i(0); i < 3; ++i) {
             if (JustDebugging) std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-            G(i) = -(x_h_(i) - beacon_position(i)) / distance;
-
-//            gfunc_val(i,0)
+            G(i) = (x_h_(i) - beacon_position(i)) / distance;
         }
         if (JustDebugging) std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
@@ -76,8 +74,9 @@ public:
         Eigen::MatrixXd GK = tP_ * G.transpose().eval() * (G * tP_ * G.transpose().eval() + GR).inverse();
         if (JustDebugging) std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
-//        x_h_ = x_h_ + GK * (range_val - distance);
-        x_h_.block(0,0,3,1) = x_h_.block(0,0,3,1) + GK.block(0,0,3,1)/GK.block(0,0,3,1).norm() * 0.1 * (range_val-distance) * 0.1;
+        x_h_ = x_h_ + GK * (range_val - distance);
+//        x_h_.block(0,0,3,1) = x_h_.block(0,0,3,1) + GK.block(0,0,3,1)/GK.block(0,0,3,1).norm() * 0.1 * (range_val-distance) * 0.1;
+//        x_h_.block(0,0,3,1) = x_h_.block(0,0,3,1) +
         if (JustDebugging) std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         std::cout << "distance :" << distance
                   << "new dist :" << (beacon_position-x_h_.block(0,0,3,1)).norm()

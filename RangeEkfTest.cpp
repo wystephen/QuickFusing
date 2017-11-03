@@ -441,21 +441,21 @@ int main(int argc, char *argv[]) {
                               0);
 
 
-//            for(int Ri(1);Ri<UwbData.cols()-1;++Ri)
-//            {
+            for(int Ri(1);Ri<UwbData.cols()-1;++Ri)
+            {
 //                std::cout << "uwb data";
 //                std::cout.flush();
 //                std::cout << Ri << " -- " ;
 //                std::cout.flush();
 //                std::cout << UwbData(uwb_index,Ri) << std::endl;
-////                rangeEKF.CorrectRange(beaconset.block(Ri,0,1,3).transpose(),
-////                UwbData(uwb_index,Ri),
-////                2.0);
-//            }
+                rangeEKF.CorrectRange(beaconset.block(Ri,0,1,3).transpose(),
+                UwbData(uwb_index,Ri),
+                10.0);
+            }
 
-//            auto tmp_result = rangeEKF.getTransformation();
-//            Rekfx.push_back(tmp_result(0,3));
-//            Rekfx.push_back(tmp_result(1,3));
+            Eigen::Isometry3d tmp_result = rangeEKF.getTransformation();
+            Rekfx.push_back(double(tmp_result(0,3)));
+            Rekfy.push_back(double(tmp_result(1,3)));
 
 
             Eigen::VectorXd tmp = muwbpf.GetResult(0);
@@ -494,7 +494,11 @@ int main(int argc, char *argv[]) {
     plt::named_plot("fusing", fx, fy, "g-+");
 
     plt::named_plot("Real pose", urx, ury, "m-");
+    std::cout << "rekfx size :" << Rekfx.size()
+              << " pf size   :" << fx.size()
+              << std::endl;
     plt::named_plot("RangeEKF", Rekfx,Rekfy,"r-");
+    std::cout << "after plt" << std::endl;
 
 //    std::cout << urx.size() << ";;;;;;;;;" << irx.size() << std::endl;
 //    plt::named_plot("uwb_only_python", spx, spy, "r-+");

@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     double fus_transpose_sigma = 1.3;
     double fus_eval_sigma = 1.0;
 
-    int data_num = 3;
+    int data_num = 5;
 
     std::string out_dir_name = "./";
     std::string dir_name = "/home/steve/locate/";

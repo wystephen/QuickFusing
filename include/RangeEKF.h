@@ -46,8 +46,9 @@ public:
     bool CorrectRange(Eigen::Vector3d beacon_position,
                       double range_val, double range_sigma) {
         bool JustDebugging = false;
-        tP_.setOnes();
-        tP_ *= 0.01;
+//        tP_.setOnes();
+//        tP_ *= 0.01;
+        tP_ = P_.eval();
 
         if (JustDebugging) std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         GR.setZero();
@@ -82,7 +83,7 @@ public:
                   << "new dist :" << (beacon_position-x_h_.block(0,0,3,1)).norm()
                   << " real :" << range_val << std::endl;
 //        std::cout << x_h_.transpose() << std::endl;
-//        std::cout << "GK:" << GK << std::endl;
+        std::cout << "GK:" << GK.transpose() << std::endl;
         return true;
     }
 

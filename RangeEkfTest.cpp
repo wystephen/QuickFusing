@@ -450,7 +450,7 @@ int main(int argc, char *argv[]) {
 //                std::cout << UwbData(uwb_index,Ri) << std::endl;
                 rangeEKF.CorrectRange(beaconset.block(Ri-1,0,1,3).transpose(),
                 UwbData(uwb_index,Ri),
-                0.51710);
+                10.0051710);
             }
 
             Eigen::Isometry3d tmp_result = rangeEKF.getTransformation();

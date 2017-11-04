@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     double fus_transpose_sigma = 1.3;
     double fus_eval_sigma = 1.0;
 
-    int data_num = 5;
+    int data_num = 3;
 
     std::string out_dir_name = "./";
     std::string dir_name = "/home/steve/locate/";
@@ -450,7 +450,7 @@ int main(int argc, char *argv[]) {
 //                std::cout << UwbData(uwb_index,Ri) << std::endl;
                 rangeEKF.CorrectRange(beaconset.block(Ri-1,0,1,3).transpose(),
                 UwbData(uwb_index,Ri),
-                0.011710);
+                0.51710);
             }
 
             Eigen::Isometry3d tmp_result = rangeEKF.getTransformation();
@@ -528,15 +528,18 @@ int main(int argc, char *argv[]) {
     std::ofstream pwubf(out_dir_name + "uwb.txt");
     std::ofstream imuf(out_dir_name + "imu.txt");
     std::ofstream fusf(out_dir_name + "fus.txt");
+    std::ofstream rangeekf(out_dir_name+"rekf.txt");
     std::ofstream fustimef(out_dir_name + "fustime.txt");
     std::ofstream puwbtime(out_dir_name + "puwbtime.txt");
     pwubf.precision(10);
     imuf.precision(10);
     fusf.precision(10);
+    std::cout << "out dir name : " << out_dir_name << std::endl;
     // uwb and fusing
     for (int i(0); i < ux.size(); ++i) {
         pwubf << ux[i] << " " << uy[i] << std::endl;
         fusf << fx[i] << " " << fy[i] << std::endl;
+        rangeekf << Rekfx[i] << " " << Rekfy[i] << std::endl;
 
     }
     for (int i(0); i < mx.size(); ++i) {

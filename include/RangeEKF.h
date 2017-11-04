@@ -79,11 +79,11 @@ public:
 //        x_h_.block(0,0,3,1) = x_h_.block(0,0,3,1) + GK.block(0,0,3,1)/GK.block(0,0,3,1).norm() * 0.1 * (range_val-distance) * 0.1;
 //        x_h_.block(0,0,3,1) = x_h_.block(0,0,3,1) +
         if (JustDebugging) std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-        std::cout << "distance :" << distance
-                  << "new dist :" << (beacon_position-x_h_.block(0,0,3,1)).norm()
-                  << " real :" << range_val << std::endl;
+//        std::cout << "distance :" << distance
+//                  << "new dist :" << (beacon_position-x_h_.block(0,0,3,1)).norm()
+//                  << " real :" << range_val << std::endl;
 //        std::cout << x_h_.transpose() << std::endl;
-        std::cout << "GK:" << GK.transpose() << std::endl;
+//        std::cout << "GK:" << GK.transpose() << std::endl;
         return true;
     }
 

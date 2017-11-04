@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     double fus_transpose_sigma = 1.3;
     double fus_eval_sigma = 1.0;
 
-    int data_num = 5;
+    int data_num = 3;
 
     std::string out_dir_name = "./";
     std::string dir_name = "/home/steve/locate/";
@@ -450,7 +450,7 @@ int main(int argc, char *argv[]) {
 //                std::cout << UwbData(uwb_index,Ri) << std::endl;
                 rangeEKF.CorrectRange(beaconset.block(Ri-1,0,1,3).transpose(),
                 UwbData(uwb_index,Ri),
-                10.0051710);
+                1000.0051710);
             }
 
             Eigen::Isometry3d tmp_result = rangeEKF.getTransformation();

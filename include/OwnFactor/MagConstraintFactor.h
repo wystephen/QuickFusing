@@ -227,13 +227,6 @@ namespace gtsam {
 
 
 
-//            if (H1)
-//                *H1 = Matrix33();
-//            if (H2)
-//                *H2 = I_3x3;
-
-//            return Vector3(src_m(0) - target_m(0), src_m(1) - target_m(1),
-//                           src_m(2) - target_m(2));
             return src_m - target_m;
 
 

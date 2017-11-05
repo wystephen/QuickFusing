@@ -195,6 +195,14 @@ namespace gtsam {
             );
         }
 
+        /**
+         *
+         * @param src_Pose (x,y,z,roll,pitch,yaw)
+         * @param target_Pose (x,y,z,roll,pitch,yaw)
+         * @param H1 Jacobian matrix for src_Pose
+         * @param H2
+         * @return
+         */
         Vector evaluateError(
                 const Pose3 &src_Pose,
                 const Pose3 &target_Pose,

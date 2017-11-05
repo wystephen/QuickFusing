@@ -225,8 +225,6 @@ namespace gtsam {
             }
 
 
-
-
             return src_m - target_m;
 
 

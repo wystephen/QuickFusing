@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
      */
 
     std::cout << "start initial GRAPH" << std::endl;
-    ISAM2GaussNewtonParams isam2GaussNewtonParams(0.001);
+    ISAM2DoglegParams isam2GaussNewtonParams(0.001);
     ISAM2Params isam2Params(isam2GaussNewtonParams);
     isam2Params.relinearizeThreshold = 0.0001;
 //    isam2Params.relinearizeSkip = 1;
@@ -568,6 +568,9 @@ int main(int argc, char *argv[]) {
         isam2.update(*graph,initial_values);
         graph->resize(0);
         initial_values.clear();
+
+        std::cout << "trace id :" << trace_id << std::endl;
+
         last_zupt_flag = zupt_flag;
 
 
@@ -581,37 +584,38 @@ int main(int argc, char *argv[]) {
     std::cout << "begin optimizer" << std::endl;
 //    graph.print("before optimize");
 //    GaussNewtonOptimizer optimizer(*graph, initial_values);
-    LevenbergMarquardtParams lm_para;
-    lm_para.setMaxIterations(1000);
-    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
+//    LevenbergMarquardtParams lm_para;
+//    lm_para.setMaxIterations(1000);
+//    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
 
 
     /// Show itereation times ~
-    std::thread thread1([&] {
-        int last_index = 0;
-        int counter = 0;
-        while (true) {
-            sleep(1);
-
-
-            if (last_index >= optimizer.iterations()) {
-                counter += 1;
-            } else {
-                std::cout << "i :" << optimizer.iterations() << std::endl;
-                counter = 0;
-            }
-
-            if (counter > 10) {
-                break;
-            }
-            last_index = int(optimizer.iterations());
-        }
-    });
-    thread1.detach();
+//    std::thread thread1([&] {
+//        int last_index = 0;
+//        int counter = 0;
+//        while (true) {
+//            sleep(1);
+//
+//
+//            if (last_index >= optimizer.iterations()) {
+//                counter += 1;
+//            } else {
+//                std::cout << "i :" << optimizer.iterations() << std::endl;
+//                counter = 0;
+//            }
+//
+//            if (counter > 10) {
+//                break;
+//            }
+//            last_index = int(optimizer.iterations());
+//        }
+//    });
+//    thread1.detach();
 
     auto result = initial_values;
 
-    result = optimizer.optimize();
+//    result = optimizer.optimize();
+    result  = isam2.calculateEstimate();
 
 
     /**

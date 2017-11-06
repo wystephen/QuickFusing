@@ -30,6 +30,7 @@
 #include <sophus/se3.h>
 #include <sophus/so3.h>
 #include <Zero_Detecter.h>
+#include <OwnEdge/RelativeMagEdge.h>
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
@@ -59,6 +60,9 @@
 #include "OwnEdge/OrientationEdge.h"
 #include "OwnEdge/OrientationEdge.cpp"
 
+#include "OwnEdge/RelativeMagEdge.h"
+#include "OwnEdge/RelativeMagEdge.cpp"
+
 //#include "OwnEdge/Line2D.h"
 //#include "OwnEdge/Line2D.cpp"
 //#include "OwnEdge/Point2Line2D.h"
@@ -69,6 +73,8 @@
 //#include "g2o_types_slam3d_addons_api.h"
 //#include "g2o/types/slam3d_addons/line3d.h"
 
+
+#include "ImuKeyPointInfo.h"
 
 
 G2O_USE_TYPE_GROUP(slam3d)
@@ -247,6 +253,8 @@ int main(int argc, char *argv[]) {
     Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
     double last_theta = 0.0;
 
+    std::vector<ImuKeyPointInfo> key_info_mag;
+
     for (int index(0); index < imudata.rows(); ++index) {
 //        std::cout << "index:" << index << std::endl;
         double zupt_flag = 0.0;
@@ -357,6 +365,25 @@ int main(int argc, char *argv[]) {
 //            edge_ori->setRobustKernel(robustKernel);
 //
 //            globalOptimizer.addEdge(edge_ori);
+            /// Add ..
+            for( auto iter = key_info_mag.begin();
+                    iter != key_info_mag.end();
+                    iter++)
+            {
+                if((iter->data_vec_.block(7,0,3,1).transpose()-
+                imudata.block(index,7,1,3)).norm()<30)
+                {
+                    auto *mag_edge = RelativeMagEdge(iter->data_vec_.block(7,0,3,1),
+                    imudata.block(index,7,1,3).transpose());
+
+                }
+            }
+
+            key_info_mag.push_back(ImuKeyPointInfo(trace_id,
+            imudata.block(index,0,1,10)));
+
+
+
 
 
             trace_id++;

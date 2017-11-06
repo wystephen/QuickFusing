@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
 
     /// Global parameters
     double first_info(10), second_info(10 * M_PI / 180.0);
-    double ori_info(10);
+    double ori_info(100);
 
     double turn_threshold = 1000.0;
     double corner_ratio = 10.0;
@@ -278,7 +278,7 @@ int main(int argc, char *argv[]) {
                 zupt_flag = 1.0;
             }
         }
-        std::cout << "index:" << index << " zupt state: " << zupt_flag << std::endl;
+//        std::cout << "index:" << index << " zupt state: " << zupt_flag << std::endl;
         ///ZUPT GET POSITION
         auto tx = myekf.GetPosition(imudata.block(index, 1, 1, 6).transpose(), zupt_flag);
 
@@ -371,30 +371,30 @@ int main(int argc, char *argv[]) {
                     iter++)
             {
                 if((iter->data_vec_.block(7,0,3,1).transpose()-
-                imudata.block(index,7,1,3)).norm()<30)
+                imudata.block(index,7,1,3)).norm()<10)
                 {
                     std::cout << "src :" << iter->data_vec_.block(7,0,3,1) << std::endl;
-                    std::cout << "target :" << imudata.block(index,7,1,3) << std::endl;
+                    std::cout << "target :" << imudata.block(index,7,1,3).transpose() << std::endl;
                     auto *mag_edge = new RelativeMagEdge(iter->data_vec_.block(7,0,3,1),
                     imudata.block(index,7,1,3).transpose());
 //
-//                    mag_edge->vertices()[0] = globalOptimizer.vertex(iter->index_);
-//                    mag_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+                    mag_edge->vertices()[0] = globalOptimizer.vertex(iter->index_);
+                    mag_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 //
-//                    Eigen::Matrix<double,3,3> information_matrix = Eigen::Matrix<double,3,3>::Identity();
-//                    information_matrix *= ori_info;
-//
-//                    mag_edge->setInformation(information_matrix);
-//
-//                    mag_edge->setMeasurement(Eigen::Vector3d(0,0,0));
-//
-//                    globalOptimizer.addEdge(mag_edge);
+                    Eigen::Matrix<double,3,3> information_matrix = Eigen::Matrix<double,3,3>::Identity();
+                    information_matrix *= ori_info;
+
+                    mag_edge->setInformation(information_matrix);
+
+                    mag_edge->setMeasurement(Eigen::Vector3d(0,0,0));
+
+                    globalOptimizer.addEdge(mag_edge);
 //
                 }
             }
 
             key_info_mag.push_back(ImuKeyPointInfo(trace_id,
-            imudata.block(index,0,1,10)));
+            imudata.block(index,0,1,10).transpose()));
 
 
 
@@ -417,7 +417,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.setVerbose(true);
     globalOptimizer.initializeOptimization();
-    globalOptimizer.optimize(30000);
+    globalOptimizer.optimize(3000);
 
     for (int k(0); k < trace_id; ++k) {
         double t_data[10] = {0};

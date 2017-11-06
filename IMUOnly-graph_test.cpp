@@ -29,6 +29,7 @@
 #include <Eigen/Geometry>
 #include <sophus/se3.h>
 #include <sophus/so3.h>
+#include <Zero_Detecter.h>
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
@@ -144,7 +145,8 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
+//    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
+    std::string dir_name = "/home/steve/Data/II/17/";
 
     /// Global parameters
     double first_info(10), second_info(10 * M_PI / 180.0);
@@ -154,7 +156,7 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
+    CppExtent::CSVReader imu_data_reader(dir_name + "Imu.csv");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
@@ -218,7 +220,7 @@ int main(int argc, char *argv[]) {
     SettingPara initial_para(true);
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
     initial_para.init_heading1_ = M_PI / 2.0;
-    initial_para.Ts_ = 1.0f / 128.0f;
+    initial_para.Ts_ = 1.0f / 200.0f;
 
     initial_para.sigma_a_ = 1.1;
     initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
@@ -228,7 +230,7 @@ int main(int argc, char *argv[]) {
     initial_para.ZeroDetectorWindowSize_ = 10;// Time windows size fo zupt detector
 
     MyEkf myekf(initial_para);
-    myekf.InitNavEq(imudata.block(0, 0, 20, 6));
+    myekf.InitNavEq(imudata.block(0, 1, 20, 6));
 
     double last_zupt_flag = 0.0;
 
@@ -248,20 +250,20 @@ int main(int argc, char *argv[]) {
 //                                       initial_para.ZeroDetectorWindowSize_, 6).cols() << std::endl;
 //
 
-            if (std::isnan(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 0,
+            if (std::isnan(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 1,
                                          initial_para.ZeroDetectorWindowSize_, 6).sum())) {
                 std::cout << " input data of GLRT is nana " << std::endl;
             }
-            if (GLRT_Detector_special(
+            if (GLRT_Detector(
                     imudata.block(index - initial_para.ZeroDetectorWindowSize_,
-                                  0, initial_para.ZeroDetectorWindowSize_, 6).transpose(),
+                                  1, initial_para.ZeroDetectorWindowSize_, 6).transpose(),
                     initial_para)) {
                 zupt_flag = 1.0;
             }
         }
         std::cout << "index:" << index << " zupt state: " << zupt_flag << std::endl;
         ///ZUPT GET POSITION
-        auto tx = myekf.GetPosition(imudata.block(index, 0, 1, 6).transpose(), zupt_flag);
+        auto tx = myekf.GetPosition(imudata.block(index, 1, 1, 6).transpose(), zupt_flag);
 
         if ((zupt_flag < 0.5 && last_zupt_flag > 0.5)) {
             std::cout << "index: " << index << "key step"

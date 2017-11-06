@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    double sa(0.01), sg(0.02 / 180.0 * M_PI), sv(0.000001);
+    double sa(0.01), sg(0.05 / 180.0 * M_PI), sv(0.000001);
     double gravity(9.6), smag_attitude(0.1), sgravity_attitude(-1.7);
     double initial_heading = 180.0 / 180.0 * M_PI;
     if (argc >= 4) {
@@ -429,28 +429,28 @@ int main(int argc, char *argv[]) {
 
 
 
-                    for (auto tmp_iter = zv_info_vec.begin(); tmp_iter != zv_info_vec.end(); ++tmp_iter) {
-                        if ((tmp_iter->data_vec_.block(7, 0, 3, 1).transpose() -
-                             imudata.block(index, 7, 1, 3)).norm() <
-                            30
-                            || tmp_iter->index_ > trace_id - 20) {
-
-                            noiseModel::Diagonal::shared_ptr mag_unit_noise =
-                                    noiseModel::Isotropic::Sigma(3, 0.82);
-                            graph->add(
-                                    MagConstraintRelativeFactor(
-                                            X(tmp_iter->index_),
-                                            X(trace_id),
-                                            (tmp_iter->data_vec_.block(7, 0, 3, 1)) /
-                                            (tmp_iter->data_vec_.block(7, 0, 3, 1)).norm(),
-                                            (imudata.block(index, 7, 1, 3).transpose()) /
-                                            (imudata.block(index, 7, 1, 3).transpose()).norm(),
-                                            mag_unit_noise
-
-                                    )
-                            );
-                        }
-                    }
+//                    for (auto tmp_iter = zv_info_vec.begin(); tmp_iter != zv_info_vec.end(); ++tmp_iter) {
+//                        if ((tmp_iter->data_vec_.block(7, 0, 3, 1).transpose() -
+//                             imudata.block(index, 7, 1, 3)).norm() <
+//                            30
+//                            || tmp_iter->index_ > trace_id - 20) {
+//
+//                            noiseModel::Diagonal::shared_ptr mag_unit_noise =
+//                                    noiseModel::Isotropic::Sigma(3, 0.82);
+//                            graph->add(
+//                                    MagConstraintRelativeFactor(
+//                                            X(tmp_iter->index_),
+//                                            X(trace_id),
+//                                            (tmp_iter->data_vec_.block(7, 0, 3, 1)) /
+//                                            (tmp_iter->data_vec_.block(7, 0, 3, 1)).norm(),
+//                                            (imudata.block(index, 7, 1, 3).transpose()) /
+//                                            (imudata.block(index, 7, 1, 3).transpose()).norm(),
+//                                            mag_unit_noise
+//
+//                                    )
+//                            );
+//                        }
+//                    }
 
 
                     zv_info_vec.push_back(ImuKeyPointInfo(

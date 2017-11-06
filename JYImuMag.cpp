@@ -98,12 +98,13 @@ int main(int argc, char *argv[]) {
      */
 //    std::string dir_name = "/home/steve/Data/AttitudeIMU/";
 //    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/91/";
-    std::string dir_name = "/home/steve/Data/IU/92/";
-//    std::string dir_name = "/home/steve/Data/II/20/";
+//    std::string dir_name = "/home/steve/Data/IU/92/";
+    std::string dir_name = "/home/steve/Data/II/17/";
 
 
 //    CppExtent::CSVReader imu_data_reader(dir_name + "ImuData.csv");
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+//    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
@@ -433,11 +434,6 @@ int main(int argc, char *argv[]) {
                              imudata.block(index, 7, 1, 3)).norm() <
                             30
                             || tmp_iter->index_ > trace_id - 20) {
-//                            std::cout << tmp_iter->data_vec_.block(7, 0, 3, 1).transpose()
-//                                      << ":"
-//                                      << imudata.block(index, 7, 1, 3)
-//                                      << std::endl;
-
 
                             noiseModel::Diagonal::shared_ptr mag_unit_noise =
                                     noiseModel::Isotropic::Sigma(3, 0.82);

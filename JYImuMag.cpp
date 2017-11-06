@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    double sa(0.01), sg(0.05 / 180.0 * M_PI), sv(0.000001);
+    double sa(0.1), sg(0.05 / 180.0 * M_PI), sv(0.000001);
     double gravity(9.6), smag_attitude(0.1), sgravity_attitude(-1.7);
     double initial_heading = 180.0 / 180.0 * M_PI;
     if (argc >= 4) {

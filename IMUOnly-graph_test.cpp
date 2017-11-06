@@ -156,17 +156,24 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "Imu.csv");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
     imudata.setZero();
     auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
-
+    Eigen::Vector3d central(-25, -128, 80);
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
+            if (0 < j && j < 4) {
+                imudata(i, j) *= 9.81;
+            } else if (4 <= j && j < 7) {
+                imudata(i, j) *= (M_PI / 180.0f);
+            } else if (7 <= j && j < 10) {
+                imudata(i, j) = (imudata(i, j) - central(j - 7));///scale_axis(j-7);
+            }
         }
     }
     std::cout << "imu data size: " << imudata.rows() << "x"
@@ -222,12 +229,14 @@ int main(int argc, char *argv[]) {
     initial_para.init_heading1_ = M_PI / 2.0;
     initial_para.Ts_ = 1.0f / 200.0f;
 
+
+
     initial_para.sigma_a_ = 1.1;
     initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
 //    initial_para.sigma_a_ /= 3.0;
 //    initial_para.sigma_g_ /= 3.0;
 
-    initial_para.ZeroDetectorWindowSize_ = 10;// Time windows size fo zupt detector
+    initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 1, 20, 6));
@@ -325,29 +334,29 @@ int main(int argc, char *argv[]) {
             }
 
             /// add ori edg
-            auto *edge_ori = new OrientationEdge();
-
-            edge_ori->vertices()[0] = globalOptimizer.vertex(trace_id);
-            edge_ori->vertices()[1] = globalOptimizer.vertex(attitude_vertex_id);
-
-
-            Eigen::Matrix<double, 3, 3> information = Eigen::Matrix<double, 3, 3>::Identity();
-            information *= ori_info;
-
-            edge_ori->setInformation(information);
-
-            Sophus::SO3 ori_so3(
-                    Eigen::Quaterniond(imudata(index, 12), imudata(index, 10), imudata(index, 11), imudata(index, 9)));
-            ori_1.push_back(ori_so3.log()(0));
-            ori_2.push_back(ori_so3.log()(1));
-            ori_3.push_back(ori_so3.log()(2));
-
-            edge_ori->setMeasurement(ori_so3);
-            /// robust kernel
-            static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct("Cauchy");
-            edge_ori->setRobustKernel(robustKernel);
-
-            globalOptimizer.addEdge(edge_ori);
+//            auto *edge_ori = new OrientationEdge();
+//
+//            edge_ori->vertices()[0] = globalOptimizer.vertex(trace_id);
+//            edge_ori->vertices()[1] = globalOptimizer.vertex(attitude_vertex_id);
+//
+//
+//            Eigen::Matrix<double, 3, 3> information = Eigen::Matrix<double, 3, 3>::Identity();
+//            information *= ori_info;
+//
+//            edge_ori->setInformation(information);
+//
+//            Sophus::SO3 ori_so3(
+//                    Eigen::Quaterniond(imudata(index, 12), imudata(index, 10), imudata(index, 11), imudata(index, 9)));
+//            ori_1.push_back(ori_so3.log()(0));
+//            ori_2.push_back(ori_so3.log()(1));
+//            ori_3.push_back(ori_so3.log()(2));
+//
+//            edge_ori->setMeasurement(ori_so3);
+//            /// robust kernel
+//            static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct("Cauchy");
+//            edge_ori->setRobustKernel(robustKernel);
+//
+//            globalOptimizer.addEdge(edge_ori);
 
 
             trace_id++;

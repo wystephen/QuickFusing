@@ -373,8 +373,20 @@ int main(int argc, char *argv[]) {
                 if((iter->data_vec_.block(7,0,3,1).transpose()-
                 imudata.block(index,7,1,3)).norm()<30)
                 {
-                    auto *mag_edge = RelativeMagEdge(iter->data_vec_.block(7,0,3,1),
+                    auto *mag_edge = new RelativeMagEdge(iter->data_vec_.block(7,0,3,1),
                     imudata.block(index,7,1,3).transpose());
+
+                    mag_edge->vertices()[0] = globalOptimizer.vertex(iter->index_);
+                    mag_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+                    Eigen::Matrix<double,3,3> information_matrix = Eigen::Matrix<double,3,3>::Identity();
+                    information_matrix *= ori_info;
+
+                    mag_edge->setInformation(information_matrix);
+
+                    mag_edge->setMeasurement(Eigen::Vector3d(0,0,0));
+
+                    globalOptimizer.addEdge(mag_edge);
 
                 }
             }

@@ -566,9 +566,6 @@ int main(int argc, char *argv[]) {
                                                  imudata.block(index, 4, 1, 3).transpose(),
                                                  initial_para.Ts_);
 
-
-
-
         last_zupt_flag = zupt_flag;
 
 
@@ -582,37 +579,37 @@ int main(int argc, char *argv[]) {
     std::cout << "begin optimizer" << std::endl;
 //    graph.print("before optimize");
 //    GaussNewtonOptimizer optimizer(*graph, initial_values);
-//    LevenbergMarquardtParams lm_para;
-//    lm_para.setMaxIterations(1000);
-//    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
+    LevenbergMarquardtParams lm_para;
+    lm_para.setMaxIterations(1000);
+    LevenbergMarquardtOptimizer optimizer(*graph, initial_values, lm_para);
 
 
     /// Show itereation times ~
-//    std::thread thread1([&] {
-//        int last_index = 0;
-//        int counter = 0;
-//        while (true) {
-//            sleep(1);
-//
-//
-//            if (last_index >= optimizer.iterations()) {
-//                counter += 1;
-//            } else {
-//                std::cout << "i :" << optimizer.iterations() << std::endl;
-//                counter = 0;
-//            }
-//
-//            if (counter > 10) {
-//                break;
-//            }
-//            last_index = int(optimizer.iterations());
-//        }
-//    });
-//    thread1.detach();
+    std::thread thread1([&] {
+        int last_index = 0;
+        int counter = 0;
+        while (true) {
+            sleep(1);
+
+
+            if (last_index >= optimizer.iterations()) {
+                counter += 1;
+            } else {
+                std::cout << "i :" << optimizer.iterations() << std::endl;
+                counter = 0;
+            }
+
+            if (counter > 10) {
+                break;
+            }
+            last_index = int(optimizer.iterations());
+        }
+    });
+    thread1.detach();
 
     auto result = initial_values;
 
-//    result = optimizer.optimize();
+    result = optimizer.optimize();
 
 
     /**

@@ -175,6 +175,15 @@ namespace gtsam {
         const Vector3 src_nM_, target_nM_;// magnetometer values of source and target pose(3d).
 
     public:
+
+        /**
+         *
+         * @param key_src
+         * @param key_target
+         * @param src_nM
+         * @param target_nM
+         * @param model
+         */
         MagConstraintRelativeFactor(
                 Key key_src,
                 Key key_target,
@@ -189,6 +198,10 @@ namespace gtsam {
 
         }
 
+        /**
+         * Deep copying
+         * @return
+         */
         virtual gtsam::NonlinearFactor::shared_ptr clone() const {
             return boost::static_pointer_cast<NonlinearFactor>(
                     gtsam::NonlinearFactor::shared_ptr(new MagConstraintRelativeFactor(*this))
@@ -196,12 +209,12 @@ namespace gtsam {
         }
 
         /**
-         *
+         * Recheck the Jacobian matrix if possible.
          * @param src_Pose (x,y,z,roll,pitch,yaw)
          * @param target_Pose (x,y,z,roll,pitch,yaw)
          * @param H1 Jacobian matrix for src_Pose
-         * @param H2
-         * @return
+         * @param H2 Jacobian matrix for target_Pose
+         * @return error_vector (3-d vector)
          */
         Vector evaluateError(
                 const Pose3 &src_Pose,

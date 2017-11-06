@@ -143,7 +143,10 @@ add_executable(SCImuMag SCImuMag.cpp)
 target_link_libraries(SCImuMag
         ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES}
         -ltbb ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
-
+add_executable(JYImuMagISAM JYImuMagISAM.cpp)
+target_link_libraries(JYImuMagISAM
+        ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES}
+        -ltbb ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
 add_executable(JYImuMag JYImuMag.cpp)
 target_link_libraries(JYImuMag
         ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES}

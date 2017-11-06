@@ -565,7 +565,9 @@ int main(int argc, char *argv[]) {
         imu_preintegrated_->integrateMeasurement(imudata.block(index, 1, 1, 3).transpose(),
                                                  imudata.block(index, 4, 1, 3).transpose(),
                                                  initial_para.Ts_);
-
+        isam2.update(*graph,initial_values);
+        graph->resize(0);
+        initial_values.clear();
         last_zupt_flag = zupt_flag;
 
 

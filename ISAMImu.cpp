@@ -125,8 +125,8 @@ int main() {
     ISAM2DoglegParams isam2DoglegParams(0.001);
 //    ISAM2GaussNewtonParams isam2GaussNewtonParams();
     ISAM2Params isam2Params(isam2DoglegParams);
-    isam2Params.relinearizeThreshold = 0.000001;
-    isam2Params.relinearizeSkip = 1;
+//    isam2Params.relinearizeThreshold = 0.000001;
+//    isam2Params.relinearizeSkip = 1;
 
 
     ISAM2 isam2(isam2Params);

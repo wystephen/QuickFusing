@@ -122,7 +122,7 @@ int main() {
      * Initial Graph parameters.
      */
 
-    ISAM2DoglegParams isam2DoglegParams();
+    ISAM2DoglegParams isam2DoglegParams(0.001);
 //    ISAM2GaussNewtonParams isam2GaussNewtonParams();
     ISAM2Params isam2Params(isam2DoglegParams);
     isam2Params.relinearizeThreshold = 0.000001;

@@ -46,8 +46,8 @@ public:
     Eigen::Vector3d src_mag_;
     Eigen::Vector3d target_mag_;
 
-    RelativeMagEdge(Eigen::Vector3d src_mag,
-    Eigen::Vector3d target_mag);
+    RelativeMagEdge(cosnt Eigen::Vector3d &src_mag,
+    const Eigen::Vector3d & target_mag);
 
     virtual bool read(std::istream &is);
 

@@ -55,8 +55,8 @@ void GravityZ::computeError() {
     Sophus::SO3 from_so3(p1[3],p1[4],p1[5]);
     Sophus::SO3 to_so3(p2[3],p2[4],p2[5]);
 
-    _error(0) = (from_so3.matrix().inverse() * src_acc_  + Eigen::Vector3d(0,0,1.0)).norm();
-    _error(1) = (to_so3.matrix().inverse() * target_acc_ + Eigen::Vector3d(0,0,1.0)).norm();
+    _error(0) = (from_so3.matrix() * src_acc_  + Eigen::Vector3d(0,0,1.0)).norm();
+    _error(1) = (to_so3.matrix() * target_acc_ + Eigen::Vector3d(0,0,1.0)).norm();
 
 }
 

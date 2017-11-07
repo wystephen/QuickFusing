@@ -27,11 +27,17 @@
 #include <sophus/so3.h>
 #include "GravityZ.h"
 
-GravityZ::GravityZ(Eigen::Vector3d arc_acc, Eigen::Vector3d target_acc){
-    src_acc_ = arc_acc/arc_acc.norm();
+GravityZ::GravityZ(Eigen::Vector3d src_acc,
+                   Eigen::Vector3d target_acc){
+    src_acc_ = src_acc/src_acc.norm();
     target_acc_ = target_acc/target_acc.norm();
 //    return true;
 }
+
+bool GravityZ::read(std::istream &is){
+    return true;
+}
+
 
 bool GravityZ::write(std::ostream &os) const {
     return os.good();

@@ -163,6 +163,7 @@ int main(int argc, char *argv[]) {
 //    double ori_info(100);
 //    double first_info(0.001), second_info(0.05), ori_info(0.001);
     double first_info(100), second_info(1000), ori_info(0.5);
+    double gravity_info(0.1);
 
     if (argc == 4) {
         first_info = std::stod(argv[1]);
@@ -170,7 +171,11 @@ int main(int argc, char *argv[]) {
         ori_info = std::stod(argv[3]);
     }
 
-    double turn_threshold = 10.0/180.0 * M_PI;
+    if (argc == 5) {
+        gravity_info = std::stod(argv[4]);
+    }
+
+    double turn_threshold = 10.0 / 180.0 * M_PI;
     double corner_ratio = 10.0;
 
     //// Load data
@@ -192,8 +197,8 @@ int main(int argc, char *argv[]) {
 //            238   263   269
 //    Eigen::Vector3d central(5,105,283);//imu
 //    Eigen::Vector3d scale(238,263,269);//imu
-       Eigen::Vector3d central(-63  ,-108  , 151);//imu2
-    Eigen::Vector3d scale(241 ,  264 ,  283);//imu2
+    Eigen::Vector3d central(-63, -108, 151);//imu2
+    Eigen::Vector3d scale(241, 264, 283);//imu2
 
 
     for (int i(0); i < imudata.rows(); ++i) {
@@ -204,7 +209,7 @@ int main(int argc, char *argv[]) {
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
             } else if (7 <= j && j < 10) {
-                imudata(i, j) = (imudata(i, j) - central(j - 7))/scale(j-7);
+                imudata(i, j) = (imudata(i, j) - central(j - 7)) / scale(j - 7);
             }
         }
     }
@@ -435,7 +440,7 @@ int main(int argc, char *argv[]) {
                     mag_edge->setMeasurement(Eigen::Vector3d(0, 0, 0));
 
 
-            static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct("Cauchy");
+                    static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct("Cauchy");
                     mag_edge->setRobustKernel(robustKernel);
 
                     globalOptimizer.addEdge(mag_edge);
@@ -443,21 +448,24 @@ int main(int argc, char *argv[]) {
 
 
                     /// Gravit
-                    auto *edge_gravity = new GravityZ(iter->data_vec_.block(1,0,3,1),
-                                                      imudata.block(index,1,1,3).transpose());
+                    if (gravity_info > 0) {
+                        auto *edge_gravity = new GravityZ(iter->data_vec_.block(1, 0, 3, 1),
+                                                          imudata.block(index, 1, 1, 3).transpose());
 
-                    edge_gravity->vertices()[0] = globalOptimizer.vertex(iter->index_);
-                    edge_gravity->vertices()[1] = globalOptimizer.vertex(trace_id);
+                        edge_gravity->vertices()[0] = globalOptimizer.vertex(iter->index_);
+                        edge_gravity->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                    Eigen::Matrix2d info;
-                    info.setIdentity();
-                    info *= 0.1;
+                        Eigen::Matrix2d info;
+                        info.setIdentity();
+                        info *= gravity_info;
 
-                    edge_gravity->setInformation(info);
+                        edge_gravity->setInformation(info);
 
-                    edge_gravity->setMeasurement(Eigen::Vector2d(0,0));
+                        edge_gravity->setMeasurement(Eigen::Vector2d(0, 0));
 
-                    globalOptimizer.addEdge(edge_gravity);
+                        globalOptimizer.addEdge(edge_gravity);
+
+                    }
 
 
 //

@@ -166,17 +166,17 @@ int main(int argc, char *argv[]) {
     double gravity_info(0.1);
     double zero_z_info(0.1);
 
-    if (argc == 4) {
+    if (argc >= 4) {
         first_info = std::stod(argv[1]);
         second_info = std::stod(argv[2]);
         ori_info = std::stod(argv[3]);
     }
 
-    if (argc == 5) {
+    if (argc >= 5) {
         gravity_info = std::stod(argv[4]);
     }
 
-    if (argc == 6) {
+    if (argc >= 6) {
         zero_z_info = std::stod(argv[5]);
     }
 

@@ -44,6 +44,9 @@ bool GravityZ::write(std::ostream &os) const {
 }
 
 
+/**
+ *
+ */
 void GravityZ::computeError() {
     g2o::VertexSE3 *from = static_cast<g2o::VertexSE3 *>(_vertices[0]);
     g2o::VertexSE3 *to = static_cast<g2o::VertexSE3 *>(_vertices[1]);

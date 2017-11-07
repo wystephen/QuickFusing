@@ -164,6 +164,7 @@ int main(int argc, char *argv[]) {
 //    double first_info(0.001), second_info(0.05), ori_info(0.001);
     double first_info(100), second_info(1000), ori_info(0.5);
     double gravity_info(0.1);
+    double zero_z_info(0.1);
 
     if (argc == 4) {
         first_info = std::stod(argv[1]);
@@ -173,6 +174,10 @@ int main(int argc, char *argv[]) {
 
     if (argc == 5) {
         gravity_info = std::stod(argv[4]);
+    }
+
+    if (argc == 6) {
+        zero_z_info = std::stod(argv[5]);
     }
 
     double turn_threshold = 10.0 / 180.0 * M_PI;
@@ -336,17 +341,18 @@ int main(int argc, char *argv[]) {
             if (trace_id > 0) {
 
                 // Zero of Z constraint
-                auto *edge_zero = new Z0Edge();
-                edge_zero->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
-                edge_zero->vertices()[1] = globalOptimizer.vertex(trace_id);
+                if (zero_z_info > 0.0) {
+                    auto *edge_zero = new Z0Edge();
+                    edge_zero->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
+                    edge_zero->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                edge_zero->setMeasurement(0.0);
-                edge_zero->setInformation(Eigen::Matrix<double, 1, 1>(1.0));
+                    edge_zero->setMeasurement(0.0);
+                    edge_zero->setInformation(Eigen::Matrix<double, 1, 1>(zero_z_info));
 
-//                globalOptimizer.addEdge(edge_zero);
+                    globalOptimizer.addEdge(edge_zero);
 
 
-//                auto * edge_gravity = new GravityZ()
+                }
 
 
                 auto *edge_se3 = new g2o::EdgeSE3();

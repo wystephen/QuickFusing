@@ -161,7 +161,8 @@ int main(int argc, char *argv[]) {
     /// Global parameters
 //    double first_info(10), second_info(10 * M_PI / 180.0);
 //    double ori_info(100);
-    double first_info(0.001), second_info(0.05), ori_info(0.001);
+//    double first_info(0.001), second_info(0.05), ori_info(0.001);
+    double first_info(100), second_info(1000), ori_info(0.5);
 
     if (argc == 4) {
         first_info = std::stod(argv[1]);
@@ -340,6 +341,9 @@ int main(int argc, char *argv[]) {
 //                globalOptimizer.addEdge(edge_zero);
 
 
+//                auto * edge_gravity = new GravityZ()
+
+
                 auto *edge_se3 = new g2o::EdgeSE3();
 
                 edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
@@ -435,6 +439,27 @@ int main(int argc, char *argv[]) {
                     mag_edge->setRobustKernel(robustKernel);
 
                     globalOptimizer.addEdge(mag_edge);
+
+
+
+                    /// Gravit
+                    auto *edge_gravity = new GravityZ(iter->data_vec_.block(1,0,3,1),
+                                                      imudata.block(index,1,1,3).transpose());
+
+                    edge_gravity->vertices()[0] = globalOptimizer.vertex(iter->index_);
+                    edge_gravity->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+                    Eigen::Matrix2d info;
+                    info.setIdentity();
+                    info *= 0.1;
+
+                    edge_gravity->setInformation(info);
+
+                    edge_gravity->setMeasurement(Eigen::Vector2d(0,0));
+
+                    globalOptimizer.addEdge(edge_gravity);
+
+
 //
                 }
             }

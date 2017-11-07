@@ -28,8 +28,8 @@
 #include "GravityZ.h"
 
 GravityZ::GravityZ(Eigen::Vector3d arc_acc, Eigen::Vector3d target_acc){
-    src_acc_ = arc_acc;
-    target_acc_ = target_acc;
+    src_acc_ = arc_acc/arc_acc.norm();
+    target_acc_ = target_acc/target_acc.norm();
 //    return true;
 }
 

@@ -34,8 +34,10 @@
 class GravityZ: public g2o::BaseBinaryEdge<2,Eigen::Vector2d,g2o::VertexSE3,g2o::VertexSE3> {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    Eigen::Vector3d src_acc_ = Eigen::Vector3d(0,0,1);
-    Eigen::Vector3d target_acc_ = Eigen::Vector3d(0,0,1);
+    Eigen::Vector3d src_acc_ ;//= Eigen::Vector3d(0,0,1);
+    Eigen::Vector3d target_acc_ ;//= Eigen::Vector3d(0,0,1);
+
+
     GravityZ(Eigen::Vector3d arc_acc,
     Eigen::Vector3d target_acc);
 

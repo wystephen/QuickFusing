@@ -154,7 +154,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
-    std::string dir_name = "/home/steve/Data/II/17/";
+    std::string dir_name = "/home/steve/Data/II/20/";
 
     /// Global parameters
 //    double first_info(10), second_info(10 * M_PI / 180.0);
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
@@ -187,8 +187,12 @@ int main(int argc, char *argv[]) {
 //    Scale_axis =
 //
 //            238   263   269
-    Eigen::Vector3d central(5,105,283);
-    Eigen::Vector3d scale(238,263,269);
+//    Eigen::Vector3d central(5,105,283);//imu
+//    Eigen::Vector3d scale(238,263,269);//imu
+       Eigen::Vector3d central(-63  ,-108  , 151);//imu2
+    Eigen::Vector3d scale(241 ,  264 ,  283);//imu2
+
+
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
@@ -405,7 +409,7 @@ int main(int argc, char *argv[]) {
                  iter != key_info_mag.end();
                  iter++) {
                 if ((iter->data_vec_.block(7, 0, 3, 1).transpose() -
-                     imudata.block(index, 7, 1, 3)).norm() < 0.5) {
+                     imudata.block(index, 7, 1, 3)).norm() < 0.15) {
                     std::cout << "src :" << iter->data_vec_.block(7, 0, 3, 1) << std::endl;
                     std::cout << "target :" << imudata.block(index, 7, 1, 3).transpose() << std::endl;
                     auto *mag_edge = new RelativeMagEdge(iter->data_vec_.block(7, 0, 3, 1),

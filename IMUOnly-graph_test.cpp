@@ -171,14 +171,14 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
     imudata.setZero();
     auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
-    Eigen::Vector3d central(0,0,0);
+    Eigen::Vector3d central(-25, -128, 80);
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
@@ -426,7 +426,7 @@ int main(int argc, char *argv[]) {
         if (trace_id - last_optimized_id > 5) {
             globalOptimizer.setVerbose(true);
             globalOptimizer.initializeOptimization();
-            globalOptimizer.optimize(3);
+            globalOptimizer.optimize(5);
             last_optimized_id = trace_id;
 //
         }
@@ -440,7 +440,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.setVerbose(true);
     globalOptimizer.initializeOptimization();
-    globalOptimizer.optimize(10);
+    globalOptimizer.optimize(100);
     std::ofstream test("./ResultData/test.txt");
 
     for (int k(0); k < trace_id; ++k) {

@@ -159,12 +159,11 @@ int main(int argc, char *argv[]) {
     /// Global parameters
 //    double first_info(10), second_info(10 * M_PI / 180.0);
 //    double ori_info(100);
-    double first_info(0.001),second_info(0.05),ori_info(0.001);
+    double first_info(0.001), second_info(0.05), ori_info(0.001);
 
-    if(argc==4)
-    {
+    if (argc == 4) {
         first_info = std::stod(argv[1]);
-        second_info=std::stod(argv[2]);
+        second_info = std::stod(argv[2]);
         ori_info = std::stod(argv[3]);
     }
 
@@ -172,14 +171,14 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
     imudata.setZero();
     auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
-    Eigen::Vector3d central(-25, -128, 80);
+    Eigen::Vector3d central(0,0,0);
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
@@ -246,7 +245,6 @@ int main(int argc, char *argv[]) {
     initial_para.Ts_ = 1.0f / 200.0f;
 
 
-
     initial_para.sigma_a_ = 1.1;
     initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
 //    initial_para.sigma_a_ /= 3.0;
@@ -262,6 +260,8 @@ int main(int argc, char *argv[]) {
     int trace_id(0);
     Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
     double last_theta = 0.0;
+
+    int last_optimized_id(0);
 
     std::vector<ImuKeyPointInfo> key_info_mag;
 
@@ -311,12 +311,12 @@ int main(int argc, char *argv[]) {
             /// add transform edge
             if (trace_id > 0) {
 
-                auto * edge_zero = new Z0Edge();
-                edge_zero->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+                auto *edge_zero = new Z0Edge();
+                edge_zero->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
                 edge_zero->vertices()[1] = globalOptimizer.vertex(trace_id);
 
                 edge_zero->setMeasurement(0.0);
-                edge_zero->setInformation(Eigen::Matrix<double,1,1>(10.0));
+                edge_zero->setInformation(Eigen::Matrix<double, 1, 1>(10.0));
 
                 globalOptimizer.addEdge(edge_zero);
 
@@ -390,27 +390,25 @@ int main(int argc, char *argv[]) {
 //
 //            globalOptimizer.addEdge(edge_ori);
             /// Add ..
-            for( auto iter = key_info_mag.begin();
-                    iter != key_info_mag.end();
-                    iter++)
-            {
-                if((iter->data_vec_.block(7,0,3,1).transpose()-
-                imudata.block(index,7,1,3)).norm()<30)
-                {
-                    std::cout << "src :" << iter->data_vec_.block(7,0,3,1) << std::endl;
-                    std::cout << "target :" << imudata.block(index,7,1,3).transpose() << std::endl;
-                    auto *mag_edge = new RelativeMagEdge(iter->data_vec_.block(7,0,3,1),
-                    imudata.block(index,7,1,3).transpose());
+            for (auto iter = key_info_mag.begin();
+                 iter != key_info_mag.end();
+                 iter++) {
+                if ((iter->data_vec_.block(7, 0, 3, 1).transpose() -
+                     imudata.block(index, 7, 1, 3)).norm() < 30) {
+                    std::cout << "src :" << iter->data_vec_.block(7, 0, 3, 1) << std::endl;
+                    std::cout << "target :" << imudata.block(index, 7, 1, 3).transpose() << std::endl;
+                    auto *mag_edge = new RelativeMagEdge(iter->data_vec_.block(7, 0, 3, 1),
+                                                         imudata.block(index, 7, 1, 3).transpose());
 //
                     mag_edge->vertices()[0] = globalOptimizer.vertex(iter->index_);
                     mag_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 //
-                    Eigen::Matrix<double,3,3> information_matrix = Eigen::Matrix<double,3,3>::Identity();
+                    Eigen::Matrix<double, 3, 3> information_matrix = Eigen::Matrix<double, 3, 3>::Identity();
                     information_matrix *= ori_info;
 
                     mag_edge->setInformation(information_matrix);
 
-                    mag_edge->setMeasurement(Eigen::Vector3d(0,0,0));
+                    mag_edge->setMeasurement(Eigen::Vector3d(0, 0, 0));
 
                     globalOptimizer.addEdge(mag_edge);
 //
@@ -418,19 +416,20 @@ int main(int argc, char *argv[]) {
             }
 
             key_info_mag.push_back(ImuKeyPointInfo(trace_id,
-            imudata.block(index,0,1,10).transpose()));
-
-
-
+                                                   imudata.block(index, 0, 1, 10).transpose()));
 
 
             trace_id++;
             last_transform = the_transform;
         }
 
-//        globalOptimizer.setVerbose(true);
-//        globalOptimizer.initializeOptimization();
-//        globalOptimizer.optimize(100);
+        if (trace_id - last_optimized_id > 3) {
+            globalOptimizer.setVerbose(true);
+            globalOptimizer.initializeOptimization();
+            globalOptimizer.optimize(3);
+            last_optimized_id = trace_id;
+//
+        }
 
         last_zupt_flag = zupt_flag;
         ix.push_back(tx(0));

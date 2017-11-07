@@ -53,7 +53,19 @@ void RelativeMagEdge::computeError() {
     Sophus::SO3 from_so3(p1[3],p1[4],p1[5]);
     Sophus::SO3 to_so3(p2[3],p2[4],p2[5]);
 
-    Eigen::Vector3d tmp_vec = from_so3.matrix().inverse() * src_mag_ - to_so3.matrix().inverse() * target_mag_;
+    Eigen::Vector3d tmp_vec = from_so3.matrix() * src_mag_ - to_so3.matrix() * target_mag_;
+//    for(int i(0);i<3;++i)
+//    {
+//        if(tmp_vec(i)>M_PI/2.0)
+//        {
+//            tmp_vec(i)-=M_PI/2.0;
+//        }
+//
+//        if(tmp_vec(i) < -M_PI/2.0)
+//        {
+//            tmp_vec(i) += M_PI/2.0;
+//        }
+//    }
 
     _error = tmp_vec;
 }

@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu_att.txt");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
@@ -376,22 +376,23 @@ int main(int argc, char *argv[]) {
             }
 
             /// add ori edg
-//            auto *edge_ori = new OrientationEdge();
-//
-//            edge_ori->vertices()[0] = globalOptimizer.vertex(trace_id);
-//            edge_ori->vertices()[1] = globalOptimizer.vertex(attitude_vertex_id);
-//
-//
-//            Eigen::Matrix<double, 3, 3> information = Eigen::Matrix<double, 3, 3>::Identity();
-//            information *= ori_info;
-//
-//            edge_ori->setInformation(information);
+            auto *edge_ori = new OrientationEdge();
+
+            edge_ori->vertices()[0] = globalOptimizer.vertex(trace_id);
+            edge_ori->vertices()[1] = globalOptimizer.vertex(attitude_vertex_id);
+
+
+            Eigen::Matrix<double, 3, 3> information = Eigen::Matrix<double, 3, 3>::Identity();
+            information *= ori_info;
+
+            edge_ori->setInformation(information);
 //
 //            Sophus::SO3 ori_so3(
 //                    Eigen::Quaterniond(imudata(index, 12), imudata(index, 10), imudata(index, 11), imudata(index, 9)));
 //            ori_1.push_back(ori_so3.log()(0));
 //            ori_2.push_back(ori_so3.log()(1));
 //            ori_3.push_back(ori_so3.log()(2));
+//            Sophus::SO3 ori_so3(imudata(index,9),imudata(index,8),imudata(index,7));
 //
 //            edge_ori->setMeasurement(ori_so3);
 //            /// robust kernel

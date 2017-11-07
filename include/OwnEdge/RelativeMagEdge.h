@@ -47,7 +47,7 @@ public:
     Eigen::Vector3d target_mag_;
 
     RelativeMagEdge(const Eigen::Vector3d &src_mag,
-    const Eigen::Vector3d & target_mag);
+                    const Eigen::Vector3d &target_mag);
 
     virtual bool read(std::istream &is);
 
@@ -55,15 +55,16 @@ public:
 
     void computeError();
 
-    void setMeasurement(const Eigen::Vector3d &m){
+    void setMeasurement(const Eigen::Vector3d &m) {
         _measurement = m;
     }
 
-    virtual bool getMeasurementData(double *d)const {
+    virtual bool getMeasurementData(double *d) const {
         Eigen::Map<Eigen::Vector3d> v(d);
         v = _measurement;
         return true;
     }
+
     virtual int measurementDimension() const {
         return 3;
     }
@@ -86,29 +87,25 @@ public:
 
     double sigma_ = 1.0;
 
-    bool setSigma(double sigma)
-    {
-        if(sigma>0)
-        {
+    bool setSigma(double sigma) {
+        if (sigma > 0) {
             sigma_ = sigma;
             return true;
-        }else{
+        } else {
             return false;
         }
 
     }
 
-    double getSigma()
-    {
+    double getSigma() {
         return sigma_;
     }
 
-    inline double logNormalPdf(double x, double miu, double sigma)
-    {
+    inline double logNormalPdf(double x, double miu, double sigma) {
         double para1((x - miu) * (x - miu) / 2 / sigma / sigma);
         double para2(1 / std::sqrt(2 * sigma * sigma * M_PI));
 
-        return std::log(para2+1e-10)/para1;
+        return std::log(para2 + 1e-10) / para1;
     }
 
     inline double NormalPdf(double x,

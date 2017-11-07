@@ -171,14 +171,24 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
                    imu_data_reader.GetMatrix().GetCols());
     imudata.setZero();
     auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
-    Eigen::Vector3d central(-25, -128, 80);
+
+//    central =
+//
+//            5   105   283
+//
+//
+//    Scale_axis =
+//
+//            238   263   269
+    Eigen::Vector3d central(5,105,283);
+    Eigen::Vector3d scale(238,263,269);
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
@@ -187,7 +197,7 @@ int main(int argc, char *argv[]) {
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
             } else if (7 <= j && j < 10) {
-                imudata(i, j) = (imudata(i, j) - central(j - 7));///scale_axis(j-7);
+                imudata(i, j) = (imudata(i, j) - central(j - 7))/scale(j-7);
             }
         }
     }

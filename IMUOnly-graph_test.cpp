@@ -154,7 +154,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
-    std::string dir_name = "/home/steve/Data/II/20/";
+    std::string dir_name = "/home/steve/Data/II/16/";
 
     /// Global parameters
 //    double first_info(10), second_info(10 * M_PI / 180.0);
@@ -255,7 +255,7 @@ int main(int argc, char *argv[]) {
      */
     SettingPara initial_para(true);
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
-    initial_para.init_heading1_ = M_PI / 2.0;
+    initial_para.init_heading1_ = 0.0;
     initial_para.Ts_ = 1.0f / 200.0f;
 
 
@@ -263,6 +263,8 @@ int main(int argc, char *argv[]) {
     initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
 //    initial_para.sigma_a_ /= 3.0;
 //    initial_para.sigma_g_ /= 3.0;
+//    initial_para.sigma_acc_ = Eigen::Vector3d(0.01,0.01,0.01)*200.0;
+//    initial_para.sigma_gyro_ = Eigen::Vector3d(0.01,0.01,0.01)/180.0*M_PI*200.0;
 
     initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 
@@ -332,7 +334,7 @@ int main(int argc, char *argv[]) {
                 edge_zero->setMeasurement(0.0);
                 edge_zero->setInformation(Eigen::Matrix<double, 1, 1>(1.0));
 
-                globalOptimizer.addEdge(edge_zero);
+//                globalOptimizer.addEdge(edge_zero);
 
 
                 auto *edge_se3 = new g2o::EdgeSE3();

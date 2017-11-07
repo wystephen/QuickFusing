@@ -316,7 +316,7 @@ int main(int argc, char *argv[]) {
                 edge_zero->vertices()[1] = globalOptimizer.vertex(trace_id);
 
                 edge_zero->setMeasurement(0.0);
-                edge_zero->setInformation(Eigen::Matrix<double, 1, 1>(10.0));
+                edge_zero->setInformation(Eigen::Matrix<double, 1, 1>(1.0));
 
                 globalOptimizer.addEdge(edge_zero);
 
@@ -423,7 +423,7 @@ int main(int argc, char *argv[]) {
             last_transform = the_transform;
         }
 
-        if (trace_id - last_optimized_id > 3) {
+        if (trace_id - last_optimized_id > 5) {
             globalOptimizer.setVerbose(true);
             globalOptimizer.initializeOptimization();
             globalOptimizer.optimize(3);
@@ -440,7 +440,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.setVerbose(true);
     globalOptimizer.initializeOptimization();
-    globalOptimizer.optimize(100);
+    globalOptimizer.optimize(10);
     std::ofstream test("./ResultData/test.txt");
 
     for (int k(0); k < trace_id; ++k) {

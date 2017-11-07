@@ -158,6 +158,13 @@ int main(int argc, char *argv[]) {
     double first_info(10), second_info(10 * M_PI / 180.0);
     double ori_info(100);
 
+    if(argc==4)
+    {
+        first_info = std::stod(argv[1]);
+        second_info=std::stod(argv[2]);
+        ori_info = std::stod(argv[3]);
+    }
+
     double turn_threshold = 1000.0;
     double corner_ratio = 10.0;
 
@@ -371,7 +378,7 @@ int main(int argc, char *argv[]) {
                     iter++)
             {
                 if((iter->data_vec_.block(7,0,3,1).transpose()-
-                imudata.block(index,7,1,3)).norm()<10)
+                imudata.block(index,7,1,3)).norm()<30)
                 {
                     std::cout << "src :" << iter->data_vec_.block(7,0,3,1) << std::endl;
                     std::cout << "target :" << imudata.block(index,7,1,3).transpose() << std::endl;
@@ -417,7 +424,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.setVerbose(true);
     globalOptimizer.initializeOptimization();
-    globalOptimizer.optimize(3000);
+    globalOptimizer.optimize(100);
 
     for (int k(0); k < trace_id; ++k) {
         double t_data[10] = {0};
@@ -434,7 +441,10 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ori_2,"b-+");
 //    plt::plot(ori_3,"g-+");
     plt::title("show");
-    plt::show();
+    plt::save(std::to_string(first_info)+":"
+    +std::to_string(second_info)+":"
+    +std::to_string(ori_info)+".png");
+//    plt::show();
 
 
 }

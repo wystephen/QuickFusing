@@ -31,10 +31,13 @@
 #include <g2o/core/base_binary_edge.h>
 #include <g2o/types/slam3d/vertex_se3.h>
 
-class GravityZ: public g2o::BaseBinaryEdge<1,double,g2o::VertexSE3,g2o::VertexSE3> {
+class GravityZ: public g2o::BaseBinaryEdge<2,Eigen::Vector2d,g2o::VertexSE3,g2o::VertexSE3> {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    GravityZ();
+    Eigen::Vector3d src_acc_ = Eigen::Vector3d(0,0,1);
+    Eigen::Vector3d target_acc_ = Eigen::Vector3d(0,0,1);
+    GravityZ(Eigen::Vector3d arc_acc,
+    Eigen::Vector3d target_acc);
 
     virtual bool read(std::istream &is);
 
@@ -42,12 +45,12 @@ public:
 
     void computeError();
 
-    virtual void setMeasurement(const double &m) {
+    virtual void setMeasurement(const Eigen::Vector2d &m) {
         _measurement = m;
 //        _inverseMeasurement = 10000;
     }
 
-    virtual bool getMeasurementData(double *d) const {
+    virtual bool getMeasurementData(Eigen::Vector2d *d) const {
         *d = _measurement;
         return true;
     }

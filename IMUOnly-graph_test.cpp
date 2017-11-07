@@ -33,6 +33,8 @@
 #include <OwnEdge/RelativeMagEdge.h>
 #include <OwnEdge/ZoEdge.h>
 #include <OwnEdge/ZoEdge.cpp>
+#include <OwnEdge/GravityZ.h>
+#include <OwnEdge/GravityZ.cpp>
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
@@ -327,6 +329,7 @@ int main(int argc, char *argv[]) {
             /// add transform edge
             if (trace_id > 0) {
 
+                // Zero of Z constraint
                 auto *edge_zero = new Z0Edge();
                 edge_zero->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
                 edge_zero->vertices()[1] = globalOptimizer.vertex(trace_id);

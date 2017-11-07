@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu_att.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
@@ -405,7 +405,7 @@ int main(int argc, char *argv[]) {
                  iter != key_info_mag.end();
                  iter++) {
                 if ((iter->data_vec_.block(7, 0, 3, 1).transpose() -
-                     imudata.block(index, 7, 1, 3)).norm() < 0.05) {
+                     imudata.block(index, 7, 1, 3)).norm() < 0.5) {
                     std::cout << "src :" << iter->data_vec_.block(7, 0, 3, 1) << std::endl;
                     std::cout << "target :" << imudata.block(index, 7, 1, 3).transpose() << std::endl;
                     auto *mag_edge = new RelativeMagEdge(iter->data_vec_.block(7, 0, 3, 1),

@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
         ori_info = std::stod(argv[3]);
     }
 
-    double turn_threshold = 1000.0;
+    double turn_threshold = 10.0/180.0 * M_PI;
     double corner_ratio = 10.0;
 
     //// Load data
@@ -404,7 +404,7 @@ int main(int argc, char *argv[]) {
                  iter != key_info_mag.end();
                  iter++) {
                 if ((iter->data_vec_.block(7, 0, 3, 1).transpose() -
-                     imudata.block(index, 7, 1, 3)).norm() < 10) {
+                     imudata.block(index, 7, 1, 3)).norm() < 0.1) {
                     std::cout << "src :" << iter->data_vec_.block(7, 0, 3, 1) << std::endl;
                     std::cout << "target :" << imudata.block(index, 7, 1, 3).transpose() << std::endl;
                     auto *mag_edge = new RelativeMagEdge(iter->data_vec_.block(7, 0, 3, 1),

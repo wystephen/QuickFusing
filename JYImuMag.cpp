@@ -113,12 +113,12 @@ int main(int argc, char *argv[]) {
     // for imu mag
 //    central =
 //
-//            -25  -128    80
+//            -63  -108   151
 //
 //
 //    Scale_axis =
 //
-//            238   263   271
+//            241   264   283
     Eigen::Vector3d central(-25, -128, 80);
     Eigen::Vector3d scale_axis(238, 263, 271);
     for (int i(0); i < imudata.rows(); ++i) {

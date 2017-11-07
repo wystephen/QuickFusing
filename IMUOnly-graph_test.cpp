@@ -31,6 +31,8 @@
 #include <sophus/so3.h>
 #include <Zero_Detecter.h>
 #include <OwnEdge/RelativeMagEdge.h>
+#include <OwnEdge/ZoEdge.h>
+#include <OwnEdge/ZoEdge.cpp>
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
@@ -303,8 +305,22 @@ int main(int argc, char *argv[]) {
 
             globalOptimizer.addVertex(v);
 
+//            auto *edge_zero = new Z0Edge();
+//            edge_zero->vertices()[0] = E
+
             /// add transform edge
             if (trace_id > 0) {
+
+                auto * edge_zero = new Z0Edge();
+                edge_zero->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+                edge_zero->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+                edge_zero->setMeasurement(0.0);
+                edge_zero->setInformation(Eigen::Matrix<double,1,1>(10.0));
+
+                globalOptimizer.addEdge(edge_zero);
+
+
                 auto *edge_se3 = new g2o::EdgeSE3();
 
                 edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
@@ -426,10 +442,12 @@ int main(int argc, char *argv[]) {
     globalOptimizer.setVerbose(true);
     globalOptimizer.initializeOptimization();
     globalOptimizer.optimize(100);
+    std::ofstream test("./ResultData/test.txt");
 
     for (int k(0); k < trace_id; ++k) {
         double t_data[10] = {0};
         globalOptimizer.vertex(k)->getEstimateData(t_data);
+        test << t_data[0] << "," << t_data[1] << "," << t_data[2] << std::endl;
 
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);

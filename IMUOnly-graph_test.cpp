@@ -155,8 +155,9 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/II/17/";
 
     /// Global parameters
-    double first_info(10), second_info(10 * M_PI / 180.0);
-    double ori_info(100);
+//    double first_info(10), second_info(10 * M_PI / 180.0);
+//    double ori_info(100);
+    double first_info(0.001),second_info(0.05),ori_info(0.001);
 
     if(argc==4)
     {
@@ -169,7 +170,7 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
@@ -441,10 +442,10 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ori_2,"b-+");
 //    plt::plot(ori_3,"g-+");
     plt::title("show");
-    plt::save(std::to_string(first_info)+":"
-    +std::to_string(second_info)+":"
-    +std::to_string(ori_info)+".png");
-//    plt::show();
+//    plt::save(std::to_string(first_info)+":"
+//    +std::to_string(second_info)+":"
+//    +std::to_string(ori_info)+".png");
+    plt::show();
 
 
 }

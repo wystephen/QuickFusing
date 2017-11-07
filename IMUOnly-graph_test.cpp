@@ -274,6 +274,9 @@ int main(int argc, char *argv[]) {
 
     initial_para.sigma_a_ = 1.1;
     initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
+
+
+    initial_para.gravity_ = 9.26;
 //    initial_para.sigma_a_ /= 3.0;
 //    initial_para.sigma_g_ /= 3.0;
 //    initial_para.sigma_acc_ = Eigen::Vector3d(0.01,0.01,0.01)*200.0;

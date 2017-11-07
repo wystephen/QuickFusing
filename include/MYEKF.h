@@ -394,7 +394,7 @@ public:
 //        MYCHECK(1);
 
         //---------------
-        Eigen::Vector3d g_t(0, 0, 9.8173);
+        Eigen::Vector3d g_t(0, 0, para_.gravity_);
 //        g_t = g_t.transpose();
 
         Eigen::Matrix3d Rb2t(q2dcm(quat_));

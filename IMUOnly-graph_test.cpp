@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
 //    double first_info(10), second_info(10 * M_PI / 180.0);
 //    double ori_info(100);
 //    double first_info(0.001), second_info(0.05), ori_info(0.001);
-    double first_info(1000), second_info(1000), ori_info(0.5);
+    double first_info(1000), second_info(10000), ori_info(0.5);
     double gravity_info(0.1);
     double zero_z_info(-10.1);
 
@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),

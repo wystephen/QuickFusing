@@ -433,8 +433,8 @@ int main(int argc, char *argv[]) {
                  iter++) {
                 if ((iter->data_vec_.block(7, 0, 3, 1).transpose() -
                      imudata.block(index, 7, 1, 3)).norm() < 0.15) {
-                    std::cout << "src :" << iter->data_vec_.block(7, 0, 3, 1) << std::endl;
-                    std::cout << "target :" << imudata.block(index, 7, 1, 3).transpose() << std::endl;
+//                    std::cout << "src :" << iter->data_vec_.block(7, 0, 3, 1) << std::endl;
+//                    std::cout << "target :" << imudata.block(index, 7, 1, 3).transpose() << std::endl;
                     auto *mag_edge = new RelativeMagEdge(iter->data_vec_.block(7, 0, 3, 1),
                                                          imudata.block(index, 7, 1, 3).transpose());
 //
@@ -539,9 +539,9 @@ int main(int argc, char *argv[]) {
         Sophus::SO3 so3(t_data[3], t_data[4], t_data[5]);
 
         std::cout << "acc:"
-                  << (so3.matrix() * it->data_vec_.block(1,0,3,1)).transpose()
+                  << (so3.matrix().inverse() * it->data_vec_.block(1,0,3,1)).transpose()
                   << "mag :"
-                  << (so3.matrix() * it->data_vec_.block(7,0,3,1)).transpose()
+                  << (so3.matrix().inverse() * it->data_vec_.block(7,0,3,1)).transpose()
                   << std::endl;
     }
 

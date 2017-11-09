@@ -162,9 +162,9 @@ int main(int argc, char *argv[]) {
 //    double first_info(10), second_info(10 * M_PI / 180.0);
 //    double ori_info(100);
 //    double first_info(0.001), second_info(0.05), ori_info(0.001);
-    double first_info(100), second_info(1000), ori_info(0.5);
+    double first_info(1000), second_info(1000), ori_info(0.5);
     double gravity_info(0.1);
-    double zero_z_info(0.1);
+    double zero_z_info(-10.1);
 
     if (argc >= 4) {
         first_info = std::stod(argv[1]);

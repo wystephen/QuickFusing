@@ -277,7 +277,7 @@ int main(int argc, char *argv[]) {
 
 
     initial_para.sigma_a_ = 0.01;
-    initial_para.sigma_g_ = 0.05 / 180.0 * M_PI;
+    initial_para.sigma_g_ = 0.01 / 180.0 * M_PI;
 
 
     initial_para.gravity_ = 9.8;

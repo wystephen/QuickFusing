@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
               << imudata.cols() << std::endl;
 
 
-    std::vector<double> ix, iy; //ix iy
+    std::vector<double> ix, iy, iz; //ix iy
     std::vector<double> gx, gy;// graph x
 
     std::vector<double> ori_1, ori_2, ori_3;
@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
     initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
 
 
-    initial_para.gravity_ = 9.26;
+    initial_para.gravity_ = 9.8;
 //    initial_para.sigma_a_ /= 3.0;
 //    initial_para.sigma_g_ /= 3.0;
 //    initial_para.sigma_acc_ = Eigen::Vector3d(0.01,0.01,0.01)*200.0;
@@ -500,6 +500,7 @@ int main(int argc, char *argv[]) {
         last_zupt_flag = zupt_flag;
         ix.push_back(tx(0));
         iy.push_back(tx(1));
+        iz.push_back(tx(2));
     }
 
     ///optimization
@@ -508,11 +509,23 @@ int main(int argc, char *argv[]) {
     globalOptimizer.initializeOptimization();
     globalOptimizer.optimize(100);
     std::ofstream test("./ResultData/test.txt");
+    std::ofstream test_imu ("./ResultData/text_imu.txt");
+
+    for(int k(0);k<ix.size();++k)
+    {
+        test_imu << ix[k]
+                 << ","
+                 << iy[k]
+                 << ","
+                 << iz[k]
+                 << std::endl;
+    }
 
     for (int k(0); k < trace_id; ++k) {
         double t_data[10] = {0};
         globalOptimizer.vertex(k)->getEstimateData(t_data);
         test << t_data[0] << "," << t_data[1] << "," << t_data[2] << std::endl;
+
 
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);

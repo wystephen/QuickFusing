@@ -103,8 +103,8 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/II/20/";
 
     /// Global parameters
-    double first_info(1000), second_info(10000), ori_info(0.5);
-    double gravity_info(0.1);
+    double first_info(1000), second_info(10000), ori_info(9.8);
+    double gravity_info(9.8);
     double zero_z_info(-10.1);
 
     if (argc >= 4) {
@@ -172,22 +172,6 @@ int main(int argc, char *argv[]) {
 
     std::vector<double> ori_1, ori_2, ori_3;
 
-    /*
-
-    int zupt_id_offset(0.0);
-    int airpre_id_offset(100000);
-
-    int attitude_vertex_id(400000);
-
-    /// insert attitude offset vertex. represent the globle offset of positioning(6dof) between imu and world frame
-    auto *v = new g2o::VertexSE3();
-    double p[6] = {0.0};
-    v->setEstimateData(p);
-
-    v->setFixed(false);
-    v->setId(attitude_vertex_id);
-    globalOptimizer.addVertex(v);
-
 
 
 
@@ -200,17 +184,17 @@ int main(int argc, char *argv[]) {
     initial_para.Ts_ = 1.0f / 200.0f;
 
 
-    initial_para.sigma_a_ = 0.01;
-    initial_para.sigma_g_ = 0.01 / 180.0 * M_PI;
+    initial_para.sigma_a_ = 0.01*ori_info;
+    initial_para.sigma_g_ = 0.01*ori_info / 180.0 * M_PI;
 
 
-    initial_para.gravity_ = 9.8;
+    initial_para.gravity_ = gravity_info;
 //    initial_para.sigma_a_ /= 3.0;
 //    initial_para.sigma_g_ /= 3.0;
-//    initial_para.sigma_acc_ = Eigen::Vector3d(0.01,0.01,0.01)*200.0;
-//    initial_para.sigma_gyro_ = Eigen::Vector3d(0.01,0.01,0.01)/180.0*M_PI*200.0;
-    initial_para.sigma_acc_ *= 6.0;
-    initial_para.sigma_gyro_ *= 6.0;
+    initial_para.sigma_acc_ = Eigen::Vector3d(1,1,1)*200.0*first_info;
+    initial_para.sigma_gyro_ = Eigen::Vector3d(1,1,1)/180.0*M_PI*second_info;
+//    initial_para.sigma_acc_ *= 6.0;
+//    initial_para.sigma_gyro_ *= 6.0;
 
     initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 
@@ -259,9 +243,9 @@ int main(int argc, char *argv[]) {
         iz.push_back(tx(2));
     }
 
-    std::cout << "after imu data :\n" << imudata.block(0, 0, 10, 10) << std::endl;
+//    std::cout << "after imu data :\n" << imudata.block(0, 0, 10, 10) << std::endl;
 
-    std::cout << "after imu data last 10 lines:\n" << imudata.block(imudata.rows() - 11, 0, 10, 10) << std::endl;
+//    std::cout << "after imu data last 10 lines:\n" << imudata.block(imudata.rows() - 11, 0, 10, 10) << std::endl;
 
 
 
@@ -286,10 +270,10 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ori_2,"b-+");
 //    plt::plot(ori_3,"g-+");
     plt::title("show");
-//    plt::save(std::to_string(first_info)+":"
-//    +std::to_string(second_info)+":"
-//    +std::to_string(ori_info)+".png");
-    plt::show();
+    plt::save(std::to_string(first_info)+":"
+    +std::to_string(second_info)+":"
+    +std::to_string(ori_info)+".png");
+//    plt::show();
 
 
 }

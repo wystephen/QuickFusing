@@ -210,7 +210,7 @@ int main(int argc, char *argv[]) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
             if (0 < j && j < 4) {
-                imudata(i, j) *= 9.81;
+                imudata(i, j) *= 9.8;
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
             } else if (7 <= j && j < 10) {
@@ -220,6 +220,8 @@ int main(int argc, char *argv[]) {
     }
     std::cout << "imu data size: " << imudata.rows() << "x"
               << imudata.cols() << std::endl;
+
+    std::cout << "source imu data :\n" << imudata.block(0,0,10,10)<<std::endl;
 
 
     std::vector<double> ix, iy, iz; //ix iy
@@ -272,8 +274,8 @@ int main(int argc, char *argv[]) {
     initial_para.Ts_ = 1.0f / 200.0f;
 
 
-    initial_para.sigma_a_ = 1.1;
-    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
+    initial_para.sigma_a_ = 0.2;
+    initial_para.sigma_g_ = 1.0 / 180.0 * M_PI;
 
 
     initial_para.gravity_ = 9.8;
@@ -284,7 +286,7 @@ int main(int argc, char *argv[]) {
     initial_para.sigma_acc_ *= 6.0;
     initial_para.sigma_gyro_ *= 6.0;
 
-    initial_para.ZeroDetectorWindowSize_ = 15;// Time windows size fo zupt detector
+    initial_para.ZeroDetectorWindowSize_ = 45;// Time windows size fo zupt detector
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 1, 20, 6));
@@ -326,7 +328,7 @@ int main(int argc, char *argv[]) {
         ///ZUPT GET POSITION
         auto tx = myekf.GetPosition(imudata.block(index, 1, 1, 6).transpose(), zupt_flag);
 
-        if ((zupt_flag < 0.5 && last_zupt_flag > 0.5)) {
+        if ((zupt_flag < 0.5 && last_zupt_flag > 0.5) ) {
             std::cout << "index: " << index << "key step"
                       << "ori:" << myekf.getOriente() << std::endl;
 
@@ -540,14 +542,15 @@ int main(int argc, char *argv[]) {
 
         Sophus::SO3 so3(t_data[3], t_data[4], t_data[5]);
 
-        std::cout << "  acc:"
-                  << it->data_vec_.block(1,0,3,1).transpose()
-                  << "  acc rotated:"
-                  << (so3.matrix().inverse() * it->data_vec_.block(1,0,3,1)).transpose()
-                  << "  mag: "
-                  << it->data_vec_.block(7,0,3,1).transpose()
-                  << "  mag rotated:"
-                  << (so3.matrix().inverse() * it->data_vec_.block(7,0,3,1)).transpose()
+        std::cout << it->data_vec_.transpose()
+//                  << "  acc:"
+//                  << it->data_vec_.block(1,0,3,1).transpose()
+//                  << "  acc rotated:"
+//                  << (so3.matrix().inverse() * it->data_vec_.block(1,0,3,1)).transpose()
+//                  << "  mag: "
+//                  << it->data_vec_.block(7,0,3,1).transpose()
+//                  << "  mag rotated:"
+//                  << (so3.matrix().inverse() * it->data_vec_.block(7,0,3,1)).transpose()
                   << std::endl;
     }
 

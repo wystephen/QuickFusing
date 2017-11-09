@@ -200,8 +200,8 @@ int main(int argc, char *argv[]) {
 //    Scale_axis =
 //
 //            238   263   269
-    Eigen::Vector3d central(5,105,283);//imu
-    Eigen::Vector3d scale(238,263,269);//imu
+    Eigen::Vector3d central(5, 105, 283);//imu
+    Eigen::Vector3d scale(238, 263, 269);//imu
 //    Eigen::Vector3d central(-63, -108, 151);//imu2
 //    Eigen::Vector3d scale(241, 264, 283);//imu2
 
@@ -509,10 +509,9 @@ int main(int argc, char *argv[]) {
     globalOptimizer.initializeOptimization();
     globalOptimizer.optimize(100);
     std::ofstream test("./ResultData/test.txt");
-    std::ofstream test_imu ("./ResultData/text_imu.txt");
+    std::ofstream test_imu("./ResultData/text_imu.txt");
 
-    for(int k(0);k<ix.size();++k)
-    {
+    for (int k(0); k < ix.size(); ++k) {
         test_imu << ix[k]
                  << ","
                  << iy[k]
@@ -529,6 +528,21 @@ int main(int argc, char *argv[]) {
 
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);
+    }
+
+    for (auto it = key_info_mag.begin();
+         it != key_info_mag.end();
+         ++it) {
+        double t_data[10] = {0};
+        globalOptimizer.vertex(it->index_)->getEstimateData(t_data);
+
+        Sophus::SO3 so3(t_data[3], t_data[4], t_data[5]);
+
+        std::cout << "acc:"
+                  << (so3.matrix() * it->data_vec_.block(1,0,3,1)).transpose()
+                  << "mag :"
+                  << (so3.matrix() * it->data_vec_.block(7,0,3,1)).transpose()
+                  << std::endl;
     }
 
 

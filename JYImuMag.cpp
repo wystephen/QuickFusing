@@ -173,8 +173,8 @@ int main(int argc, char *argv[]) {
 
 //    initial_para.sigma_a_ = 1.1;//zupt detector parameter
 //    initial_para.sigma_g_ = 2.0 / 180.0 * M_PI;
-    initial_para.sigma_a_ = 0.01;//zupt detector parameter
-    initial_para.sigma_g_ = 0.01 / 180.0 * M_PI;
+    initial_para.sigma_a_ = 0.1;//zupt detector parameter
+    initial_para.sigma_g_ = 0.1 / 180.0 * M_PI;
 
     std::vector<double> ax, ay, az, zupt_v;
 

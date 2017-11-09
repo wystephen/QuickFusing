@@ -116,6 +116,8 @@ target_link_libraries(RealTimeGraphLocation ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYT
 # for only imu mag
 add_executable(ImuOnlyGraph IMUOnly-graph_test.cpp)
 target_link_libraries(ImuOnlyGraph ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
+add_executable(EKFOnly EKFOnly.cpp)
+target_link_libraries(EKFOnly ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
 
 
 # imu mag fusion based on gtsam

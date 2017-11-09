@@ -156,7 +156,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
-    std::string dir_name = "/home/steve/Data/II/16/";
+    std::string dir_name = "/home/steve/Data/II/20/";
 
     /// Global parameters
 //    double first_info(10), second_info(10 * M_PI / 180.0);
@@ -550,15 +550,16 @@ int main(int argc, char *argv[]) {
 
         Sophus::SO3 so3(t_data[3], t_data[4], t_data[5]);
 
-        std::cout << it->data_vec_.transpose()
-//                  << "  acc:"
-//                  << it->data_vec_.block(1,0,3,1).transpose()
-//                  << "  acc rotated:"
-//                  << (so3.matrix().inverse() * it->data_vec_.block(1,0,3,1)).transpose()
-//                  << "  mag: "
-//                  << it->data_vec_.block(7,0,3,1).transpose()
-//                  << "  mag rotated:"
-//                  << (so3.matrix().inverse() * it->data_vec_.block(7,0,3,1)).transpose()
+        std::cout
+                //<< it->data_vec_.transpose()
+                  << "  acc:"
+                  << it->data_vec_.block(1,0,3,1).transpose()
+                  << "  acc rotated:"
+                  << (so3.matrix().inverse() * it->data_vec_.block(1,0,3,1)).transpose()
+                  << "  mag: "
+                  << it->data_vec_.block(7,0,3,1).transpose()
+                  << "  mag rotated:"
+                  << (so3.matrix().inverse() * it->data_vec_.block(7,0,3,1)).transpose()
                   << std::endl;
     }
 

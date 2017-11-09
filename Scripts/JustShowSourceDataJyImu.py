@@ -29,7 +29,7 @@ import numpy as np
 
 if __name__ == '__main__':
     dir_nema = '/home/steve/Data/II/16/'
-    imudata = np.loadtxt(dir_nema+'imu2.txt')
+    imudata = np.loadtxt(dir_nema+'imu2.txt',delimiter=',')
 
     plt.figure()
     plt.title("acc")

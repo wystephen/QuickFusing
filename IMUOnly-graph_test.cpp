@@ -284,7 +284,7 @@ int main(int argc, char *argv[]) {
     initial_para.sigma_acc_ *= 6.0;
     initial_para.sigma_gyro_ *= 6.0;
 
-    initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
+    initial_para.ZeroDetectorWindowSize_ = 15;// Time windows size fo zupt detector
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 1, 20, 6));

@@ -538,13 +538,13 @@ int main(int argc, char *argv[]) {
 
         Sophus::SO3 so3(t_data[3], t_data[4], t_data[5]);
 
-        std::cout << "acc:"
+        std::cout << "  acc:"
                   << it->data_vec_.block(1,0,3,1).transpose()
-                  << "acc rotated:"
+                  << "  acc rotated:"
                   << (so3.matrix().inverse() * it->data_vec_.block(1,0,3,1)).transpose()
-                  << "mag: "
+                  << "  mag: "
                   << it->data_vec_.block(7,0,3,1).transpose()
-                  << "mag rotated:"
+                  << "  mag rotated:"
                   << (so3.matrix().inverse() * it->data_vec_.block(7,0,3,1)).transpose()
                   << std::endl;
     }

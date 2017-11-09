@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
@@ -200,10 +200,10 @@ int main(int argc, char *argv[]) {
 //    Scale_axis =
 //
 //            238   263   269
-//    Eigen::Vector3d central(5,105,283);//imu
-//    Eigen::Vector3d scale(238,263,269);//imu
-    Eigen::Vector3d central(-63, -108, 151);//imu2
-    Eigen::Vector3d scale(241, 264, 283);//imu2
+    Eigen::Vector3d central(5,105,283);//imu
+    Eigen::Vector3d scale(238,263,269);//imu
+//    Eigen::Vector3d central(-63, -108, 151);//imu2
+//    Eigen::Vector3d scale(241, 264, 283);//imu2
 
 
     for (int i(0); i < imudata.rows(); ++i) {

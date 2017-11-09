@@ -223,6 +223,8 @@ int main(int argc, char *argv[]) {
 
     std::cout << "source imu data :\n" << imudata.block(0,0,10,10)<<std::endl;
 
+    std::cout << "source imu data last 10 lines:\n"<< imudata.block(imudata.rows()-11,0,10,10)<<std::endl;
+
 
     std::vector<double> ix, iy, iz; //ix iy
     std::vector<double> gx, gy;// graph x
@@ -274,8 +276,8 @@ int main(int argc, char *argv[]) {
     initial_para.Ts_ = 1.0f / 200.0f;
 
 
-    initial_para.sigma_a_ = 0.2;
-    initial_para.sigma_g_ = 1.0 / 180.0 * M_PI;
+    initial_para.sigma_a_ = 0.01;
+    initial_para.sigma_g_ = 0.05 / 180.0 * M_PI;
 
 
     initial_para.gravity_ = 9.8;
@@ -286,7 +288,7 @@ int main(int argc, char *argv[]) {
     initial_para.sigma_acc_ *= 6.0;
     initial_para.sigma_gyro_ *= 6.0;
 
-    initial_para.ZeroDetectorWindowSize_ = 45;// Time windows size fo zupt detector
+    initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 
     MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 1, 20, 6));
@@ -506,6 +508,12 @@ int main(int argc, char *argv[]) {
         iy.push_back(tx(1));
         iz.push_back(tx(2));
     }
+
+    std::cout << "after imu data :\n" << imudata.block(0,0,10,10)<<std::endl;
+
+    std::cout << "after imu data last 10 lines:\n"<< imudata.block(imudata.rows()-11,0,10,10)<<std::endl;
+
+
 
     ///optimization
 

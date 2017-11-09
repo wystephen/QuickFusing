@@ -29,8 +29,8 @@
 
 RelativeMagEdge::RelativeMagEdge(const Eigen::Vector3d &src_mag,
                                  const Eigen::Vector3d &target_mag) {
-    src_mag_ = src_mag/src_mag.norm();
-    target_mag_ = target_mag/target_mag.norm();
+    src_mag_ = src_mag / src_mag.norm();
+    target_mag_ = target_mag / target_mag.norm();
 }
 
 bool RelativeMagEdge::read(std::istream &is) {
@@ -50,11 +50,11 @@ void RelativeMagEdge::computeError() {
     from->getEstimateData(p1);
     to->getEstimateData(p2);
 
-    Sophus::SO3 from_so3(p1[3],p1[4],p1[5]);
-    Sophus::SO3 to_so3(p2[3],p2[4],p2[5]);
+    Sophus::SO3 from_so3(p1[3], p1[4], p1[5]);
+    Sophus::SO3 to_so3(p2[3], p2[4], p2[5]);
 
-    Eigen::Vector3d tmp_vec = (from_so3.matrix() * src_mag_ -
-            to_so3.matrix() * target_mag_);
+    Eigen::Vector3d tmp_vec = (from_so3.matrix().inverse() * src_mag_ -
+                               to_so3.matrix().inverse() * target_mag_);
 //    for(int i(0);i<3;++i)
 //    {
 //        if(tmp_vec(i)>M_PI/2.0)
@@ -72,7 +72,7 @@ void RelativeMagEdge::computeError() {
 }
 
 bool RelativeMagEdge::setMeasurementFromState() {
-    setMeasurement(Eigen::Vector3d(0,0,0));
+    setMeasurement(Eigen::Vector3d(0, 0, 0));
     return true;
 }
 

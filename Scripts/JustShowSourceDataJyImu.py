@@ -39,6 +39,7 @@ if __name__ == '__main__':
     plt.legend()
 
 
+
     plt.figure()
     plt.title("gyro")
     for i in range(3):

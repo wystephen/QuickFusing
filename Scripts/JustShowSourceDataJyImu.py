@@ -63,8 +63,8 @@ if __name__ == '__main__':
     plt.title("mag")
     for i in range(3):
         plt.plot((imudata[:,i+7]-mag_cent[i])/mag_scale[i],'*-',label=str(i))
+
+    plt.plot(np.linalg.norm((imudata[:,7:10]-mag_cent)/mag_scale,axis=1),'r-',label="norm")
     plt.grid()
     plt.legend()
-
-
     plt.show()

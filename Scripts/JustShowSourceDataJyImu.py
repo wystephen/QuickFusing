@@ -39,6 +39,8 @@ if __name__ == '__main__':
     plt.title("acc")
     for i in range(3):
         plt.plot((imudata[:,i+1]-acc_cent[i])/acc_scale[i],'*-',label=str(i))
+
+    plt.plot(np.linalg.norm((imudata[:,1:4]-acc_cent)/acc_scale,axis=1),'r-',label="norm")
     plt.grid()
     plt.legend()
 

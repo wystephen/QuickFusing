@@ -100,10 +100,10 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/II/20/";
+    std::string dir_name = "/home/steve/Data/II/16/";
 
     /// Global parameters
-    double first_info(1000), second_info(10000), ori_info(9.8);
+    double first_info(0.01), second_info(0.1), ori_info(5);
     double gravity_info(9.8);
     double zero_z_info(-10.1);
 
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
     initial_para.gravity_ = gravity_info;
 //    initial_para.sigma_a_ /= 3.0;
 //    initial_para.sigma_g_ /= 3.0;
-    initial_para.sigma_acc_ = Eigen::Vector3d(1,1,1)*200.0*first_info;
+    initial_para.sigma_acc_ = Eigen::Vector3d(1,1,1)*first_info;
     initial_para.sigma_gyro_ = Eigen::Vector3d(1,1,1)/180.0*M_PI*second_info;
 //    initial_para.sigma_acc_ *= 6.0;
 //    initial_para.sigma_gyro_ *= 6.0;
@@ -270,10 +270,10 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ori_2,"b-+");
 //    plt::plot(ori_3,"g-+");
     plt::title("show");
-    plt::save(std::to_string(first_info)+":"
-    +std::to_string(second_info)+":"
-    +std::to_string(ori_info)+".png");
-//    plt::show();
+//    plt::save(std::to_string(first_info)+":"
+//    +std::to_string(second_info)+":"
+//    +std::to_string(ori_info)+".png");
+    plt::show();
 
 
 }

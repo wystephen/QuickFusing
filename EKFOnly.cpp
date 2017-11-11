@@ -275,10 +275,10 @@ int main(int argc, char *argv[]) {
 //    plt::plot(ori_2,"b-+");
 //    plt::plot(ori_3,"g-+");
     plt::title("show");
-    plt::save(std::to_string(first_info)+":"
-    +std::to_string(second_info)+":"
-    +std::to_string(ori_info)+".png");
-//    plt::show();
+//    plt::save(std::to_string(first_info)+":"
+//    +std::to_string(second_info)+":"
+//    +std::to_string(ori_info)+".png");
+    plt::show();
 
 
 }

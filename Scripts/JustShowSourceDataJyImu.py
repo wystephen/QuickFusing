@@ -31,12 +31,17 @@ if __name__ == '__main__':
     dir_nema = '/home/steve/Data/II/16/'
     imudata = np.loadtxt(dir_nema+'imu2.txt',delimiter=',')
 
+
+    acc_cent = [0.0195,0.0154,-0.0877]
+    acc_scale =[ 1.0015,1.0008,1.0336]
+
     plt.figure()
     plt.title("acc")
     for i in range(3):
-        plt.plot(imudata[:,i+1],'*-',label=str(i))
+        plt.plot((imudata[:,i+1]-acc_cent[i])/acc_scale[i],'*-',label=str(i))
     plt.grid()
     plt.legend()
+
 
 
 
@@ -48,10 +53,14 @@ if __name__ == '__main__':
     plt.legend()
 
 
+    mag_cent = [-58.0512,-117.0970,151.9004]
+    mag_scale = [213.8826,208.3894,232.3945]
+
+
     plt.figure()
     plt.title("mag")
     for i in range(3):
-        plt.plot(imudata[:,i+7],'*-',label=str(i))
+        plt.plot((imudata[:,i+7]-mag_cent[i])/mag_scale[i],'*-',label=str(i))
     plt.grid()
     plt.legend()
 

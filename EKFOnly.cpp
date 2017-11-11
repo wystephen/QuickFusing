@@ -145,7 +145,10 @@ int main(int argc, char *argv[]) {
     Eigen::Vector3d scale(238, 263, 269);//imu
 //    Eigen::Vector3d central(-63, -108, 151);//imu2
 //    Eigen::Vector3d scale(241, 264, 283);//imu2
-
+//    acc_cent = [0.0195,0.0154,-0.0877]
+//    acc_scale =[ 1.0015,1.0008,1.0336]
+    Eigen::Vector3d acc_cent = Eigen::Vector3d(0.0195,0.0154,-0.0877);
+    Eige
 
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {

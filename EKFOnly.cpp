@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/II/20/";
 
     /// Global parameters
-    double first_info(0.01), second_info(2.5), ori_info(100);
+    double first_info(0.1), second_info(2.5), ori_info(100);
     double gravity_info(9.8);
     double zero_z_info(-10.1);
 

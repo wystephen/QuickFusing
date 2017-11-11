@@ -148,12 +148,13 @@ int main(int argc, char *argv[]) {
 //    acc_cent = [0.0195,0.0154,-0.0877]
 //    acc_scale =[ 1.0015,1.0008,1.0336]
     Eigen::Vector3d acc_cent = Eigen::Vector3d(0.0195,0.0154,-0.0877);
-    Eige
+    Eigen::Vector3d acc_scale = Eigen::Vector3d(1.0015,1.0008,1.0336);
 
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
             if (0 < j && j < 4) {
+                imudata(i,j) = (imudata(i,j)-acc_cent(j-1))/acc_scale(j-1);
                 imudata(i, j) *= 9.8;
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);

@@ -100,10 +100,10 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/II/20/";
+    std::string dir_name = "/home/steve/Data/II/16/";
 
     /// Global parameters
-    double first_info(0.1), second_info(2.5), ori_info(100);
+    double first_info(8.1), second_info(7.5), ori_info(100);
     double gravity_info(9.8);
     double zero_z_info(-10.1);
 
@@ -147,14 +147,14 @@ int main(int argc, char *argv[]) {
 //    Eigen::Vector3d scale(241, 264, 283);//imu2
 //    acc_cent = [0.0195,0.0154,-0.0877]
 //    acc_scale =[ 1.0015,1.0008,1.0336]
-    Eigen::Vector3d acc_cent = Eigen::Vector3d(0.0195,0.0154,-0.0877);
-    Eigen::Vector3d acc_scale = Eigen::Vector3d(1.0015,1.0008,1.0336);
+    Eigen::Vector3d acc_cent = Eigen::Vector3d(0.0195, 0.0154, -0.0877);
+    Eigen::Vector3d acc_scale = Eigen::Vector3d(1.0015, 1.0008, 1.0336);
 
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
             if (0 < j && j < 4) {
-                imudata(i,j) = (imudata(i,j)-acc_cent(j-1))/acc_scale(j-1);
+                imudata(i, j) = (imudata(i, j) - acc_cent(j - 1)) / acc_scale(j - 1);
                 imudata(i, j) *= 9.8;
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
@@ -188,15 +188,15 @@ int main(int argc, char *argv[]) {
     initial_para.Ts_ = 1.0f / 200.0f;
 
 
-    initial_para.sigma_a_ = 0.01*ori_info;
-    initial_para.sigma_g_ = 0.01*ori_info / 180.0 * M_PI;
+    initial_para.sigma_a_ = 0.01 * ori_info;
+    initial_para.sigma_g_ = 0.01 * ori_info / 180.0 * M_PI;
 
 
-    initial_para.gravity_ = gravity_info;
+    initial_para.gravity_ = 9.8;
 //    initial_para.sigma_a_ /= 3.0;
 //    initial_para.sigma_g_ /= 3.0;
-    initial_para.sigma_acc_ = Eigen::Vector3d(1,1,1)*first_info;
-    initial_para.sigma_gyro_ = Eigen::Vector3d(1,1,1)/180.0*M_PI*second_info;
+    initial_para.sigma_acc_ = Eigen::Vector3d(1, 1, 1) * first_info;
+    initial_para.sigma_gyro_ = Eigen::Vector3d(1, 1, 1) / 180.0 * M_PI * second_info;
     initial_para.sigma_vel_ /= 50.0;
 //    initial_para.sigma_acc_ *= 6.0;
 //    initial_para.sigma_gyro_ *= 6.0;

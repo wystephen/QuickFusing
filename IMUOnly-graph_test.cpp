@@ -156,7 +156,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
-    std::string dir_name = "/home/steve/Data/II/20/";
+    std::string dir_name = "/home/steve/Data/II/16/";
 
     /// Global parameters
 //    double first_info(10), second_info(10 * M_PI / 180.0);
@@ -200,16 +200,20 @@ int main(int argc, char *argv[]) {
 //    Scale_axis =
 //
 //            238   263   269
-    Eigen::Vector3d central(5, 105, 283);//imu
-    Eigen::Vector3d scale(238, 263, 269);//imu
-//    Eigen::Vector3d central(-63, -108, 151);//imu2
-//    Eigen::Vector3d scale(241, 264, 283);//imu2
-
+//    Eigen::Vector3d central(5, 105, 283);//imu
+//    Eigen::Vector3d scale(238, 263, 269);//imu
+    Eigen::Vector3d central(-58.0512,-117.0970,151.9001);//imu2
+    Eigen::Vector3d scale(213.8826,208.3894,232.3945);//imu2
+//    acc_cent = [0.0195,0.0154,-0.0877]
+//    acc_scale =[ 1.0015,1.0008,1.0336]
+    Eigen::Vector3d acc_cent = Eigen::Vector3d(0.0195, 0.0154, -0.0877);
+    Eigen::Vector3d acc_scale = Eigen::Vector3d(1.0015, 1.0008, 1.0336);
 
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
             if (0 < j && j < 4) {
+                imudata(i, j) = (imudata(i, j) - acc_cent(j - 1)) / acc_scale(j - 1);
                 imudata(i, j) *= 9.8;
             } else if (4 <= j && j < 7) {
                 imudata(i, j) *= (M_PI / 180.0f);
@@ -285,8 +289,9 @@ int main(int argc, char *argv[]) {
 //    initial_para.sigma_g_ /= 3.0;
 //    initial_para.sigma_acc_ = Eigen::Vector3d(0.01,0.01,0.01)*200.0;
 //    initial_para.sigma_gyro_ = Eigen::Vector3d(0.01,0.01,0.01)/180.0*M_PI*200.0;
-    initial_para.sigma_acc_ *= 6.0;
-    initial_para.sigma_gyro_ *= 6.0;
+    initial_para.sigma_acc_ = Eigen::Vector3d(1, 1, 1) * 8.0;
+    initial_para.sigma_gyro_ = Eigen::Vector3d(1, 1, 1) / 180.0 * M_PI * 6.0;
+    initial_para.sigma_vel_ /= 50.0;
 
     initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 

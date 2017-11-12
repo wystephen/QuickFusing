@@ -165,6 +165,7 @@ int main(int argc, char *argv[]) {
     double first_info(1000), second_info(10000), ori_info(0.5);
     double gravity_info(0.1);
     double zero_z_info(-10.1);
+    double mag_threold(0.1);
 
     if (argc >= 4) {
         first_info = std::stod(argv[1]);
@@ -178,6 +179,11 @@ int main(int argc, char *argv[]) {
 
     if (argc >= 6) {
         zero_z_info = std::stod(argv[5]);
+    }
+
+    if(argc>= 7)
+    {
+        mag_threold = std::stod(argv[6]);
     }
 
     double turn_threshold = 10.0 / 180.0 * M_PI;
@@ -443,7 +449,7 @@ int main(int argc, char *argv[]) {
                  iter != key_info_mag.end();
                  iter++) {
                 if ((iter->data_vec_.block(7, 0, 3, 1).transpose() -
-                     imudata.block(index, 7, 1, 3)).norm() < 0.04) {
+                     imudata.block(index, 7, 1, 3)).norm() < mag_threold) {
 //                    std::cout << "src :" << iter->data_vec_.block(7, 0, 3, 1) << std::endl;
 //                    std::cout << "target :" << imudata.block(index, 7, 1, 3).transpose() << std::endl;
                     auto *mag_edge = new RelativeMagEdge(iter->data_vec_.block(7, 0, 3, 1),

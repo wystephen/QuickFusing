@@ -443,7 +443,7 @@ int main(int argc, char *argv[]) {
                  iter != key_info_mag.end();
                  iter++) {
                 if ((iter->data_vec_.block(7, 0, 3, 1).transpose() -
-                     imudata.block(index, 7, 1, 3)).norm() < 0.15) {
+                     imudata.block(index, 7, 1, 3)).norm() < 0.04) {
 //                    std::cout << "src :" << iter->data_vec_.block(7, 0, 3, 1) << std::endl;
 //                    std::cout << "target :" << imudata.block(index, 7, 1, 3).transpose() << std::endl;
                     auto *mag_edge = new RelativeMagEdge(iter->data_vec_.block(7, 0, 3, 1),
@@ -560,11 +560,11 @@ int main(int argc, char *argv[]) {
                   << "  acc:"
                   << it->data_vec_.block(1,0,3,1).transpose()
                   << "  acc rotated:"
-                  << (so3.matrix() * it->data_vec_.block(1,0,3,1)).transpose()
+                  << (so3.matrix().inverse() * it->data_vec_.block(1,0,3,1)).transpose()
                   << "  mag: "
                   << it->data_vec_.block(7,0,3,1).transpose()
                   << "  mag rotated:"
-                  << (so3.matrix() * it->data_vec_.block(7,0,3,1)).transpose()
+                  << (so3.matrix().inverse() * it->data_vec_.block(7,0,3,1)).transpose()
                   << std::endl;
     }
 

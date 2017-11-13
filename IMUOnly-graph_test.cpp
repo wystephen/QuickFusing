@@ -414,7 +414,7 @@ int main(int argc, char *argv[]) {
 
                 edge_se3->setInformation(information);
 
-                edge_se3->setMeasurement(last_transform * the_transform.inverse());
+                edge_se3->setMeasurement(last_transform.inverse() * the_transform);
                 globalOptimizer.addEdge(edge_se3);
 
 

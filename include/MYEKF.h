@@ -568,8 +568,8 @@ public:
 
             P_ = (Id - K * H_) * P_.eval();
 
-            if (P_.block(0, 0, 3, 3).mean() > 1e10) {
-                P_.block(0, 0, 3, 3) /= 1e10;
+            if (P_.block(0, 0, 3, 3).mean() > 1e3) {
+                P_.block(0, 0, 3, 3) /= 1e2;
                 if (!outputted_warning) {
                     std::cerr << "error at :" << __FILE__
                               << ":"

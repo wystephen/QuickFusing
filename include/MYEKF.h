@@ -291,11 +291,15 @@ public:
         p.resize(6);
         p.setZero();
 
-        p.block(0, 0, 4, 1) = q.array().pow(2.0);
+//        p.block(0, 0, 4, 1) = q.array().pow(2.0);
+        for(int i(0);i<4;++i)
+        {
+            p(i)  = q(i)*q(i);
+        }
 
         p(4) = p(1) + p(2);
 
-        if (fabs(p(0) + p(3) + p(4)) > 1e-18) {
+        if (fabs(p(0) + p(3) + p(4)) > 1e-38) {
             p(5) = 2.0 / (p(0) + p(3) + p(4));
 
         } else {
@@ -380,8 +384,19 @@ public:
 
             //TODO: Try to use rotation matrix?
             // first-order Runge-Kutta use to update the q....
-            quat_ = (std::cos(v / 2.0) * Eigen::Matrix4d::Identity() +
-                     2.0 / v * sin(v / 2.0) * OMEGA) * (q);
+//            quat_ = (std::cos(v / 2.0) * Eigen::Matrix4d::Identity() +
+//                     2.0 / v * sin(v / 2.0) * OMEGA) * (q);
+
+
+            // Another type of update methond.
+            /**
+             * q = exp(t/2 * OMEGA) * q
+             */
+
+            Eigen::Matrix4d expOMEGA = Eigen::Matrix4d::Identity();
+            expOMEGA +=(OMEGA+0.5*OMEGA*OMEGA+1/6.0*OMEGA*OMEGA*OMEGA+1/6.0/4.0*OMEGA*OMEGA*OMEGA*OMEGA);
+            quat_ = expOMEGA*q;
+
 
             quat_ /= quat_.norm();
 //            quat_ /= quat_(3);

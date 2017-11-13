@@ -156,7 +156,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
-    std::string dir_name = "/home/steve/Data/II/19/";
+    std::string dir_name = "/home/steve/Data/II/17/";
 
     /// Global parameters
 //    double first_info(10), second_info(10 * M_PI / 180.0);
@@ -297,7 +297,7 @@ int main(int argc, char *argv[]) {
 //    initial_para.sigma_acc_ = Eigen::Vector3d(0.01,0.01,0.01)*200.0;
 //    initial_para.sigma_gyro_ = Eigen::Vector3d(0.01,0.01,0.01)/180.0*M_PI*200.0;
     initial_para.sigma_acc_ = Eigen::Vector3d(1, 1, 1) * 8.0;
-    initial_para.sigma_gyro_ = Eigen::Vector3d(1, 1, 1) / 180.0 * M_PI * 6.0;
+    initial_para.sigma_gyro_ = Eigen::Vector3d(1, 1, 1) / 180.0 * M_PI * 7.5;
     initial_para.sigma_vel_ /= 50.0;
 
     initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
@@ -468,7 +468,7 @@ int main(int argc, char *argv[]) {
 
 
                     static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct("Cauchy");
-                    mag_edge->setRobustKernel(robustKernel);
+//                    mag_edge->setRobustKernel(robustKernel);
 
                     globalOptimizer.addEdge(mag_edge);
 

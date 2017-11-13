@@ -579,7 +579,7 @@ public:
             std::cout << P_ << std::endl << x_h_ << std::endl;
         }
 
-        assert(!std::isinf(P_.sum()) && !std::isnan(P_.sum()) && !std::isnan(x_h_.sum()) && !std::isinf(x_h_.sum()));
+//        assert(!std::isinf(P_.sum()) && !std::isnan(P_.sum()) && !std::isnan(x_h_.sum()) && !std::isinf(x_h_.sum()));
 
 
         /**

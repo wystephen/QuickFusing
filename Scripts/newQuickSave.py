@@ -22,7 +22,7 @@ if __name__ == '__main__':
     # dir_name = "/home/steve/tmp/test/20/"
 
 
-    a = np.loadtxt(dir_name + 'imu.txt', delimiter=',')
+    a = np.loadtxt(dir_name + 'imu2.txt', delimiter=',')
     print(a[:, 1:4].shape)
     # a[:,1:4] *= 9.816
 

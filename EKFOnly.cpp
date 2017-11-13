@@ -103,7 +103,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/II/16/";
+    std::string dir_name = "/home/steve/Data/II/19/";
 
     /// Global parameters
     double first_info(8.1), second_info(7.5), ori_info(100);
@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
 
     initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 
-    EKFEigen myekf(initial_para);
+    EKFSimple myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 1, 20, 6));
 
     double last_zupt_flag = 0.0;

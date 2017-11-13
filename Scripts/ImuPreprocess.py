@@ -125,6 +125,7 @@ class ImuPreprocess:
             self.all_quat[index, :] = ins_filter.quat1.reshape([1, -1])
 
         self.trace_x = self.trace_x.transpose()
+        print(ins_filter.P)
 
         print(self.trace_x.shape)
         np.savetxt("./tmp_data/trace.txt", self.trace_x)

@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
 //    initial_para.sigma_g_ = 0.01 * ori_info / 180.0 * M_PI;
 
 
-    initial_para.gravity_ = 9.8;
+    initial_para.gravity_ = 9.75;
     initial_para.sigma_a_ *=5.0;
     initial_para.sigma_g_ *=5.0;
 //    initial_para.sigma_acc_ = Eigen::Vector3d(1, 1, 1) * first_info;

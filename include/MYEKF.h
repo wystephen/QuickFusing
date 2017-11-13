@@ -131,7 +131,10 @@ public:
         f_w = u.col(2).mean();
 
 
-        double roll(atan2(-f_v, -f_w)), pitch(atan2(f_u, sqrt(f_v * f_v + f_w * f_w)));
+//        double roll(atan2(-f_v, -f_w)), pitch(atan2(f_u, sqrt(f_v * f_v + f_w * f_w)));
+        double roll(std::atan2(-f_v, -f_w));
+        double pitch(std::atan2(f_u, std::sqrt(f_v * f_v + f_w * f_w)));
+
 
         Eigen::Vector3d attitude(roll, pitch, para_.init_heading1_);
 
@@ -565,7 +568,7 @@ public:
         }
 
 
-        P_ = (P_.eval() * 0.5 + P_.transpose().eval() * 0.5);
+        P_ = (P_ + P_.transpose()) * 0.5;
 
 
         /**

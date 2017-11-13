@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
                 imudata(i, j) = (imudata(i, j) - acc_cent(j - 1)) / acc_scale(j - 1);
                 imudata(i, j) *= 9.8;
             } else if (4 <= j && j < 7) {
-                imudata(i, j) *= (M_PI / 180.0f);
+                imudata(i, j) *= double(M_PI / 180.0);
             } else if (7 <= j && j < 10) {
                 imudata(i, j) = (imudata(i, j) - central(j - 7)) / scale(j - 7);
             }
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
     SettingPara initial_para(true);
     initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
     initial_para.init_heading1_ = 0.0;
-    initial_para.Ts_ = 1.0f / 200.0f;
+    initial_para.Ts_ = 0.005;//1.0f / 200.0f;
 
 
 //    initial_para.sigma_a_ = 0.01 * ori_info;
@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 //    initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 
     MyEkf myekf(initial_para);
-    myekf.InitNavEq(imudata.block(0, 1, 20, 6));
+    myekf.InitNavEq(imudata.block(10, 1, 40, 6));
 
     double last_zupt_flag = 0.0;
 

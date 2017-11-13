@@ -268,7 +268,7 @@ public:
 
             Eigen::Vector4d quart(qx, qy, qz, qw);
 //            std::cout << "quart:" << quart << "norm:" << quart.norm() << std::endl;
-            quart /= quart.norm();
+//            quart /= quart.norm();
 
             return quart;
 
@@ -496,9 +496,9 @@ public:
     }
 
 
-    Eigen::VectorXd ComputeInternalState(Eigen::VectorXd x_in,
-                                         Eigen::VectorXd dx,
-                                         Eigen::VectorXd q_in) {
+    Eigen::VectorXd ComputeInternalState(const Eigen::VectorXd &x_in,
+                                         const Eigen::VectorXd &dx,
+                                         const Eigen::VectorXd &q_in) {
 
 //        MYCHECK(1);
 
@@ -521,7 +521,8 @@ public:
         OMEGA(2, 1) = epsilon(0);
 
 
-        R = (Eigen::Matrix3d::Identity() - OMEGA) * (R);
+//        R = (Eigen::Matrix3d::Identity() - OMEGA) * (R);
+        R = (Eigen::Matrix3d::Identity() - OMEGA + 1.0/2.0 * OMEGA*OMEGA-1.0/6.0*OMEGA*OMEGA*OMEGA)*R.eval();
 
 //        std::cout << "current R:" << R << std::endl;
         //std::cout << "delta theta :" << get

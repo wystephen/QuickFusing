@@ -131,20 +131,19 @@ public:
         f_w = u.col(2).mean();
 
 
-        double roll(atan2(-f_v, -f_w)), pitch(atan2(f_u, sqrt(f_v * f_v + f_w * f_w)));
+        double roll(std::atan(f_v/f_w)), pitch(-std::asin(f_u/std::sqrt(f_u*f_u+f_v*f_v+f_w*f_w)));
 
         Eigen::Vector3d attitude(roll, pitch, para_.init_heading1_);
 
         Eigen::Matrix3d Rb2t = Rt2b(attitude);
         Rb2t.transposeInPlace();
 
-        Eigen::Vector3d g_v = u.block(0, 0, 1, 3).transpose();
+        Eigen::Vector3d g_v = u.block(0,0,1,3).transpose();
         g_v = Rb2t * g_v;
-        std::cout << " g_v in ekf InitNavEq:"
-                  << g_v.transpose() << std::endl;
+        std::cout  << " g_v in ekf InitNavEq:"
+                   << g_v.transpose() << std::endl;
         std::cout << "g_v sum : " << g_v.sum() << std::endl;
-        assert((std::abs(g_v(2)) > std::abs(g_v.sum() * 0.9)) &&
-               "initial Attitude Error!acc in z-axis not similar to gravity");
+        assert((std::abs(g_v(2))>std::abs(g_v.sum()*0.9))&&"initial Attitude Error!acc in z-axis not similar to gravity");
 
 
 //        std::cout << "test gravity in ekf : "

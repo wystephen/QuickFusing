@@ -567,11 +567,11 @@ int main(int argc, char *argv[]) {
                   << "  acc:"
                   << it->data_vec_.block(1,0,3,1).transpose()
                   << "  acc rotated:"
-                  << (so3.matrix().inverse() * it->data_vec_.block(1,0,3,1)).transpose()
+                  << (so3.matrix() * it->data_vec_.block(1,0,3,1)).transpose()
                   << "  mag: "
                   << it->data_vec_.block(7,0,3,1).transpose()
                   << "  mag rotated:"
-                  << (so3.matrix().inverse() * it->data_vec_.block(7,0,3,1)).transpose()
+                  << (so3.matrix() * it->data_vec_.block(7,0,3,1)).transpose()
                   << std::endl;
     }
 

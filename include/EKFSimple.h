@@ -69,7 +69,7 @@ public:
         Eigen::Vector3d attitude(roll, pitch, para_.init_heading1_);
 //
 
-        std::cout << "roll : " << roll << "pitch: " << pitch << std::endl;
+//        std::cout << "roll : " << roll << "pitch: " << pitch << std::endl;
         rotation_matrix_ = Ang2RotMatrix(attitude);
 //        rotation_matrix_ = rotation_matrix_.transpose();
         rotation_matrix_.transposeInPlace();

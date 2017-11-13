@@ -24,6 +24,9 @@
 
 
 #include "MYEKF.h"
+#include "EKFR.h"
+#include "EKFEigen.h"
+#include "EKFSimple.h"
 //#include "Zero_Detecter.h"
 #include<Eigen/Dense>
 #include <Eigen/Geometry>
@@ -203,7 +206,7 @@ int main(int argc, char *argv[]) {
 
     initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 
-    MyEkf myekf(initial_para);
+    EKFR myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 1, 20, 6));
 
     double last_zupt_flag = 0.0;

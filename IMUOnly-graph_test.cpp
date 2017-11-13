@@ -167,6 +167,7 @@ int main(int argc, char *argv[]) {
     double zero_z_info(-10.1);
     double mag_threold(0.1);
 
+
     if (argc >= 4) {
         first_info = std::stod(argv[1]);
         second_info = std::stod(argv[2]);
@@ -413,7 +414,7 @@ int main(int argc, char *argv[]) {
 
                 edge_se3->setInformation(information);
 
-                edge_se3->setMeasurement(last_transform.inverse() * the_transform);
+                edge_se3->setMeasurement(last_transform * the_transform.inverse());
                 globalOptimizer.addEdge(edge_se3);
 
 

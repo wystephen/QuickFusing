@@ -156,7 +156,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/XIMU&UWB/3/";
-    std::string dir_name = "/home/steve/Data/II/16/";
+    std::string dir_name = "/home/steve/Data/II/19/";
 
     /// Global parameters
 //    double first_info(10), second_info(10 * M_PI / 180.0);

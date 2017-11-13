@@ -32,6 +32,7 @@ if __name__ == '__main__':
     ip.computezupt()
     # plt.show()
     ip.findvertex()
+    ip.findcorner()
     print(ip.zupt_result)
 
     np.savetxt(dir_name + "sim_pose.csv", ip.vertics, delimiter=',')

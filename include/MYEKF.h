@@ -530,14 +530,14 @@ public:
         StateMatrix(quat_, u, para_.Ts_);
 //        MYCHECK(1);
 
-        P_ = (F_ * (P_)) * (F_.transpose().eval()) +
-             (G_ * Q_ * G_.transpose().eval());
+        P_ = (F_ * (P_)) * (F_.transpose()) +
+             (G_ * Q_ * G_.transpose());
         if (zupt1 > 0.5) {
             Eigen::Vector3d z(-x_h_.block(3, 0, 3, 1));
 
 
             Eigen::MatrixXd K;
-            K = P_ * H_.transpose().eval() * (H_ * P_ * H_.transpose().eval() + R_).inverse();
+            K = P_ * H_.transpose().eval() * (H_ * P_ * H_.transpose() + R_).inverse();
 
             Eigen::VectorXd dx = K * z;
             dx_ = dx;
@@ -548,18 +548,18 @@ public:
 
             P_ = (Id - K * H_) * P_.eval();
 
-//            if (P_.block(0, 0, 3, 3).mean() > 1e10) {
-//                P_.block(0, 0, 3, 3) /= 1e5;
-//                if (!outputted_warning) {
-//                    std::cerr << "error at :" << __FILE__
-//                              << ":"
-//                              << __LINE__
-//                              << " cov of state(P_) is too large"
-//                              << std::endl;
-//                    outputted_warning = true;
-//                }
-//
-//            }
+            if (P_.block(0, 0, 3, 3).mean() > 1e10) {
+                P_.block(0, 0, 3, 3) /= 1e10;
+                if (!outputted_warning) {
+                    std::cerr << "error at :" << __FILE__
+                              << ":"
+                              << __LINE__
+                              << " cov of state(P_) is too large"
+                              << std::endl;
+                    outputted_warning = true;
+                }
+
+            }
 
             x_h_ = ComputeInternalState(x_h_, dx, quat_);
         }

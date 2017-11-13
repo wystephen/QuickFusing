@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_BUILD_TOOL Release)
 #set(CMAKE_BUILD_TOOL Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -g  -lpthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11  -g  -lpthread")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -S -O -fno-omit-frame-pointer -g  -lpthread -Wreturn-type -Wsign-compare")
 #set(CUDA_NVCC_FLAGSS ${CUDA_NVCC_FLAGS} --gpu-architecture sm_20)
 

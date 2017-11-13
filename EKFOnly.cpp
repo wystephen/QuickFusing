@@ -103,11 +103,11 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/II/17/";
+    std::string dir_name = "/home/steve/Data/II/20/";
 
     /// Global parameters
     double first_info(8.1), second_info(7.5), ori_info(100);
-    double gravity_info(9.8);
+    double gravity_info(9.78);
     double zero_z_info(-10.1);
 
     if (argc >= 4) {

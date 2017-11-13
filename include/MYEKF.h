@@ -334,9 +334,9 @@ public:
      *
      *
      */
-    Eigen::VectorXd NavigationEquation(Eigen::VectorXd x_h,
-                                       Eigen::VectorXd u,
-                                       Eigen::VectorXd q,
+    Eigen::VectorXd NavigationEquation(const Eigen::VectorXd &x_h,
+                                       const Eigen::VectorXd &u,
+                                       const Eigen::VectorXd &q,
                                        double dt) {
 
 //        MYCHECK(1);
@@ -377,7 +377,7 @@ public:
 
             //TODO: Try to use rotation matrix?
             // first-order Runge-Kutta use to update the q....
-            quat_ = (cos(v / 2.0) * Eigen::Matrix4d::Identity() +
+            quat_ = (std::cos(v / 2.0) * Eigen::Matrix4d::Identity() +
                      2.0 / v * sin(v / 2.0) * OMEGA) * (q);
 
             quat_ /= quat_.norm();
@@ -388,7 +388,7 @@ public:
             /*
              * Need not do any thing.
              */
-//            quat_ = q;
+            quat_ = q;
         }
 
 //        MYCHECK(1);
@@ -414,7 +414,6 @@ public:
 
         B.resize(6, 3);
         B.setZero();
-        Eigen::Matrix3d tmp;
 
 //        std::cout << B.rows() << " x " << B.cols() << std::endl;
 //        tmp.setZero();
@@ -522,7 +521,7 @@ public:
      * @param zupt1
      * @return
      */
-    Eigen::VectorXd GetPosition(Eigen::VectorXd u, double zupt1) {
+    Eigen::VectorXd GetPosition(const Eigen::VectorXd &u, double zupt1) {
 
 //        MYCHECK(1);
 
@@ -547,20 +546,20 @@ public:
             Id.resize(9, 9);
             Id.setIdentity();
 
-            P_ = (Id - K * H_) * P_;
+            P_ = (Id - K * H_) * P_.eval();
 
-            if (P_.block(0, 0, 3, 3).mean() > 1e4) {
-                P_.block(0, 0, 3, 3) /= 1e5;
-                if (!outputted_warning) {
-                    std::cerr << "error at :" << __FILE__
-                              << ":"
-                              << __LINE__
-                              << " cov of state(P_) is too large"
-                              << std::endl;
-                    outputted_warning = true;
-                }
-
-            }
+//            if (P_.block(0, 0, 3, 3).mean() > 1e10) {
+//                P_.block(0, 0, 3, 3) /= 1e5;
+//                if (!outputted_warning) {
+//                    std::cerr << "error at :" << __FILE__
+//                              << ":"
+//                              << __LINE__
+//                              << " cov of state(P_) is too large"
+//                              << std::endl;
+//                    outputted_warning = true;
+//                }
+//
+//            }
 
             x_h_ = ComputeInternalState(x_h_, dx, quat_);
         }

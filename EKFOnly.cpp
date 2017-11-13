@@ -191,8 +191,8 @@ int main(int argc, char *argv[]) {
     initial_para.Ts_ = 1.0f / 200.0f;
 
 
-    initial_para.sigma_a_ = 0.01 * ori_info;
-    initial_para.sigma_g_ = 0.01 * ori_info / 180.0 * M_PI;
+//    initial_para.sigma_a_ = 0.01 * ori_info;
+//    initial_para.sigma_g_ = 0.01 * ori_info / 180.0 * M_PI;
 
 
     initial_para.gravity_ = 9.8;
@@ -204,9 +204,9 @@ int main(int argc, char *argv[]) {
 //    initial_para.sigma_acc_ *= 6.0;
 //    initial_para.sigma_gyro_ *= 6.0;
 
-    initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
+//    initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 
-    EKFSimple myekf(initial_para);
+    MyEkf myekf(initial_para);
     myekf.InitNavEq(imudata.block(0, 1, 20, 6));
 
     double last_zupt_flag = 0.0;

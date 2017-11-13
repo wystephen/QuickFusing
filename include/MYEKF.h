@@ -299,15 +299,15 @@ public:
 
         p(4) = p(1) + p(2);
 
-        if (fabs(p(0) + p(3) + p(4)) > 1e-38) {
+        if (fabs(p(0) + p(3) + p(4)) > 1e-10) {
             p(5) = 2.0 / (p(0) + p(3) + p(4));
 
         } else {
             p(5) = 0.0;
         }
 
-        Eigen::Matrix3d R;
-        R.setZero();
+        Eigen::Matrix3d R(Eigen::Matrix3d::Identity());
+//        R.setZero();
 
         R(0, 0) = 1 - p(5) * p(4);
         R(1, 1) = 1 - p(5) * (p(0) + p(2));

@@ -318,7 +318,7 @@ public:
         }
 
 
-        P_ = (P_ * 0.5 + P_.transpose().eval() * 0.5);
+        P_ = (P_ * 0.5 + P_.transpose().eval() * 0.5)*0.5;
 
 
         return x_h_;

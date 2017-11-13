@@ -138,12 +138,13 @@ public:
         Eigen::Matrix3d Rb2t = Rt2b(attitude);
         Rb2t.transposeInPlace();
 
-        Eigen::Vector3d g_v = u.block(0,0,1,3).transpose();
+        Eigen::Vector3d g_v = u.block(0, 0, 1, 3).transpose();
         g_v = Rb2t * g_v;
-        std::cout  << " g_v in ekf InitNavEq:"
-                   << g_v.transpose() << std::endl;
+        std::cout << " g_v in ekf InitNavEq:"
+                  << g_v.transpose() << std::endl;
         std::cout << "g_v sum : " << g_v.sum() << std::endl;
-        assert((std::abs(g_v(2))>std::abs(g_v.sum()*0.9))&&"initial Attitude Error!acc in z-axis not similar to gravity");
+        assert((std::abs(g_v(2)) > std::abs(g_v.sum() * 0.9)) &&
+               "initial Attitude Error!acc in z-axis not similar to gravity");
 
 
 //        std::cout << "test gravity in ekf : "

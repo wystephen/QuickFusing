@@ -201,8 +201,8 @@ int main(int argc, char *argv[]) {
 //    initial_para.sigma_acc_ = Eigen::Vector3d(1, 1, 1) * first_info;
 //    initial_para.sigma_gyro_ = Eigen::Vector3d(1, 1, 1) / 180.0 * M_PI * second_info;
 //    initial_para.sigma_vel_ /= 50.0;
-//    initial_para.sigma_acc_ *= 4.0;
-//    initial_para.sigma_gyro_ *= 4.0;
+    initial_para.sigma_acc_ *= 4.0;
+    initial_para.sigma_gyro_ *= 4.0;
 
 //    initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 

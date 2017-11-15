@@ -159,16 +159,23 @@ public:
              * Renormalization
              */
 
-            Eigen::Matrix3d error_matrix = rotation_matrix_.block(0, 0, 1, 3)*(
-                    Eigen::Vector3d(rotation_matrix_.block(1, 0, 1, 3)).transpose());
+//            Eigen::Matrix<double,1,1> error_matrix = rotation_matrix_.block(0, 0, 1, 3)(
+//                    Eigen::Vector3d(rotation_matrix_.block(1, 0, 1, 3)).transpose());
 
-            double error = error_matrix(0,0);
+            double error = rotation_matrix_(0,0)*rotation_matrix_(1,0)+
+                    rotation_matrix_(0,1)*rotation_matrix_(1,1)+rotation_matrix_(0,2)*rotation_matrix_(1,2);
 
             rotation_matrix_.block(0, 0, 1, 3) = (tmp_r.block(0, 0, 1, 3) -
                                                   error*(tmp_r.block(1, 0, 1, 3)) / 2.0);
 
             rotation_matrix_.block(1, 0, 1, 3) = (tmp_r.block(1, 0, 1, 3) -
                                                   error*(tmp_r.block(1, 0, 1, 3)) / 2.0);
+
+            rotation_matrix_.block(2,0,1,3) = (Eigen::Vector3d(tmp_r.block(0,0,1,3).transpose()).cross(
+                    Eigen::Vector3d(tmp_r.block(1,0,1,3).transpose())
+            )).transpose();
+
+
 
 
         } else {

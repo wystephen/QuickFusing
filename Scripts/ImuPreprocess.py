@@ -26,8 +26,8 @@ class ImuPreprocess:
         self.data[:, 4:7] = self.data[:, 4:7] * np.pi / 180.0
         # use m/s^2 replace g.
 
-        acc_cent = [0.0195,0.0154,-0.0877]
-        acc_scale =[ 1.0015,1.0008,1.0336]
+        acc_cent = [0.0195, 0.0154, -0.0877]
+        acc_scale = [1.0015, 1.0008, 1.0336]
         # for i in range(3):
         #     self.data[:,1:]
         # self.data[:,1:4] = (self.data[:,1:4]-acc_cent)/acc_scale
@@ -200,21 +200,20 @@ class ImuPreprocess:
                 vertex_time.append(self.data[i, 0])
 
                 for j in range(self.data.shape[1]):
-                    vertex_all_data.append(self.data[i,j])
+                    vertex_all_data.append(self.data[i, j])
 
                 if (self.data.shape[1] > 10):
                     vertex_high.append(self.pressure2high(self.data[i, 10]))
-
 
                 for j in range(data_cols):
                     vertex_point.append(self.trace_x[i, j])
 
                 for j in range(6):
-                    vertex_all_data.append(self.trace_x[i,j])
+                    vertex_all_data.append(self.trace_x[i, j])
 
                 for k in range(4):
                     vertex_quat.append(self.all_quat[i, k])
-                    vertex_all_data.append(self.all_quat[i,k])
+                    vertex_all_data.append(self.all_quat[i, k])
                     # vertex_point.append(self.trace_x[i,0])
                     # vertex_point.append(self.trace_x[i,1])
                     # vertex_point.append(self.trace_x[i,2])
@@ -227,7 +226,7 @@ class ImuPreprocess:
         self.vertics_id = np.frombuffer(vertex_to_id, dtype=np.float).reshape([-1])
         self.vertics_id = self.vertics_id.astype(dtype=np.int32)
         self.vertics_time = np.frombuffer(vertex_time, dtype=np.float).reshape([-1])
-        self.vertics_all = np.frombuffer(vertex_all_data,dtype=np.float).reshape([-1,23])
+        self.vertics_all = np.frombuffer(vertex_all_data, dtype=np.float).reshape([-1, 22])
 
         np.savetxt("../TMP_DATA/vertex_pose.csv", self.vertics, delimiter=',')
         np.savetxt("../TMP_DATA/vertex_quat.csv", self.vertex_quat, delimiter=',')

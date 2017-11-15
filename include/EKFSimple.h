@@ -358,6 +358,19 @@ public:
 
             P_ = (Id - K * H_) * P_;
 
+            if (P_.block(0, 0, 3, 3).mean() > 2e2) {
+                P_.block(0, 0, 3, 3) /= 5e2;
+                if (!outputted_warning) {
+                    std::cerr << "error at :" << __FILE__
+                              << ":"
+                              << __LINE__
+                              << " cov of state(P_) is too large"
+                              << std::endl;
+                    outputted_warning = true;
+                }
+
+            }
+
             x_h_ = ComputeInternalState(x_h_, dx);
         }
 

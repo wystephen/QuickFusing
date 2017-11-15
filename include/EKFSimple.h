@@ -164,6 +164,18 @@ public:
 
             double error = rotation_matrix_(0,0)*rotation_matrix_(1,0)+
                     rotation_matrix_(0,1)*rotation_matrix_(1,1)+rotation_matrix_(0,2)*rotation_matrix_(1,2);
+//            std::cout << "err " <<  error << std::endl;
+            if(std::isnan(error))
+            {
+                std::cout << "errrrrrr is nan in "
+                          << __FILE__
+                          << " "
+                          << __LINE__
+                          << " "
+                          << "at function : "
+                          << __FUNCTION__
+                          << std::endl;
+            }
 
             rotation_matrix_.block(0, 0, 1, 3) = (tmp_r.block(0, 0, 1, 3) -
                                                   error*(tmp_r.block(1, 0, 1, 3)) / 2.0);

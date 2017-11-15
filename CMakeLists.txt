@@ -118,7 +118,7 @@ target_link_libraries(ImuOnlyGraph ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIB
 add_executable(EKFOnly EKFOnly.cpp)
 target_link_libraries(EKFOnly ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
 add_executable(DirectMagConstraint DirectMagConstraint.cpp)
-target_link_libraries(DirectMagConstraint.cpp ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
+target_link_libraries(DirectMagConstraint ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
 
 
 # imu mag fusion based on gtsam

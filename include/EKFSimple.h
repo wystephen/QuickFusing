@@ -320,6 +320,10 @@ public:
 //        rotation_matrix_ = ((2 * Eigen::Matrix3d::Identity() + ang_rate_matrix)*
 //                            (2 * Eigen::Matrix3d::Identity() - ang_rate_matrix).inverse) * rotation_matrix_;
         rotation_matrix_ = (Eigen::Matrix3d::Identity() - ang_rate_matrix) * rotation_matrix_;
+        if(rotation_matrix_.hasNaN())
+        {
+            std::cout <<" error here" << std::endl;
+        }
 
 //        rotation_matrix_ = Sophus::SO3::exp(w_tb).matrix() * rotation_matrix_;
 //

@@ -164,11 +164,11 @@ public:
 
             double error = error_matrix(0,0);
 
-            rotation_matrix_.block(0, 0, 1, 3) = (tmp_r.block(0, 0, 1, 3).transpose() -
-                                                  error*(tmp_r.block(1, 0, 1, 3).transpose()) / 2.0).transpose();
+            rotation_matrix_.block(0, 0, 1, 3) = (tmp_r.block(0, 0, 1, 3) -
+                                                  error*(tmp_r.block(1, 0, 1, 3)) / 2.0);
 
-            rotation_matrix_.block(1, 0, 1, 3) = (tmp_r.block(1, 0, 1, 3).transpose() -
-                                                  error*(tmp_r.block(1, 0, 1, 3).transpose()) / 2.0).transpose();
+            rotation_matrix_.block(1, 0, 1, 3) = (tmp_r.block(1, 0, 1, 3) -
+                                                  error*(tmp_r.block(1, 0, 1, 3)) / 2.0);
 
 
         } else {

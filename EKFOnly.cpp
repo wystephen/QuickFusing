@@ -210,6 +210,7 @@ int main(int argc, char *argv[]) {
     EKFSimple myekf(initial_para);
     myekf.InitNavEq(imudata.block(10, 1, 40, 6));
 
+
     double last_zupt_flag = 0.0;
 
     int trace_id(0);

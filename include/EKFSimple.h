@@ -154,6 +154,21 @@ public:
             rotation_matrix_  = rotation_matrix_ * (cos(phi)*Eigen::Matrix3d::Identity()+
                     (1-cos(phi))*alpha*alpha.transpose()+sin(phi)*alpha_hat);
 
+            Eigen::Matrix3d tmp_r = rotation_matrix_ * 1.0;
+
+
+            /**
+             * Renormalization
+             */
+
+            auto error = rotation_matrix_.block(0,0,1,3) * rotation_matrix_.block(1,0,1,3).transpose();
+
+            rotation_matrix_.block(0,0,1,3) = (tmp_r.block(0,0,1,3).transpose() -
+                    error/2.0 * tmp_r.block(1,0,1,3).transpose()).transpose();
+
+            rotation_matrix_.block(1,0,1,3) = (tmp_r.block(1,0,1,3).transpose() -
+            error / 2.0 * tmp_r.block(1,0,1,3).transpose()).transpose();
+
 
         } else {
             /*

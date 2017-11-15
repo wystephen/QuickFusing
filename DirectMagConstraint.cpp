@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
     double corner_ratio = 10.0;
 
     //// Load data
-    CppExtent::CSVReader imu_data_reader(dir_name + "imu2.txt");
+    CppExtent::CSVReader imu_data_reader(dir_name + "vertex_all_data.csv");
 
     Eigen::MatrixXd imudata;
     imudata.resize(imu_data_reader.GetMatrix().GetRows(),
@@ -136,83 +136,75 @@ int main(int argc, char *argv[]) {
     imudata.setZero();
     auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
 
-//    central =
-//
-//            5   105   283
-//
-//
-//    Scale_axis =
-//
-//            238   263   269
-//    Eigen::Vector3d central(5, 105, 283);//imu
-//    Eigen::Vector3d scale(238, 263, 269);//imu
-    Eigen::Vector3d central(-58.0512,-117.0970,151.9001);//imu2
-    Eigen::Vector3d scale(213.8826,208.3894,232.3945);//imu2
-//    acc_cent = [0.0195,0.0154,-0.0877]
-//    acc_scale =[ 1.0015,1.0008,1.0336]
-    Eigen::Vector3d acc_cent = Eigen::Vector3d(0.0195, 0.0154, -0.0877);
-    Eigen::Vector3d acc_scale = Eigen::Vector3d(1.0015, 1.0008, 1.0336);
-
+/**
+ * imudata
+ * '''
+        id | time ax ay az wx wy wz mx my mz pressure| x y z vx vy vz| qx qy qz qw
+        1 + 11 + 6 + 4 = 22
+        '''
+ */
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
-            if (0 < j && j < 4) {
-                imudata(i, j) = (imudata(i, j) - acc_cent(j - 1)) / acc_scale(j - 1);
-                imudata(i, j) *= 9.8;
-            } else if (4 <= j && j < 7) {
-                imudata(i, j) *= double(M_PI / 180.0);
-            } else if (7 <= j && j < 10) {
-                imudata(i, j) = (imudata(i, j) - central(j - 7)) / scale(j - 7);
-            }
+//            if (0 < j && j < 4) {
+//                imudata(i, j) = (imudata(i, j) - acc_cent(j - 1)) / acc_scale(j - 1);
+//                imudata(i, j) *= 9.8;
+//            } else if (4 <= j && j < 7) {
+//                imudata(i, j) *= double(M_PI / 180.0);
+//            } else if (7 <= j && j < 10) {
+//                imudata(i, j) = (imudata(i, j) - central(j - 7)) / scale(j - 7);
+//            }
         }
     }
     std::cout << "imu data size: " << imudata.rows() << "x"
               << imudata.cols() << std::endl;
 
-    std::cout << "source imu data :\n" << imudata.block(0, 0, 10, 10) << std::endl;
+    std::cout << "source imu data :\n" << imudata.block(0, 0, 10, imudata.cols()) << std::endl;
 
-    std::cout << "source imu data last 10 lines:\n" << imudata.block(imudata.rows() - 11, 0, 10, 10) << std::endl;
+//    std::cout << "source imu data last 10 lines:\n" << imudata.block(imudata.rows() - 11, 0, 10, 10) << std::endl;
 
 
     std::vector<double> ix, iy, iz; //ix iy
-    std::vector<double> gx, gy;// graph x
+    std::vector<double> gx, gy, gz;// graph x
 
     std::vector<double> ori_1, ori_2, ori_3;
 
 
 
-
     /**
-     * Initial ZUPT parameters
+     * Initial  graph parameters
      */
-    SettingPara initial_para(true);
-    initial_para.init_pos1_ = Eigen::Vector3d(0.0, 0.0, 0.0);
-    initial_para.init_heading1_ = 20.0;
-
-    initial_para.Ts_ = 0.005;//1.0f / 200.0f;
+    g2o::SparseOptimizer globalOptimizer;
 
 
-//    initial_para.sigma_a_ = 0.01 * ori_info;
-//    initial_para.sigma_g_ = 0.01 * ori_info / 180.0 * M_PI;
+    typedef g2o::BlockSolverX SlamBlockSolver;
+    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+
+    // Initial solver
+    SlamLinearSolver *linearSolver = new SlamLinearSolver();
+//    linearSolver->setBlockOrdering(false);
+    linearSolver->setWriteDebug(true);
+    SlamBlockSolver *blockSolver = new SlamBlockSolver(linearSolver);
+    g2o::OptimizationAlgorithmLevenberg *solver =
+            new g2o::OptimizationAlgorithmLevenberg(blockSolver);
+    globalOptimizer.setAlgorithm(solver);
+
+    int zupt_id_offset(0.0);
+    int airpre_id_offset(100000);
+
+    int attitude_vertex_id(400000);
+
+    /// insert attitude offset vertex. represent the globle offset of positioning(6dof) between imu and world frame
+    auto *v = new g2o::VertexSE3();
+    double p[6] = {0.0};
+    v->setEstimateData(p);
+
+    v->setFixed(false);
+    v->setId(attitude_vertex_id);
+    globalOptimizer.addVertex(v);
 
 
-    initial_para.gravity_ = 9.81;
-    initial_para.sigma_a_ *=5.0;
-    initial_para.sigma_g_ *=5.0;
-//    initial_para.sigma_acc_ = Eigen::Vector3d(1, 1, 1) * first_info;
-//    initial_para.sigma_gyro_ = Eigen::Vector3d(1, 1, 1) / 180.0 * M_PI * second_info;
-//    initial_para.sigma_vel_ /= 50.0;
-    initial_para.sigma_acc_ *= 4.0;
-    initial_para.sigma_gyro_ *= 4.0;
 
-//    initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
-
-
-    MyEkf myekf(initial_para);
-    myekf.InitNavEq(imudata.block(10, 1, 40, 6));
-
-
-    double last_zupt_flag = 0.0;
 
     int trace_id(0);
     Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
@@ -223,40 +215,25 @@ int main(int argc, char *argv[]) {
     std::vector<ImuKeyPointInfo> key_info_mag;
 
     for (int index(0); index < imudata.rows(); ++index) {
-//        std::cout << "index:" << index << std::endl;
-        double zupt_flag = 0.0;
-        if (index <= initial_para.ZeroDetectorWindowSize_) {
-            zupt_flag = 1.0;
-        } else {
-//
 
-            if (std::isnan(imudata.block(index - initial_para.ZeroDetectorWindowSize_, 1,
-                                         initial_para.ZeroDetectorWindowSize_, 6).sum())) {
-                std::cout << " input data of GLRT is nana " << std::endl;
-            }
-            if (GLRT_Detector(
-                    imudata.block(index - initial_para.ZeroDetectorWindowSize_,
-                                  1, initial_para.ZeroDetectorWindowSize_, 6).transpose(),
-                    initial_para)) {
-                zupt_flag = 1.0;
-            }
-        }
+        /**
+         * '''
+            id | time ax ay az wx wy wz mx my mz pressure| x  y  z  vx vy vz| qx qy qz qw
+            0  |   1   2  3 4  5   6  7 8  9  10 11      | 12 13 14 15 16 17| 19 20 21 22
+            1 + 11 + 6 + 4 = 22
+        '''
+         */
+        double zupt_flag = 0.0;
+
         ///ZUPT GET POSITION
-        auto tx = myekf.GetPosition(imudata.block(index, 1, 1, 6).transpose(), zupt_flag);
 
 
         last_optimized_id = trace_id;
-//
 
-        last_zupt_flag = zupt_flag;
-        ix.push_back(tx(0));
-        iy.push_back(tx(1));
-        iz.push_back(tx(2));
+
+
     }
 
-//    std::cout << "after imu data :\n" << imudata.block(0, 0, 10, 10) << std::endl;
-
-//    std::cout << "after imu data last 10 lines:\n" << imudata.block(imudata.rows() - 11, 0, 10, 10) << std::endl;
 
 
 
@@ -277,12 +254,7 @@ int main(int argc, char *argv[]) {
 
     plt::plot(gx, gy, "r-+");
     plt::plot(ix, iy, "b-");
-//    plt::plot(ori_1,"r-+");
-//    plt::plot(ori_2,"b-+");
-//    plt::plot(ori_3,"g-+");
     plt::title("show");
-//   plt::save(std::to_string(first_info)+":"
-//    +std::to_string(second_info)+":" +std::to_string(ori_info)+".png");
     plt::show();
 
 

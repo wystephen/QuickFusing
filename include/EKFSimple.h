@@ -140,19 +140,17 @@ public:
 //            ang_rate_matrix << 0.0, -w_tb(2), w_tb(1),
 //                    w_tb(2), 0.0, w_tb(0),
 //                    -w_tb(1), w_tb(0), 0.0;
-            Eigen::Vector3d alpha(0,0,0);
-            alpha = w_tb/w_tb.norm();
+            Eigen::Vector3d alpha(0, 0, 0);
+            alpha = w_tb / w_tb.norm();
             double phi(w_tb.norm());
             Eigen::Matrix3d alpha_hat;
-            alpha_hat<< 0.0,-alpha(2),alpha(1),
-                    alpha(2),0.0,-alpha(0),
-                    -alpha(1),alpha(0),0.0;
+            alpha_hat << 0.0, -alpha(2), alpha(1),
+                    alpha(2), 0.0, -alpha(0),
+                    -alpha(1), alpha(0), 0.0;
 
 
-
-
-            rotation_matrix_  = rotation_matrix_ * (cos(phi)*Eigen::Matrix3d::Identity()+
-                    (1-cos(phi))*alpha*alpha.transpose()+sin(phi)*alpha_hat);
+            rotation_matrix_ = rotation_matrix_ * (cos(phi) * Eigen::Matrix3d::Identity() +
+                                                   (1 - cos(phi)) * alpha * alpha.transpose() + sin(phi) * alpha_hat);
 
             Eigen::Matrix3d tmp_r = rotation_matrix_ * 1.0;
 
@@ -161,13 +159,14 @@ public:
              * Renormalization
              */
 
-            auto error = rotation_matrix_.block(0,0,1,3) * rotation_matrix_.block(1,0,1,3).transpose();
+            Eigen::Matrix3d error = rotation_matrix_.block(0, 0, 1, 3).dot(
+                    rotation_matrix_.block(1, 0, 1, 3).transpose());
 
-            rotation_matrix_.block(0,0,1,3) = (tmp_r.block(0,0,1,3).transpose() -
-                    error/2.0 * tmp_r.block(1,0,1,3).transpose()).transpose();
+            rotation_matrix_.block(0, 0, 1, 3) = (tmp_r.block(0, 0, 1, 3).transpose() -
+                                                  error.dot(tmp_r.block(1, 0, 1, 3).transpose()) / 2.0).transpose();
 
-            rotation_matrix_.block(1,0,1,3) = (tmp_r.block(1,0,1,3).transpose() -
-            error / 2.0 * tmp_r.block(1,0,1,3).transpose()).transpose();
+            rotation_matrix_.block(1, 0, 1, 3) = (tmp_r.block(1, 0, 1, 3).transpose() -
+                                                  error.dot(tmp_r.block(1, 0, 1, 3).transpose()) / 2.0).transpose();
 
 
         } else {
@@ -289,12 +288,12 @@ public:
 
         ang_rate_matrix <<
                         0.0, -w_tb(2), w_tb(1),
-                        w_tb(2), 0.0, -w_tb(0),
-                        -w_tb(1), w_tb(0), 0.0;
+                w_tb(2), 0.0, -w_tb(0),
+                -w_tb(1), w_tb(0), 0.0;
 
 //        rotation_matrix_ = ((2 * Eigen::Matrix3d::Identity() + ang_rate_matrix)*
 //                            (2 * Eigen::Matrix3d::Identity() - ang_rate_matrix).inverse) * rotation_matrix_;
-        rotation_matrix_ = (Eigen::Matrix3d::Identity()-ang_rate_matrix)*rotation_matrix_;
+        rotation_matrix_ = (Eigen::Matrix3d::Identity() - ang_rate_matrix) * rotation_matrix_;
 
 //        rotation_matrix_ = Sophus::SO3::exp(w_tb).matrix() * rotation_matrix_;
 //
@@ -324,7 +323,7 @@ public:
             Eigen::VectorXd dx = K * z;
             dx_ = dx;
 
-            Eigen::Matrix<double,9,9> Id;
+            Eigen::Matrix<double, 9, 9> Id;
             Id.setIdentity();
 
             P_ = (Id - K * H_) * P_;

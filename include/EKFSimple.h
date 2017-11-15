@@ -431,6 +431,8 @@ public:
 public:
     //Parameters in here.
     SettingPara para_;
+
+    bool outputted_warning = false;
 private:
 
 

@@ -208,6 +208,7 @@ int main(int argc, char *argv[]) {
 
     int trace_id(0);
     Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
+    Eigen::Isometry3d
     double last_theta = 0.0;
 
     int last_optimized_id(0);
@@ -225,7 +226,7 @@ int main(int argc, char *argv[]) {
          */
         double zupt_flag = 0.0;
 
-        ///ZUPT GET POSITION
+
 
 
         last_optimized_id = trace_id;

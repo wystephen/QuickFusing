@@ -175,6 +175,11 @@ public:
                     Eigen::Vector3d(tmp_r.block(1,0,1,3).transpose())
             )).transpose();
 
+            for(int i(0);i<3;++i)
+            {
+                rotation_matrix_.block(i,0,1,3) /= rotation_matrix_.block(i,0,1,3).norm();
+            }
+
 
 
 

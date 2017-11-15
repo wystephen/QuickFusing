@@ -186,19 +186,33 @@ class ImuPreprocess:
         vertex_to_id = array.array('d')
         vertex_time = array.array('d')
         vertex_high = array.array('d')
+        vertex_all_data = array.array('d')
+        '''
+        id | time ax ay az wx wy wz mx my mz pressure| x y z vx vy vz| qx qy qz qw
+        1 + 11 + 6 + 4 = 22
+        '''
 
         data_cols = 9
 
         for i in range(1, self.trace_x.shape[0]):
             if self.zupt_result[i] > 0.5 and self.zupt_result[i - 1] < 0.5:
+                vertex_all_data.append(i)
                 vertex_time.append(self.data[i, 0])
+                for j in range(self.data.shape[1]):
+                    vertex_time.append(self.data[i,j])
                 if (self.data.shape[1] > 10):
                     vertex_high.append(self.pressure2high(self.data[i, 10]))
 
+
                 for j in range(data_cols):
                     vertex_point.append(self.trace_x[i, j])
+
+                for j in range(6):
+                    vertex_all_data.append(self.trace_x[i,j])
+
                 for k in range(4):
                     vertex_quat.append(self.all_quat[i, k])
+                    vertex_all_data.append(self.all_quat[i,k])
                     # vertex_point.append(self.trace_x[i,0])
                     # vertex_point.append(self.trace_x[i,1])
                     # vertex_point.append(self.trace_x[i,2])
@@ -211,6 +225,7 @@ class ImuPreprocess:
         self.vertics_id = np.frombuffer(vertex_to_id, dtype=np.float).reshape([-1])
         self.vertics_id = self.vertics_id.astype(dtype=np.int32)
         self.vertics_time = np.frombuffer(vertex_time, dtype=np.float).reshape([-1])
+        self.vertics_all = np.frombuffer(vertex_all_data,dtype=np.float).reshape([-1,22])
 
         np.savetxt("../TMP_DATA/vertex_pose.csv", self.vertics, delimiter=',')
         np.savetxt("../TMP_DATA/vertex_quat.csv", self.vertex_quat, delimiter=',')

@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 
 //    initial_para.ZeroDetectorWindowSize_ = 5;// Time windows size fo zupt detector
 
-    MyEkf myekf(initial_para);
+    EKFSimple myekf(initial_para);
     myekf.InitNavEq(imudata.block(10, 1, 40, 6));
 
     double last_zupt_flag = 0.0;

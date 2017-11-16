@@ -108,7 +108,8 @@ int main(int argc, char *argv[]) {
     /// Global parameters
     double first_info(8.1), second_info(7.5), ori_info(100);
     double gravity_info(9.78);
-    double zero_z_info(-10.1);
+    double mag_threshold(0.1);
+//    double zero_z_info(-10.1);
 
     if (argc >= 4) {
         first_info = std::stod(argv[1]);
@@ -121,7 +122,8 @@ int main(int argc, char *argv[]) {
     }
 
     if (argc >= 6) {
-        zero_z_info = std::stod(argv[5]);
+//        zero_z_info = std::stod(argv[5]);
+        mag_threshold = std::stod(argv[5]);
     }
 
     double turn_threshold = 10.0 / 180.0 * M_PI;
@@ -136,16 +138,23 @@ int main(int argc, char *argv[]) {
     imudata.setZero();
     auto imu_data_tmp_matrix = imu_data_reader.GetMatrix();
 
-/**
- * imudata
- * '''
-        id | time ax ay az wx wy wz mx my mz pressure| x y z vx vy vz| qx qy qz qw
+    /**
+     * '''
+        id | time ax ay az wx wy wz mx my mz pressure| x  y  z  vx vy vz| qx qy qz qw
+        0  |   1   2  3 4  5   6  7 8  9  10 11      | 12 13 14 15 16 17| 18 19 20 21
         1 + 11 + 6 + 4 = 22
-        '''
- */
+    '''
+     */
+
+    Eigen::Vector3d central(-58.0512,-117.0970,151.9001);//imu2
+    Eigen::Vector3d scale(213.8826,208.3894,232.3945);//imu2
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
+            if(7<j&& j<11)
+            {
+                imudata(i,j) = (imudata(i,j)-central(j-8))/scale(j-8);
+            }
 //            if (0 < j && j < 4) {
 //                imudata(i, j) = (imudata(i, j) - acc_cent(j - 1)) / acc_scale(j - 1);
 //                imudata(i, j) *= 9.8;
@@ -222,7 +231,6 @@ int main(int argc, char *argv[]) {
         v->setEstimate(current_transform);
         globalOptimizer.addVertex(v);
 
-
         /**
          * '''
             id | time ax ay az wx wy wz mx my mz pressure| x  y  z  vx vy vz| qx qy qz qw
@@ -230,6 +238,7 @@ int main(int argc, char *argv[]) {
             1 + 11 + 6 + 4 = 22
         '''
          */
+
 
         auto tmp_quaternion = Eigen::Quaterniond(imudata(index, 21),
                                                  imudata(index, 18),

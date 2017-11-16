@@ -328,7 +328,7 @@ int main(int argc, char *argv[]) {
         }
 
 
-        if (trace_id - last_optimized_id > 5) {
+        if (trace_id - last_optimized_id > 15) {
 
             last_optimized_id = trace_id;
             globalOptimizer.initializeOptimization();

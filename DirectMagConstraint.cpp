@@ -243,6 +243,8 @@ int main(int argc, char *argv[]) {
                                          tmp_quaternion);
 
         if (trace_id > 0) {
+
+            /// Add transform constraint
             auto *edge_se3 = new g2o::EdgeSE3();
             edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
             edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
@@ -258,19 +260,26 @@ int main(int argc, char *argv[]) {
             edge_se3->setMeasurement(last_transform.inverse() * current_transform);
             globalOptimizer.addEdge(edge_se3);
 
-            auto *edge_gravity = new GravityZ(imudata.block(trace_id-1,2, 1 ,3).transpose(),
-            imudata.block(trace_id,2,1,3).transpose());
+            /// Add gravity constraint
+            auto *edge_gravity = new GravityZ(imudata.block(trace_id - 1, 2, 1, 3).transpose(),
+                                              imudata.block(trace_id, 2, 1, 3).transpose());
 
-            edge_gravity->vertices()[0] = globalOptimizer.vertex(trace_id-1);
-            edge_gravity->vertices()[1]= globalOptimizer.vertex(trace_id);
+            edge_gravity->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
+            edge_gravity->vertices()[1] = globalOptimizer.vertex(trace_id);
 
             Eigen::Matrix2d info;
             info.setIdentity();
             info *= gravity_info;
 
             edge_gravity->setInformation(info);
-            edge_gravity->setMeasurement(Eigen::Vector2d(0,0));
+            edge_gravity->setMeasurement(Eigen::Vector2d(0, 0));
             globalOptimizer.addEdge(edge_gravity);
+
+            /// Add mag constraint
+
+            for (int before_id(0); before_id < trace_id; ++before_id) {
+
+            }
 
 
         }

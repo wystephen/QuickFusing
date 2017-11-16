@@ -273,6 +273,9 @@ int main(int argc, char *argv[]) {
 
     }
 
+    globalOptimizer.setVerbose(true);
+    globalOptimizer.initMultiThreading();
+    globalOptimizer.optimize(1000);
 
 
 

@@ -281,9 +281,9 @@ int main(int argc, char *argv[]) {
                 if((imudata.block(before_id,8,1,3)/imudata.block(before_id,8,1,3).norm()
                     -imudata.block(trace_id,8,1,3)/imudata.block(trace_id,8,1,3).norm()).norm()<0.15)
                 {
-                    auto *mag_edge = new RelativeMagEdge(imudata.block(before_id,8,1,3)/
+                    auto *mag_edge = new RelativeMagEdge(imudata.block(before_id,8,1,3).transpose()/
                                                                  imudata.block(before_id,8,1,3).norm(),
-                                                         imudata.block(trace_id,8,1,3)/
+                                                         imudata.block(trace_id,8,1,3).transpose()/
                                                          imudata.block(trace_id,8,1,3).norm()
                     );
 

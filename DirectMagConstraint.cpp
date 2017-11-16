@@ -146,14 +146,13 @@ int main(int argc, char *argv[]) {
     '''
      */
 
-    Eigen::Vector3d central(-58.0512,-117.0970,151.9001);//imu2
-    Eigen::Vector3d scale(213.8826,208.3894,232.3945);//imu2
+    Eigen::Vector3d central(-58.0512, -117.0970, 151.9001);//imu2
+    Eigen::Vector3d scale(213.8826, 208.3894, 232.3945);//imu2
     for (int i(0); i < imudata.rows(); ++i) {
         for (int j(0); j < imudata.cols(); ++j) {
             imudata(i, j) = *(imu_data_tmp_matrix(i, j));
-            if(7<j&& j<11)
-            {
-                imudata(i,j) = (imudata(i,j)-central(j-8))/scale(j-8);
+            if (7 < j && j < 11) {
+                imudata(i, j) = (imudata(i, j) - central(j - 8)) / scale(j - 8);
             }
 //            if (0 < j && j < 4) {
 //                imudata(i, j) = (imudata(i, j) - acc_cent(j - 1)) / acc_scale(j - 1);
@@ -265,9 +264,8 @@ int main(int argc, char *argv[]) {
             information(3, 3) = information(4, 4) = information(5, 5) = second_info;
 
 
-            auto detector_vec = tmp_quaternion.toRotationMatrix().matrix() * Eigen::Vector3d(1,0,0);
-            if(detector_vec(0)<0.9)
-            {
+            auto detector_vec = tmp_quaternion.toRotationMatrix().matrix() * Eigen::Vector3d(1, 0, 0);
+            if (detector_vec(0) < 0.9) {
                 information /= 10.0;
             }
 
@@ -299,8 +297,8 @@ int main(int argc, char *argv[]) {
             if (ori_info > 0.0) {
                 for (int before_id(0); before_id < trace_id; ++before_id) {
                     if ((imudata.block(before_id, 8, 1, 3)
-                         - imudata.block(trace_id, 8, 1, 3) ).norm() < mag_threshold) {
-                        auto *mag_edge = new RelativeMagEdge(imudata.block(before_id, 8, 1, 3).transpose() ,
+                         - imudata.block(trace_id, 8, 1, 3)).norm() < mag_threshold) {
+                        auto *mag_edge = new RelativeMagEdge(imudata.block(before_id, 8, 1, 3).transpose(),
                                                              imudata.block(trace_id, 8, 1, 3).transpose()
                         );
 
@@ -383,15 +381,17 @@ int main(int argc, char *argv[]) {
 
     plt::plot(gx, gy, "r-+");
     plt::plot(ix, iy, "b-");
-    plt::title(std::to_string(first_info)+"-"+
-    std::to_string(second_info)+"-"+
-    std::to_string(ori_info)+"-"+
-    std::to_string(gravity_info));
+    plt::title(std::to_string(first_info) + "-" +
+               std::to_string(second_info) + "-" +
+               std::to_string(ori_info) + "-" +
+               std::to_string(gravity_info) + "-" +
+               std::to_string(mag_threshold));
 //    plt::show();
-    plt::save(std::to_string(first_info)+"-"+
-    std::to_string(second_info)+"-"+
-    std::to_string(ori_info)+"-"+
-    std::to_string(gravity_info)+".png");
+    plt::save(std::to_string(first_info) + "-" +
+              std::to_string(second_info) + "-" +
+              std::to_string(ori_info) + "-" +
+              std::to_string(gravity_info) + "-" +
+              std::to_string(mag_threshold) + ".png");
 
 
 }

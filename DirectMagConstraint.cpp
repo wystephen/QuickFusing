@@ -261,55 +261,62 @@ int main(int argc, char *argv[]) {
             globalOptimizer.addEdge(edge_se3);
 
             /// Add gravity constraint
-            auto *edge_gravity = new GravityZ(imudata.block(trace_id - 1, 2, 1, 3).transpose(),
-                                              imudata.block(trace_id, 2, 1, 3).transpose());
+            if (gravity_info > 0.0) {
+                auto *edge_gravity = new GravityZ(imudata.block(trace_id - 1, 2, 1, 3).transpose(),
+                                                  imudata.block(trace_id, 2, 1, 3).transpose());
 
-            edge_gravity->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
-            edge_gravity->vertices()[1] = globalOptimizer.vertex(trace_id);
+                edge_gravity->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
+                edge_gravity->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-            Eigen::Matrix2d info;
-            info.setIdentity();
-            info *= gravity_info;
+                Eigen::Matrix2d info;
+                info.setIdentity();
+                info *= gravity_info;
 
-            edge_gravity->setInformation(info);
-            edge_gravity->setMeasurement(Eigen::Vector2d(0, 0));
-            globalOptimizer.addEdge(edge_gravity);
+                edge_gravity->setInformation(info);
+                edge_gravity->setMeasurement(Eigen::Vector2d(0, 0));
+                globalOptimizer.addEdge(edge_gravity);
+
+            }
 
             /// Add mag constraint
 
-            for (int before_id(0); before_id < trace_id; ++before_id) {
-                if ((imudata.block(before_id, 8, 1, 3) / imudata.block(before_id, 8, 1, 3).norm()
-                     - imudata.block(trace_id, 8, 1, 3) / imudata.block(trace_id, 8, 1, 3).norm()).norm() < 0.15) {
-                    auto *mag_edge = new RelativeMagEdge(imudata.block(before_id, 8, 1, 3).transpose() /
-                                                         imudata.block(before_id, 8, 1, 3).norm(),
-                                                         imudata.block(trace_id, 8, 1, 3).transpose() /
-                                                         imudata.block(trace_id, 8, 1, 3).norm()
-                    );
+            if (ori_info > 0.0) {
+                for (int before_id(0); before_id < trace_id; ++before_id) {
+                    if ((imudata.block(before_id, 8, 1, 3) / imudata.block(before_id, 8, 1, 3).norm()
+                         - imudata.block(trace_id, 8, 1, 3) / imudata.block(trace_id, 8, 1, 3).norm()).norm() < 0.15) {
+                        auto *mag_edge = new RelativeMagEdge(imudata.block(before_id, 8, 1, 3).transpose() /
+                                                             imudata.block(before_id, 8, 1, 3).norm(),
+                                                             imudata.block(trace_id, 8, 1, 3).transpose() /
+                                                             imudata.block(trace_id, 8, 1, 3).norm()
+                        );
 
-                    mag_edge->vertices()[0] = globalOptimizer.vertex(before_id);
-                    mag_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+                        mag_edge->vertices()[0] = globalOptimizer.vertex(before_id);
+                        mag_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                    Eigen::Matrix<double, 3, 3> information_matrix = Eigen::Matrix<double, 3, 3>::Identity();
-                    information_matrix *= ori_info;
+                        Eigen::Matrix<double, 3, 3> information_matrix = Eigen::Matrix<double, 3, 3>::Identity();
+                        information_matrix *= ori_info;
 
-                    mag_edge->setInformation(information_matrix);
+                        mag_edge->setInformation(information_matrix);
 
-                    mag_edge->setMeasurement(Eigen::Vector3d(0, 0, 0));
+                        mag_edge->setMeasurement(Eigen::Vector3d(0, 0, 0));
 
 
-                    static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct("Cauchy");
+                        static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct(
+                                "Cauchy");
 //                    mag_edge->setRobustKernel(robustKernel);
 
-                    globalOptimizer.addEdge(mag_edge);
+                        globalOptimizer.addEdge(mag_edge);
+
+                    }
 
                 }
-
             }
+
 
         }
 
 
-        if(trace_id-last_optimized_id>5){
+        if (trace_id - last_optimized_id > 5) {
 
             last_optimized_id = trace_id;
             globalOptimizer.initializeOptimization();

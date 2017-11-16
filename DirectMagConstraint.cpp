@@ -278,13 +278,12 @@ int main(int argc, char *argv[]) {
             /// Add mag constraint
 
             for (int before_id(0); before_id < trace_id; ++before_id) {
-                if((imudata.block(before_id,8,1,3)/imudata.block(before_id,8,1,3).norm()
-                    -imudata.block(trace_id,8,1,3)/imudata.block(trace_id,8,1,3).norm()).norm()<0.15)
-                {
-                    auto *mag_edge = new RelativeMagEdge(imudata.block(before_id,8,1,3).transpose()/
-                                                                 imudata.block(before_id,8,1,3).norm(),
-                                                         imudata.block(trace_id,8,1,3).transpose()/
-                                                         imudata.block(trace_id,8,1,3).norm()
+                if ((imudata.block(before_id, 8, 1, 3) / imudata.block(before_id, 8, 1, 3).norm()
+                     - imudata.block(trace_id, 8, 1, 3) / imudata.block(trace_id, 8, 1, 3).norm()).norm() < 0.15) {
+                    auto *mag_edge = new RelativeMagEdge(imudata.block(before_id, 8, 1, 3).transpose() /
+                                                         imudata.block(before_id, 8, 1, 3).norm(),
+                                                         imudata.block(trace_id, 8, 1, 3).transpose() /
+                                                         imudata.block(trace_id, 8, 1, 3).norm()
                     );
 
                     mag_edge->vertices()[0] = globalOptimizer.vertex(before_id);

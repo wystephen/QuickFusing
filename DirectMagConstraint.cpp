@@ -387,7 +387,11 @@ int main(int argc, char *argv[]) {
     std::to_string(second_info)+"-"+
     std::to_string(ori_info)+"-"+
     std::to_string(gravity_info));
-    plt::show();
+//    plt::show();
+    plt::save(std::to_string(first_info)+"-"+
+    std::to_string(second_info)+"-"+
+    std::to_string(ori_info)+"-"+
+    std::to_string(gravity_info)+".png");
 
 
 }

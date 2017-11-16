@@ -213,11 +213,12 @@ int main(int argc, char *argv[]) {
 
     std::vector<ImuKeyPointInfo> key_info_mag;
 
+
     for (int index(0); index < imudata.rows(); ++index) {
 
         ///Add vertex
         auto *v = new g2o::VertexSE3();
-        v->setId(index);
+        v->setId(trace_id);
         v->setEstimate(current_transform);
         globalOptimizer.addVertex(v);
 
@@ -239,15 +240,34 @@ int main(int argc, char *argv[]) {
         current_transform.matrix().block(0, 0, 3, 3) = tmp_quaternion.toRotationMatrix();
         current_transform.matrix().block(0, 2, 3, 1) = imudata.block(index, 12, 1, 3).transpose();
 
-        if (index > 0) {
+        if (trace_id > 0) {
             auto *edge_se3 = new g2o::EdgeSE3();
-            edge_se3->vertices()[0]
+            edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+            edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+            Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
+
+
+            information(0, 0) = information(1, 1) = information(2, 2) = first_info;
+            information(3, 3) = information(4, 4) = information(5, 5) = second_info;
+
+            edge_se3->setInformation(information);
+
+            edge_se3->setMeasurement(last_transform.inverse() * current_transform);
+            globalOptimizer.addEdge(edge_se3);
+
 
         }
 
 
+
         last_optimized_id = trace_id;
         last_transform = current_transform;
+
+        trace_id++;
+        ix.push_back(current_transform(0,3));
+        iy.push_back(current_transform(1,3));
+        iz.push_back(current_transform(2,3));
 
 
     }
@@ -268,6 +288,8 @@ int main(int argc, char *argv[]) {
                  << iz[k]
                  << std::endl;
     }
+
+
 
 
     plt::plot(gx, gy, "r-+");

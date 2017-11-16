@@ -226,15 +226,15 @@ int main(int argc, char *argv[]) {
         /**
          * '''
             id | time ax ay az wx wy wz mx my mz pressure| x  y  z  vx vy vz| qx qy qz qw
-            0  |   1   2  3 4  5   6  7 8  9  10 11      | 12 13 14 15 16 17| 19 20 21 22
+            0  |   1   2  3 4  5   6  7 8  9  10 11      | 12 13 14 15 16 17| 18 19 20 21
             1 + 11 + 6 + 4 = 22
         '''
          */
 
-        auto tmp_quaternion = Eigen::Quaterniond(imudata(index, 22),
+        auto tmp_quaternion = Eigen::Quaterniond(imudata(index, 21),
+                                                 imudata(index, 18),
                                                  imudata(index, 19),
-                                                 imudata(index, 20),
-                                                 imudata(index, 21));
+                                                 imudata(index, 20));
 
         current_transform = Eigen::Isometry3d::Identity();
 //        current_transform.matrix().block(0, 0, 3, 3) = tmp_quaternion.toRotationMatrix();

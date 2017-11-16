@@ -278,6 +278,32 @@ int main(int argc, char *argv[]) {
             /// Add mag constraint
 
             for (int before_id(0); before_id < trace_id; ++before_id) {
+                if((imudata.block(before_id,8,1,3)/imudata.block(before_id,8,1,3).norm()
+                    -imudata.block(trace_id,8,1,3)/imudata.block(trace_id,8,1,3).norm()).norm()<0.15)
+                {
+                    auto *mag_edge = new RelativeMagEdge(imudata.block(before_id,8,1,3)/
+                                                                 imudata.block(before_id,8,1,3).norm(),
+                                                         imudata.block(trace_id,8,1,3)/
+                                                         imudata.block(trace_id,8,1,3).norm()
+                    );
+
+                    mag_edge->vertices()[0] = globalOptimizer.vertex(before_id);
+                    mag_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+                    Eigen::Matrix<double, 3, 3> information_matrix = Eigen::Matrix<double, 3, 3>::Identity();
+                    information_matrix *= ori_info;
+
+                    mag_edge->setInformation(information_matrix);
+
+                    mag_edge->setMeasurement(Eigen::Vector3d(0, 0, 0));
+
+
+                    static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct("Cauchy");
+//                    mag_edge->setRobustKernel(robustKernel);
+
+                    globalOptimizer.addEdge(mag_edge);
+
+                }
 
             }
 
@@ -315,7 +341,7 @@ int main(int argc, char *argv[]) {
                  << iz[k]
                  << std::endl;
     }
-    auto *t_data = new double[10ul;
+    auto *t_data = new double[10];
     for (int k(0); k < trace_id; ++k) {
         globalOptimizer.vertex(k)->getEstimateData(t_data);
         test << t_data[0] << "," << t_data[1] << "," << t_data[2] << std::endl;

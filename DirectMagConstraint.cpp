@@ -258,6 +258,20 @@ int main(int argc, char *argv[]) {
             edge_se3->setMeasurement(last_transform.inverse() * current_transform);
             globalOptimizer.addEdge(edge_se3);
 
+            auto *edge_gravity = new GravityZ(imudata.block(trace_id-1,2, 1 ,3).transpose(),
+            imudata.block(trace_id,2,1,3).transpose());
+
+            edge_gravity->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+            edge_gravity->vertices()[1]= globalOptimizer.vertex(trace_id);
+
+            Eigen::Matrix2d info;
+            info.setIdentity();
+            info *= gravity_info;
+
+            edge_gravity->setInformation(info);
+            edge_gravity->setMeasurement(Eigen::Vector2d(0,0));
+            globalOptimizer.addEdge(edge_gravity);
+
 
         }
 
@@ -292,7 +306,7 @@ int main(int argc, char *argv[]) {
                  << iz[k]
                  << std::endl;
     }
-    auto *t_data = new double[10];
+    auto *t_data = new double[10ul;
     for (int k(0); k < trace_id; ++k) {
         globalOptimizer.vertex(k)->getEstimateData(t_data);
         test << t_data[0] << "," << t_data[1] << "," << t_data[2] << std::endl;

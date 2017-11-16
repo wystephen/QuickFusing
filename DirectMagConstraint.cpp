@@ -204,11 +204,9 @@ int main(int argc, char *argv[]) {
     globalOptimizer.addVertex(v);
 
 
-
-
     int trace_id(0);
     Eigen::Isometry3d last_transform = Eigen::Isometry3d::Identity();
-    Eigen::Isometry3d
+    Eigen::Isometry3d current_transform = Eigen::Isometry3d::Identity();
     double last_theta = 0.0;
 
     int last_optimized_id(0);
@@ -217,6 +215,13 @@ int main(int argc, char *argv[]) {
 
     for (int index(0); index < imudata.rows(); ++index) {
 
+        ///Add vertex
+        auto *v = new g2o::VertexSE3();
+        v->setId(index);
+        v->setEstimate(current_transform);
+        globalOptimizer.addVertex(v);
+
+
         /**
          * '''
             id | time ax ay az wx wy wz mx my mz pressure| x  y  z  vx vy vz| qx qy qz qw
@@ -224,13 +229,25 @@ int main(int argc, char *argv[]) {
             1 + 11 + 6 + 4 = 22
         '''
          */
-        double zupt_flag = 0.0;
 
+        auto tmp_quaternion = Eigen::Quaternion(imudata(index, 22),
+                                                imudata(index, 19),
+                                                imudata(index, 20),
+                                                imudata(index, 21));
 
+        current_transform = Eigen::Isometry3d::Identity();
+        current_transform.matrix().block(0, 0, 3, 3) = tmp_quaternion.toRotationMatrix();
+        current_transform.matrix().block(0, 2, 3, 1) = imudata.block(index, 12, 1, 3).transpose();
+
+        if (index > 0) {
+            auto *edge_se3 = new g2o::EdgeSE3();
+            edge_se3->vertices()[0]
+
+        }
 
 
         last_optimized_id = trace_id;
-
+        last_transform = current_transform;
 
 
     }

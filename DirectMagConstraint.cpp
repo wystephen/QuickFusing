@@ -326,7 +326,7 @@ int main(int argc, char *argv[]) {
 //    globalOptimizer.initMultiThreading();
     globalOptimizer.initializeOptimization();
 //    globalOptimize
-    globalOptimizer.optimize(1000);
+    globalOptimizer.optimize(50);
 
 
 

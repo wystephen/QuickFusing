@@ -231,18 +231,20 @@ int main(int argc, char *argv[]) {
         '''
          */
 
-        auto tmp_quaternion = Eigen::Quaternion(imudata(index, 22),
-                                                imudata(index, 19),
-                                                imudata(index, 20),
-                                                imudata(index, 21));
+        auto tmp_quaternion = Eigen::Quaterniond(imudata(index, 22),
+                                                 imudata(index, 19),
+                                                 imudata(index, 20),
+                                                 imudata(index, 21));
 
         current_transform = Eigen::Isometry3d::Identity();
-        current_transform.matrix().block(0, 0, 3, 3) = tmp_quaternion.toRotationMatrix();
-        current_transform.matrix().block(0, 2, 3, 1) = imudata.block(index, 12, 1, 3).transpose();
+//        current_transform.matrix().block(0, 0, 3, 3) = tmp_quaternion.toRotationMatrix();
+//        current_transform.matrix().block(0, 2, 3, 1) = imudata.block(index, 12, 1, 3).transpose();
+        current_transform = tq2Transform(imudata.block(index, 12, 1, 3).transpose(),
+                                         tmp_quaternion);
 
         if (trace_id > 0) {
             auto *edge_se3 = new g2o::EdgeSE3();
-            edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+            edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
             edge_se3->vertices()[1] = globalOptimizer.vertex(trace_id);
 
             Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Identity();
@@ -260,14 +262,13 @@ int main(int argc, char *argv[]) {
         }
 
 
-
         last_optimized_id = trace_id;
         last_transform = current_transform;
 
         trace_id++;
-        ix.push_back(current_transform(0,3));
-        iy.push_back(current_transform(1,3));
-        iz.push_back(current_transform(2,3));
+        ix.push_back(current_transform(0, 3));
+        iy.push_back(current_transform(1, 3));
+        iz.push_back(current_transform(2, 3));
 
 
     }
@@ -288,8 +289,18 @@ int main(int argc, char *argv[]) {
                  << iz[k]
                  << std::endl;
     }
+    auto *t_data = new double[10];
+    for (int k(0); k < trace_id; ++k) {
+        globalOptimizer.vertex(k)->getEstimateData(t_data);
+        test << t_data[0] << "," << t_data[1] << "," << t_data[2] << std::endl;
 
 
+        gx.push_back(t_data[0]);
+        gy.push_back(t_data[1]);
+
+    }
+
+    delete[] t_data;
 
 
     plt::plot(gx, gy, "r-+");

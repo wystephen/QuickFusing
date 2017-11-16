@@ -264,6 +264,13 @@ int main(int argc, char *argv[]) {
             information(0, 0) = information(1, 1) = information(2, 2) = first_info;
             information(3, 3) = information(4, 4) = information(5, 5) = second_info;
 
+
+            auto detector_vec = tmp_quaternion.toRotationMatrix().matrix() * Eigen::Vector3d(1,0,0);
+            if(detector_vec(0)<0.9)
+            {
+                information /= 10.0;
+            }
+
             edge_se3->setInformation(information);
 
             edge_se3->setMeasurement(last_transform.inverse() * current_transform);
@@ -291,12 +298,10 @@ int main(int argc, char *argv[]) {
 
             if (ori_info > 0.0) {
                 for (int before_id(0); before_id < trace_id; ++before_id) {
-                    if ((imudata.block(before_id, 8, 1, 3) / imudata.block(before_id, 8, 1, 3).norm()
-                         - imudata.block(trace_id, 8, 1, 3) / imudata.block(trace_id, 8, 1, 3).norm()).norm() < 0.15) {
-                        auto *mag_edge = new RelativeMagEdge(imudata.block(before_id, 8, 1, 3).transpose() /
-                                                             imudata.block(before_id, 8, 1, 3).norm(),
-                                                             imudata.block(trace_id, 8, 1, 3).transpose() /
-                                                             imudata.block(trace_id, 8, 1, 3).norm()
+                    if ((imudata.block(before_id, 8, 1, 3)
+                         - imudata.block(trace_id, 8, 1, 3) ).norm() < mag_threshold) {
+                        auto *mag_edge = new RelativeMagEdge(imudata.block(before_id, 8, 1, 3).transpose() ,
+                                                             imudata.block(trace_id, 8, 1, 3).transpose()
                         );
 
                         mag_edge->vertices()[0] = globalOptimizer.vertex(before_id);

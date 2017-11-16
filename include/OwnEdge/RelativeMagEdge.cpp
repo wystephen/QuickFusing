@@ -68,7 +68,7 @@ void RelativeMagEdge::computeError() {
 //        }
 //    }
 
-    _error = tmp_vec;
+    _error = tmp_vec.array().pow(2.0);
 }
 
 bool RelativeMagEdge::setMeasurementFromState() {

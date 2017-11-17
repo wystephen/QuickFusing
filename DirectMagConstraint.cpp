@@ -103,7 +103,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/II/17/";
+    std::string dir_name = "/home/steve/Data/II/20/";
 
     /// Global parameters
     double first_info(8.1), second_info(7.5), ori_info(100);
@@ -220,7 +220,9 @@ int main(int argc, char *argv[]) {
     int last_optimized_id(0);
 
     std::vector<ImuKeyPointInfo> key_info_mag;
-//    std::vector<int> pairt_
+    std::vector<int> mag_before, mag_after;
+    std::vector<bool> corner_flag_vec;
+    corner_flag_vec.push_back(false);
 
 
     for (int index(0); index < imudata.rows(); ++index) {
@@ -257,6 +259,7 @@ int main(int argc, char *argv[]) {
                                          tmp_quaternion);
 
         if (trace_id > 0) {
+            bool is_corner = false;
 
 
 
@@ -286,7 +289,9 @@ int main(int argc, char *argv[]) {
             auto detector_vec = tmp_quaternion.toRotationMatrix().matrix() * Eigen::Vector3d(1, 0, 0);
             if (detector_vec(0) < 0.9) {
                 information /= 10.0;
+                is_corner = true;
             }
+            corner_flag_vec.push_back(is_corner);
 
             edge_se3->setInformation(information);
 
@@ -317,6 +322,17 @@ int main(int argc, char *argv[]) {
                 for (int before_id(0); before_id < trace_id; ++before_id) {
                     if ((imudata.block(before_id, 8, 1, 3)
                          - imudata.block(trace_id, 8, 1, 3)).norm() < mag_threshold) {
+
+                        if (is_corner && corner_flag_vec[before_id] &&
+                            before_id > 10 &&
+                            trace_id < imudata.rows() - 15) {
+
+                        }
+
+
+                        mag_before.push_back(before_id);
+                        mag_after.push_back(trace_id);
+
                         auto *mag_edge = new RelativeMagEdge(imudata.block(before_id, 8, 1, 3).transpose(),
                                                              imudata.block(trace_id, 8, 1, 3).transpose()
                         );
@@ -375,6 +391,8 @@ int main(int argc, char *argv[]) {
 
     std::ofstream test("./ResultData/test.txt");
     std::ofstream test_imu("./ResultData/text_imu.txt");
+    std::ofstream test_pairs("./ResultData/pair.txt");
+
 
     for (int k(0); k < ix.size(); ++k) {
         test_imu << ix[k]
@@ -392,10 +410,23 @@ int main(int argc, char *argv[]) {
 
         gx.push_back(t_data[0]);
         gy.push_back(t_data[1]);
+        gz.push_back(t_data[2]);
 
     }
 
     delete[] t_data;
+
+    for (int k(0); k < mag_before.size(); ++k) {
+        test_pairs << mag_before[k]
+                   << ","
+                   << mag_after[k]
+                   << std::endl;
+
+    }
+
+    test.close();
+    test_imu.close();
+    test_pairs.close();
 
 
     plt::grid(true);

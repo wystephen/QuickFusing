@@ -252,6 +252,19 @@ int main(int argc, char *argv[]) {
 
         if (trace_id > 0) {
 
+
+
+            /// Add z 0 edge
+            auto *edge_z0 = new Z0Edge();
+            edge_z0->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+            edge_z0->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+            edge_z0->setMeasurement(0.0);
+            edge_z0->setInformation(Eigen::Matrix<double,1,1>(0.00001));
+            globalOptimizer.addEdge(edge_z0);
+
+
+
             /// Add transform constraint
             auto *edge_se3 = new g2o::EdgeSE3();
             edge_se3->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
@@ -379,6 +392,7 @@ int main(int argc, char *argv[]) {
     delete[] t_data;
 
 
+    plt::grid(true);
     plt::plot(gx, gy, "r-+");
     plt::plot(ix, iy, "b-");
     plt::title(std::to_string(first_info) + "-" +

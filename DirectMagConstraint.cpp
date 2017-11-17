@@ -103,7 +103,7 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/II/20/";
+    std::string dir_name = "/home/steve/Data/II/17/";
 
     /// Global parameters
     double first_info(8.1), second_info(7.5), ori_info(100);
@@ -224,6 +224,9 @@ int main(int argc, char *argv[]) {
     std::vector<bool> corner_flag_vec;
     corner_flag_vec.push_back(false);
 
+    std::vector<int> corner_before,corner_after;
+    std::vector<double> corner_score;
+
 
     for (int index(0); index < imudata.rows(); ++index) {
 
@@ -327,6 +330,26 @@ int main(int argc, char *argv[]) {
                             before_id > 10 &&
                             trace_id < imudata.rows() - 15) {
 
+                            double tmp_score = (imudata.block(before_id-5,8,10,3)-imudata.block(trace_id-5,8,10,3)).norm();
+
+                            if(tmp_score<0.05*10)
+                            {
+                                corner_before.push_back(before_id);
+                                corner_after.push_back(trace_id);
+                                corner_score.push_back(tmp_score);
+                            }
+
+                            auto *dis_edge = new DistanceEdge();
+                            dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
+                            dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+                            dis_edge->setMeasurement(0.1);
+                            dis_edge->setInformation(Eigen::Matrix<double,1,1>(0.0));
+
+                            globalOptimizer.addEdge(dis_edge);
+
+//                            dis_edge->set
+
                         }
 
 
@@ -392,6 +415,7 @@ int main(int argc, char *argv[]) {
     std::ofstream test("./ResultData/test.txt");
     std::ofstream test_imu("./ResultData/text_imu.txt");
     std::ofstream test_pairs("./ResultData/pair.txt");
+    std::ofstream test_corner_pairs("./ResultData/corner_pair.txt");
 
 
     for (int k(0); k < ix.size(); ++k) {
@@ -422,6 +446,15 @@ int main(int argc, char *argv[]) {
                    << mag_after[k]
                    << std::endl;
 
+    }
+    for(int k(0);k<corner_before.size();++k)
+    {
+        test_corner_pairs<< corner_before[k]
+                         <<","
+                         << corner_after[k]
+                         << ","
+                         << corner_score[k]
+                         << std::endl;
     }
 
     test.close();

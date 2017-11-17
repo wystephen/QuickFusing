@@ -354,31 +354,38 @@ int main(int argc, char *argv[]) {
                     if ((imudata.block(before_id, 8, 1, 3)
                          - imudata.block(trace_id, 8, 1, 3)).norm() < mag_threshold) {
 
-                        if (is_corner && corner_flag_vec[before_id] &&
-                            before_id > 10 &&
-                            trace_id < imudata.rows() - 15) {
+                        if(loop_info>0.0){
+                            if (is_corner && corner_flag_vec[before_id] &&
+                                before_id > 10 &&
+                                trace_id < imudata.rows() - 15) {
 
-                            double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
-                                                imudata.block(trace_id - 5, 8, 10, 3)).norm();
+                                double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
+                                                    imudata.block(trace_id - 5, 8, 10, 3)).norm();
 
-                            if (tmp_score < 0.05 * 10) {
-                                corner_before.push_back(before_id);
-                                corner_after.push_back(trace_id);
-                                corner_score.push_back(tmp_score);
-                            }
+                                if (tmp_score < loop_threshold) {
+                                    corner_before.push_back(before_id);
+                                    corner_after.push_back(trace_id);
+                                    corner_score.push_back(tmp_score);
 
-                            auto *dis_edge = new DistanceEdge();
-                            dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
-                            dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                            dis_edge->setMeasurement(0.0);
-                            dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(0.005));
+                                    auto *dis_edge = new DistanceEdge();
+                                    dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
+                                    dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                            globalOptimizer.addEdge(dis_edge);
+                                    dis_edge->setMeasurement(0.0);
+                                    dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
+
+                                    globalOptimizer.addEdge(dis_edge);
+                                }
+
+
 
 //                            dis_edge->set
 
+                            }
                         }
+
+
 
                         if (ori_info > 0.0) {
                             mag_before.push_back(before_id);

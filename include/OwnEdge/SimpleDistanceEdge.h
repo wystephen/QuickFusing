@@ -32,7 +32,7 @@
 
 class SimpleDistanceEdge:public  DistanceEdge {
 public:
-    SimpleDistanceEdge():DistanceEdge(){
+    SimpleDistanceEdge(){
 
     }
 
@@ -48,6 +48,7 @@ public:
         double dis_2 = (p1[0] - p2[0]) * (p1[0] - p2[0]) +
                                (p1[1] - p2[1]) * (p1[1] - p2[1]) +
                                (p1[2] - p2[2]) * (p1[2] - p2[2]);
+        std::cout << dis_2 << std::endl;
         _error(0,0) = dis_2;
 
     }

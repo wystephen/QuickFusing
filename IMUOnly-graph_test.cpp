@@ -182,8 +182,7 @@ int main(int argc, char *argv[]) {
         zero_z_info = std::stod(argv[5]);
     }
 
-    if(argc>= 7)
-    {
+    if (argc >= 7) {
         mag_threold = std::stod(argv[6]);
     }
 
@@ -209,8 +208,8 @@ int main(int argc, char *argv[]) {
 //            238   263   269
 //    Eigen::Vector3d central(5, 105, 283);//imu
 //    Eigen::Vector3d scale(238, 263, 269);//imu
-    Eigen::Vector3d central(-58.0512,-117.0970,151.9001);//imu2
-    Eigen::Vector3d scale(213.8826,208.3894,232.3945);//imu2
+    Eigen::Vector3d central(-58.0512, -117.0970, 151.9001);//imu2
+    Eigen::Vector3d scale(213.8826, 208.3894, 232.3945);//imu2
 //    acc_cent = [0.0195,0.0154,-0.0877]
 //    acc_scale =[ 1.0015,1.0008,1.0336]
     Eigen::Vector3d acc_cent = Eigen::Vector3d(0.0195, 0.0154, -0.0877);
@@ -232,9 +231,9 @@ int main(int argc, char *argv[]) {
     std::cout << "imu data size: " << imudata.rows() << "x"
               << imudata.cols() << std::endl;
 
-    std::cout << "source imu data :\n" << imudata.block(0,0,10,10)<<std::endl;
+    std::cout << "source imu data :\n" << imudata.block(0, 0, 10, 10) << std::endl;
 
-    std::cout << "source imu data last 10 lines:\n"<< imudata.block(imudata.rows()-11,0,10,10)<<std::endl;
+    std::cout << "source imu data last 10 lines:\n" << imudata.block(imudata.rows() - 11, 0, 10, 10) << std::endl;
 
 
     std::vector<double> ix, iy, iz; //ix iy
@@ -342,7 +341,7 @@ int main(int argc, char *argv[]) {
         ///ZUPT GET POSITION
         auto tx = myekf.GetPosition(imudata.block(index, 1, 1, 6).transpose(), zupt_flag);
 
-        if ((zupt_flag < 0.5 && last_zupt_flag > 0.5) ) {
+        if ((zupt_flag < 0.5 && last_zupt_flag > 0.5)) {
             std::cout << "index: " << index << "key step"
                       << "ori:" << myekf.getOriente() << std::endl;
 
@@ -521,9 +520,9 @@ int main(int argc, char *argv[]) {
         iz.push_back(tx(2));
     }
 
-    std::cout << "after imu data :\n" << imudata.block(0,0,10,10)<<std::endl;
+    std::cout << "after imu data :\n" << imudata.block(0, 0, 10, 10) << std::endl;
 
-    std::cout << "after imu data last 10 lines:\n"<< imudata.block(imudata.rows()-11,0,10,10)<<std::endl;
+    std::cout << "after imu data last 10 lines:\n" << imudata.block(imudata.rows() - 11, 0, 10, 10) << std::endl;
 
 
 
@@ -564,15 +563,15 @@ int main(int argc, char *argv[]) {
 
         std::cout
                 //<< it->data_vec_.transpose()
-                  << "  acc:"
-                  << it->data_vec_.block(1,0,3,1).transpose()
-                  << "  acc rotated:"
-                  << (so3.matrix() * it->data_vec_.block(1,0,3,1)).transpose()
-                  << "  mag: "
-                  << it->data_vec_.block(7,0,3,1).transpose()
-                  << "  mag rotated:"
-                  << (so3.matrix() * it->data_vec_.block(7,0,3,1)).transpose()
-                  << std::endl;
+                << "  acc:"
+                << it->data_vec_.block(1, 0, 3, 1).transpose()
+                << "  acc rotated:"
+                << (so3.matrix() * it->data_vec_.block(1, 0, 3, 1)).transpose()
+                << "  mag: "
+                << it->data_vec_.block(7, 0, 3, 1).transpose()
+                << "  mag rotated:"
+                << (so3.matrix() * it->data_vec_.block(7, 0, 3, 1)).transpose()
+                << std::endl;
     }
 
 

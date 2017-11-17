@@ -24,7 +24,7 @@ plot3(the_line(:,1),the_line(:,2),the_line(:,3),'b-');
 % end
 
 for i = 1:length(test_corner_pair)
-    if test_corner_pair(i,3) < 0.5
+    if test_corner_pair(i,3) < 111110.5
         plot3([test(uint32(test_corner_pair(i,1))+1,1);test(uint32(test_corner_pair(i,2))+1,1)], ...
             [test(uint32(test_corner_pair(i,1))+1,2);test(uint32(test_corner_pair(i,2))+1,2)], ...
             [test(uint32(test_corner_pair(i,1))+1,3);test(uint32(test_corner_pair(i,2))+1,3)],'g--');

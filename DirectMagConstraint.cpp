@@ -103,13 +103,16 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 
 int main(int argc, char *argv[]) {
-    std::string dir_name = "/home/steve/Data/II/17/";
+    std::string dir_name = "/home/steve/Data/II/";
 
     /// Global parameters
     double first_info(8.1), second_info(7.5), ori_info(100);
     double gravity_info(9.78);
     double mag_threshold(0.1);
-//    double zero_z_info(-10.1);
+    double loop_threshold(0.5),loop_info(0.0001);
+    double max_ite(100);
+    double zero_z_info(-10.1);
+    int data_dir(16);
 
     if (argc >= 4) {
         first_info = std::stod(argv[1]);
@@ -124,6 +127,30 @@ int main(int argc, char *argv[]) {
     if (argc >= 6) {
 //        zero_z_info = std::stod(argv[5]);
         mag_threshold = std::stod(argv[5]);
+    }
+
+    if(argc >= 7)
+    {
+        loop_threshold = std::stod(argv[6]);
+    }
+
+    if(argc>=8)
+    {
+        loop_info = std::stod(argv[7]);
+    }
+
+    if(argc>=9)
+    {
+        max_ite=int(std::stod(argv[8]));
+    }
+
+    if(argc>=10)
+    {
+        zero_z_info = std::stod(argv[9]);
+    }
+
+    if(argc>=11){
+        data_dir=std::stoi(argv[10]);
     }
 
     double turn_threshold = 10.0 / 180.0 * M_PI;
@@ -224,7 +251,7 @@ int main(int argc, char *argv[]) {
     std::vector<bool> corner_flag_vec;
     corner_flag_vec.push_back(false);
 
-    std::vector<int> corner_before,corner_after;
+    std::vector<int> corner_before, corner_after;
     std::vector<double> corner_score;
 
 
@@ -321,7 +348,7 @@ int main(int argc, char *argv[]) {
 
             /// Add mag constraint
 
-            if (ori_info > 0.0) {
+            if (true) {
                 for (int before_id(0); before_id < trace_id; ++before_id) {
                     if ((imudata.block(before_id, 8, 1, 3)
                          - imudata.block(trace_id, 8, 1, 3)).norm() < mag_threshold) {
@@ -330,10 +357,10 @@ int main(int argc, char *argv[]) {
                             before_id > 10 &&
                             trace_id < imudata.rows() - 15) {
 
-                            double tmp_score = (imudata.block(before_id-5,8,10,3)-imudata.block(trace_id-5,8,10,3)).norm();
+                            double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
+                                                imudata.block(trace_id - 5, 8, 10, 3)).norm();
 
-                            if(tmp_score<0.05*10)
-                            {
+                            if (tmp_score < 0.05 * 10) {
                                 corner_before.push_back(before_id);
                                 corner_after.push_back(trace_id);
                                 corner_score.push_back(tmp_score);
@@ -343,8 +370,8 @@ int main(int argc, char *argv[]) {
                             dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
                             dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                            dis_edge->setMeasurement(0.1);
-                            dis_edge->setInformation(Eigen::Matrix<double,1,1>(0.0));
+                            dis_edge->setMeasurement(0.0);
+                            dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(0.005));
 
                             globalOptimizer.addEdge(dis_edge);
 
@@ -352,30 +379,32 @@ int main(int argc, char *argv[]) {
 
                         }
 
+                        if (ori_info > 0.0) {
+                            mag_before.push_back(before_id);
+                            mag_after.push_back(trace_id);
 
-                        mag_before.push_back(before_id);
-                        mag_after.push_back(trace_id);
+                            auto *mag_edge = new RelativeMagEdge(imudata.block(before_id, 8, 1, 3).transpose(),
+                                                                 imudata.block(trace_id, 8, 1, 3).transpose()
+                            );
 
-                        auto *mag_edge = new RelativeMagEdge(imudata.block(before_id, 8, 1, 3).transpose(),
-                                                             imudata.block(trace_id, 8, 1, 3).transpose()
-                        );
+                            mag_edge->vertices()[0] = globalOptimizer.vertex(before_id);
+                            mag_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
-                        mag_edge->vertices()[0] = globalOptimizer.vertex(before_id);
-                        mag_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+                            Eigen::Matrix<double, 3, 3> information_matrix = Eigen::Matrix<double, 3, 3>::Identity();
+                            information_matrix *= ori_info;
 
-                        Eigen::Matrix<double, 3, 3> information_matrix = Eigen::Matrix<double, 3, 3>::Identity();
-                        information_matrix *= ori_info;
+                            mag_edge->setInformation(information_matrix);
 
-                        mag_edge->setInformation(information_matrix);
-
-                        mag_edge->setMeasurement(Eigen::Vector3d(0, 0, 0));
+                            mag_edge->setMeasurement(Eigen::Vector3d(0, 0, 0));
 
 
-                        static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct(
-                                "Cauchy");
+                            static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct(
+                                    "Cauchy");
 //                    mag_edge->setRobustKernel(robustKernel);
 
-                        globalOptimizer.addEdge(mag_edge);
+                            globalOptimizer.addEdge(mag_edge);
+                        }
+
 
                     }
 
@@ -447,14 +476,13 @@ int main(int argc, char *argv[]) {
                    << std::endl;
 
     }
-    for(int k(0);k<corner_before.size();++k)
-    {
-        test_corner_pairs<< corner_before[k]
-                         <<","
-                         << corner_after[k]
-                         << ","
-                         << corner_score[k]
-                         << std::endl;
+    for (int k(0); k < corner_before.size(); ++k) {
+        test_corner_pairs << corner_before[k]
+                          << ","
+                          << corner_after[k]
+                          << ","
+                          << corner_score[k]
+                          << std::endl;
     }
 
     test.close();
@@ -469,7 +497,10 @@ int main(int argc, char *argv[]) {
                std::to_string(second_info) + "-" +
                std::to_string(ori_info) + "-" +
                std::to_string(gravity_info) + "-" +
-               std::to_string(mag_threshold));
+               std::to_string(mag_threshold) + "-"+
+    std::to_string(loop_threshold)+"-"+
+    std::to_string(loop_info)+"-"+
+    std::to_string(zero_z_info));
     plt::show();
 //    plt::save(std::to_string(first_info) + "-" +
 //              std::to_string(second_info) + "-" +

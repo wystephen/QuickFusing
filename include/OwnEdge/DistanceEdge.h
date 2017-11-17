@@ -93,6 +93,12 @@ public:
 //    std::cout << "dis :" << x << " range:" << miu << std::endl;
         double para1((x - miu) * (x - miu) / 2 / sigma / sigma);
         double para2(1 / std::sqrt(2 * sigma * sigma * M_PI));
+//
+        if(!(!std::isinf(para1)&&!std::isnan(para1)&&!std::isinf(para2)&&!std::isnan(para2)))
+        {
+            std::cout << para1<< " " << para2 << std::endl;
+            std::cout << "x:" << x << "miu:" << miu << "sigma:" << sigma << std::endl;
+        }
         assert(!std::isinf(para1)&&!std::isnan(para1)&&!std::isinf(para2)&&!std::isnan(para2));
         return para2 * std::exp(-para1);
     }

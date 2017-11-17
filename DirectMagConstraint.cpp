@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
     double loop_threshold(0.5),loop_info(0.0001);
     double max_ite(100);
     double zero_z_info(-10.1);
-    int data_dir(16);
+    int data_dir(20);
 
     if (argc >= 4) {
         first_info = std::stod(argv[1]);

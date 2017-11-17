@@ -229,11 +229,11 @@ int main(int argc, char *argv[]) {
         v->setId(trace_id);
         v->setEstimate(current_transform);
 
-        if(trace_id==0)
-        {
-            v->setFixed(true);
-
-        }
+//        if(trace_id==0)
+//        {
+//            v->setFixed(true);
+//
+//        }
         globalOptimizer.addVertex(v);
         /**
          * '''

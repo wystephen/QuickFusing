@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
     double first_info(100), second_info(100), ori_info(0.03);
     double gravity_info(0.002);
     double mag_threshold(0.25);
-    double loop_threshold(0.5),loop_info(0.0001);
+    double loop_threshold(0.5), loop_info(0.0001);
     double max_ite(100);
     double zero_z_info(-10.1);
     int data_dir(20);
@@ -132,28 +132,24 @@ int main(int argc, char *argv[]) {
         mag_threshold = std::stod(argv[5]);
     }
 
-    if(argc >= 7)
-    {
+    if (argc >= 7) {
         loop_threshold = std::stod(argv[6]);
     }
 
-    if(argc>=8)
-    {
+    if (argc >= 8) {
         loop_info = std::stod(argv[7]);
     }
 
-    if(argc>=9)
-    {
-        max_ite=int(std::stod(argv[8]));
+    if (argc >= 9) {
+        max_ite = int(std::stod(argv[8]));
     }
 
-    if(argc>=10)
-    {
+    if (argc >= 10) {
         zero_z_info = std::stod(argv[9]);
     }
 
-    if(argc>=11){
-        data_dir=std::stoi(argv[10]);
+    if (argc >= 11) {
+        data_dir = std::stoi(argv[10]);
     }
 
     dir_name = dir_name + std::to_string(data_dir) + "/";
@@ -297,14 +293,18 @@ int main(int argc, char *argv[]) {
 
 
 
-//            /// Add z 0 edge
-//            auto *edge_z0 = new Z0Edge();
-//            edge_z0->vertices()[0] = globalOptimizer.vertex(trace_id-1);
-//            edge_z0->vertices()[1] = globalOptimizer.vertex(trace_id);
-//
-//            edge_z0->setMeasurement(0.0);
-//            edge_z0->setInformation(Eigen::Matrix<double,1,1>(0.00001));
-//            globalOptimizer.addEdge(edge_z0);
+
+            /// Add z 0 edge
+            if (zero_z_info > 0.0) {
+                auto *edge_z0 = new Z0Edge();
+                edge_z0->vertices()[0] = globalOptimizer.vertex(trace_id - 1);
+                edge_z0->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+                edge_z0->setMeasurement(0.0);
+                edge_z0->setInformation(Eigen::Matrix<double, 1, 1>(zero_z_info));
+                globalOptimizer.addEdge(edge_z0);
+
+            }
 
 
 
@@ -357,8 +357,8 @@ int main(int argc, char *argv[]) {
                     if ((imudata.block(before_id, 8, 1, 3)
                          - imudata.block(trace_id, 8, 1, 3)).norm() < mag_threshold) {
 
-                        if(loop_info>0.0){
-                            if (is_corner && corner_flag_vec[before_id] &&
+                        if (loop_info > 0.0) {
+                            if (//is_corner && corner_flag_vec[before_id] &&
                                 before_id > 10 &&
                                 trace_id < imudata.rows() - 15) {
 
@@ -387,7 +387,6 @@ int main(int argc, char *argv[]) {
 
                             }
                         }
-
 
 
                         if (ori_info > 0.0) {
@@ -429,9 +428,17 @@ int main(int argc, char *argv[]) {
         if (trace_id - last_optimized_id > 15) {
 
             last_optimized_id = trace_id;
+            globalOptimizer.setVerbose(true);
             globalOptimizer.initializeOptimization();
-            globalOptimizer.optimize(5);
+//            globalOptimizer.updateInitialization()
+            globalOptimizer.optimize(10,false);
         }
+
+//        if(trace_id>50)
+//        {
+//            globalOptimizer.vertex(trace_id-50)->setFixed(true);
+//        }
+
         last_transform = current_transform;
 
         trace_id++;
@@ -508,10 +515,10 @@ int main(int argc, char *argv[]) {
                std::to_string(second_info) + "-" +
                std::to_string(ori_info) + "-" +
                std::to_string(gravity_info) + "-" +
-               std::to_string(mag_threshold) + "-"+
-    std::to_string(loop_threshold)+"-"+
-    std::to_string(loop_info)+"-"+
-    std::to_string(zero_z_info));
+               std::to_string(mag_threshold) + "-" +
+               std::to_string(loop_threshold) + "-" +
+               std::to_string(loop_info) + "-" +
+               std::to_string(zero_z_info));
     plt::show();
 //    plt::save(std::to_string(first_info) + "-" +
 //              std::to_string(second_info) + "-" +

@@ -36,6 +36,11 @@ void DistanceEdge::computeError() {
     double dis = std::sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) +
                            (p1[1] - p2[1]) * (p1[1] - p2[1]) +
                            (p1[2] - p2[2]) * (p1[2] - p2[2]));
+
+    if(std::isnan(dis))
+    {
+        std::cout << "stop here" << std::endl;
+    }
 //    _error(0, 0) = std::pow(dis - (_measurement), 2.0);//*_information(0,0);
 //    std::cout << "id:"<<vertices()[0]->id() <<
 //              p1[0]<<","<<p1[1]<< ","<<p1[2]<<
@@ -45,7 +50,7 @@ void DistanceEdge::computeError() {
 //    _error(0, 0) = std::log(NormalPdf(dis, _measurement, sigma_));
     try{
 //        _error(0,0)=NormalPdf(dis,_measurement,sigma_);
-            _error(0, 0) = std::log(NormalPdf(dis, _measurement, sigma_));
+            _error(0, 0) = std::log(1.0 + NormalPdf(dis, _measurement, sigma_));
         if(std::isnan(_error(0,0))||std::isinf(_error(0,0)))
         {
             throw std::bad_cast();

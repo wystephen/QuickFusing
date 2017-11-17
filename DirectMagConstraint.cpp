@@ -70,6 +70,9 @@
 #include "OwnEdge/RelativeMagEdge.h"
 #include "OwnEdge/RelativeMagEdge.cpp"
 
+#include "OwnEdge/SimpleDistanceEdge.h"
+#include "OwnEdge/SimpleDistanceEdge.cpp"
+
 //#include "OwnEdge/Line2D.h"
 //#include "OwnEdge/Line2D.cpp"
 //#include "OwnEdge/Point2Line2D.h"
@@ -368,7 +371,7 @@ int main(int argc, char *argv[]) {
                                     corner_score.push_back(tmp_score);
 
 
-                                    auto *dis_edge = new DistanceEdge();
+                                    auto *dis_edge = new SimpleDistanceEdge();
                                     dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
                                     dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
@@ -443,7 +446,7 @@ int main(int argc, char *argv[]) {
 //    globalOptimizer.initMultiThreading();
     globalOptimizer.initializeOptimization();
 //    globalOptimize
-    globalOptimizer.optimize(150);
+    globalOptimizer.optimize(max_ite);
 
 
 

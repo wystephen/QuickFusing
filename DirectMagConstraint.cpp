@@ -228,8 +228,13 @@ int main(int argc, char *argv[]) {
         auto *v = new g2o::VertexSE3();
         v->setId(trace_id);
         v->setEstimate(current_transform);
-        globalOptimizer.addVertex(v);
 
+        if(trace_id==0)
+        {
+            v->setFixed(true);
+
+        }
+        globalOptimizer.addVertex(v);
         /**
          * '''
             id | time ax ay az wx wy wz mx my mz pressure| x  y  z  vx vy vz| qx qy qz qw
@@ -254,14 +259,14 @@ int main(int argc, char *argv[]) {
 
 
 
-            /// Add z 0 edge
-            auto *edge_z0 = new Z0Edge();
-            edge_z0->vertices()[0] = globalOptimizer.vertex(trace_id-1);
-            edge_z0->vertices()[1] = globalOptimizer.vertex(trace_id);
-
-            edge_z0->setMeasurement(0.0);
-            edge_z0->setInformation(Eigen::Matrix<double,1,1>(0.00001));
-            globalOptimizer.addEdge(edge_z0);
+//            /// Add z 0 edge
+//            auto *edge_z0 = new Z0Edge();
+//            edge_z0->vertices()[0] = globalOptimizer.vertex(trace_id-1);
+//            edge_z0->vertices()[1] = globalOptimizer.vertex(trace_id);
+//
+//            edge_z0->setMeasurement(0.0);
+//            edge_z0->setInformation(Eigen::Matrix<double,1,1>(0.00001));
+//            globalOptimizer.addEdge(edge_z0);
 
 
 

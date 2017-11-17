@@ -220,6 +220,7 @@ int main(int argc, char *argv[]) {
     int last_optimized_id(0);
 
     std::vector<ImuKeyPointInfo> key_info_mag;
+//    std::vector<int> pairt_
 
 
     for (int index(0); index < imudata.rows(); ++index) {

@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
     double p[6] = {0.0};
     v->setEstimateData(p);
 
-    v->setFixed(false);
+    v->setFixed(true);
     v->setId(attitude_vertex_id);
     globalOptimizer.addVertex(v);
 
@@ -348,7 +348,7 @@ int main(int argc, char *argv[]) {
 //    globalOptimizer.initMultiThreading();
     globalOptimizer.initializeOptimization();
 //    globalOptimize
-    globalOptimizer.optimize(50);
+    globalOptimizer.optimize(150);
 
 
 

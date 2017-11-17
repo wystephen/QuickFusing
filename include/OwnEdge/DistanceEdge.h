@@ -27,7 +27,7 @@ public:
 
     virtual bool write(std::ostream &os) const;
 
-    void computeError();
+    virtual void computeError();
 
     /**
      * distance

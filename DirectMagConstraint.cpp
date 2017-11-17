@@ -153,6 +153,7 @@ int main(int argc, char *argv[]) {
         data_dir=std::stoi(argv[10]);
     }
 
+    dir_name = dir_name + std::to_string(data_dir) + "/";
     double turn_threshold = 10.0 / 180.0 * M_PI;
     double corner_ratio = 10.0;
 

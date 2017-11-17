@@ -46,6 +46,10 @@ void DistanceEdge::computeError() {
     try{
 //        _error(0,0)=NormalPdf(dis,_measurement,sigma_);
             _error(0, 0) = std::log(NormalPdf(dis, _measurement, sigma_));
+        if(std::isnan(_error(0,0))||std::isinf(_error(0,0)))
+        {
+            throw std::bad_cast();
+        }
     }catch(std::exception &e)
     {
         std::cout << e.what() << __FILE__<< ":"<< __LINE__ <<":"<<__FUNCTION__ << std::endl;

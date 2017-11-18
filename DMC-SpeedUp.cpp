@@ -359,44 +359,45 @@ int main(int argc, char *argv[]) {
 
             /// Add mag constraint
 
+            std::vector<int> mag_acceptable_id;
+//            int last_added_mag
+
             if (true) {
                 for (int before_id(0); before_id < trace_id; ++before_id) {
+                    if (loop_info > 0.0) {
+                        if (//is_corner && corner_flag_vec[before_id] &&
+                                before_id > 10 &&
+                                trace_id < imudata.rows() - 15) {
+
+                            double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
+                                                imudata.block(trace_id - 5, 8, 10, 3)).norm();
+
+                            if (tmp_score < loop_threshold) {
+                                corner_before.push_back(before_id);
+                                corner_after.push_back(trace_id);
+                                corner_score.push_back(tmp_score);
+
+
+                                auto *dis_edge = new SimpleDistanceEdge();
+                                dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
+                                dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+
+                                dis_edge->setMeasurement(0.0);
+                                dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
+
+                                globalOptimizer.addEdge(dis_edge);
+                            }
+
+                        }
+                    }
                     if ((imudata.block(before_id, 8, 1, 3)
                          - imudata.block(trace_id, 8, 1, 3)).norm() < mag_threshold) {
 
-                        if (loop_info > 0.0) {
-                            if (//is_corner && corner_flag_vec[before_id] &&
-                                    before_id > 10 &&
-                                    trace_id < imudata.rows() - 15) {
-
-                                double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
-                                                    imudata.block(trace_id - 5, 8, 10, 3)).norm();
-
-                                if (tmp_score < loop_threshold) {
-                                    corner_before.push_back(before_id);
-                                    corner_after.push_back(trace_id);
-                                    corner_score.push_back(tmp_score);
-
-
-                                    auto *dis_edge = new SimpleDistanceEdge();
-                                    dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
-                                    dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
-
-                                    dis_edge->setMeasurement(0.0);
-                                    dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
-
-                                    globalOptimizer.addEdge(dis_edge);
-                                }
-
-
-
-//                            dis_edge->set
-
-                            }
-                        }
-
 
                         if (ori_info > 0.0) {
+
+                            mag_acceptable_id.push_back(before_id);
+
                             mag_before.push_back(before_id);
                             mag_after.push_back(trace_id);
 
@@ -424,6 +425,7 @@ int main(int argc, char *argv[]) {
 
 
                     }
+
 
                 }
             }

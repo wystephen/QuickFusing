@@ -359,8 +359,8 @@ int main(int argc, char *argv[]) {
 
                         if (loop_info > 0.0) {
                             if (//is_corner && corner_flag_vec[before_id] &&
-                                before_id > 10 &&
-                                trace_id < imudata.rows() - 15) {
+                                    before_id > 10 &&
+                                    trace_id < imudata.rows() - 15) {
 
                                 double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
                                                     imudata.block(trace_id - 5, 8, 10, 3)).norm();
@@ -431,7 +431,7 @@ int main(int argc, char *argv[]) {
             globalOptimizer.setVerbose(true);
             globalOptimizer.initializeOptimization();
 //            globalOptimizer.updateInitialization()
-            globalOptimizer.optimize(10,false);
+            globalOptimizer.optimize(10, false);
         }
 
 //        if(trace_id>50)

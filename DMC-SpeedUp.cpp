@@ -466,6 +466,7 @@ int main(int argc, char *argv[]) {
 
 
     std::cout << "total time :" << TimeStamp::now()-start_time << std::endl;
+    std::cout << "data time :" << imudata(trace_id,1)-imudata(0,1) << std::endl;
 
 
 

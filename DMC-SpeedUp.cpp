@@ -439,11 +439,11 @@ int main(int argc, char *argv[]) {
             globalOptimizer.initializeOptimization();
 //            globalOptimizer.updateInitialization()
 //            globalOptimizer.optimize(10, false);
-            globalOptimizer.optimize(15, false);
+            globalOptimizer.optimize(10, false);
         }
 
-        if (trace_id > 500) {
-            globalOptimizer.vertex(trace_id - 500)->setFixed(true);
+        if (trace_id > 450) {
+            globalOptimizer.vertex(trace_id - 450)->setFixed(true);
         }
 
         last_transform = current_transform;

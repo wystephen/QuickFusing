@@ -87,7 +87,6 @@
 #include "ImuKeyPointInfo.h"
 
 
-
 G2O_USE_TYPE_GROUP(slam3d)
 
 
@@ -258,7 +257,6 @@ int main(int argc, char *argv[]) {
 
     std::vector<int> corner_before, corner_after;
     std::vector<double> corner_score;
-
 
 
     double start_time = TimeStamp::now();
@@ -440,12 +438,12 @@ int main(int argc, char *argv[]) {
             globalOptimizer.setVerbose(true);
             globalOptimizer.initializeOptimization();
 //            globalOptimizer.updateInitialization()
-            globalOptimizer.optimize(10, false);
+//            globalOptimizer.optimize(10, false);
+            globalOptimizer.optimize(15, false);
         }
 
-        if(trace_id>500)
-        {
-            globalOptimizer.vertex(trace_id-500)->setFixed(true);
+        if (trace_id > 500) {
+            globalOptimizer.vertex(trace_id - 500)->setFixed(true);
         }
 
         last_transform = current_transform;
@@ -465,8 +463,8 @@ int main(int argc, char *argv[]) {
     globalOptimizer.optimize(max_ite);
 
 
-    double compute_time = TimeStamp::now()-start_time;
-    double data_time = imudata(trace_id-1,1)-imudata(0,1);
+    double compute_time = TimeStamp::now() - start_time;
+    double data_time = imudata(trace_id - 1, 1) - imudata(0, 1);
     std::cout << "total time :" << compute_time << std::endl;
     std::cout << "data time :" << data_time << std::endl;
     std::cout << "rate:" << compute_time / data_time << std::endl;

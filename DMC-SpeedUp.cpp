@@ -465,8 +465,11 @@ int main(int argc, char *argv[]) {
     globalOptimizer.optimize(max_ite);
 
 
-    std::cout << "total time :" << TimeStamp::now()-start_time << std::endl;
-    std::cout << "data time :" << imudata(trace_id,1)-imudata(0,1) << std::endl;
+    double compute_time = TimeStamp::now()-start_time;
+    double data_time = imudata(trace_id-1,1)-imudata(0,1);
+    std::cout << "total time :" << compute_time << std::endl;
+    std::cout << "data time :" << data_time << std::endl;
+    std::cout << "rate:" << compute_time / data_time << std::endl;
 
 
 

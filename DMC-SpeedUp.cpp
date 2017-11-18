@@ -443,10 +443,10 @@ int main(int argc, char *argv[]) {
             globalOptimizer.optimize(10, false);
         }
 
-//        if(trace_id>50)
-//        {
-//            globalOptimizer.vertex(trace_id-50)->setFixed(true);
-//        }
+        if(trace_id>500)
+        {
+            globalOptimizer.vertex(trace_id-500)->setFixed(true);
+        }
 
         last_transform = current_transform;
 
@@ -470,6 +470,7 @@ int main(int argc, char *argv[]) {
     std::cout << "total time :" << compute_time << std::endl;
     std::cout << "data time :" << data_time << std::endl;
     std::cout << "rate:" << compute_time / data_time << std::endl;
+    std::cout << " trace id :" << trace_id << "average time :" << compute_time / double(trace_id) << std::endl;
 
 
 

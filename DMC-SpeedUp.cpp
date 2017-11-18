@@ -87,6 +87,7 @@
 #include "ImuKeyPointInfo.h"
 
 
+
 G2O_USE_TYPE_GROUP(slam3d)
 
 
@@ -257,6 +258,10 @@ int main(int argc, char *argv[]) {
 
     std::vector<int> corner_before, corner_after;
     std::vector<double> corner_score;
+
+
+
+    double start_time = TimeStamp::now();
 
 
     for (int index(0); index < imudata.rows(); ++index) {
@@ -458,6 +463,9 @@ int main(int argc, char *argv[]) {
     globalOptimizer.initializeOptimization();
 //    globalOptimize
     globalOptimizer.optimize(max_ite);
+
+
+    std::cout << "total time :" << TimeStamp::now()-start_time << std::endl;
 
 
 

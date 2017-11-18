@@ -105,6 +105,10 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 }
 
 
+// Good result by Version 2 :
+// ./cmake-build-debug/DirectMagConstraint 100 1000 0.03 0.002 0.25 0.5 0.0001 17 0.01 17
+
+
 int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/II/";
 

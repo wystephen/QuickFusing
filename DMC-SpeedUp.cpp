@@ -382,6 +382,7 @@ int main(int argc, char *argv[]) {
                                 dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
                                 dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
 
+
                                 dis_edge->setMeasurement(0.0);
                                 dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
 

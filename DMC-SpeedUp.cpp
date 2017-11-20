@@ -419,6 +419,7 @@ int main(int argc, char *argv[]) {
 
                             static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct(
                                     "Cauchy");
+
 //                    mag_edge->setRobustKernel(robustKernel);
 
                             globalOptimizer.addEdge(mag_edge);

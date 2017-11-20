@@ -417,8 +417,8 @@ int main(int argc, char *argv[]) {
                             mag_edge->setMeasurement(Eigen::Vector3d(0, 0, 0));
 
 
-                            static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct(
-                                    "Cauchy");
+//                            static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct(
+//                                    "Cauchy");
 
 //                    mag_edge->setRobustKernel(robustKernel);
 

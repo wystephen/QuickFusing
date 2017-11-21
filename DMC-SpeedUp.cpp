@@ -363,12 +363,16 @@ int main(int argc, char *argv[]) {
 //            int last_added_mag
 
             if (true) {
+                int mag_attitude_constraint_counter = 0;
                 for (int before_id(0); before_id < trace_id; ++before_id) {
                     if (loop_info > 0.0) {
                         if (//is_corner && corner_flag_vec[before_id] &&
-                            std::fabs(imudata(trace_id,11)-imudata(trace_id,11))<1e12  &&
+                                std::fabs(imudata(trace_id, 11) - imudata(trace_id, 11)) < 1e12 &&
                                 before_id > 10 &&
                                 trace_id < imudata.rows() - 15) {
+
+                            int compare_offset = 9;
+                            int compare_long = 18;
 
 
                             /**
@@ -377,15 +381,24 @@ int main(int argc, char *argv[]) {
                              * 3.
                              */
 
-                            double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
-                                                imudata.block(trace_id - 5, 8, 10, 3)).norm();
+                            double tmp_score = (imudata.block(before_id - compare_offset, 8, compare_long, 3) -
+                                                imudata.block(trace_id - compare_offset, 8, compare_long, 3)).norm();
 
-                            double before_score = (imudata.block(before_id - 6, 8, 10, 3) -
-                                                imudata.block(trace_id - 6, 8, 10, 3)).norm();
-                            double after_score = (imudata.block(before_id - 4, 8, 10, 3) -
-                                                imudata.block(trace_id - 4, 8, 10, 3)).norm();
+                            double before_score = (imudata.block(before_id - compare_offset - 1, 8, compare_long, 3) -
+                                                   imudata.block(trace_id - compare_offset - 1, 8, compare_long,
+                                                                 3)).norm();
+                            double after_score = (imudata.block(before_id - compare_offset + 1, 8, compare_long, 3) -
+                                                  imudata.block(trace_id - compare_offset + 1, 8, compare_long,
+                                                                3)).norm();
 
-                            if (tmp_score < loop_threshold && tmp_score<before_score && tmp_score < after_score
+                            if ((tmp_score < loop_threshold &&
+                                 tmp_score < before_score &&
+                                 tmp_score < after_score) ||
+                                (
+                                        corner_after.size() > 0 &&
+                                        corner_after[corner_after.size() - 1] == trace_id - 1 &&
+                                        tmp_score < loop_threshold * 1.3
+                                )
                                     ) {
                                 corner_before.push_back(before_id);
                                 corner_after.push_back(trace_id);
@@ -403,13 +416,20 @@ int main(int argc, char *argv[]) {
                                 globalOptimizer.addEdge(dis_edge);
                             }
 
+
+                            /// reverse comapre
+
+
                         }
                     }
                     if ((imudata.block(before_id, 8, 1, 3)
-                         - imudata.block(trace_id, 8, 1, 3)).norm() < mag_threshold) {
+                         - imudata.block(trace_id, 8, 1, 3)).norm() < mag_threshold
+                            ) {
 
 
-                        if (ori_info > 0.0) {
+                        if (ori_info > 0.0 && mag_attitude_constraint_counter < 2) {
+
+                            mag_attitude_constraint_counter++;
 
                             mag_acceptable_id.push_back(before_id);
 
@@ -431,10 +451,10 @@ int main(int argc, char *argv[]) {
                             mag_edge->setMeasurement(Eigen::Vector3d(0, 0, 0));
 
 
-//                            static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct(
-//                                    "Cauchy");
+                            static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct(
+                                    "Cauchy");
 
-//                    mag_edge->setRobustKernel(robustKernel);
+                            mag_edge->setRobustKernel(robustKernel);
 
                             globalOptimizer.addEdge(mag_edge);
                         }

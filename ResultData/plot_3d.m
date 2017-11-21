@@ -9,7 +9,7 @@ test_pair = test_pair + 1;
 
 
 save_trace = test;
-plot3(test_imu(:,1),test_imu(:,2),test_imu(:,3),'b*-');
+plot3(test_imu(:,1),test_imu(:,2),test_imu(:,3),'y*-');
 plot3(save_trace(:,1),save_trace(:,2),save_trace(:,3),'*r-');
 the_line = zeros(2,3);
 the_line(1,:) = save_trace(1,:);
@@ -27,7 +27,7 @@ for i = 1:length(test_corner_pair)
     if test_corner_pair(i,3) < 111110.5
         plot3([test(uint32(test_corner_pair(i,1))+1,1);test(uint32(test_corner_pair(i,2))+1,1)], ...
             [test(uint32(test_corner_pair(i,1))+1,2);test(uint32(test_corner_pair(i,2))+1,2)], ...
-            [test(uint32(test_corner_pair(i,1))+1,3);test(uint32(test_corner_pair(i,2))+1,3)],'g--');
+            [test(uint32(test_corner_pair(i,1))+1,3);test(uint32(test_corner_pair(i,2))+1,3)],'b--');
     end
 end
         

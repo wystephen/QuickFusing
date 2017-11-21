@@ -28,7 +28,7 @@ import scipy as sp
 import numpy as np
 
 if __name__ == '__main__':
-    dir_nema = '/home/steve/Data/II/16/'
+    dir_nema = '/home/steve/Data/II/31/'
     imudata = np.loadtxt(dir_nema+'imu2.txt',delimiter=',')
 
 
@@ -67,4 +67,12 @@ if __name__ == '__main__':
     plt.plot(np.linalg.norm((imudata[:,7:10]-mag_cent)/mag_scale,axis=1),'r-',label="norm")
     plt.grid()
     plt.legend()
+
+
+    plt.figure()
+    plt.title('pressure')
+    plt.plot(imudata[:,10],'r-*')
+    plt.grid()
+
+
     plt.show()

@@ -366,13 +366,27 @@ int main(int argc, char *argv[]) {
                 for (int before_id(0); before_id < trace_id; ++before_id) {
                     if (loop_info > 0.0) {
                         if (//is_corner && corner_flag_vec[before_id] &&
+                            std::fabs(imudata(trace_id,11)-imudata(trace_id,11))<1e12  &&
                                 before_id > 10 &&
                                 trace_id < imudata.rows() - 15) {
+
+
+                            /**
+                             * 1. add Pressure constrain, choice floor
+                             * 2. add multi-attitude
+                             * 3.
+                             */
 
                             double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
                                                 imudata.block(trace_id - 5, 8, 10, 3)).norm();
 
-                            if (tmp_score < loop_threshold) {
+                            double before_score = (imudata.block(before_id - 6, 8, 10, 3) -
+                                                imudata.block(trace_id - 6, 8, 10, 3)).norm();
+                            double after_score = (imudata.block(before_id - 4, 8, 10, 3) -
+                                                imudata.block(trace_id - 4, 8, 10, 3)).norm();
+
+                            if (tmp_score < loop_threshold && tmp_score<before_score && tmp_score < after_score
+                                    ) {
                                 corner_before.push_back(before_id);
                                 corner_after.push_back(trace_id);
                                 corner_score.push_back(tmp_score);
@@ -446,9 +460,9 @@ int main(int argc, char *argv[]) {
             globalOptimizer.optimize(10, false);
         }
 
-        if (trace_id > 450) {
-            globalOptimizer.vertex(trace_id - 450)->setFixed(true);
-        }
+//        if (trace_id > 450) {
+//            globalOptimizer.vertex(trace_id - 450)->setFixed(true);
+//        }
 
         last_transform = current_transform;
 

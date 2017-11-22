@@ -49,7 +49,7 @@ if __name__ == '__main__':
     for i1 in para_list:
         for i2 in para_list:
             for i3 in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
-                all_str_run.append("../cmake-build-debug/DirectMagConstraint 100.0 100.0 {0} {1} {2}".format(
+                all_str_run.append("../cmake-build-debug/DMC-SpeedUp 100.0 1000.0 {0} {1} {2} 0.7 -10 200 -1 28".format(
                     i1,
                     i2,
                     i3 / 2.0

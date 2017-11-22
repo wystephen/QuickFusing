@@ -397,7 +397,8 @@ int main(int argc, char *argv[]) {
                                 (
                                         corner_after.size() > 0 &&
                                         corner_after[corner_after.size() - 1] == trace_id - 1 &&
-                                        tmp_score < loop_threshold * 1.3
+                                        corner_before[corner_before.size() - 1] == before_id - 1 &&
+                                        tmp_score < loop_threshold * 1.5
                                 )
                                     ) {
                                 corner_before.push_back(before_id);
@@ -427,7 +428,7 @@ int main(int argc, char *argv[]) {
                             ) {
 
 
-                        if (ori_info > 0.0 && mag_attitude_constraint_counter < 2) {
+                        if (ori_info > 0.0 && mag_attitude_constraint_counter < 5) {
 
                             mag_attitude_constraint_counter++;
 

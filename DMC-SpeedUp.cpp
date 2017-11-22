@@ -428,7 +428,7 @@ int main(int argc, char *argv[]) {
                             ) {
 
 
-                        if (ori_info > 0.0 && mag_attitude_constraint_counter < 5) {
+                        if (ori_info > 0.0 && mag_attitude_constraint_counter < 10) {
 
                             mag_attitude_constraint_counter++;
 

@@ -22,7 +22,6 @@
          佛祖保佑       永无BUG 
 '''
 
-
 import Scripts.ImuResultReader
 import Scripts.ImuPreprocess
 import Scripts.PcSavedReader
@@ -41,11 +40,9 @@ if __name__ == '__main__':
     # dir_name = "/home/steve/Data/FastUwbDemo/2/"
     # dir_name = "/home/steve/tmp/test/20/"
 
-
     # a = np.loadtxt(dir_name + 'imu.txt', delimiter=',')
     # print(a[:, 1:4].shape)
     # a[:,1:4] *= 9.816
-
 
     ip = Scripts.ImuPreprocess.ImuPreprocess(dir_name + "imu.txt")
     ip.computezupt()
@@ -60,7 +57,7 @@ if __name__ == '__main__':
     # np.savetxt(dir_name + "vertex_high.csv", ip.vertics_high, delimiter=',')
 
     # print(ip.vertics.shape, " - ", ip.vertex_quat.shape, " - ", ip.vertics_time.shape)
-    ip2 = Scripts.ImuPreprocess.ImuPreprocess(dir_name+'imu2.txt')
+    ip2 = Scripts.ImuPreprocess.ImuPreprocess(dir_name + 'imu2.txt')
     ip2.computezupt()
     ip2.findvertex()
 
@@ -69,22 +66,21 @@ if __name__ == '__main__':
     ax.plot(ip.vertics[:, 0], ip.vertics[:, 1], ip.vertics[:, 2],
             'r*-',
             label='trace imu.txt')
-    ax.plot(ip2.vertics[:,0],ip2.vertics[:,1],ip2.vertics[:,2],
+    ax.plot(ip2.vertics[:, 0], ip2.vertics[:, 1], ip2.vertics[:, 2],
             'b*-',
             label='trace imu2.txt')
     ax.legend()
-    trace_fig.savefig(dir_name+'trace3d.png',dpi=2000)
+    trace_fig.savefig(dir_name + 'trace3d.png', dpi=2000)
 
     plt.figure()
     plt.grid()
-    plt.plot(ip.vertics[:,0],ip.vertics[:,1],'r*-',label='trace imu.txt')
-    plt.plot(ip2.vertics[:,0],ip2.vertics[:,1],'b*-',label='traceimu2.txt')
+    plt.plot(ip.vertics[:, 0], ip.vertics[:, 1], 'r*-', label='trace imu.txt')
+    plt.plot(ip2.vertics[:, 0], ip2.vertics[:, 1], 'b*-', label='traceimu2.txt')
     plt.legend()
-    plt.savefig(dir_name+'trace2d.png',dpi=2000)
+    plt.savefig(dir_name + 'trace2d.png', dpi=2000)
     # plt.figure()
     # plt.plot(ip.vertics_time, 'r')
 
     # ip.findcorner()
     # ip.computeconerfeature()
     plt.show()
-

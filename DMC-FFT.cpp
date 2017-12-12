@@ -204,6 +204,7 @@ int main(int argc, char *argv[]) {
     auto pairs_data_tmp_matrix = pairs_index_file.GetMatrix();
 
     Eigen::MatrixXi pairs_vec;
+    pairs_vec.resize(pairs_data_tmp_matrix.GetRows(),pairs_data_tmp_matrix.GetCols());
     for(int i(0);i<pairs_data_tmp_matrix.GetRows();++i)
     {
         pairs_vec(i,0) = int(*(pairs_data_tmp_matrix(i,0)));

@@ -470,14 +470,20 @@ int main(int argc, char *argv[]) {
 
     }
 
-    static g2o::RobustKernel* robust_kernel_dis =
-            g2o::RobustKernelFactory::instance()->construct("DCS");
+//    static g2o::RobustKernel* robust_kernel_dis =
+//            g2o::RobustKernelFactory::instance()->construct("DCS");
 //        robust_kernel_dis->robustify()
 
     // add distance edge based on fft-feature distance
+    std::cout << " begin to add distance edge" << std::endl;
     for(int i(0);i<pairs_vec.rows();++i)
     {
-        if((pairs_vec(i,1)-pairs_vec(i,0))>5)
+
+        if(pairs_vec(i,0)>=trace_id || pairs_vec(i,1)>=trace_id)
+        {
+            std::cout << "trace id :"<<trace_id << " pairs:"<< pairs_vec.block(i,0,1,2)<<std::endl;
+        }
+        if((pairs_vec(i,1)-pairs_vec(i,0))>5 )
         {
             corner_before.push_back(pairs_vec(i,0));
             corner_after.push_back(pairs_vec(i,1));

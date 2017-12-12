@@ -470,8 +470,8 @@ int main(int argc, char *argv[]) {
 
     }
 
-//    static g2o::RobustKernel* robust_kernel_dis =
-//            g2o::RobustKernelFactory::instance()->construct("DCS");
+    static g2o::RobustKernel* robust_kernel_dis =
+            g2o::RobustKernelFactory::instance()->construct("");/////!!!!!!!!!!!!!TODO: FIX IT!!
 //        robust_kernel_dis->robustify()
 
     // add distance edge based on fft-feature distance
@@ -495,7 +495,7 @@ int main(int argc, char *argv[]) {
 
             dis_edge->setMeasurement(0.0);
             dis_edge->setInformation(Eigen::Matrix<double,1,1>(loop_info));
-//            dis_edge->setRobustKernel(robust_kernel_dis);
+            dis_edge->setRobustKernel(robust_kernel_dis);
 
             globalOptimizer.addEdge(dis_edge);
         }

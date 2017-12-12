@@ -200,18 +200,19 @@ int main(int argc, char *argv[]) {
 
     std::cout << "source imu data :\n" << imudata.block(0, 0, 10, imudata.cols()) << std::endl;
 
-    CppExtent::CSVReader pairs_index_file(dir_name+"pairs.csv");
+    CppExtent::CSVReader pairs_index_file(dir_name + "pairs.csv");
     auto pairs_data_tmp_matrix = pairs_index_file.GetMatrix();
 
     Eigen::MatrixXi pairs_vec;
-    pairs_vec.resize(pairs_data_tmp_matrix.GetRows(),pairs_data_tmp_matrix.GetCols());
-    for(int i(0);i<pairs_data_tmp_matrix.GetRows();++i)
-    {
-        pairs_vec(i,0) = int(*(pairs_data_tmp_matrix(i,0)));
-        pairs_vec(i,1) = int(*(pairs_data_tmp_matrix(i,1)));
+    pairs_vec.resize(pairs_data_tmp_matrix.GetRows(), pairs_data_tmp_matrix.GetCols());
+    for (int i(0); i < pairs_data_tmp_matrix.GetRows(); ++i) {
+        pairs_vec(i, 0) = int(*(pairs_data_tmp_matrix(i, 0)));
+        pairs_vec(i, 1) = int(*(pairs_data_tmp_matrix(i, 1)));
+        std::cout << "("<<i<<"):"<<pairs_vec.block(i,0,1,2) << std::endl;
     }
 
-    std::cout << "pairs:" << pairs_vec.rows() << std::endl;
+    std::cout << "pairs:" << pairs_vec.rows() << ":"
+              << pairs_vec.cols() << std::endl;
 
 
 
@@ -381,24 +382,24 @@ int main(int argc, char *argv[]) {
                                     before_id > 10 &&
                                     trace_id < imudata.rows() - 15) {
 
-                                double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
-                                                    imudata.block(trace_id - 5, 8, 10, 3)).norm();
-
-                                if (tmp_score < loop_threshold) {
-                                    corner_before.push_back(before_id);
-                                    corner_after.push_back(trace_id);
-                                    corner_score.push_back(tmp_score);
-
-
-                                    auto *dis_edge = new SimpleDistanceEdge();
-                                    dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
-                                    dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
-
-                                    dis_edge->setMeasurement(0.0);
-                                    dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
-
-                                    globalOptimizer.addEdge(dis_edge);
-                                }
+//                                double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
+//                                                    imudata.block(trace_id - 5, 8, 10, 3)).norm();
+//
+//                                if (tmp_score < loop_threshold) {
+//                                    corner_before.push_back(before_id);
+//                                    corner_after.push_back(trace_id);
+//                                    corner_score.push_back(tmp_score);
+//
+//
+//                                    auto *dis_edge = new SimpleDistanceEdge();
+//                                    dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
+//                                    dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+//
+//                                    dis_edge->setMeasurement(0.0);
+//                                    dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
+//
+//                                    globalOptimizer.addEdge(dis_edge);
+//                                }
 
 
 
@@ -467,6 +468,8 @@ int main(int argc, char *argv[]) {
 
 
     }
+
+
 
     globalOptimizer.setVerbose(true);
 //    globalOptimizer.initMultiThreading();

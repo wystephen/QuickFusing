@@ -111,6 +111,14 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/II/";
+    /**
+     * Should be used data:
+     * 16,17,19,20,28,31,32,33,34
+     * 33---Velocity is changed
+     * 34---inverse attitude
+     */
+
+
 
     /// Global parameters
     double first_info(100), second_info(100), ori_info(0.03);

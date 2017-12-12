@@ -121,6 +121,8 @@ add_executable(DirectMagConstraint DirectMagConstraint.cpp)
 target_link_libraries(DirectMagConstraint ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
 add_executable(DMC-SpeedUp DMC-SpeedUp.cpp)
 target_link_libraries(DMC-SpeedUp ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
+add_executable(DMC-FFT DMC-FFT.cpp)
+target_link_libraries(DMC-FFT ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
 
 
 # imu mag fusion based on gtsam

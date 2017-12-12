@@ -489,8 +489,8 @@ int main(int argc, char *argv[]) {
             corner_after.push_back(pairs_vec(i,1));
 
             auto *dis_edge = new SimpleDistanceEdge();
-            dis_edge->vertices()[0] = globalOptimizer.vertex(pairs_vec(i,0));
-            dis_edge->vertices()[1] = globalOptimizer.vertex(pairs_vec(i,1));
+            dis_edge->vertices()[0] = globalOptimizer.vertex(pairs_vec(i,0)-1);
+            dis_edge->vertices()[1] = globalOptimizer.vertex(pairs_vec(i,1)-1);
 
             dis_edge->setMeasurement(0.0);
             dis_edge->setInformation(Eigen::Matrix<double,1,1>(loop_info));

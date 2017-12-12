@@ -443,29 +443,7 @@ int main(int argc, char *argv[]) {
 
 
         }
-        static g2o::RobustKernel* robust_kernel_dis =
-                g2o::RobustKernelFactory::instance()->construct("DCS");
-//        robust_kernel_dis->robustify()
 
-        // add distance edge based on fft-feature distance
-        for(int i(0);i<pairs_vec.rows();++i)
-        {
-            if((pairs_vec(i,1)-pairs_vec(i,0))>5)
-            {
-                corner_before.push_back(pairs_vec(i,0));
-                corner_after.push_back(pairs_vec(i,1));
-
-                auto *dis_edge = new SimpleDistanceEdge();
-                dis_edge->vertices()[0] = globalOptimizer.vertex(pairs_vec(i,0));
-                dis_edge->vertices()[1] = globalOptimizer.vertex(pairs_vec(i,1));
-
-                dis_edge->setMeasurement(0.0);
-                dis_edge->setInformation(Eigen::Matrix<double,1,1>(loop_info));
-                dis_edge->setRobustKernel()
-
-                globalOptimizer.addEdge(dis_edge);
-            }
-        }
 
 
         if (trace_id - last_optimized_id > 15) {
@@ -492,7 +470,29 @@ int main(int argc, char *argv[]) {
 
     }
 
+    static g2o::RobustKernel* robust_kernel_dis =
+            g2o::RobustKernelFactory::instance()->construct("DCS");
+//        robust_kernel_dis->robustify()
 
+    // add distance edge based on fft-feature distance
+    for(int i(0);i<pairs_vec.rows();++i)
+    {
+        if((pairs_vec(i,1)-pairs_vec(i,0))>5)
+        {
+            corner_before.push_back(pairs_vec(i,0));
+            corner_after.push_back(pairs_vec(i,1));
+
+            auto *dis_edge = new SimpleDistanceEdge();
+            dis_edge->vertices()[0] = globalOptimizer.vertex(pairs_vec(i,0));
+            dis_edge->vertices()[1] = globalOptimizer.vertex(pairs_vec(i,1));
+
+            dis_edge->setMeasurement(0.0);
+            dis_edge->setInformation(Eigen::Matrix<double,1,1>(loop_info));
+//            dis_edge->setRobustKernel(robust_kernel_dis);
+
+            globalOptimizer.addEdge(dis_edge);
+        }
+    }
 
     globalOptimizer.setVerbose(true);
 //    globalOptimizer.initMultiThreading();

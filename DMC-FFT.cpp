@@ -193,20 +193,26 @@ int main(int argc, char *argv[]) {
             if (7 < j && j < 11) {
                 imudata(i, j) = (imudata(i, j) - central(j - 8)) / scale(j - 8);
             }
-//            if (0 < j && j < 4) {
-//                imudata(i, j) = (imudata(i, j) - acc_cent(j - 1)) / acc_scale(j - 1);
-//                imudata(i, j) *= 9.8;
-//            } else if (4 <= j && j < 7) {
-//                imudata(i, j) *= double(M_PI / 180.0);
-//            } else if (7 <= j && j < 10) {
-//                imudata(i, j) = (imudata(i, j) - central(j - 7)) / scale(j - 7);
-//            }
         }
     }
     std::cout << "imu data size: " << imudata.rows() << "x"
               << imudata.cols() << std::endl;
 
     std::cout << "source imu data :\n" << imudata.block(0, 0, 10, imudata.cols()) << std::endl;
+
+    CppExtent::CSVReader pairs_index_file(dir_name+"pairs.csv");
+    auto pairs_data_tmp_matrix = pairs_index_file.GetMatrix();
+
+    Eigen::MatrixXi pairs_vec;
+    for(int i(0);i<pairs_data_tmp_matrix.GetRows();++i)
+    {
+        pairs_vec(i,0) = int(*(pairs_data_tmp_matrix(i,0)));
+        pairs_vec(i,1) = int(*(pairs_data_tmp_matrix(i,1)));
+    }
+
+    std::cout << "pairs:" << pairs_vec.rows() << std::endl;
+
+
 
 //    std::cout << "source imu data last 10 lines:\n" << imudata.block(imudata.rows() - 11, 0, 10, 10) << std::endl;
 

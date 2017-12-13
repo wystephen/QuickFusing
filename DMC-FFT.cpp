@@ -128,6 +128,7 @@ int main(int argc, char *argv[]) {
     double max_ite(100);
     double zero_z_info(-10.1);
     int data_dir(20);
+    double robust_delta(20.0);
 
     if (argc >= 4) {
         first_info = std::stod(argv[1]);
@@ -162,6 +163,10 @@ int main(int argc, char *argv[]) {
 
     if (argc >= 11) {
         data_dir = std::stoi(argv[10]);
+    }
+
+    if(argc >= 12){
+        robust_delta = std::stod(argv[11]);
     }
 
     dir_name = dir_name + std::to_string(data_dir) + "/";
@@ -472,7 +477,7 @@ int main(int argc, char *argv[]) {
     static g2o::RobustKernel *robust_kernel_dis =
             g2o::RobustKernelFactory::instance()->construct("DCS");/////!!!!!!!!!!!!!TODO: FIX IT!!
 //        robust_kernel_dis->robustify()
-    robust_kernel_dis->setDelta(1603.0);// where error in cost function is actually error^2
+    robust_kernel_dis->setDelta(robust_delta*robust_delta);// where error in cost function is actually error^2
 
 
     // add distance edge based on fft-feature distance

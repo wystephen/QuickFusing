@@ -396,7 +396,10 @@ int main(int argc, char *argv[]) {
                     information(0, 0) = information(1, 1) = information(2, 2) = first_info;
                     information(3, 3) = information(4, 4) = information(5, 5) = second_info;
 
+                    // reduce the confidence in corner
+                    ///????the is corner with some error~
                     if (is_corner) {
+
                         information(0, 0) = information(1, 1) = information(2, 2) = first_info / corner_ratio;
                         information(3, 3) = information(4, 4) = information(5, 5) = second_info / corner_ratio;
                     }

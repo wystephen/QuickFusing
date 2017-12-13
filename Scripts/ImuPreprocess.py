@@ -35,8 +35,8 @@ class ImuPreprocess:
         self.data[:, 1:4] = self.data[:, 1:4] * 9.81
 
         self.para = Setting.settings()
-        self.para.sigma_a *= 3.0
-        self.para.sigma_g *= 3.0
+        self.para.sigma_a *= 5.0
+        self.para.sigma_g *= 5.0
 
         self.para.sigma_acc *= 6.0
         self.para.sigma_gyro *= 6.0

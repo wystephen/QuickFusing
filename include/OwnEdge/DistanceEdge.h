@@ -50,6 +50,10 @@ public:
 
     virtual bool setMeasurementFromState();
 
+    /**
+     * pure virtual in meaning side actually~
+     * @return
+     */
     virtual double initialEstimatePossible(
             const g2o::OptimizableGraph::VertexSet &/*from*/,
             g2o::OptimizableGraph::Vertex */*to*/) {
@@ -60,6 +64,11 @@ public:
     }
 
 
+    /**
+     * initial matrix by value, actually set to zero.
+     * @param from
+     * @param to
+     */
     virtual void initialEstimate(const g2o::OptimizableGraph::VertexSet &from,
                                  g2o::OptimizableGraph::Vertex *to);
 
@@ -76,6 +85,10 @@ public:
 
     }
 
+    /**
+     *
+     * @return sigma in error function.
+     */
     double getSigma() {
         return sigma_;
     }

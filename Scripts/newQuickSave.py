@@ -2,7 +2,6 @@
 # Create by steve in 17-5-19 at 上午9:55
 
 
-
 import ImuResultReader
 import ImuPreprocess
 import PcSavedReader
@@ -16,11 +15,10 @@ import os
 
 if __name__ == '__main__':
     # dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/73/"
-    dir_name = "/home/steve/Data/II/16/"
+    dir_name = "/home/steve/Data/II/35/"
     # dir_name = "/home/steve/Code/Mini-IMU/Scripts/IMUWB/20/"
     # dir_name = "/home/steve/Data/FastUwbDemo/2/"
     # dir_name = "/home/steve/tmp/test/20/"
-
 
     a = np.loadtxt(dir_name + 'imu2.txt', delimiter=',')
     print(a[:, 1:4].shape)
@@ -40,7 +38,7 @@ if __name__ == '__main__':
     np.savetxt(dir_name + "sim_zupt.csv", ip.zupt_result, delimiter=',')
     np.savetxt(dir_name + "vertex_time.csv", ip.vertics_time, delimiter=",")
     np.savetxt(dir_name + "vertex_high.csv", ip.vertics_high, delimiter=',')
-    np.savetxt(dir_name+"vertex_all_data.csv",ip.vertics_all, delimiter=',')
+    np.savetxt(dir_name + "vertex_all_data.csv", ip.vertics_all, delimiter=',')
 
     print(ip.vertics.shape, " - ", ip.vertex_quat.shape, " - ", ip.vertics_time.shape)
 
@@ -56,4 +54,4 @@ if __name__ == '__main__':
 
     # ip.findcorner()
     # ip.computeconerfeature()
-    plt.show()
+    # plt.show()

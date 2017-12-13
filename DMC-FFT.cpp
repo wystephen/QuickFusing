@@ -111,9 +111,17 @@ Eigen::Isometry3d tq2Transform(Eigen::Vector3d offset,
 
 int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/II/";
+    /**
+     * Should be used data:
+     * 16,17,19,20,28,31,32,33,34
+     * 33---Velocity is changed
+     * 34---inverse attitude
+     */
+
+
 
     /// Global parameters
-    double first_info(100), second_info(1000), ori_info(0.03);
+    double first_info(100), second_info(100), ori_info(0.03);
     double gravity_info(0.002);
     double mag_threshold(0.25);
     double loop_threshold(0.5), loop_info(0.0001);
@@ -185,20 +193,28 @@ int main(int argc, char *argv[]) {
             if (7 < j && j < 11) {
                 imudata(i, j) = (imudata(i, j) - central(j - 8)) / scale(j - 8);
             }
-//            if (0 < j && j < 4) {
-//                imudata(i, j) = (imudata(i, j) - acc_cent(j - 1)) / acc_scale(j - 1);
-//                imudata(i, j) *= 9.8;
-//            } else if (4 <= j && j < 7) {
-//                imudata(i, j) *= double(M_PI / 180.0);
-//            } else if (7 <= j && j < 10) {
-//                imudata(i, j) = (imudata(i, j) - central(j - 7)) / scale(j - 7);
-//            }
         }
     }
     std::cout << "imu data size: " << imudata.rows() << "x"
               << imudata.cols() << std::endl;
 
     std::cout << "source imu data :\n" << imudata.block(0, 0, 10, imudata.cols()) << std::endl;
+
+    CppExtent::CSVReader pairs_index_file(dir_name + "pairs.csv");
+    auto pairs_data_tmp_matrix = pairs_index_file.GetMatrix();
+
+    Eigen::MatrixXi pairs_vec;
+    pairs_vec.resize(pairs_data_tmp_matrix.GetRows(), pairs_data_tmp_matrix.GetCols());
+    for (int i(0); i < pairs_data_tmp_matrix.GetRows(); ++i) {
+        pairs_vec(i, 0) = int(*(pairs_data_tmp_matrix(i, 0)));
+        pairs_vec(i, 1) = int(*(pairs_data_tmp_matrix(i, 1)));
+        std::cout << "(" << i << "):" << pairs_vec.block(i, 0, 1, 2) << std::endl;
+    }
+
+    std::cout << "pairs:" << pairs_vec.rows() << ":"
+              << pairs_vec.cols() << std::endl;
+
+
 
 //    std::cout << "source imu data last 10 lines:\n" << imudata.block(imudata.rows() - 11, 0, 10, 10) << std::endl;
 
@@ -257,9 +273,6 @@ int main(int argc, char *argv[]) {
 
     std::vector<int> corner_before, corner_after;
     std::vector<double> corner_score;
-
-
-    double start_time = TimeStamp::now();
 
 
     for (int index(0); index < imudata.rows(); ++index) {
@@ -359,81 +372,44 @@ int main(int argc, char *argv[]) {
 
             /// Add mag constraint
 
-            std::vector<int> mag_acceptable_id;
-//            int last_added_mag
-
             if (true) {
-                int mag_attitude_constraint_counter = 0;
                 for (int before_id(0); before_id < trace_id; ++before_id) {
-                    if (loop_info > 0.0) {
-                        if (//is_corner && corner_flag_vec[before_id] &&
-                                std::fabs(imudata(trace_id, 11) - imudata(trace_id, 11)) < 1e12 &&
-                                before_id > 10 &&
-                                trace_id < imudata.rows() - 15) {
-
-                            int compare_offset = 9;
-                            int compare_long = 18;
-
-
-                            /**
-                             * 1. add Pressure constrain, choice floor
-                             * 2. add multi-attitude
-                             * 3.
-                             */
-
-                            double tmp_score = (imudata.block(before_id - compare_offset, 8, compare_long, 3) -
-                                                imudata.block(trace_id - compare_offset, 8, compare_long, 3)).norm();
-
-                            double before_score = (imudata.block(before_id - compare_offset - 1, 8, compare_long, 3) -
-                                                   imudata.block(trace_id - compare_offset - 1, 8, compare_long,
-                                                                 3)).norm();
-                            double after_score = (imudata.block(before_id - compare_offset + 1, 8, compare_long, 3) -
-                                                  imudata.block(trace_id - compare_offset + 1, 8, compare_long,
-                                                                3)).norm();
-
-                            if ((tmp_score < loop_threshold &&
-                                 tmp_score < before_score &&
-                                 tmp_score < after_score) ||
-                                (
-                                        corner_after.size() > 0 &&
-                                        corner_after[corner_after.size() - 1] == trace_id - 1 &&
-                                        corner_before[corner_before.size() - 1] == before_id - 1 &&
-                                        tmp_score < loop_threshold * 1.5
-                                )
-                                    ) {
-                                corner_before.push_back(before_id);
-                                corner_after.push_back(trace_id);
-                                corner_score.push_back(tmp_score);
-
-
-                                auto *dis_edge = new SimpleDistanceEdge();
-                                dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
-                                dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
-
-
-                                dis_edge->setMeasurement(0.0);
-                                dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
-
-                                globalOptimizer.addEdge(dis_edge);
-                            }
-
-
-                            /// reverse comapre
-
-
-                        }
-                    }
                     if ((imudata.block(before_id, 8, 1, 3)
-                         - imudata.block(trace_id, 8, 1, 3)).norm() < mag_threshold
-                            ) {
+                         - imudata.block(trace_id, 8, 1, 3)).norm() < mag_threshold) {
+
+                        if (loop_info > 0.0) {
+                            if (//is_corner && corner_flag_vec[before_id] &&
+                                    before_id > 10 &&
+                                    trace_id < imudata.rows() - 15) {
+
+//                                double tmp_score = (imudata.block(before_id - 5, 8, 10, 3) -
+//                                                    imudata.block(trace_id - 5, 8, 10, 3)).norm();
+//
+//                                if (tmp_score < loop_threshold) {
+//                                    corner_before.push_back(before_id);
+//                                    corner_after.push_back(trace_id);
+//                                    corner_score.push_back(tmp_score);
+//
+//
+//                                    auto *dis_edge = new SimpleDistanceEdge();
+//                                    dis_edge->vertices()[0] = globalOptimizer.vertex(before_id);
+//                                    dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id);
+//
+//                                    dis_edge->setMeasurement(0.0);
+//                                    dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
+//
+//                                    globalOptimizer.addEdge(dis_edge);
+//                                }
 
 
-                        if (ori_info > 0.0 && mag_attitude_constraint_counter < 10) {
 
-                            mag_attitude_constraint_counter++;
+//                            dis_edge->set
 
-                            mag_acceptable_id.push_back(before_id);
+                            }
+                        }
 
+
+                        if (ori_info > 0.0) {
                             mag_before.push_back(before_id);
                             mag_after.push_back(trace_id);
 
@@ -454,15 +430,13 @@ int main(int argc, char *argv[]) {
 
                             static g2o::RobustKernel *robustKernel = g2o::RobustKernelFactory::instance()->construct(
                                     "Cauchy");
-
-                            mag_edge->setRobustKernel(robustKernel);
+//                    mag_edge->setRobustKernel(robustKernel);
 
                             globalOptimizer.addEdge(mag_edge);
                         }
 
 
                     }
-
 
                 }
             }
@@ -477,12 +451,12 @@ int main(int argc, char *argv[]) {
             globalOptimizer.setVerbose(true);
             globalOptimizer.initializeOptimization();
 //            globalOptimizer.updateInitialization()
-//            globalOptimizer.optimize(10, false);
             globalOptimizer.optimize(10, false);
         }
 
-//        if (trace_id > 450) {
-//            globalOptimizer.vertex(trace_id - 450)->setFixed(true);
+//        if(trace_id>50)
+//        {
+//            globalOptimizer.vertex(trace_id-50)->setFixed(true);
 //        }
 
         last_transform = current_transform;
@@ -495,19 +469,41 @@ int main(int argc, char *argv[]) {
 
     }
 
+    static g2o::RobustKernel *robust_kernel_dis =
+            g2o::RobustKernelFactory::instance()->construct("DCS");/////!!!!!!!!!!!!!TODO: FIX IT!!
+//        robust_kernel_dis->robustify()
+    robust_kernel_dis->setDelta(53.0);
+
+
+    // add distance edge based on fft-feature distance
+    std::cout << " begin to add distance edge" << std::endl;
+    for (int i(0); i < pairs_vec.rows(); ++i) {
+
+        if (pairs_vec(i, 0) >= trace_id || pairs_vec(i, 1) >= trace_id) {
+            std::cout << "trace id :" << trace_id << " pairs:" << pairs_vec.block(i, 0, 1, 2) << std::endl;
+        }
+        if ((pairs_vec(i, 1) - pairs_vec(i, 0)) > 5) {
+            corner_before.push_back(pairs_vec(i, 0));
+            corner_after.push_back(pairs_vec(i, 1));
+            corner_score.push_back(1.0);
+
+            auto *dis_edge = new SimpleDistanceEdge();
+            dis_edge->vertices()[0] = globalOptimizer.vertex(pairs_vec(i, 0));
+            dis_edge->vertices()[1] = globalOptimizer.vertex(pairs_vec(i, 1));
+
+            dis_edge->setMeasurement(0.0);
+            dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
+            dis_edge->setRobustKernel(robust_kernel_dis);
+
+            globalOptimizer.addEdge(dis_edge);
+        }
+    }
+
     globalOptimizer.setVerbose(true);
 //    globalOptimizer.initMultiThreading();
     globalOptimizer.initializeOptimization();
 //    globalOptimize
     globalOptimizer.optimize(max_ite);
-
-
-    double compute_time = TimeStamp::now() - start_time;
-    double data_time = imudata(trace_id - 1, 1) - imudata(0, 1);
-    std::cout << "total time :" << compute_time << std::endl;
-    std::cout << "data time :" << data_time << std::endl;
-    std::cout << "rate:" << compute_time / data_time << std::endl;
-    std::cout << " trace id :" << trace_id << "average time :" << compute_time / double(trace_id) << std::endl;
 
 
 

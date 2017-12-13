@@ -487,7 +487,7 @@ int main(int argc, char *argv[]) {
         if (pairs_vec(i, 0) >= trace_id || pairs_vec(i, 1) >= trace_id) {
             std::cout << "trace id :" << trace_id << " pairs:" << pairs_vec.block(i, 0, 1, 2) << std::endl;
         }
-        if ((pairs_vec(i, 1) - pairs_vec(i, 0)) > 5) {
+        if ((pairs_vec(i, 1) - pairs_vec(i, 0)) > 10) {
             corner_before.push_back(pairs_vec(i, 0));
             corner_after.push_back(pairs_vec(i, 1));
             corner_score.push_back(1.0);

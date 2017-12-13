@@ -474,6 +474,7 @@ int main(int argc, char *argv[]) {
 //        robust_kernel_dis->robustify()
     robust_kernel_dis->setDelta(43.0);
 
+
     // add distance edge based on fft-feature distance
     std::cout << " begin to add distance edge" << std::endl;
     for (int i(0); i < pairs_vec.rows(); ++i) {

@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
     for (int i(0); i < pairs_data_tmp_matrix.GetRows(); ++i) {
         pairs_vec(i, 0) = int(*(pairs_data_tmp_matrix(i, 0)));
         pairs_vec(i, 1) = int(*(pairs_data_tmp_matrix(i, 1)));
-        std::cout << "("<<i<<"):"<<pairs_vec.block(i,0,1,2) << std::endl;
+        std::cout << "(" << i << "):" << pairs_vec.block(i, 0, 1, 2) << std::endl;
     }
 
     std::cout << "pairs:" << pairs_vec.rows() << ":"
@@ -445,7 +445,6 @@ int main(int argc, char *argv[]) {
         }
 
 
-
         if (trace_id - last_optimized_id > 15) {
 
             last_optimized_id = trace_id;
@@ -470,31 +469,28 @@ int main(int argc, char *argv[]) {
 
     }
 
-    static g2o::RobustKernel* robust_kernel_dis =
+    static g2o::RobustKernel *robust_kernel_dis =
             g2o::RobustKernelFactory::instance()->construct("");/////!!!!!!!!!!!!!TODO: FIX IT!!
 //        robust_kernel_dis->robustify()
 
     // add distance edge based on fft-feature distance
     std::cout << " begin to add distance edge" << std::endl;
-    for(int i(0);i<pairs_vec.rows();++i)
-    {
+    for (int i(0); i < pairs_vec.rows(); ++i) {
 
-        if(pairs_vec(i,0)>=trace_id || pairs_vec(i,1)>=trace_id)
-        {
-            std::cout << "trace id :"<<trace_id << " pairs:"<< pairs_vec.block(i,0,1,2)<<std::endl;
+        if (pairs_vec(i, 0) >= trace_id || pairs_vec(i, 1) >= trace_id) {
+            std::cout << "trace id :" << trace_id << " pairs:" << pairs_vec.block(i, 0, 1, 2) << std::endl;
         }
-        if((pairs_vec(i,1)-pairs_vec(i,0))>5 )
-        {
-            corner_before.push_back(pairs_vec(i,0));
-            corner_after.push_back(pairs_vec(i,1));
+        if ((pairs_vec(i, 1) - pairs_vec(i, 0)) > 5) {
+            corner_before.push_back(pairs_vec(i, 0));
+            corner_after.push_back(pairs_vec(i, 1));
             corner_score.push_back(1.0);
 
             auto *dis_edge = new SimpleDistanceEdge();
-            dis_edge->vertices()[0] = globalOptimizer.vertex(pairs_vec(i,0));
-            dis_edge->vertices()[1] = globalOptimizer.vertex(pairs_vec(i,1));
+            dis_edge->vertices()[0] = globalOptimizer.vertex(pairs_vec(i, 0));
+            dis_edge->vertices()[1] = globalOptimizer.vertex(pairs_vec(i, 1));
 
             dis_edge->setMeasurement(0.0);
-            dis_edge->setInformation(Eigen::Matrix<double,1,1>(loop_info));
+            dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
             dis_edge->setRobustKernel(robust_kernel_dis);
 
             globalOptimizer.addEdge(dis_edge);

@@ -470,7 +470,7 @@ int main(int argc, char *argv[]) {
     }
 
     static g2o::RobustKernel *robust_kernel_dis =
-            g2o::RobustKernelFactory::instance()->construct("");/////!!!!!!!!!!!!!TODO: FIX IT!!
+            g2o::RobustKernelFactory::instance()->construct("DCS");/////!!!!!!!!!!!!!TODO: FIX IT!!
 //        robust_kernel_dis->robustify()
 
     // add distance edge based on fft-feature distance

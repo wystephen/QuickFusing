@@ -515,7 +515,7 @@ int main(int argc, char *argv[]) {
     dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id-1);
 
     dis_edge->setMeasurement(0.0);
-    dis_edge->setInformation(Eigen::Matrix<double,1,1>(loop_info));
+    dis_edge->setInformation(Eigen::Matrix<double,1,1>(100));
 
     globalOptimizer.addEdge(dis_edge);
 

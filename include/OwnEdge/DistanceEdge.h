@@ -42,8 +42,15 @@ public:
         return true;
     }
 
+    /**
+     * Try achieve this function manually.
+     */
 //    void linearizeOplus();
 
+/**
+ * ...
+ * @return
+ */
     virtual int measurementDimension() const {
         return 1;
     }

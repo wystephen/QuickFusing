@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 
     double valid_range(10.0), range_sigma(10.0), z0_info(5.0);
 
-    int tmp_dir_num = 11;
+    int tmp_dir_num = 17;
 
     if (argc >= 2) {
         max_iterators = std::stod(argv[1]);
@@ -313,22 +313,22 @@ int main(int argc, char *argv[]) {
 //
 //    }
 
-//    if(uwb_raw.cols()==6)
-//    {
-//        for(int i(0);i<6;++i)
-//        {
-//             auto *e = new Z0Edge();
-//            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + i);
-//            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + i + 1);
-//
-//            Eigen::Matrix<double, 1, 1> info;
-//            info(0, 0) = 10.0;
-//
-//            e->setMeasurement(0.45);
-//            e->setRobustKernel(robustKernel);
-//            globalOptimizer.addEdge(e);
-//        }
-//    }
+    if(uwb_raw.cols()==6)
+    {
+        for(int i(0);i<6;++i)
+        {
+             auto *e = new Z0Edge();
+            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + i);
+            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + i + 1);
+
+            Eigen::Matrix<double, 1, 1> info;
+            info(0, 0) = 10.0;
+
+            e->setMeasurement(0.45);
+            e->setRobustKernel(robustKernel);
+            globalOptimizer.addEdge(e);
+        }
+    }
 
 
 

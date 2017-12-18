@@ -97,7 +97,9 @@ int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/IMUWB/27/";
 //    std::string dir_name = "/home/steve/Data/NewRecord/Record2/";
 //    std::string dir_name = "/home/steve/tmp/test/45/";
-    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/";
+//    std::string dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/";
+
+    std::string dir_name = "/home/steve/Data/NewIU/";
 
 //    std::ofstream for_debug("/home/steve/Code/")
 
@@ -106,6 +108,7 @@ int main(int argc, char *argv[]) {
 
     double valid_range(10.0), range_sigma(10.0), z0_info(5.0);
 
+    int tmp_dir_num = 11;
 
     if (argc >= 2) {
         max_iterators = std::stod(argv[1]);
@@ -128,7 +131,6 @@ int main(int argc, char *argv[]) {
         z0_info = std::stod(argv[7]);
     }
 
-    int tmp_dir_num = 54;
     if (argc >= 9) {
         tmp_dir_num = std::stoi(argv[8]);
     }
@@ -146,7 +148,7 @@ int main(int argc, char *argv[]) {
 
     dir_name = dir_name + std::to_string(tmp_dir_num) + "/";
 //    dir_name="/home/steve/Data/IU/76/";  // a good resutl.
-    dir_name = "/home/steve/Data/IU/76/";
+//    dir_name = "/home/steve/Data/IU/76/";
 
 
     int trace_id = 0;

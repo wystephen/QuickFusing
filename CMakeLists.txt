@@ -175,6 +175,9 @@ target_link_libraries(ISAMImu
 add_executable(dw DemoUseResult.cpp)
 #target_link_libraries(dw ${G2O_LIBS} ${Cholmod_LIBRARIES} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )
 target_link_libraries(dw ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )
+add_executable(GraphWithUwbPose GraphWithUwbPose.cpp)
+#target_link_libraries(dw ${G2O_LIBS} ${Cholmod_LIBRARIES} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )
+target_link_libraries(GraphWithUwbPose ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES} )
 
 
 # For test

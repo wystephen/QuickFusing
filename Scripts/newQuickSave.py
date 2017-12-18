@@ -49,6 +49,12 @@ if __name__ == '__main__':
             label='trace')
     ax.legend()
 
+
+    '''
+    UWB needed output:
+    
+    '''
+
     # plt.figure()
     # plt.plot(ip.vertics_time, 'r')
 

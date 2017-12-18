@@ -313,11 +313,9 @@ int main(int argc, char *argv[]) {
 //
 //    }
 
-    if(uwb_raw.cols()==6)
-    {
-        for(int i(0);i<6;++i)
-        {
-             auto *e = new Z0Edge();
+    if (uwb_raw.cols() == 6) {
+        for (int i(0); i < 6; ++i) {
+            auto *e = new Z0Edge();
             e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + i);
             e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + i + 1);
 
@@ -366,21 +364,9 @@ int main(int argc, char *argv[]) {
         /// Add ZUPT Vertex
         auto *v = new g2o::VertexSE3();
         v->setId(index);
-//        v->setEstimateData(latest_transform.inverse()*this_transform);
         v->setEstimate(this_transform);
-//        v->setFixed(true);
-//        v->setFixed(false);
-//        if(index==0)
-//        {
-//            v->setFixed(true);
-//        }
 
         globalOptimizer.addVertex(v);
-
-
-        // Add z = 0 Edge
-//        auto *edge_z0=new Z0Edge();
-
 
 
         // Add ZUPT Edge & z constrain
@@ -395,13 +381,7 @@ int main(int argc, char *argv[]) {
             info(0, 0) = z0_info;
             edge_zo->setInformation(info);
             edge_zo->setMeasurement(0.0);
-//            if (with_high) {
-//                edge_zo->setMeasurement(v_high(index, 0));
-//                if (v_high(index, 0) > -1.0) {
-//                    globalOptimizer.addEdge(edge_zo);
-//                }
-//            }
-//            edge_zo->setMeasurement(0.0);
+
 
             globalOptimizer.addEdge(edge_zo);
 
@@ -446,28 +426,12 @@ int main(int argc, char *argv[]) {
             edge_se3->setMeasurement(latest_transform.inverse() * this_transform);
 
 
-
-
-
-//            std::cout << t_theta << std::endl;
-
-
             globalOptimizer.addEdge(edge_se3);
 
         }
 
         latest_transform = this_transform;
     }
-
-
-    /// ADD High Edge
-
-    /**
-     * TODO: Redifined a new version of z constraint for high.
-     * NOTE:  now the zero edge added in the process above.
-     */
-
-
 
 
 
@@ -497,7 +461,6 @@ int main(int argc, char *argv[]) {
         current_range *= -10;
 
         ///Find time diff smaller than 1.0(after find time diff smaller than 0.5)
-//        zupt_index = 0;
         uwb_index = 0;
 
         while (true) {
@@ -601,50 +564,11 @@ int main(int argc, char *argv[]) {
         gy.push_back(data[1]);
         gz.push_back(data[2]);
         imu << data[0] << " " << data[1] << " " << data[2] << std::endl;
-        // pose
-//        axis_file << data[0] << "," << data[1] << "," << data[2] ;//<< ",";//<< ",0,0,1,0,1,0,1,0,0" << std::endl;
 
-        //axis
 
         Sophus::SO3 so3_rotation(data[3], data[4], data[5]);
         Sophus::SE3 se3_transform(so3_rotation,
                                   Eigen::Vector3d(data[0], data[1], data[2]));
-
-//        Eigen::Matrix3d rotation_matrix;
-//        rotation_matrix= so3_rotation.matrix();
-
-        Eigen::Matrix4d translate_matrix;
-//        se3_transform = se3_transform.inverse();
-        translate_matrix = se3_transform.matrix();
-        Eigen::Vector4d last_vec;
-
-        Eigen::Vector4d tmp_vec(0, 0, 0, 1);
-        tmp_vec = translate_matrix * tmp_vec;
-        axis_file << tmp_vec(0) << "," << tmp_vec(1) << "," << tmp_vec(2);
-
-        for (int i(0); i < 3; ++i) {
-            Eigen::Vector4d ori_vec(0, 0, 0, 1.0);
-            ori_vec(i) = -1.0;
-
-            ori_vec = translate_matrix * ori_vec;
-
-            for (int j(0); j < 3; ++j) {
-                axis_file << "," << ori_vec(j) - tmp_vec(j);
-            }
-
-//            if(i>0)
-//            {
-//                if(std::abs(double(last_vec.transpose() * ori_vec))>1e-3)
-//                {
-//                    std::cout << "error in inner product" << std::endl;
-//                }else{
-//                    std::cout << "axis ok" << std::endl;
-//                }
-//            }
-//            last_vec = ori_vec;
-
-        }
-        axis_file << std::endl;
 
 
     }

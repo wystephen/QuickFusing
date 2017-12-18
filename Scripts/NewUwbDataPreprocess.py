@@ -76,14 +76,14 @@ class NewUwbDataPre:
         local_time = 0.0
         the_index = 0
         # tmp_range = list()
-        tmp_range = np.zeros(max_index+1)
+        tmp_range = np.zeros(max_index + 1)
         tmp_range -= 10.0
 
-        while the_index<len(all_lines):
+        while the_index < len(all_lines):
             # for one line
-            if 'F1' in  all_lines[the_index]:
+            if 'F1' in all_lines[the_index]:
                 ### out put
-                self.tmp_array.append(local_time-self.first_time+self.start_time)
+                self.tmp_array.append(local_time - self.first_time + self.start_time)
                 for i in range(tmp_range.shape[0]):
                     self.tmp_array.append(float(tmp_range[i]))
                     tmp_range[i] = -10.0
@@ -94,35 +94,28 @@ class NewUwbDataPre:
                 mac_range = float(all_lines[the_index].split(' ')[5])
                 tmp_range[self.mac_dic.get(mac_str)[0]] = mac_range
 
+            the_index += 1
 
+        self.uwb_data = np.frombuffer(self.tmp_array, dtype=np.float).reshape([-1, max_index + 2])
 
-            the_index+=1
-
-        self.uwb_data = np.frombuffer(self.tmp_array,dtype=np.float).reshape([-1,max_index+2])
-
-        self.beaconset = np.zeros([max_index+1,3])
+        self.beaconset = np.zeros([max_index + 1, 3])
         for key in self.mac_dic:
-
-            self.beaconset[self.mac_dic.get(key)[0],0] = self.mac_dic.get(key)[1]
-            self.beaconset[self.mac_dic.get(key)[0],1] = self.mac_dic.get(key)[2]
-
-
-
+            self.beaconset[self.mac_dic.get(key)[0], 0] = self.mac_dic.get(key)[1]
+            self.beaconset[self.mac_dic.get(key)[0], 1] = self.mac_dic.get(key)[2]
 
     def show(self):
         plt.figure()
-        for i in range(1,self.uwb_data.shape[1]):
-            plt.plot(self.uwb_data[:,0],self.uwb_data[:,i],'+',label=str(i))
+        for i in range(1, self.uwb_data.shape[1]):
+            plt.plot(self.uwb_data[:, 0], self.uwb_data[:, i], '+', label=str(i))
         plt.grid()
         plt.legend()
         # plt.show()
 
         plt.figure()
-        plt.plot(self.beaconset[:,0],self.beaconset[:,1],'r*')
+        plt.plot(self.beaconset[:, 0], self.beaconset[:, 1], 'r*')
+        for i in range(self.beaconset.shape[0]):
+            plt.text(self.beaconset[i, 0], self.beaconset[i, 1], str(i))
         plt.grid()
-
-
-
 
 
 if __name__ == '__main__':

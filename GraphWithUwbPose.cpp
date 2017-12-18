@@ -542,7 +542,7 @@ int main(int argc, char *argv[]) {
     }
 
     int first_i = 0;
-    int last_i = const_cast<int>(gx.size() - 1);
+    int last_i = int(gx.size() - 1);
 
     std::cout << "distance between first and last: " <<
               std::sqrt(

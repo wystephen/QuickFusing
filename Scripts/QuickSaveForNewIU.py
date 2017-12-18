@@ -6,6 +6,8 @@ import ImuResultReader
 import ImuPreprocess
 import PcSavedReader
 
+from Scripts.NewUwbDataPreprocess import NewUwbDataPre
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -15,7 +17,8 @@ import os
 
 if __name__ == '__main__':
     # dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/73/"
-    dir_name = "/home/steve/Data/II/35/"
+    # dir_name = "/home/steve/Data/II/35/"
+    dir_name = "/home/steve/Data/NewIU/11/"
     # dir_name = "/home/steve/Code/Mini-IMU/Scripts/IMUWB/20/"
     # dir_name = "/home/steve/Data/FastUwbDemo/2/"
     # dir_name = "/home/steve/tmp/test/20/"
@@ -55,10 +58,14 @@ if __name__ == '__main__':
     beaconset.csv : x y z
     uwb_result.csv : time range1 range2 ....
     '''
+    nudp = NewUwbDataPre(dir_name,dir_name+'../MacPose.csv')
+    nudp.show()
+    np.savetxt(dir_name+"beaconset.csv",nudp.beaconset,delimiter=',')
+    np.savetxt(dir_name+'uwb_result.csv',nudp.uwb_data,delimiter=',')
 
     # plt.figure()
     # plt.plot(ip.vertics_time, 'r')
 
     # ip.findcorner()
     # ip.computeconerfeature()
-    # plt.show()
+    plt.show()

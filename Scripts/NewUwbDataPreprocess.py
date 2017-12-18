@@ -100,16 +100,26 @@ class NewUwbDataPre:
 
         self.uwb_data = np.frombuffer(self.tmp_array,dtype=np.float).reshape([-1,max_index+2])
 
+        self.beaconset = np.zeros([max_index+1,3])
+        for key in self.mac_dic:
+
+            self.beaconset[self.mac_dic.get(key)[0],0] = self.mac_dic.get(key)[1]
+            self.beaconset[self.mac_dic.get(key)[0],1] = self.mac_dic.get(key)[2]
+
 
 
 
     def show(self):
         plt.figure()
         for i in range(1,self.uwb_data.shape[1]):
-            plt.plot(self.uwb_data[:,0],self.uwb_data[:,i],'--+',label=str(i))
+            plt.plot(self.uwb_data[:,0],self.uwb_data[:,i],'+',label=str(i))
         plt.grid()
         plt.legend()
-        plt.show()
+        # plt.show()
+
+        plt.figure()
+        plt.plot(self.beaconset[:,0],self.beaconset[:,1],'r*')
+        plt.grid()
 
 
 
@@ -117,7 +127,7 @@ class NewUwbDataPre:
 
 if __name__ == '__main__':
     dir_name = '/home/steve/Data/NewIU/'
-    num_data = 11
+    num_data = 12
 
     # mac_pose_file = open(dir_name + 'MacPose.csv')
     # mac_dic = dict()

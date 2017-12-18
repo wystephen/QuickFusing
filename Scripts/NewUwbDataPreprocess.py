@@ -56,7 +56,7 @@ class NewUwbDataPre:
 
 if __name__ == '__main__':
     dir_name = '/home/steve/Data/NewIU/'
-    num_data = 10
+    num_data = 11
 
     # mac_pose_file = open(dir_name + 'MacPose.csv')
     # mac_dic = dict()

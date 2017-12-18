@@ -182,7 +182,8 @@ int main(int argc, char *argv[]) {
 
     CppExtent::CSVReader UwbRawReader(dir_name + "uwb_result.csv");
 
-    Eigen::MatrixXd uwb_raw(UwbRawReader.GetMatrix().GetRows(), UwbRawReader.GetMatrix().GetCols());
+    Eigen::MatrixXd uwb_raw(UwbRawReader.GetMatrix().GetRows(),
+                            UwbRawReader.GetMatrix().GetCols());
 
     for (int i(0); i < uwb_raw.rows(); ++i) {
         for (int j(0); j < uwb_raw.cols(); ++j) {
@@ -211,22 +212,6 @@ int main(int argc, char *argv[]) {
     CppExtent::CSVReader QuatReader(dir_name + "all_quat.csv");
     CppExtent::CSVReader VertexTime(dir_name + "vertex_time.csv");
 
-//    Eigen::MatrixXd v_high(1, 1);
-//
-//    if (with_high) {
-//        CppExtent::CSVReader VertexHigh(dir_name + "vertex_high_modified.csv");
-//
-//        v_high.resize(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
-////        v_high.setZero(VertexHigh.GetMatrix().GetRows(), VertexHigh.GetMatrix().GetCols());
-//
-//        auto v_high_matrix = VertexHigh.GetMatrix();
-//
-//        for (int i(0); i < v_high.rows(); ++i) {
-//            for (int j(0); j < v_high.cols(); ++j) {
-//                v_high(i, j) = *v_high_matrix(i, j);
-//            }
-//        }
-//    }
 
     Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(), ZuptResultReader.GetMatrix().GetCols());
     Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(), QuatReader.GetMatrix().GetCols());
@@ -275,43 +260,7 @@ int main(int argc, char *argv[]) {
      * SPECIALL
      * // TODO: REMOVE It!!!!
      */
-//
-//    std::vector<int> low_b{0, 4, 6, 7, 8, 9, 0};
-//    std::vector<int> high_b{6, 5, 1, 3, 2, 6};
-//
-//    double *beacon_high = new double[uwb_raw.cols()];
-//
-//    if (with_high) {
-//        for (int i(0); i < low_b.size() - 1; ++i) {
-//            auto *e = new Z0Edge();
-//            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + low_b[i]);
-//            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + low_b[i + 1]);
-//
-//            Eigen::Matrix<double, 1, 1> info;
-//            info(0, 0) = 0.00010;
-//
-//            beacon_high[low_b[i]] = 3.5;
-//            e->setMeasurement(3.5);
-////                e->setRobustKernel(robustKernel);
-//            globalOptimizer.addEdge(e);
-//        }
-//
-//        for (int i(0); i < high_b.size() - 1; ++i) {
-//            auto *e = new Z0Edge();
-//            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + high_b[i]);
-//            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + high_b[i + 1]);
-//
-//            Eigen::Matrix<double, 1, 1> info;
-//            info(0, 0) = 0.00010;
-//
-//            beacon_high[high_b[i]] = -1.5;
-//            e->setMeasurement(-1.5);
-////                e->setRobustKernel(robustKernel);
-//            globalOptimizer.addEdge(e);
-//        }
-//
-//
-//    }
+
 
     if (uwb_raw.cols() == 6) {
         for (int i(0); i < 6; ++i) {
@@ -593,7 +542,7 @@ int main(int argc, char *argv[]) {
     }
 
     int first_i = 0;
-    int last_i = gx.size() - 1;
+    int last_i = const_cast<int>(gx.size() - 1);
 
     std::cout << "distance between first and last: " <<
               std::sqrt(

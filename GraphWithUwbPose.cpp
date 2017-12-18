@@ -559,7 +559,10 @@ int main(int argc, char *argv[]) {
     std::vector<double> gx, gy, gz;
     for (int i(0); i < zupt_res.rows(); ++i) {
         double data[10] = {0};
-        globalOptimizer.vertex(i)->getEstimateData(data);
+//        globalOptimizer.vertex(i)->getEstimateData(data);
+        data[0] = zupt_res(i,1);
+        data[1] = zupt_res(i,2);
+        data[2] = zupt_res(i,3);
         gx.push_back(data[0]);
         gy.push_back(data[1]);
         gz.push_back(data[2]);

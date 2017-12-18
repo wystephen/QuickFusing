@@ -52,7 +52,8 @@ if __name__ == '__main__':
 
     '''
     UWB needed output:
-    
+    beaconset.csv : x y z
+    uwb_result.csv : time range1 range2 ....
     '''
 
     # plt.figure()

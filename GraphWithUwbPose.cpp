@@ -543,7 +543,7 @@ int main(int argc, char *argv[]) {
     if (max_iterators > 0) {
         globalOptimizer.optimize(max_iterators);
     }
-    globalOptimizer.optimize(6000);
+//    globalOptimizer.optimize(6000);
 
 
     /**
@@ -552,27 +552,19 @@ int main(int argc, char *argv[]) {
 
 
 
-    std::ofstream imu("./ResultData/imu.txt");
-    std::ofstream uwb_tmp("./ResultData/uwb_tmp.txt");
-    std::ofstream uwb("./ResultData/uwb.txt");
-    std::ofstream axis_file("./ResultData/axis.txt");
+    std::ofstream graph_res_file("./ResultData/graph.txt");
+    std::ofstream zupt_res_file("./ResultData/zupt.txt");
+//    std::ofstream uwb_tmp("./ResultData/uwb_tmp.txt");
+    std::ofstream beacon_set("./ResultData/beacon_pose.txt");
     std::vector<double> gx, gy, gz;
     for (int i(0); i < zupt_res.rows(); ++i) {
         double data[10] = {0};
-//        globalOptimizer.vertex(i)->getEstimateData(data);
-        data[0] = zupt_res(i,1);
-        data[1] = zupt_res(i,2);
-        data[2] = zupt_res(i,3);
+        globalOptimizer.vertex(i)->getEstimateData(data);
         gx.push_back(data[0]);
         gy.push_back(data[1]);
         gz.push_back(data[2]);
-        imu << data[0] << " " << data[1] << " " << data[2] << std::endl;
-
-
-        Sophus::SO3 so3_rotation(data[3], data[4], data[5]);
-        Sophus::SE3 se3_transform(so3_rotation,
-                                  Eigen::Vector3d(data[0], data[1], data[2]));
-
+        graph_res_file << data[0] << " " << data[1] << " " << data[2] << std::endl;
+        zupt_res_file << zupt_res(i,0) << " " << zupt_res(i,1) << " " << zupt_res(i,2) << std::endl;
 
     }
 
@@ -583,8 +575,7 @@ int main(int argc, char *argv[]) {
         bx.push_back(data[0]);
         by.push_back(data[1]);
         bz.push_back(data[2]);
-        uwb << data[0] << " " << data[1] << " " << data[2] << std::endl;
-        uwb_tmp << data[0] << "," << data[1] << "," << data[2] << std::endl;
+        beacon_set << data[0] << " " << data[1] << " " << data[2] << std::endl;
     }
 
 

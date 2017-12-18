@@ -564,7 +564,7 @@ int main(int argc, char *argv[]) {
         gy.push_back(data[1]);
         gz.push_back(data[2]);
         graph_res_file << data[0] << " " << data[1] << " " << data[2] << std::endl;
-        zupt_res_file << zupt_res(i,0) << " " << zupt_res(i,1) << " " << zupt_res(i,2) << std::endl;
+        zupt_res_file << zupt_res(i, 0) << " " << zupt_res(i, 1) << " " << zupt_res(i, 2) << std::endl;
 
     }
 

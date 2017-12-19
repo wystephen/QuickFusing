@@ -83,7 +83,8 @@ class PF_Frame:
         score = 1.0
         for i in range(self.BeaconSet.shape[0]):
             dis = np.linalg.norm(self.BeaconSet[i, :] - pose)
-            score *= (self.NormPdf(Ranges[i], dis, sigma) + 1e-50)
+            if Ranges[i] > 0.0:
+                score *= (self.NormPdf(Ranges[i], dis, sigma) + 1e-50)
         return score
         '''
         '''

@@ -494,7 +494,7 @@ int main(int argc, char *argv[]) {
     std::vector<double> ux,uy;
 
 
-    EXUWBPF<4> puwbpf(only_particle_num);
+    EXUWBPF<8> puwbpf(only_particle_num);
     puwbpf.SetMeasurementSigma(only_eval_sigma,beacon_raw.rows());
 
     puwbpf.SetBeaconSet(beacon_raw);

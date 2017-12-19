@@ -222,7 +222,14 @@ public:
             }
 
         } else if (MethodType == 3) {
-
+            if (this->p_state_.hasNaN()) {
+                std::cout << __FILE__
+                          << ":"
+                          << __LINE__
+                          << ":"
+                          << __FUNCTION__
+                          << std::endl;
+            }
             double sigma = input_noise_sigma_.mean();
             std::normal_distribution<double> state_distribution(input(0), sigma * 0.1);
 #pragma omp parallel for
@@ -283,6 +290,14 @@ public:
  */
     bool Evaluation(Eigen::VectorXd measurement, int MethodType = 0) {
         MYCHECK(ISDEBUG);
+        if (this->p_state_.hasNaN()) {
+            std::cout << __FILE__
+                      << ":"
+                      << __LINE__
+                      << ":"
+                      << __FUNCTION__
+                      << std::endl;
+        }
         if (MethodType == 0) {
 #pragma omp parallel for
             for (int i = (0); i < this->p_state_.rows(); ++i) {
@@ -348,7 +363,10 @@ Goodness of fit:
   RMSE: 0.595
                  */
 
-                score *= (this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i)) + 1e-50);
+                if(measurement(i)>0.0){
+
+                    score *= (this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i)) + 1e-50);
+                }
 
 //                score *= (this->ScalarNormalPdf(dis+std::exp(-0.2945*dis)-0.04628, measurement(i), measurement_sigma_(i)) + 1e-50);
 //                std::cout << score << ";:::" <<

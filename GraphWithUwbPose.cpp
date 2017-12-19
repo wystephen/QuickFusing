@@ -181,13 +181,28 @@ int main(int argc, char *argv[]) {
 
 
     CppExtent::CSVReader UwbRawReader(dir_name + "uwb_result.csv");
+    CppExtent::CSVReader BeaconSetReader(dir_name + "beaconset.csv");
 
     Eigen::MatrixXd uwb_raw(UwbRawReader.GetMatrix().GetRows(),
                             UwbRawReader.GetMatrix().GetCols());
 
+    auto uwb_tmp_mat = UwbRawReader.GetMatrix();
+
     for (int i(0); i < uwb_raw.rows(); ++i) {
         for (int j(0); j < uwb_raw.cols(); ++j) {
-            uwb_raw(i, j) = *(UwbRawReader.GetMatrix()(i, j));
+            uwb_raw(i, j) = *(uwb_tmp_mat(i, j));
+        }
+    }
+
+    auto beacon_tmp_mat = BeaconSetReader.GetMatrix();
+    Eigen::MatrixXd beacon_raw(beacon_tmp_mat.GetRows(),
+                               beacon_tmp_mat.GetCols());
+
+    for(int i(0);i<beacon_raw.rows();++i)
+    {
+        for (int j(0);j<beacon_raw.cols();++j)
+        {
+            beacon_raw(i,j) = *(beacon_tmp_mat(i,j));
         }
     }
 
@@ -245,12 +260,15 @@ int main(int argc, char *argv[]) {
 
 
     /// Add Beacon Vertex
-    for (int i(0); i < uwb_raw.cols() - 1; ++i) {
+    for (int i(0); i < beacon_raw.rows(); ++i) {
         auto *v = new g2o::VertexSE3();
         double p[6] = {0};
+        p[0] = beacon_raw(i,0);
+        p[1] = beacon_raw(i,1);
+        p[2] = beacon_raw(i,2);
 
         v->setEstimateData(p);
-        v->setFixed(false);
+        v->setFixed(true);
         v->setId(beacon_id_offset + i);
 
         globalOptimizer.addVertex(v);
@@ -262,20 +280,6 @@ int main(int argc, char *argv[]) {
      */
 
 
-    if (uwb_raw.cols() == 6) {
-        for (int i(0); i < 6; ++i) {
-            auto *e = new Z0Edge();
-            e->vertices()[0] = globalOptimizer.vertex(beacon_id_offset + i);
-            e->vertices()[1] = globalOptimizer.vertex(beacon_id_offset + i + 1);
-
-            Eigen::Matrix<double, 1, 1> info;
-            info(0, 0) = 10.0;
-
-            e->setMeasurement(0.45);
-            e->setRobustKernel(robustKernel);
-            globalOptimizer.addEdge(e);
-        }
-    }
 
 
 
@@ -503,7 +507,6 @@ int main(int argc, char *argv[]) {
 
     std::ofstream graph_res_file("./ResultData/graph.txt");
     std::ofstream zupt_res_file("./ResultData/zupt.txt");
-//    std::ofstream uwb_tmp("./ResultData/uwb_tmp.txt");
     std::ofstream beacon_set("./ResultData/beacon_pose.txt");
     std::vector<double> gx, gy, gz;
     for (int i(0); i < zupt_res.rows(); ++i) {

@@ -99,6 +99,8 @@ int main(int argc, char *argv[]) {
 
     std::vector<int> beacon_mask;
     beacon_mask.push_back(0);
+    beacon_mask.push_back(3);
+    beacon_mask.push_back(4);
     beacon_mask.push_back(7);
     if (argc >= 2) {
         max_iterators = std::stod(argv[1]);
@@ -263,13 +265,6 @@ int main(int argc, char *argv[]) {
 
         globalOptimizer.addVertex(v);
     }
-
-    /**
-     * SPECIALL
-     * // TODO: REMOVE It!!!!
-     */
-
-
 
 
 

@@ -534,22 +534,113 @@ int main(int argc, char *argv[]) {
     int fus_particle_num = 1000;
     double fus_eval_sigma = 0.5;
     double fus_transpose_sigma = 0.5;
+    std::vector<double> fx,fy;
 
+    auto UwbData = uwb_raw;
 
-    double fusing_start_time = TimeStamp::now();
-    int uwb_index(0), imu_index(0);
-    double last_v(0.0),last_ori(0.0);
+    double fusing_start_time = (TimeStamp::now());
+//    std::cout << " fusing start time :"<< fusing_start_time << std::endl;
+    int imu_index(0);
+    uwb_index = 0;
+
+    double last_v(0), last_ori(0);
 
     EXUWBPF<8> muwbpf(fus_particle_num);
-    muwbpf.SetMeasurementSigma(fus_eval_sigma,8);
+    muwbpf.SetMeasurementSigma(fus_eval_sigma, 8);
     muwbpf.SetInputNoiseSigma(fus_transpose_sigma);
     muwbpf.SetBeaconSet(beacon_raw);
+//    std::cout << "herererererere" << std::endl;
+//    std::cout <<  UwbData.block(10,1,1,UwbData.cols()-1) << std::endl;
+//    muwbpf.OptimateInitial(UwbData.block(10, 1, 1, UwbData.cols() - 1).transpose(), 0);
+    muwbpf.Initial(Eigen::VectorXd(Eigen::Vector4d(start_point(0), start_point(1), 0.0, 0.0)));
 
-    while(true){
-        if(uwb_index>= uwb_raw.rows() || imu_index>= zupt_res.rows()){
+    SettingPara init_para(true);
 
+    init_para.init_pos1_ = Eigen::Vector3d(start_point(0), start_point(1), 0.0);
+//    init_para.init_heading1_ = 0.0 + 20 / 180.0 * M_PI;
+    init_para.init_heading1_ = M_PI / 2.0;
+
+    init_para.Ts_ = 1.0 / 200.0;
+
+    MyEkf mixekf(init_para);
+    mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
+
+
+    while (true) {
+        if (uwb_index >= UwbData.rows() || imu_index >= ImuData.rows()) {
+
+            break;
+        }
+
+        if (UwbData(uwb_index, 0) < ImuData(imu_index, 0)) {
+            /*
+             * update Uwb data
+             */
+
+//            std::cout << "ekf velocity :"
+//                      << mixekf.getVelocity()
+//                      << " ori : "
+//                      << mixekf.getOriente() << std::endl;
+
+            double delta_ori(mixekf.getOriente() - last_ori);
+            delta_ori = delta_ori / 180.0 * M_PI;
+
+            if (delta_ori > M_PI) {
+                delta_ori -= (2 * M_PI);
+            } else if (delta_ori < -M_PI) {
+                delta_ori += (2.0 * M_PI);
+            }
+//            std::cout << "delta ori:" << delta_ori << std::endl;
+            if (std::isnan(delta_ori)) {
+                delta_ori = 0.0;
+            }
+
+
+            if (uwb_index == 0) {
+                muwbpf.StateTransmition(Eigen::Vector2d((mixekf.getVelocity() - last_v),
+                                                        delta_ori//(mixekf.getOriente()-last_ori )/ 180.0 * M_PI
+                                        ),
+                                        2);
+
+            } else {
+                muwbpf.StateTransmition(Eigen::Vector2d(
+                        (mixekf.getVelocity() - last_v),//*(UwbData(uwb_index,0)-UwbData(uwb_index-1,0)),
+                        delta_ori
+                                        ),
+                                        2);
+
+            }
+
+//            w1.push_back(mixekf.getVelocity()-last_v);// red
+//            w2.push_back((mixekf.getOriente()-last_ori )/ 180.0 * M_PI);//green
+//            w2.push_back(delta_ori);
+
+            last_v = mixekf.getVelocity();
+            last_ori = mixekf.getOriente();
+
+            muwbpf.Evaluation(UwbData.block(uwb_index, 1, 1, UwbData.cols() - 1).transpose(),
+                              0);
+
+            Eigen::VectorXd tmp = muwbpf.GetResult(0);
+            muwbpf.Resample(-1, 0);
+
+//            std::cout<< "fusing tmp :" << tmp.transpose() << std::endl;
+            fx.push_back(double(tmp(0)));
+            fy.push_back(double(tmp(1)));
+            uwb_index++;
+        } else {
+            /*
+             * update imu data
+             */
+            mixekf.GetPosition(ImuData.block(imu_index, 1, 1, 6).transpose(),
+                               Zupt(imu_index, 0));
+
+            imu_index++;
         }
     }
+    double fus_use_time = TimeStamp::now() - fusing_start_time;
+
+
 
 
     /**
@@ -616,6 +707,7 @@ int main(int argc, char *argv[]) {
     plt::named_plot("beacon", bx, by, "D");
 //    plt::plot(ux,uy,"g--");
     plt::named_plot("only_uwb_pf", ux, uy, "-*");
+    plt::named_plot("fusing",fx,fy,"-*");
     plt::title("para:" + std::to_string(offset_cov) + ":"
                + std::to_string(rotation_cov) + ":" + std::to_string(range_cov) + ":"
                + std::to_string(valid_range) + ":" + std::to_string(range_sigma) +

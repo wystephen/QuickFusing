@@ -489,13 +489,15 @@ int main(int argc, char *argv[]) {
 
     /// Only-UWB PF
     int only_particle_num = 1000;
-    double only_eval_sigma = 0.5;
+    double only_eval_sigma = 5;
     double only_transpose_sigma  = 0.5;
+
     std::vector<double> ux,uy;
 
 
     EXUWBPF<8> puwbpf(only_particle_num);
     puwbpf.SetMeasurementSigma(only_eval_sigma,beacon_raw.rows());
+    puwbpf.SetInputNoiseSigma(only_transpose_sigma);
 
     puwbpf.SetBeaconSet(beacon_raw);
     puwbpf.Initial(Eigen::VectorXd(Eigen::Vector4d(

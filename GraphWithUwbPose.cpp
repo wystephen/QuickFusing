@@ -17,6 +17,7 @@
 /////stamp---------
 
 #include "RangeKF.hpp"
+#include "RangeEKF.h"
 #include "MYEKF.h"
 
 #include "PUWBPF.hpp"
@@ -535,6 +536,7 @@ int main(int argc, char *argv[]) {
     double fus_eval_sigma = 0.5;
     double fus_transpose_sigma = 0.5;
     std::vector<double> fx,fy;
+    std::vector<double> Rekfx,Rekfy;
 
     auto UwbData = uwb_raw;
 
@@ -564,6 +566,7 @@ int main(int argc, char *argv[]) {
 
     MyEkf mixekf(init_para);
     mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
+    RangeEKF rangeEKF(init_para);
 
 
     while (true) {
@@ -627,6 +630,27 @@ int main(int argc, char *argv[]) {
 //            std::cout<< "fusing tmp :" << tmp.transpose() << std::endl;
             fx.push_back(double(tmp(0)));
             fy.push_back(double(tmp(1)));
+
+
+
+            //// RangeEKF
+            for(int Ri(1);Ri<UwbData.cols();++Ri)
+            {
+//                std::cout << "uwb data";
+//                std::cout.flush();
+//                std::cout << Ri << " -- " ;
+//                std::cout.flush();
+//                std::cout << UwbData(uwb_index,Ri) << std::endl;
+                rangeEKF.CorrectRange(beacon_raw.block(Ri-1,0,1,3).transpose(),
+                                      UwbData(uwb_index,Ri),
+                                      1000.0051710);
+            }
+
+            Eigen::Isometry3d tmp_result = rangeEKF.getTransformation();
+            Rekfx.push_back(double(tmp_result(0,3)));
+            Rekfy.push_back(double(tmp_result(1,3)));
+
+
             uwb_index++;
         } else {
             /*
@@ -635,10 +659,15 @@ int main(int argc, char *argv[]) {
             mixekf.GetPosition(ImuData.block(imu_index, 1, 1, 6).transpose(),
                                Zupt(imu_index, 0));
 
+            rangeEKF.GetPosition(ImuData.block(imu_index, 1, 1, 6).transpose(),
+                                 Zupt(imu_index, 0));
+
             imu_index++;
         }
     }
     double fus_use_time = TimeStamp::now() - fusing_start_time;
+    std::cout << "fusing used time:" << fus_use_time
+                                     << " total time :" << v_time(v_time.rows()-1)-v_time(0) << std::endl;
 
 
 
@@ -651,6 +680,8 @@ int main(int argc, char *argv[]) {
     std::ofstream zupt_res_file("./ResultData/zupt.txt");
     std::ofstream beacon_set("./ResultData/beacon_pose.txt");
     std::ofstream only_pf_file("./ResultData/only_pf.txt");
+    std::ofstream fusing_pf_file("./ResultData/fusing_pf.txt");
+    std::ofstream fusing_ekf_file("./ResultData/fusing_ekf.txt");
     std::vector<double> gx, gy, gz;
     for (int i(0); i < zupt_res.rows(); ++i) {
         double data[10] = {0};
@@ -691,6 +722,17 @@ int main(int argc, char *argv[]) {
         only_pf_file << ux[i] << " " << uy[i] << " 0.0" << std::endl;
     }
 
+    for(int i(0);i<fx.size();++i)
+    {
+        fusing_pf_file << fx[i] << " " << fy[i] << " 0.0" << std::endl;
+    }
+
+    for(int i(0);i<Rekfx.size();++i)
+    {
+        fusing_ekf_file << Rekfx[i] << " " << Rekfy[i] << " 0.0" << std::endl;
+    }
+
+
     int first_i = 0;
     int last_i = int(gx.size() - 1);
 
@@ -707,7 +749,9 @@ int main(int argc, char *argv[]) {
     plt::named_plot("beacon", bx, by, "D");
 //    plt::plot(ux,uy,"g--");
     plt::named_plot("only_uwb_pf", ux, uy, "-*");
-    plt::named_plot("fusing",fx,fy,"-*");
+    plt::named_plot("PF fusing",fx,fy,"-*");
+    plt::named_plot("Ekf Fusing",Rekfx,Rekfy, "-*");
+    plt::legend();
     plt::title("para:" + std::to_string(offset_cov) + ":"
                + std::to_string(rotation_cov) + ":" + std::to_string(range_cov) + ":"
                + std::to_string(valid_range) + ":" + std::to_string(range_sigma) +

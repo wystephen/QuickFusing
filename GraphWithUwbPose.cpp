@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 
     std::vector<int> beacon_mask;
     beacon_mask.push_back(0);
-    beacon_mask.push_back(3);
+    beacon_mask.push_back(1);
     beacon_mask.push_back(4);
     beacon_mask.push_back(7);
     if (argc >= 2) {
@@ -525,6 +525,31 @@ int main(int argc, char *argv[]) {
     double ppf_end_time = TimeStamp::now();
     std::cout << " pure uwb pf cost time :" << ppf_end_time - ppf_start_time << std::endl;
 
+
+
+    /**
+     * UWB With ZUPT EKF..
+     */
+
+    int fus_particle_num = 1000;
+    double fus_eval_sigma = 0.5;
+    double fus_transpose_sigma = 0.5;
+
+
+    double fusing_start_time = TimeStamp::now();
+    int uwb_index(0), imu_index(0);
+    double last_v(0.0),last_ori(0.0);
+
+    EXUWBPF<8> muwbpf(fus_particle_num);
+    muwbpf.SetMeasurementSigma(fus_eval_sigma,8);
+    muwbpf.SetInputNoiseSigma(fus_transpose_sigma);
+    muwbpf.SetBeaconSet(beacon_raw);
+
+    while(true){
+        if(uwb_index>= uwb_raw.rows() || imu_index>= zupt_res.rows()){
+
+        }
+    }
 
 
     /**

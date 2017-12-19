@@ -36,7 +36,7 @@ if __name__ == '__main__':
     beaconset = np.loadtxt(dir_name + 'beaconset.csv', delimiter=',')
     uwb_data = np.loadtxt(dir_name + 'uwb_result.csv', delimiter=',')
 
-    choice_list = [1,2,6]
+    choice_list = [3,2,6]
     beaconset = beaconset[choice_list,:]
 
     tmp = uwb_data[:,1:].copy()

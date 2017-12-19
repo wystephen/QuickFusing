@@ -75,8 +75,8 @@ class trianglepose:
             res = minimize(self.costfunction_single_range,
                            initial_pose,
                            # method='L-BFGS-B',
-                           bounds=((35, 70),
-                                   (-50,-15),
+                           bounds=((45, 65),
+                                   (-50,-18),
                                    (-1.0, 1.0)),
                            jac=False)
             initial_pose = res.x

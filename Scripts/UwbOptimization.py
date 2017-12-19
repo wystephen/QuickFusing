@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     tp = TranglePose.trianglepose(beaconset, uwb_data[:, 1:])
     op_result = tp.ComputePath(uwb_data[:, :])
-    op_result = op_result[:, 1:]
+    op_result = op_result[1:, 1:]
     np.savetxt('/home/steve/Code/QuickFusing/ResultData/optimized_res.txt',
                op_result)
 

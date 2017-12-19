@@ -238,7 +238,9 @@ int main(int argc, char *argv[]) {
 
     /// ROBUST KERNEL
     static g2o::RobustKernel *robustKernel =
-            g2o::RobustKernelFactory::instance()->construct("Cauchy");
+            g2o::RobustKernelFactory::instance()->construct("DCS");
+
+    robustKernel->setDelta(0.5);
     /**
      * Build Graph
      */
@@ -384,6 +386,8 @@ int main(int argc, char *argv[]) {
     double time_intervel = -10.0;
 
     std::ofstream range_file("./ResultData/range_file.txt");
+
+    std::vector<DistanceEdge*> edge_vec;
     while (true) {
         if (zupt_index > v_time.rows() - 2) {
             break;
@@ -414,7 +418,7 @@ int main(int argc, char *argv[]) {
                     last_time = zupt_time;
 
                     for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
-                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 100.0) {
+                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 108.0) {
                             double range = uwb_raw(uwb_index, bi + 1);
                             int beacon_id = bi + beacon_id_offset;
 
@@ -434,9 +438,10 @@ int main(int argc, char *argv[]) {
                             current_range(bi) = range;
 
 
-                            dist_edge->setRobustKernel(robustKernel);
+//                            dist_edge->setRobustKernel(robustKernel);
 
                             globalOptimizer.addEdge(dist_edge);
+                            edge_vec.push_back(dist_edge);
 
 
                         }
@@ -447,6 +452,8 @@ int main(int argc, char *argv[]) {
 
             uwb_index++;
         }
+//        globalOptimizer.edges()
+
 
         // Add edge after search all range:
 
@@ -459,6 +466,13 @@ int main(int argc, char *argv[]) {
         zupt_index++;
 
 
+    }
+
+    globalOptimizer.initializeOptimization();
+    globalOptimizer.optimize(100);
+    for(int i(0);i<edge_vec.size();++i)
+    {
+        edge_vec[i]->setRobustKernel(robustKernel);
     }
 
 

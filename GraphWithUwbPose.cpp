@@ -414,7 +414,7 @@ int main(int argc, char *argv[]) {
                     last_time = zupt_time;
 
                     for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
-                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 10.0) {
+                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 100.0) {
                             double range = uwb_raw(uwb_index, bi + 1);
                             int beacon_id = bi + beacon_id_offset;
 
@@ -436,14 +436,7 @@ int main(int argc, char *argv[]) {
 
                             dist_edge->setRobustKernel(robustKernel);
 
-                            if (with_high) {
-//                                if (fabs(v_high(zupt_index) - beacon_high[bi]) < 1.2) {
-//
-//                                    globalOptimizer.addEdge(dist_edge);
-//                                }
-                            } else {
-                                globalOptimizer.addEdge(dist_edge);
-                            }
+                            globalOptimizer.addEdge(dist_edge);
 
 
                         }
@@ -457,8 +450,6 @@ int main(int argc, char *argv[]) {
 
         // Add edge after search all range:
 
-
-//            range_file
         range_file << current_range(0);
         for (int tmp_k(1); tmp_k < current_range.rows(); ++tmp_k) {
             range_file << "," << current_range(tmp_k);
@@ -488,7 +479,7 @@ int main(int argc, char *argv[]) {
     Eigen::Vector3d start_point(td[0],td[1],td[2]);
 
     /// Only-UWB PF
-    int only_particle_num = 5000;
+    int only_particle_num = 1;
     double only_eval_sigma = 3;
     double only_transpose_sigma  = 1.5;
 
@@ -504,6 +495,7 @@ int main(int argc, char *argv[]) {
             start_point(0),start_point(1),
             0,0
     )));
+    double ppf_start_time = TimeStamp::now();
 
     for(int i(0);i<uwb_raw.rows();++i)
     {
@@ -517,6 +509,8 @@ int main(int argc, char *argv[]) {
         ux.push_back(double(tmp(0)));
         uy.push_back(double(tmp(1)));
     }
+    double ppf_end_time = TimeStamp::now();
+    std::cout << " pure uwb pf cost time :" << ppf_end_time-ppf_start_time << std::endl;
 
 
 

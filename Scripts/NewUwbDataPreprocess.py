@@ -131,3 +131,4 @@ if __name__ == '__main__':
     #     print(key, mac_dic.get(key)[0], mac_dic.get(key)[1])
     nudp = NewUwbDataPre(dir_name + str(num_data) + '/', dir_name + 'MacPose.csv')
     nudp.show()
+    plt.plot()

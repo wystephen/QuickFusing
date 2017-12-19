@@ -52,6 +52,8 @@
 #include <sophus/so3.h>
 #include <sophus/se3.h>
 
+#include <algorithm>
+
 
 G2O_USE_TYPE_GROUP(slam3d)
 
@@ -87,14 +89,17 @@ int main(int argc, char *argv[]) {
     std::string dir_name = "/home/steve/Data/NewIU/";
 
 //    std::ofstream for_debug("/home/steve/Code/")
-
-    double offset_cov(0.001), rotation_cov(0.002), range_cov(0.5);
     double max_iterators(1000.0);//defualt paramet35s.
+    double offset_cov(0.001), rotation_cov(0.002), range_cov(0.5);
+
 
     double valid_range(10.0), range_sigma(10.0), z0_info(5.0);
 
     int tmp_dir_num = 17;
 
+    std::vector<int> beacon_mask;
+    beacon_mask.push_back(0);
+    beacon_mask.push_back(7);
     if (argc >= 2) {
         max_iterators = std::stod(argv[1]);
     }
@@ -183,11 +188,9 @@ int main(int argc, char *argv[]) {
     Eigen::MatrixXd beacon_raw(beacon_tmp_mat.GetRows(),
                                beacon_tmp_mat.GetCols());
 
-    for(int i(0);i<beacon_raw.rows();++i)
-    {
-        for (int j(0);j<beacon_raw.cols();++j)
-        {
-            beacon_raw(i,j) = *(beacon_tmp_mat(i,j));
+    for (int i(0); i < beacon_raw.rows(); ++i) {
+        for (int j(0); j < beacon_raw.cols(); ++j) {
+            beacon_raw(i, j) = *(beacon_tmp_mat(i, j));
         }
     }
 
@@ -240,7 +243,7 @@ int main(int argc, char *argv[]) {
     static g2o::RobustKernel *robustKernel =
             g2o::RobustKernelFactory::instance()->construct("DCS");
 
-    robustKernel->setDelta(0.5);
+    robustKernel->setDelta(1.5);
     /**
      * Build Graph
      */
@@ -250,9 +253,9 @@ int main(int argc, char *argv[]) {
     for (int i(0); i < beacon_raw.rows(); ++i) {
         auto *v = new g2o::VertexSE3();
         double p[6] = {0};
-        p[0] = beacon_raw(i,0);
-        p[1] = beacon_raw(i,1);
-        p[2] = beacon_raw(i,2);
+        p[0] = beacon_raw(i, 0);
+        p[1] = beacon_raw(i, 1);
+        p[2] = beacon_raw(i, 2);
 
         v->setEstimateData(p);
         v->setFixed(true);
@@ -387,7 +390,7 @@ int main(int argc, char *argv[]) {
 
     std::ofstream range_file("./ResultData/range_file.txt");
 
-    std::vector<DistanceEdge*> edge_vec;
+    std::vector<DistanceEdge *> edge_vec;
     while (true) {
         if (zupt_index > v_time.rows() - 2) {
             break;
@@ -418,7 +421,10 @@ int main(int argc, char *argv[]) {
                     last_time = zupt_time;
 
                     for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
-                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 108.0) {
+                        auto b_num = std::count(beacon_mask.begin(), beacon_mask.end(), bi);
+                        if (uwb_raw(uwb_index, bi + 1) > 0
+                            && uwb_raw(uwb_index, bi + 1) < 100.0
+                            && b_num < 1) {
                             double range = uwb_raw(uwb_index, bi + 1);
                             int beacon_id = bi + beacon_id_offset;
 
@@ -470,8 +476,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.optimize(100);
-    for(int i(0);i<edge_vec.size();++i)
-    {
+    for (int i(0); i < edge_vec.size(); ++i) {
         edge_vec[i]->setRobustKernel(robustKernel);
     }
 
@@ -490,41 +495,40 @@ int main(int argc, char *argv[]) {
     // Obtain start point pose
     double td[10] = {0};
     globalOptimizer.vertex(0)->getEstimateData(td);
-    Eigen::Vector3d start_point(td[0],td[1],td[2]);
+    Eigen::Vector3d start_point(td[0], td[1], td[2]);
 
     /// Only-UWB PF
     int only_particle_num = 1;
     double only_eval_sigma = 3;
-    double only_transpose_sigma  = 1.5;
+    double only_transpose_sigma = 1.5;
 
-    std::vector<double> ux,uy;
+    std::vector<double> ux, uy;
 
 
     EXUWBPF<8> puwbpf(only_particle_num);
-    puwbpf.SetMeasurementSigma(only_eval_sigma,beacon_raw.rows());
+    puwbpf.SetMeasurementSigma(only_eval_sigma, beacon_raw.rows());
     puwbpf.SetInputNoiseSigma(only_transpose_sigma);
 
     puwbpf.SetBeaconSet(beacon_raw);
     puwbpf.Initial(Eigen::VectorXd(Eigen::Vector4d(
-            start_point(0),start_point(1),
-            0,0
+            start_point(0), start_point(1),
+            0, 0
     )));
     double ppf_start_time = TimeStamp::now();
 
-    for(int i(0);i<uwb_raw.rows();++i)
-    {
+    for (int i(0); i < uwb_raw.rows(); ++i) {
 //        if()
 
-        puwbpf.StateTransmition(Eigen::Vector2d(0,0),3);
-        puwbpf.Evaluation(uwb_raw.block(i,1,1,uwb_raw.cols()-1).transpose(),
-        0);
+        puwbpf.StateTransmition(Eigen::Vector2d(0, 0), 3);
+        puwbpf.Evaluation(uwb_raw.block(i, 1, 1, uwb_raw.cols() - 1).transpose(),
+                          0);
         auto tmp = puwbpf.GetResult(0);
-        puwbpf.Resample(-1,0);
+        puwbpf.Resample(-1, 0);
         ux.push_back(double(tmp(0)));
         uy.push_back(double(tmp(1)));
     }
     double ppf_end_time = TimeStamp::now();
-    std::cout << " pure uwb pf cost time :" << ppf_end_time-ppf_start_time << std::endl;
+    std::cout << " pure uwb pf cost time :" << ppf_end_time - ppf_start_time << std::endl;
 
 
 
@@ -572,9 +576,8 @@ int main(int argc, char *argv[]) {
         std::cout << "i : " << i << " z = " << bz[i] << std::endl;
     }
 
-    for(int i(0);i<ux.size();++i)
-    {
-        only_pf_file << ux[i] << " " << uy[i] << " 0.0"<<std::endl;
+    for (int i(0); i < ux.size(); ++i) {
+        only_pf_file << ux[i] << " " << uy[i] << " 0.0" << std::endl;
     }
 
     int first_i = 0;
@@ -588,11 +591,11 @@ int main(int argc, char *argv[]) {
               ) << std::endl;
 
 //    plt::plot(gx, gy, "b-*");
-    plt::named_plot("graph",gx,gy,"-*");
+    plt::named_plot("graph", gx, gy, "-*");
 //    plt::plot(bx, by, "r*");
-    plt::named_plot("beacon",bx,by,"D");
+    plt::named_plot("beacon", bx, by, "D");
 //    plt::plot(ux,uy,"g--");
-    plt::named_plot("only_uwb_pf",ux,uy,"-*");
+    plt::named_plot("only_uwb_pf", ux, uy, "-*");
     plt::title("para:" + std::to_string(offset_cov) + ":"
                + std::to_string(rotation_cov) + ":" + std::to_string(range_cov) + ":"
                + std::to_string(valid_range) + ":" + std::to_string(range_sigma) +

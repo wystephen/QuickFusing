@@ -50,7 +50,8 @@ void DistanceEdge::computeError() {
 //    _error(0, 0) = std::log(NormalPdf(dis, _measurement, sigma_));
     try{
 //        _error(0,0)=NormalPdf(dis,_measurement,sigma_);
-            _error(0, 0) = std::log( NormalPdf(dis, _measurement, sigma_));
+//            _error(0, 0) = std::log( NormalPdf(dis, _measurement, sigma_));
+        _error(0,0) = std::pow(dis-_measurement,2.0);
         if(std::isnan(_error(0,0))||std::isinf(_error(0,0)))
         {
             throw std::bad_cast();

@@ -36,15 +36,14 @@ if __name__ == '__main__':
     beaconset = np.loadtxt(dir_name + 'beaconset.csv', delimiter=',')
     uwb_data = np.loadtxt(dir_name + 'uwb_result.csv', delimiter=',')
 
-    choice_list = [3,2,6]
-    beaconset = beaconset[choice_list,:]
+    choice_list = [3, 2, 6]
+    beaconset = beaconset[choice_list, :]
 
-    tmp = uwb_data[:,1:].copy()
-    t_ud = np.zeros([uwb_data.shape[0],len(choice_list)+1])
-    t_ud[:,0] = uwb_data[:,0]
-    t_ud[:,1:] = tmp[:,choice_list]
+    tmp = uwb_data[:, 1:].copy()
+    t_ud = np.zeros([uwb_data.shape[0], len(choice_list) + 1])
+    t_ud[:, 0] = uwb_data[:, 0]
+    t_ud[:, 1:] = tmp[:, choice_list]
     uwb_data = t_ud.copy()
-
 
     ## only particle filter
     # filter_start = time.time()
@@ -75,7 +74,7 @@ if __name__ == '__main__':
     np.savetxt('/home/steve/Code/QuickFusing/ResultData/optimized_res.txt',
                op_result)
     op_end_time = time.time()
-    print('optimized time: ', op_end_time-op_start_time)
+    print('optimized time: ', op_end_time - op_start_time)
 
     plt.figure()
     # plt.plot(only_pf_result[:, 0], only_pf_result[:, 1], label='only uwb pf')

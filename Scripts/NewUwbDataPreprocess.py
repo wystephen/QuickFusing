@@ -80,7 +80,7 @@ class NewUwbDataPre:
         tmp_range -= 10.0
 
         while the_index < len(all_lines):
-            # for one line
+            # for each line
             if 'F1' in all_lines[the_index]:
                 ### out put
                 self.tmp_array.append(local_time - self.first_time + self.start_time)

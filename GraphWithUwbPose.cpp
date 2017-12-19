@@ -535,8 +535,8 @@ int main(int argc, char *argv[]) {
     int fus_particle_num = 1000;
     double fus_eval_sigma = 0.5;
     double fus_transpose_sigma = 0.5;
-    std::vector<double> fx,fy;
-    std::vector<double> Rekfx,Rekfy;
+    std::vector<double> fx, fy;
+    std::vector<double> Rekfx, Rekfy;
 
     auto UwbData = uwb_raw;
 
@@ -567,6 +567,7 @@ int main(int argc, char *argv[]) {
     MyEkf mixekf(init_para);
     mixekf.InitNavEq(ImuData.block(0, 1, 20, 6));
     RangeEKF rangeEKF(init_para);
+    rangeEKF.InitNavEq(ImuData.block(0,1,20,6));
 
 
     while (true) {
@@ -621,7 +622,16 @@ int main(int argc, char *argv[]) {
             last_v = mixekf.getVelocity();
             last_ori = mixekf.getOriente();
 
-            muwbpf.Evaluation(UwbData.block(uwb_index, 1, 1, UwbData.cols() - 1).transpose(),
+
+            Eigen::VectorXd uwb_tmp = UwbData.block(uwb_index,1,1,UwbData.cols()-1).transpose();
+            for(auto iter = beacon_mask.begin();iter!=beacon_mask.end();iter++)
+            {
+                uwb_tmp(*iter)=-10.0;
+
+            }
+
+
+            muwbpf.Evaluation(uwb_tmp,
                               0);
 
             Eigen::VectorXd tmp = muwbpf.GetResult(0);
@@ -634,21 +644,19 @@ int main(int argc, char *argv[]) {
 
 
             //// RangeEKF
-            for(int Ri(1);Ri<UwbData.cols();++Ri)
-            {
-//                std::cout << "uwb data";
-//                std::cout.flush();
-//                std::cout << Ri << " -- " ;
-//                std::cout.flush();
-//                std::cout << UwbData(uwb_index,Ri) << std::endl;
-                rangeEKF.CorrectRange(beacon_raw.block(Ri-1,0,1,3).transpose(),
-                                      UwbData(uwb_index,Ri),
-                                      1000.0051710);
+            for (int Ri(1); Ri < UwbData.cols(); ++Ri) {
+                auto b_num = std::count(beacon_mask.begin(), beacon_mask.end(), Ri-1);
+                if (UwbData(uwb_index, Ri) > 0 && b_num == 0) {
+                    rangeEKF.CorrectRange(beacon_raw.block(Ri - 1, 0, 1, 3).transpose(),
+                                          UwbData(uwb_index, Ri),
+                                          1000.0051710);
+                }
+
             }
 
             Eigen::Isometry3d tmp_result = rangeEKF.getTransformation();
-            Rekfx.push_back(double(tmp_result(0,3)));
-            Rekfy.push_back(double(tmp_result(1,3)));
+            Rekfx.push_back(double(tmp_result(0, 3)));
+            Rekfy.push_back(double(tmp_result(1, 3)));
 
 
             uwb_index++;
@@ -667,7 +675,7 @@ int main(int argc, char *argv[]) {
     }
     double fus_use_time = TimeStamp::now() - fusing_start_time;
     std::cout << "fusing used time:" << fus_use_time
-                                     << " total time :" << v_time(v_time.rows()-1)-v_time(0) << std::endl;
+              << " total time :" << v_time(v_time.rows() - 1) - v_time(0) << std::endl;
 
 
 
@@ -722,13 +730,11 @@ int main(int argc, char *argv[]) {
         only_pf_file << ux[i] << " " << uy[i] << " 0.0" << std::endl;
     }
 
-    for(int i(0);i<fx.size();++i)
-    {
+    for (int i(0); i < fx.size(); ++i) {
         fusing_pf_file << fx[i] << " " << fy[i] << " 0.0" << std::endl;
     }
 
-    for(int i(0);i<Rekfx.size();++i)
-    {
+    for (int i(0); i < Rekfx.size(); ++i) {
         fusing_ekf_file << Rekfx[i] << " " << Rekfy[i] << " 0.0" << std::endl;
     }
 
@@ -749,8 +755,8 @@ int main(int argc, char *argv[]) {
     plt::named_plot("beacon", bx, by, "D");
 //    plt::plot(ux,uy,"g--");
     plt::named_plot("only_uwb_pf", ux, uy, "-*");
-    plt::named_plot("PF fusing",fx,fy,"-*");
-    plt::named_plot("Ekf Fusing",Rekfx,Rekfy, "-*");
+    plt::named_plot("PF fusing", fx, fy, "-*");
+    plt::named_plot("Ekf Fusing", Rekfx, Rekfy, "-*");
     plt::legend();
     plt::title("para:" + std::to_string(offset_cov) + ":"
                + std::to_string(rotation_cov) + ":" + std::to_string(range_cov) + ":"

@@ -226,10 +226,18 @@ public:
             double sigma = input_noise_sigma_.mean();
             std::normal_distribution<double> state_distribution(input(0), sigma * 0.1);
 #pragma omp parallel for
-
             for (int i = 0; i < this->p_state_.rows(); ++i) {
                 this->p_state_(i, 0) += state_distribution(this->e_);
                 this->p_state_(i, 1) += state_distribution(this->e_);
+            }
+
+            if (this->p_state_.hasNaN()) {
+                std::cout << __FILE__
+                          << ":"
+                          << __LINE__
+                          << ":"
+                          << __FUNCTION__
+                          << std::endl;
             }
 
 
@@ -290,6 +298,16 @@ public:
 
         ///normalize probability.
         this->probability_ /= this->probability_.sum();
+
+        if(this->probability_.hasNaN())
+        {
+            std::cout << __FILE__
+                      <<":"
+                      <<__LINE__
+                      <<":"
+                      <<__FUNCTION__
+                      <<std::endl;
+        }
         return true;
 
     }
@@ -331,7 +349,7 @@ Goodness of fit:
                  */
 
                 score *= (this->ScalarNormalPdf(dis, measurement(i), measurement_sigma_(i)) + 1e-50);
-                
+
 //                score *= (this->ScalarNormalPdf(dis+std::exp(-0.2945*dis)-0.04628, measurement(i), measurement_sigma_(i)) + 1e-50);
 //                std::cout << score << ";:::" <<
 //                          dis << " :"
@@ -408,6 +426,7 @@ Goodness of fit:
 //            }
             this->probability_ = tmp_score;
             this->p_state_ = tmp_vec;
+
             if (std::isnan(this->probability_.sum())) {
                 this->probability_.setOnes();
             }

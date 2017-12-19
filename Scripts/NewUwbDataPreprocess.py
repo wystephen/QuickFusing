@@ -120,15 +120,9 @@ class NewUwbDataPre:
 
 if __name__ == '__main__':
     dir_name = '/home/steve/Data/NewIU/'
-    num_data = 12
+    num_data = 17
 
-    # mac_pose_file = open(dir_name + 'MacPose.csv')
-    # mac_dic = dict()
-    # for index,line in enumerate(mac_pose_file.readlines()):
-    #     mac_dic[line.split(',')[0]] = (int(index),float(line.split(',')[1]), float(line.split(',')[2]))
-    #
-    # for key in mac_dic:
-    #     print(key, mac_dic.get(key)[0], mac_dic.get(key)[1])
+
     nudp = NewUwbDataPre(dir_name + str(num_data) + '/', dir_name + 'MacPose.csv')
     nudp.show()
-    plt.plot()
+    plt.show()

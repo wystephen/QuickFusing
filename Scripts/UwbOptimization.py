@@ -60,7 +60,7 @@ if __name__ == '__main__':
     print('cost time :', filter_end - filter_start)
 
     tp = TranglePose.trianglepose(beaconset, uwb_data[:, 1:])
-    op_result = tp.ComputePath(uwb_data[:, 1:])
+    op_result = tp.ComputePath(uwb_data[:, :])
 
     plt.figure()
     plt.plot(only_pf_result[:, 0], only_pf_result[:, 1], label='only uwb pf')

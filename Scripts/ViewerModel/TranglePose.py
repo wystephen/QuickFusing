@@ -50,8 +50,9 @@ class trianglepose:
     def costfunction_single_range(self, pose):
         val = 0.0
         for i in range(self.beaconset.shape[0]):
-            val += np.abs(np.linalg.norm(self.beaconset[i, :] - pose)
-                          - self.single_range_list[i])
+            if self.single_range_list[i]>0:
+                val += np.abs(np.linalg.norm(self.beaconset[i, :] - pose)
+                              - self.single_range_list[i])
         return val
 
     def costfunction_multi_range(self, pose):
@@ -74,9 +75,9 @@ class trianglepose:
             res = minimize(self.costfunction_single_range,
                            initial_pose,
                            # method='L-BFGS-B',
-                           bounds=((-40, 40),
-                                   (-40, 40),
-                                   (1.0, 3.0)),
+                           # bounds=((-40, 40),
+                           #         (-40, 40),
+                           #         (1.0, 3.0)),
                            jac=False)
             initial_pose = res.x
             OptResult[i, 0] = uwbdata[i, 0]

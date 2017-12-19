@@ -488,9 +488,9 @@ int main(int argc, char *argv[]) {
     Eigen::Vector3d start_point(td[0],td[1],td[2]);
 
     /// Only-UWB PF
-    int only_particle_num = 1000;
-    double only_eval_sigma = 5;
-    double only_transpose_sigma  = 0.5;
+    int only_particle_num = 5000;
+    double only_eval_sigma = 3;
+    double only_transpose_sigma  = 1.5;
 
     std::vector<double> ux,uy;
 
@@ -579,9 +579,12 @@ int main(int argc, char *argv[]) {
                       std::pow(gz[first_i] - gz[last_i], 2.0)
               ) << std::endl;
 
-    plt::plot(gx, gy, "b-*");
-    plt::plot(bx, by, "r*");
-    plt::plot(ux,uy,"g--");
+//    plt::plot(gx, gy, "b-*");
+    plt::named_plot("graph",gx,gy,"-*");
+//    plt::plot(bx, by, "r*");
+    plt::named_plot("beacon",bx,by,"D");
+//    plt::plot(ux,uy,"g--");
+    plt::named_plot("only_uwb_pf",ux,uy,"-*");
     plt::title("para:" + std::to_string(offset_cov) + ":"
                + std::to_string(rotation_cov) + ":" + std::to_string(range_cov) + ":"
                + std::to_string(valid_range) + ":" + std::to_string(range_sigma) +

@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     ## only particle filter
     filter_start = time.time()
-    particle_num = 150
+    particle_num = 15
     sample_sigma = 1.5
 
     pf = PF_FRAME.PF_Frame([2000, 2000],
@@ -61,6 +61,9 @@ if __name__ == '__main__':
 
     tp = TranglePose.trianglepose(beaconset, uwb_data[:, 1:])
     op_result = tp.ComputePath(uwb_data[:, :])
+    op_result = op_result[:, 1:]
+    np.savetxt('/home/steve/Code/QuickFusing/ResultData/optimized_res.txt',
+               op_result)
 
     plt.figure()
     plt.plot(only_pf_result[:, 0], only_pf_result[:, 1], label='only uwb pf')

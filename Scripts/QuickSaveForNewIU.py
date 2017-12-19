@@ -26,6 +26,9 @@ if __name__ == '__main__':
     a = np.loadtxt(dir_name + 'imu2.txt', delimiter=',')
     print(a[:, 1:4].shape)
     # a[:,1:4] *= 9.816
+    # a[:,1:3] *= -1.0
+    # a[:,4:6] *= -1.0
+
 
     np.savetxt(dir_name + "sim_imu.csv", a, delimiter=',')
 

@@ -47,7 +47,7 @@ class NewUwbDataPre:
             self.mac_dic[line.split(',')[0]] = \
                 (int(index),
                  float(line.split(',')[1]),
-                 float(line.split(',')[2]))
+                 -float(line.split(',')[2]))
 
         max_index = 0
         for key in self.mac_dic:

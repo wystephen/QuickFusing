@@ -268,7 +268,7 @@ int main(int argc, char *argv[]) {
         p[2] = beacon_raw(i,2);
 
         v->setEstimateData(p);
-        v->setFixed(false);
+        v->setFixed(true);
         v->setId(beacon_id_offset + i);
 
         globalOptimizer.addVertex(v);

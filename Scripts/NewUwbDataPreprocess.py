@@ -102,6 +102,7 @@ class NewUwbDataPre:
         for key in self.mac_dic:
             self.beaconset[self.mac_dic.get(key)[0], 0] = self.mac_dic.get(key)[1]
             self.beaconset[self.mac_dic.get(key)[0], 1] = self.mac_dic.get(key)[2]
+            # self.beaconset[self.mac_dic.get(key)[0],2]= 0.2
 
     def show(self):
         plt.figure()

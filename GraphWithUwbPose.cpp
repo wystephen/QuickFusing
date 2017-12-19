@@ -17,7 +17,7 @@
 /////stamp---------
 
 #include "RangeKF.hpp"
-
+#include "MYEKF.h"
 
 #include "PUWBPF.hpp"
 
@@ -37,31 +37,16 @@
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 
-
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_impl.h"
 
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
 
-
-//#include "g2o/types/slam3d_addons/vertex_line3d.h"
-//#include "g2o/types/slam3d_addons/edge_se3_line.h"
-
 #include "OwnEdge/ZoEdge.h"
 #include "OwnEdge/ZoEdge.cpp"
 #include "OwnEdge/DistanceEdge.h"
 #include "OwnEdge/DistanceEdge.cpp"
-
-//#include "OwnEdge/Line2D.h"
-//#include "OwnEdge/Line2D.cpp"
-//#include "OwnEdge/Point2Line2D.h"
-//#include "OwnEdge/Point2Line2D.cpp"
-
-//#include "OwnEdge/DistanceSE3Line3D.h"
-//#include "OwnEdge/DistanceSE3Line3D.cpp"
-//#include "g2o_types_slam3d_addons_api.h"
-//#include "g2o/types/slam3d_addons/line3d.h"
 
 
 #include <sophus/so3.h>
@@ -268,7 +253,7 @@ int main(int argc, char *argv[]) {
         p[2] = beacon_raw(i,2);
 
         v->setEstimateData(p);
-        v->setFixed(false);
+        v->setFixed(true);
         v->setId(beacon_id_offset + i);
 
         globalOptimizer.addVertex(v);
@@ -497,17 +482,50 @@ int main(int argc, char *argv[]) {
         globalOptimizer.optimize(max_iterators);
     }
 //    globalOptimizer.optimize(6000);
+    // Obtain start point pose
+    double td[10] = {0};
+    globalOptimizer.vertex(0)->getEstimateData(td);
+    Eigen::Vector3d start_point(td[0],td[1],td[2]);
+
+    /// Only-UWB PF
+    int only_particle_num = 1000;
+    double only_eval_sigma = 0.5;
+    double only_transpose_sigma  = 0.5;
+    std::vector<double> ux,uy;
+
+
+    EXUWBPF<4> puwbpf(only_particle_num);
+    puwbpf.SetMeasurementSigma(only_eval_sigma,beacon_raw.rows());
+
+    puwbpf.SetBeaconSet(beacon_raw);
+    puwbpf.Initial(Eigen::VectorXd(Eigen::Vector4d(
+            start_point(0),start_point(1),
+            0,0
+    )));
+
+    for(int i(0);i<uwb_raw.rows();++i)
+    {
+//        if()
+
+        puwbpf.StateTransmition(Eigen::Vector2d(0,0),3);
+        puwbpf.Evaluation(uwb_raw.block(i,1,1,uwb_raw.cols()-1).transpose(),
+        0);
+        auto tmp = puwbpf.GetResult(0);
+        puwbpf.Resample(-1,0);
+        ux.push_back(double(tmp(0)));
+        uy.push_back(double(tmp(1)));
+    }
+
 
 
     /**
      * output and Plot result
      */
 
-
-
     std::ofstream graph_res_file("./ResultData/graph.txt");
     std::ofstream zupt_res_file("./ResultData/zupt.txt");
     std::ofstream beacon_set("./ResultData/beacon_pose.txt");
+    std::ofstream only_pf_file("./ResultData/only_pf.txt");
     std::vector<double> gx, gy, gz;
     for (int i(0); i < zupt_res.rows(); ++i) {
         double data[10] = {0};
@@ -544,6 +562,11 @@ int main(int argc, char *argv[]) {
         std::cout << "i : " << i << " z = " << bz[i] << std::endl;
     }
 
+    for(int i(0);i<ux.size();++i)
+    {
+        only_pf_file << ux[i] << " " << uy[i] << " 0.0"<<std::endl;
+    }
+
     int first_i = 0;
     int last_i = int(gx.size() - 1);
 
@@ -556,6 +579,7 @@ int main(int argc, char *argv[]) {
 
     plt::plot(gx, gy, "b-*");
     plt::plot(bx, by, "r*");
+    plt::plot(ux,uy,"g--");
     plt::title("para:" + std::to_string(offset_cov) + ":"
                + std::to_string(rotation_cov) + ":" + std::to_string(range_cov) + ":"
                + std::to_string(valid_range) + ":" + std::to_string(range_sigma) +

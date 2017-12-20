@@ -99,10 +99,10 @@ int main(int argc, char *argv[]) {
     int tmp_dir_num = 17;
 
     std::vector<int> beacon_mask;
-    beacon_mask.push_back(0);
-    beacon_mask.push_back(3);
-    beacon_mask.push_back(4);
-    beacon_mask.push_back(7);
+//    beacon_mask.push_back(0);
+//    beacon_mask.push_back(3);
+//    beacon_mask.push_back(4);
+//    beacon_mask.push_back(7);
     if (argc >= 2) {
         max_iterators = std::stod(argv[1]);
     }
@@ -532,8 +532,8 @@ int main(int argc, char *argv[]) {
      * UWB With ZUPT EKF..
      */
 
-    int fus_particle_num = 1000;
-    double fus_eval_sigma = 0.5;
+    int fus_particle_num = 3000;
+    double fus_eval_sigma = 0.1;
     double fus_transpose_sigma = 0.5;
     std::vector<double> fx, fy;
     std::vector<double> Rekfx, Rekfy;
@@ -649,7 +649,7 @@ int main(int argc, char *argv[]) {
                 if (UwbData(uwb_index, Ri) > 0 && b_num == 0) {
                     rangeEKF.CorrectRange(beacon_raw.block(Ri - 1, 0, 1, 3).transpose(),
                                           UwbData(uwb_index, Ri),
-                                          1000.0051710);
+                                          110.50051710);
                 }
 
             }

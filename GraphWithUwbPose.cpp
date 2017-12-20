@@ -99,10 +99,10 @@ int main(int argc, char *argv[]) {
     int tmp_dir_num = 17;
 
     std::vector<int> beacon_mask;
-//    beacon_mask.push_back(0);
-//    beacon_mask.push_back(3);
-//    beacon_mask.push_back(4);
-//    beacon_mask.push_back(7);
+    beacon_mask.push_back(0);
+    beacon_mask.push_back(1);
+    beacon_mask.push_back(4);
+    beacon_mask.push_back(7);
     if (argc >= 2) {
         max_iterators = std::stod(argv[1]);
     }

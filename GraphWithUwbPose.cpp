@@ -387,6 +387,7 @@ int main(int argc, char *argv[]) {
     std::ofstream range_file("./ResultData/range_file.txt");
 
     std::vector<DistanceEdge *> edge_vec;
+    double graph_start_time = TimeStamp::now();
     while (true) {
         if (zupt_index > v_time.rows() - 2) {
             break;
@@ -455,6 +456,8 @@ int main(int argc, char *argv[]) {
             uwb_index++;
         }
 //        globalOptimizer.edges()
+        globalOptimizer.initializeOptimization();
+        globalOptimizer.optimize(10);
 
 
         // Add edge after search all range:
@@ -469,6 +472,8 @@ int main(int argc, char *argv[]) {
 
 
     }
+    double graph_end_time  = TimeStamp::now();
+    std::cout << " graph optimized time:" << graph_end_time-graph_start_time << std::endl;
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.optimize(100);

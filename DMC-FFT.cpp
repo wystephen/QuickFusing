@@ -457,8 +457,7 @@ int main(int argc, char *argv[]) {
 
             last_optimized_id = trace_id;
             globalOptimizer.setVerbose(true);
-            globalOptimizer.initializeOptimization();
-//            globalOptimizer.updateInitialization()
+//            globalOptimizer.initializeOptimization();
 //            globalOptimizer.optimize(10, false);
         }
 

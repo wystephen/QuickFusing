@@ -58,7 +58,7 @@ public:
             _error(0,0) = 0.0;
 
 
-        } else if (dis < high_threshold_) {
+        } else if (high_threshold_ > dis) {
             /// low threshold < dis < high threshold
             _error(0, 0) = dis-low_threshold_;
 

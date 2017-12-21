@@ -64,7 +64,8 @@ public:
 
         } else {
             /// high threshold < dis
-            _error(0,0) = high_threshold_+std::pow(dis-high_threshold_,0.5);
+//            _error(0,0) = high_threshold_+std::pow(dis-high_threshold_,0.5);
+            _error(0,0) = dis - low_threshold_;
 
 
         }

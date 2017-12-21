@@ -21,22 +21,26 @@
          佛祖保佑       永无BUG 
 */
 //
-// Created by steve on 17-11-17.
+// Created by steve on 17-12-20.
 //
 
-#ifndef QUICKFUSING_SIMPLEDISTANCEEDGE_H
-#define QUICKFUSING_SIMPLEDISTANCEEDGE_H
+#ifndef QUICKFUSING_SIMPLEROBUSTDISTANCEEDGE_H
+#define QUICKFUSING_SIMPLEROBUSTDISTANCEEDGE_H
 
-#include "DistanceEdge.h"
+#include "SimpleDistanceEdge.h"
 
 
-class SimpleDistanceEdge : public DistanceEdge {
+class SimpleRobustDistanceEdge : public SimpleDistanceEdge {
 public:
-    SimpleDistanceEdge() {
+    SimpleRobustDistanceEdge() {
 
     }
 
-    virtual void computeError() {
+
+    /**
+     *
+     */
+    void computeError() {
         g2o::VertexSE3 *from = static_cast<g2o::VertexSE3 *>(_vertices[0]);
         g2o::VertexSE3 *to = static_cast<g2o::VertexSE3 *>(_vertices[1]);
 
@@ -47,12 +51,41 @@ public:
         double dis_2 = (p1[0] - p2[0]) * (p1[0] - p2[0]) +
                        (p1[1] - p2[1]) * (p1[1] - p2[1]) +
                        (p1[2] - p2[2]) * (p1[2] - p2[2]);
-//        std::cout << dis_2 << std::endl;
-        _error(0, 0) = dis_2;
+
+        double dis = std::sqrt(dis_2);
+        if (dis < low_threshold_) {
+            ///  dis < low threshold
+            _error(0,0) = 0.0;
+
+
+        } else if (dis < high_threshold_) {
+            /// low threshold < dis < high threshold
+            _error(0, 0) = dis-low_threshold_;
+
+        } else {
+            /// high threshold < dis
+            _error(0,0) = high_threshold_+std::log(dis-high_threshold_+1.0);
+
+
+        }
+
 
     }
 
+protected:
+    double low_threshold_ = (1.5);
+    double high_threshold_ = (3.0);
+
+public:
+    void setLow_threshold(double low_threshold) {
+        SimpleRobustDistanceEdge::low_threshold_ = low_threshold;
+    }
+
+    void setHigh_threshold(double high_threshold) {
+        SimpleRobustDistanceEdge::high_threshold_ = high_threshold;
+    }
+
+
 };
 
-
-#endif //QUICKFUSING_SIMPLEDISTANCEEDGE_H
+#endif //QUICKFUSING_SIMPLEROBUSTDISTANCEEDGE_H

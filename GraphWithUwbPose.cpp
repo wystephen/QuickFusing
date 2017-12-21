@@ -456,8 +456,8 @@ int main(int argc, char *argv[]) {
             uwb_index++;
         }
 //        globalOptimizer.edges()
-        globalOptimizer.initializeOptimization();
-        globalOptimizer.optimize(10);
+//        globalOptimizer.initializeOptimization();
+//        globalOptimizer.optimize(100);
 
 
         // Add edge after search all range:

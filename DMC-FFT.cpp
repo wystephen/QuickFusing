@@ -73,6 +73,8 @@
 #include "OwnEdge/SimpleDistanceEdge.h"
 #include "OwnEdge/SimpleDistanceEdge.cpp"
 
+#include "OwnEdge/SimpleRobustDistanceEdge.h"
+
 //#include "OwnEdge/Line2D.h"
 //#include "OwnEdge/Line2D.cpp"
 //#include "OwnEdge/Point2Line2D.h"
@@ -457,7 +459,7 @@ int main(int argc, char *argv[]) {
             globalOptimizer.setVerbose(true);
             globalOptimizer.initializeOptimization();
 //            globalOptimizer.updateInitialization()
-            globalOptimizer.optimize(10, false);
+//            globalOptimizer.optimize(10, false);
         }
 
 //        if(trace_id>50)
@@ -493,13 +495,14 @@ int main(int argc, char *argv[]) {
             corner_after.push_back(pairs_vec(i, 1));
             corner_score.push_back(1.0);
 
-            auto *dis_edge = new SimpleDistanceEdge();
+//            auto *dis_edge = new SimpleDistanceEdge();
+            auto *dis_edge = new SimpleRobustDistanceEdge();
             dis_edge->vertices()[0] = globalOptimizer.vertex(pairs_vec(i, 0));
             dis_edge->vertices()[1] = globalOptimizer.vertex(pairs_vec(i, 1));
 
             dis_edge->setMeasurement(0.0);
             dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
-            dis_edge->setRobustKernel(robust_kernel_dis);
+//            dis_edge->setRobustKernel(robust_kernel_dis);
 
             globalOptimizer.addEdge(dis_edge);
         }

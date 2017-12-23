@@ -60,15 +60,16 @@ public:
 
         } else if (dis < high_threshold_) {
             /// high threshold < dis
-            _error(0, 0) = dis - low_threshold_;
+            _error(0, 0) = high_threshold_
+                           + std::pow(dis - high_threshold_, 0.5)
+                           - low_threshold_;
+            _error(0,0) = dis - low_threshold_;
 
 
         } else {
             /// low threshold < dis < high threshold
+            _error(0, 0) = dis - low_threshold_;
 
-            _error(0, 0) = high_threshold_
-                           + std::pow(dis - high_threshold_, 0.5)
-                           - low_threshold_;
         }
 //        _error(0,0) = dis;
 

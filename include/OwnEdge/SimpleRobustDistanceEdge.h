@@ -55,7 +55,7 @@ public:
         double dis = std::sqrt(dis_2);
         if (dis < low_threshold_) {
             ///  dis < low threshold
-            _error(0,0) = 0.0;
+            _error(0, 0) = 0.0;
 
 
         } else if (dis < high_threshold_) {
@@ -63,7 +63,7 @@ public:
             _error(0, 0) = high_threshold_
                            + std::pow(dis - high_threshold_, 0.5)
                            - low_threshold_;
-            _error(0,0) = dis - low_threshold_;
+            _error(0, 0) = dis - low_threshold_;
 
 
         } else {

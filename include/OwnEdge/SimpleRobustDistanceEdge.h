@@ -95,9 +95,9 @@ public:
     }
 
 protected:
-    double low_threshold_ = (1.5);
-    double high_threshold_ = (3.0);
-    double error_counter_ = 20;
+    double low_threshold_ = (1.0);
+    double high_threshold_ = (2.0);
+    double error_counter_ = 50;
 
 public:
     void setLow_threshold(double low_threshold) {

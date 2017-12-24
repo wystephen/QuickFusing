@@ -512,14 +512,14 @@ int main(int argc, char *argv[]) {
      * Just for debug... add first point and last point into distance edge
      */
 
-    auto *dis_edge = new SimpleDistanceEdge();
-    dis_edge->vertices()[0] = globalOptimizer.vertex(0);
-    dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id - 1);
-
-    dis_edge->setMeasurement(0.0);
-    dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
-
-    globalOptimizer.addEdge(dis_edge);
+//    auto *dis_edge = new SimpleDistanceEdge();
+//    dis_edge->vertices()[0] = globalOptimizer.vertex(0);
+//    dis_edge->vertices()[1] = globalOptimizer.vertex(trace_id - 1);
+//
+//    dis_edge->setMeasurement(0.0);
+//    dis_edge->setInformation(Eigen::Matrix<double, 1, 1>(loop_info));
+//
+//    globalOptimizer.addEdge(dis_edge);
     /**
      *  End ...
      */

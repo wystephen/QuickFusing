@@ -494,8 +494,8 @@ int main(int argc, char *argv[]) {
             corner_after.push_back(pairs_vec(i, 1));
             corner_score.push_back(1.0);
 
-            auto *dis_edge = new SimpleDistanceEdge();
-//            auto *dis_edge = new SimpleRobustDistanceEdge();
+//            auto *dis_edge = new SimpleDistanceEdge();
+            auto *dis_edge = new SimpleRobustDistanceEdge();
             dis_edge->vertices()[0] = globalOptimizer.vertex(pairs_vec(i, 0));
             dis_edge->vertices()[1] = globalOptimizer.vertex(pairs_vec(i, 1));
 

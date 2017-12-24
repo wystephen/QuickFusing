@@ -123,12 +123,12 @@ int main(int argc, char *argv[]) {
 
 
     /// Global parameters
-    double first_info(100), second_info(100), ori_info(0.03);
+    double first_info(100), second_info(1000), ori_info(0.03);
     double gravity_info(0.002);
     double mag_threshold(0.25);
-    double loop_threshold(0.5), loop_info(0.0001);
+    double loop_threshold(0.5), loop_info(0.01);
     double max_ite(100);
-    double zero_z_info(-10.1);
+    double zero_z_info(10.1);
     int data_dir(20);
 
     double robust_delta(20.0);

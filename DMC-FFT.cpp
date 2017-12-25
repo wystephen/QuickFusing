@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
     double gravity_info(0.002);
     double mag_threshold(0.25);
     double loop_threshold(0.5), loop_info(0.01);
-    double max_ite(100);
+    double max_ite(3000);
     double zero_z_info(10.1);
     int data_dir(20);
 

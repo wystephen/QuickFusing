@@ -104,7 +104,7 @@ public:
         double para1((x - miu) * (x - miu) / 2 / sigma / sigma);
         double para2(1 / std::sqrt(2 * sigma * sigma * M_PI));
 
-        return std::log(para2 + 1e-10) / (para1+1e-10);
+        return std::log(para2 + 1e-10) / (para1 + 1e-10);
     }
 
     inline double NormalPdf(double x,
@@ -119,7 +119,7 @@ public:
 //            std::cout << para1<< " " << para2 << std::endl;
 //            std::cout << "x:" << x << "miu:" << miu << "sigma:" << sigma << std::endl;
 //        }
-        assert(!std::isinf(para1)&&!std::isnan(para1)&&!std::isinf(para2)&&!std::isnan(para2));
+        assert(!std::isinf(para1) && !std::isnan(para1) && !std::isinf(para2) && !std::isnan(para2));
         return para2 * std::exp(-para1);
     }
 };

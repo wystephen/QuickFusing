@@ -6,21 +6,19 @@ import os
 
 import re
 
-
 import numpy as np
 
 import matplotlib.pyplot as plt
 import array
 
+
 class UwbDataPre:
-    def __init__(self,dir_name):
+    def __init__(self, dir_name):
         self.dir_name = dir_name
         self.file_name = dir_name
 
         self.start_time = 0.0
 
-        
-        
         self.tmp_array = array.array('d')
 
         for file in os.listdir(dir_name):
@@ -29,13 +27,12 @@ class UwbDataPre:
                 self.file_name += file
                 self.start_time = float(file.split('_')[0])
 
-        print("filr name is :" , self.file_name)
-        print("start_time :" , self.start_time)
-
+        print("filr name is :", self.file_name)
+        print("start_time :", self.start_time)
 
         this_file = open(self.file_name)
 
-        is_new_ob=False
+        is_new_ob = False
 
         mac_list = list()
 
@@ -48,28 +45,27 @@ class UwbDataPre:
                     if mac_name not in mac_list:
                         mac_list.append(mac_name)
 
-
-        print("mac list :" , mac_list)
+        print("mac list :", mac_list)
         this_file.close()
-        this_file=open(self.file_name)
+        this_file = open(self.file_name)
 
         is_first_line = True
 
         for line in this_file.readlines():
-            print("time:",line.split('[')[1].split(']')[0])
+            print("time:", line.split('[')[1].split(']')[0])
             time_in_the_line = float(line.split('[')[1].split(']')[0])
 
             if is_first_line:
                 self.start_time -= time_in_the_line
-                print("start time :",time_in_the_line)
-                is_first_line=False
+                print("start time :", time_in_the_line)
+                is_first_line = False
 
             if line.split(' ')[2] == '@R':
                 print(line)
                 if line.split(' ')[3] != 'F1':
                     print(line)
                     mac_name = line.split(' ')[4]
-                    self.tmp_array.append(float(self.start_time+time_in_the_line))
+                    self.tmp_array.append(float(self.start_time + time_in_the_line))
                     print("time : ", float(self.start_time + time_in_the_line))
                     for i in range(len(mac_list)):
 
@@ -78,9 +74,8 @@ class UwbDataPre:
                         else:
                             self.tmp_array.append(float(line.split(' ')[5]))
 
-
-        print('len mac list:',len(mac_list))
-        self.result_uwb = np.frombuffer(self.tmp_array,dtype=np.float).reshape([-1,len(mac_list)+1])
+        print('len mac list:', len(mac_list))
+        self.result_uwb = np.frombuffer(self.tmp_array, dtype=np.float).reshape([-1, len(mac_list) + 1])
 
         print(self.result_uwb)
 
@@ -90,26 +85,27 @@ class UwbDataPre:
         # self.result_uwb[:,4]  -= 100.0
 
     def save(self):
-        np.savetxt(self.dir_name+"uwb_result.csv",self.result_uwb,'%.4f',delimiter=',')
+        np.savetxt(self.dir_name + "uwb_result.csv", self.result_uwb, '%.4f', delimiter=',')
+
     '''
     
     Show result
     '''
+
     def show(self):
         '''
 
         :return:
         '''
         plt.figure()
-        plt.plot(self.result_uwb[:,0],'r')
-
+        plt.plot(self.result_uwb[:, 0], 'r')
 
         plt.figure()
         plt.title('uwb ')
-        for i in range(1,self.result_uwb.shape[1]):
+        for i in range(1, self.result_uwb.shape[1]):
             # if i != 4 :
             #     continue
-            plt.plot(self.result_uwb[:,i],'*',label='i:'+str(i))
+            plt.plot(self.result_uwb[:, i], '*', label='i:' + str(i))
         plt.legend()
         plt.show()
 
@@ -123,37 +119,27 @@ class UwbDataPre:
             index_list = list()
             # find all valid data
             for j in range(self.result_uwb.shape[0]):
-                if self.result_uwb[j,i] > -0.1:
-                    index_list .append(j)
+                if self.result_uwb[j, i] > -0.1:
+                    index_list.append(j)
 
             # Main filter process
             step_len = 5
             tmp_value_list = list()
-            for index in range(step_len,len(index_list)-step_len):
-                if abs((self.result_uwb[index_list[index-step_len],i]+
-                            self.result_uwb[index_list[index+step_len],i])
-                       -2.0* self.result_uwb[index_list[index],i]) > 1.92:
+            for index in range(step_len, len(index_list) - step_len):
+                if abs((self.result_uwb[index_list[index - step_len], i] +
+                        self.result_uwb[index_list[index + step_len], i])
+                       - 2.0 * self.result_uwb[index_list[index], i]) > 1.92:
                     # print(abs((self.result_uwb[index_list[index-step_len],i]+
                     #         self.result_uwb[index_list[index+step_len],i])
                     #    -2.0* self.result_uwb[index_list[index],i]) )
                     tmp_value_list.append(-10.0)
                 else:
-                    tmp_value_list.append(self.result_uwb[index_list[index],i])
+                    tmp_value_list.append(self.result_uwb[index_list[index], i])
 
-
-
-
-            for index in range(step_len,len(index_list)-step_len):
-                print(index-step_len,'of',len(tmp_value_list))
-                self.result_uwb[index_list[index],i] = \
-                    tmp_value_list[index-step_len]
-
-
-
-
-
-
-
+            for index in range(step_len, len(index_list) - step_len):
+                print(index - step_len, 'of', len(tmp_value_list))
+                self.result_uwb[index_list[index], i] = \
+                    tmp_value_list[index - step_len]
 
 
 if __name__ == '__main__':
@@ -165,7 +151,3 @@ if __name__ == '__main__':
 
     udp.save()
     udp.show()
-
-
-
-

@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
     double loop_threshold(0.5), loop_info(0.01);
     double max_ite(300);
     double zero_z_info(10.1);
-    int data_dir(32);
+    int data_dir(20);
 
     double robust_delta(20.0);
 

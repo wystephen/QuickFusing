@@ -7,6 +7,9 @@
 
 #include <Eigen/Dense>
 
+
+#include <thread>
+
 int main()
 //{
 //    Eigen::Vector4d q(1.0,2.0,3.0,5.0);
@@ -85,16 +88,30 @@ int main()
 //    
 //}
 {
-    Eigen::Matrix4d A;
-    Eigen::MatrixXd B;
+//    Eigen::Matrix4d A;
+//    Eigen::MatrixXd B;
+//
+//    A.setIdentity();
+//    B = A;
+//
+//    for(int i(0);i<100;++i)
+//    {
+//        B.setRandom();
+//        std::cout << B << std::endl;
+//    }
+    std::cout << "main started" << std::endl;
 
-    A.setIdentity();
-    B = A;
-
-    for(int i(0);i<100;++i)
+    std::thread t([](){
+        for(int i;i<100;++i)
+        {
+            std::cout << "local thread :" << i << std::endl;
+        }
+    });
+    for(int i;i<100;++i)
     {
-        B.setRandom();
-        std::cout << B << std::endl;
+        std::cout << "main thread:" << i << std::endl;
     }
+    t.join();
+    return 0;
 }
 

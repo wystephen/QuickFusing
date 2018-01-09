@@ -226,7 +226,7 @@ class ImuPreprocess:
         self.vertics_id = np.frombuffer(vertex_to_id, dtype=np.float).reshape([-1])
         self.vertics_id = self.vertics_id.astype(dtype=np.int32)
         self.vertics_time = np.frombuffer(vertex_time, dtype=np.float).reshape([-1])
-        self.vertics_all = np.frombuffer(vertex_all_data, dtype=np.float).reshape([-1, 22])
+        # self.vertics_all = np.frombuffer(vertex_all_data, dtype=np.float).reshape([-1, 22])
 
         np.savetxt("../TMP_DATA/vertex_pose.csv", self.vertics, delimiter=',')
         np.savetxt("../TMP_DATA/vertex_quat.csv", self.vertex_quat, delimiter=',')

@@ -22,9 +22,9 @@
          佛祖保佑       永无BUG 
 '''
 
-import scripts.ImuResultReader
-import scripts.ImuPreprocess
-import scripts.PcSavedReader
+import ImuResultReader
+import ImuPreprocess
+import PcSavedReader
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -32,34 +32,36 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 import os
-from scripts.UwbDataPreprocess import UwbDataPre
+from UwbDataPreprocess import UwbDataPre
+
+import JavaObtainedUWBProcess
 
 if __name__ == '__main__':
     # dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/73/"
-    dir_name = "/home/steve/Data/FusingLocationData/0007/"
+    dir_name = "/home/steve/Data/FusingLocationData/0013/"
 
     a = np.loadtxt(dir_name + 'LEFT_FOOT.data', delimiter=',')
     a = a[:, 1:]
-    b = np.loadtxt(dir_name + "RIGHT_FOOT.data", delimiter=',')
-    b = b[:, 1:]
+    # b = np.loadtxt(dir_name + "RIGHT_FOOT.data", delimiter=',')
+    # b = b[:, 1:]
     # print(a[:, 1:4].shape)
     # a[:,1:4] *= 9.816
 
     np.savetxt(dir_name + "sim_imu.csv", a, delimiter=',')
 
-    ip = scripts.ImuPreprocess.ImuPreprocess(dir_name + "sim_imu.csv")
+    ip = ImuPreprocess.ImuPreprocess(dir_name + "sim_imu.csv")
     ip.computezupt()
     # plt.show()
     ip.findvertex()
     # print(ip.zupt_result)
 
-    # np.savetxt(dir_name + "sim_pose.csv", ip.vertics, delimiter=',')
-    # np.savetxt(dir_name + "all_quat.csv", ip.vertex_quat, delimiter=',')
-    # np.savetxt(dir_name + "sim_zupt.csv", ip.zupt_result, delimiter=',')
-    # np.savetxt(dir_name + "vertex_time.csv", ip.vertics_time, delimiter=",")
-    # np.savetxt(dir_name + "vertex_high.csv", ip.vertics_high, delimiter=',')
+    np.savetxt(dir_name + "sim_pose.csv", ip.vertics, delimiter=',')
+    np.savetxt(dir_name + "all_quat.csv", ip.vertex_quat, delimiter=',')
+    np.savetxt(dir_name + "sim_zupt.csv", ip.zupt_result, delimiter=',')
+    np.savetxt(dir_name + "vertex_time.csv", ip.vertics_time, delimiter=",")
+    np.savetxt(dir_name + "vertex_high.csv", ip.vertics_high, delimiter=',')
     #
-    # print(ip.vertics.shape, " - ", ip.vertex_quat.shape, " - ", ip.vertics_time.shape)
+    print(ip.vertics.shape, " - ", ip.vertex_quat.shape, " - ", ip.vertics_time.shape)
 
     trace_fig = plt.figure()
     ax = trace_fig.gca(projection='3d')
@@ -67,5 +69,8 @@ if __name__ == '__main__':
             'r*-',
             label='trace')
     ax.legend()
+
+    u = JavaObtainedUWBProcess.UwbProcess(dir_name+'HEAD_UWB.data',dir_name+'../mac.txt')
+    np.savetxt(dir_name+'uwb_result.csv',u.uwb_data,'%.4f',delimiter=',')
 
     plt.show()

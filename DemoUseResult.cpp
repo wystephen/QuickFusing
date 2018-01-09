@@ -146,7 +146,8 @@ int main(int argc, char *argv[]) {
 
     dir_name = dir_name + std::to_string(tmp_dir_num) + "/";
 //    dir_name="/home/steve/Data/IU/76/";  // a good resutl.
-    dir_name = "/home/steve/Data/IU/76/";
+//    dir_name = "/home/steve/Data/IU/76/";
+    dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
 
     int trace_id = 0;

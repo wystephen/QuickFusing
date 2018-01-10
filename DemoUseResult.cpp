@@ -180,12 +180,14 @@ int main(int argc, char *argv[]) {
 
 
     CppExtent::CSVReader UwbRawReader(dir_name + "uwb_result.csv");
+    CppExtent::Matrix tmpUwbRawMatrix = UwbRawReader.GetMatrix();
 
     Eigen::MatrixXd uwb_raw(UwbRawReader.GetMatrix().GetRows(), UwbRawReader.GetMatrix().GetCols());
 
     for (int i(0); i < uwb_raw.rows(); ++i) {
         for (int j(0); j < uwb_raw.cols(); ++j) {
-            uwb_raw(i, j) = *(UwbRawReader.GetMatrix()(i, j));
+//            uwb_raw(i, j) = *(UwbRawReader.GetMatrix()(i, j));
+            uwb_raw(i,j) = *(tmpUwbRawMatrix(i,j));
         }
     }
 
@@ -209,6 +211,9 @@ int main(int argc, char *argv[]) {
     CppExtent::CSVReader ZuptResultReader(dir_name + "sim_pose.csv");
     CppExtent::CSVReader QuatReader(dir_name + "all_quat.csv");
     CppExtent::CSVReader VertexTime(dir_name + "vertex_time.csv");
+    CppExtent::Matrix TmpzuptMatrix = ZuptResultReader.GetMatrix();
+    CppExtent::Matrix TmpquatMatrix = QuatReader.GetMatrix();
+    CppExtent::Matrix TmpvertexMatrix = VertexTime.GetMatrix();
 
 //    Eigen::MatrixXd v_high(1, 1);
 //
@@ -230,22 +235,26 @@ int main(int argc, char *argv[]) {
     Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(), ZuptResultReader.GetMatrix().GetCols());
     Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(), QuatReader.GetMatrix().GetCols());
     Eigen::MatrixXd v_time(VertexTime.GetMatrix().GetRows(), VertexTime.GetMatrix().GetCols());
+    
 
     for (int i(0); i < zupt_res.rows(); ++i) {
         for (int j(0); j < zupt_res.cols(); ++j) {
-            zupt_res(i, j) = *(ZuptResultReader.GetMatrix()(i, j));
+//            zupt_res(i, j) = *(ZuptResultReader.GetMatrix()(i, j));
+            zupt_res(i,j) = *(TmpzuptMatrix(i,j));
         }
     }
 
     for (int i(0); i < quat.rows(); ++i) {
         for (int j(0); j < quat.cols(); ++j) {
-            quat(i, j) = *(QuatReader.GetMatrix()(i, j));
+//            quat(i, j) = *(QuatReader.GetMatrix()(i, j));
+            quat(i,j) = *(TmpquatMatrix(i,j));
         }
     }
 
     for (int i(0); i < v_time.rows(); ++i) {
         for (int j(0); j < v_time.cols(); ++j) {
-            v_time(i, j) = *(VertexTime.GetMatrix()(i, j));
+//            v_time(i, j) = *(VertexTime.GetMatrix()(i, j));
+            v_time(i,j) = *(TmpquatMatrix(i,j));
         }
     }
 

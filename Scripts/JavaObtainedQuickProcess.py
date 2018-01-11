@@ -42,10 +42,6 @@ if __name__ == '__main__':
 
     a = np.loadtxt(dir_name + 'LEFT_FOOT.data', delimiter=',')
     a = a[:, 1:]
-    # b = np.loadtxt(dir_name + "RIGHT_FOOT.data", delimiter=',')
-    # b = b[:, 1:]
-    # print(a[:, 1:4].shape)
-    # a[:,1:4] *= 9.816
 
     np.savetxt(dir_name + "sim_imu.csv", a, delimiter=',')
 

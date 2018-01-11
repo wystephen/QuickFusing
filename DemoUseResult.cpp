@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 
 
     int trace_id = 0;
-    const int beacon_id_offset(100000);
+    const int beacon_id_offset(1000000);
 
 
     /**
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
 
 
     CppExtent::CSVReader UwbRawReader(dir_name + "uwb_result.csv");
-    CppExtent::Matrix tmpUwbRawMatrix = UwbRawReader.GetMatrix();
+    CppExtent::Matrix<double> tmpUwbRawMatrix = UwbRawReader.GetMatrix();
 
     Eigen::MatrixXd uwb_raw(UwbRawReader.GetMatrix().GetRows(), UwbRawReader.GetMatrix().GetCols());
 
@@ -190,6 +190,8 @@ int main(int argc, char *argv[]) {
             uwb_raw(i,j) = *(tmpUwbRawMatrix(i,j));
         }
     }
+
+    std::cout << uwb_raw << std::endl;
 
 
     CppExtent::CSVReader ImuDataReader(dir_name + "sim_imu.csv"),
@@ -211,9 +213,9 @@ int main(int argc, char *argv[]) {
     CppExtent::CSVReader ZuptResultReader(dir_name + "sim_pose.csv");
     CppExtent::CSVReader QuatReader(dir_name + "all_quat.csv");
     CppExtent::CSVReader VertexTime(dir_name + "vertex_time.csv");
-    CppExtent::Matrix TmpzuptMatrix = ZuptResultReader.GetMatrix();
-    CppExtent::Matrix TmpquatMatrix = QuatReader.GetMatrix();
-    CppExtent::Matrix TmpvertexMatrix = VertexTime.GetMatrix();
+    CppExtent::Matrix<double> TmpzuptMatrix = ZuptResultReader.GetMatrix();
+    CppExtent::Matrix<double> TmpquatMatrix = QuatReader.GetMatrix();
+    CppExtent::Matrix<double> TmpvertexMatrix = VertexTime.GetMatrix();
 
 //    Eigen::MatrixXd v_high(1, 1);
 //

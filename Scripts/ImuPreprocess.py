@@ -25,6 +25,7 @@ class ImuPreprocess:
         # use rad replace deg
         self.data[:, 4:7] = self.data[:, 4:7] * np.pi / 180.0
         # use m/s^2 replace g.
+        self.data[:, 1:4] = self.data[:, 1:4] * 9.81
 
         acc_cent = [0.0195, 0.0154, -0.0877]
         acc_scale = [1.0015, 1.0008, 1.0336]
@@ -32,7 +33,7 @@ class ImuPreprocess:
         #     self.data[:,1:]
         # self.data[:,1:4] = (self.data[:,1:4]-acc_cent)/acc_scale
         #
-        self.data[:, 1:4] = self.data[:, 1:4] * 9.81
+
 
         self.para = Setting.settings()
         self.para.sigma_a *= 5.0

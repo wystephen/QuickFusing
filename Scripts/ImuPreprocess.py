@@ -42,8 +42,8 @@ class ImuPreprocess:
         self.para.sigma_acc *= 6.0
         self.para.sigma_gyro *= 6.0
 
-        # self.para.Ts = 0.005 #np.mean(self.data[1:, 0] - self.data[:-1, 0])
-        self.para.Ts = -1.0 * (self.data[1, 0] - self.data[self.data.shape[0] - 2, 0]) / float(self.data.shape[0])
+        self.para.Ts = 0.005 #np.mean(self.data[1:, 0] - self.data[:-1, 0])
+        # self.para.Ts = (self.data[-1, 0] - self.data[0, 0]) / float(self.data.shape[0])
         print("TS :", self.para.Ts)
         np.savetxt("../TMP_DATA/preprocess_data.csv", self.data, delimiter=',')
         # self.para.time_Window_size = 5

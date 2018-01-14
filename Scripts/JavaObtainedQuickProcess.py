@@ -66,7 +66,7 @@ if __name__ == '__main__':
             label='trace')
     ax.legend()
 
-    u = JavaObtainedUWBProcess.UwbProcess(dir_name+'HEAD_UWB.data',dir_name+'../mac.txt')
-    np.savetxt(dir_name+'uwb_result.csv',u.uwb_data,'%.4f',delimiter=',')
+    u = JavaObtainedUWBProcess.UwbProcess(dir_name + 'HEAD_UWB.data', dir_name + '../mac.txt')
+    np.savetxt(dir_name + 'uwb_result.csv', u.uwb_data, '%.4f', delimiter=',')
 
     plt.show()

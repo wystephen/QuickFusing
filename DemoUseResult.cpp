@@ -323,15 +323,8 @@ int main(int argc, char *argv[]) {
             info(0, 0) = z0_info;
             edge_zo->setInformation(info);
             edge_zo->setMeasurement(0.0);
-//            if (with_high) {
-//                edge_zo->setMeasurement(v_high(index, 0));
-//                if (v_high(index, 0) > -1.0) {
-//                    globalOptimizer.addEdge(edge_zo);
-//                }
-//            }
-//            edge_zo->setMeasurement(0.0);
 
-            globalOptimizer.addEdge(edge_zo);
+//            globalOptimizer.addEdge(edge_zo);
 
 
             /// ZUPT EDGE

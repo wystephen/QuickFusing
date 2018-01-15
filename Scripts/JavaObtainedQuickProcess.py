@@ -38,7 +38,7 @@ import JavaObtainedUWBProcess
 
 if __name__ == '__main__':
     # dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/73/"
-    dir_name = "/home/steve/Data/FusingLocationData/0017/"
+    dir_name = "/home/steve/Data/FusingLocationData/0016/"
 
     a = np.loadtxt(dir_name + 'LEFT_FOOT.data', delimiter=',')
     a = a[:, 1:]

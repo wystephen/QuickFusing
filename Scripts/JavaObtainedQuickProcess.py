@@ -67,6 +67,6 @@ if __name__ == '__main__':
     ax.legend()
 
     u = JavaObtainedUWBProcess.UwbProcess(dir_name + 'HEAD_UWB.data', dir_name + '../mac.txt')
-    np.savetxt(dir_name + 'uwb_result.csv', u.uwb_data, '%.4f', delimiter=',')
+    np.savetxt(dir_name + 'uwb_result.csv', u.uwb_data, '%.19f', delimiter=',')
 
     plt.show()

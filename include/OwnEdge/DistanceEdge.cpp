@@ -37,43 +37,22 @@ void DistanceEdge::computeError() {
                            (p1[1] - p2[1]) * (p1[1] - p2[1]) +
                            (p1[2] - p2[2]) * (p1[2] - p2[2]));
 
-    if(std::isnan(dis))
-    {
+    if (std::isnan(dis)) {
         std::cout << "stop here" << std::endl;
     }
-//    _error(0, 0) = std::pow(dis - (_measurement), 2.0);//*_information(0,0);
-//    std::cout << "id:"<<vertices()[0]->id() <<
-//              p1[0]<<","<<p1[1]<< ","<<p1[2]<<
-//              "-----"<<"id:"<<vertices()[1]->id()<<
-//              p2[0]<<","<<p2[1]<<","<<p2[2];
-//    std::cout << vertices()[1]->id()<<" : " << vertices()[0]->id() << "-" << dis <<"-"<<_measurement<< std::endl;
-//    _error(0, 0) = std::log(NormalPdf(dis, _measurement, sigma_));
-    try{
-//        _error(0,0)=NormalPdf(dis,_measurement,sigma_);
-//            _error(0, 0) = std::log( NormalPdf(dis, _measurement, sigma_));
-        _error(0,0) = std::pow(dis-_measurement,2.0);
-        if(std::isnan(_error(0,0))||std::isinf(_error(0,0)))
-        {
+    try {
+
+        _error(0, 0) = std::pow(dis - _measurement, 2.0);
+        if (std::isnan(_error(0, 0)) || std::isinf(_error(0, 0))) {
             throw std::bad_cast();
         }
-    }catch(std::exception &e)
-    {
-        std::cout << e.what() << __FILE__<< ":"<< __LINE__ <<":"<<__FUNCTION__ << std::endl;
-    }catch(...)
-    {
+    } catch (std::exception &e) {
+        std::cout << e.what() << __FILE__ << ":" << __LINE__ << ":" << __FUNCTION__ << std::endl;
+    } catch (...) {
 
-        std::cout  << __FILE__<< ":"<< __LINE__ <<":"<<__FUNCTION__ << std::endl;
+        std::cout << __FILE__ << ":" << __LINE__ << ":" << __FUNCTION__ << std::endl;
     }
 
-//    _error(0, 0) = std::log(NormalPdf(dis, _measurement, sigma_));
-//    _error(0,0) = (NormalPdf(dis,_measurement,sigma_));
-
-
-//    if(_error(0,0)>1.5)
-
-//    {
-//        _error(0,0) = 0.0;
-//    }
 
 }
 

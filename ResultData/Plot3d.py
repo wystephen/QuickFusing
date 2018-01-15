@@ -25,6 +25,7 @@ if __name__ == '__main__':
         print(name)
 
         ax.plot(data[:, 0], data[:, 1], data[:, 2],
+                '*-',
                 label=name)
 
     plt.grid()

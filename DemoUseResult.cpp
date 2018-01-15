@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
 
     for (int i(0); i < v_time.rows(); ++i) {
         for (int j(0); j < v_time.cols(); ++j) {
-            v_time(i,j) = *(TmpquatMatrix(i,j));
+            v_time(i,j) = *(TmpvertexMatrix(i,j));
         }
     }
 

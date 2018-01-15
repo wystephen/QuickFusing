@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
 
     for (int i(0); i < uwb_raw.rows(); ++i) {
         for (int j(0); j < uwb_raw.cols(); ++j) {
-            uwb_raw(i,j) = *(tmpUwbRawMatrix(i,j));
+            uwb_raw(i, j) = *(tmpUwbRawMatrix(i, j));
         }
     }
 
@@ -220,23 +220,23 @@ int main(int argc, char *argv[]) {
     Eigen::MatrixXd zupt_res(ZuptResultReader.GetMatrix().GetRows(), ZuptResultReader.GetMatrix().GetCols());
     Eigen::MatrixXd quat(QuatReader.GetMatrix().GetRows(), QuatReader.GetMatrix().GetCols());
     Eigen::MatrixXd v_time(VertexTime.GetMatrix().GetRows(), VertexTime.GetMatrix().GetCols());
-    
+
 
     for (int i(0); i < zupt_res.rows(); ++i) {
         for (int j(0); j < zupt_res.cols(); ++j) {
-            zupt_res(i,j) = *(TmpzuptMatrix(i,j));
+            zupt_res(i, j) = *(TmpzuptMatrix(i, j));
         }
     }
 
     for (int i(0); i < quat.rows(); ++i) {
         for (int j(0); j < quat.cols(); ++j) {
-            quat(i,j) = *(TmpquatMatrix(i,j));
+            quat(i, j) = *(TmpquatMatrix(i, j));
         }
     }
 
     for (int i(0); i < v_time.rows(); ++i) {
         for (int j(0); j < v_time.cols(); ++j) {
-            v_time(i,j) = *(TmpvertexMatrix(i,j));
+            v_time(i, j) = *(TmpvertexMatrix(i, j));
         }
     }
 
@@ -367,8 +367,6 @@ int main(int argc, char *argv[]) {
             edge_se3->setMeasurement(latest_transform.inverse() * this_transform);
 
 
-
-
             globalOptimizer.addEdge(edge_se3);
 
         }
@@ -418,9 +416,8 @@ int main(int argc, char *argv[]) {
             }
 
 
-
-            min_time = std::min(std::fabs(uwb_raw(uwb_index,0)-zupt_time),min_time);
-            if (std::fabs(uwb_raw(uwb_index,0) - zupt_time) < 1.5) {
+            min_time = std::min(std::fabs(uwb_raw(uwb_index, 0) - zupt_time), min_time);
+            if (std::fabs(uwb_raw(uwb_index, 0) - zupt_time) < 1.5) {
                 if (zupt_time - last_time > time_intervel) {
                     last_time = zupt_time;
 
@@ -430,7 +427,7 @@ int main(int argc, char *argv[]) {
                             int beacon_id = bi + beacon_id_offset;
 
                             int zupt_id = zupt_index;
-                            std::cout << "beacon id:"<< beacon_id << "zupt id :" << zupt_id << std::endl;
+                            std::cout << "beacon id:" << beacon_id << "zupt id :" << zupt_id << std::endl;
 
                             auto *dist_edge = new DistanceEdge();
                             dist_edge->vertices()[0] = globalOptimizer.vertex(beacon_id);
@@ -450,14 +447,6 @@ int main(int argc, char *argv[]) {
                             globalOptimizer.addEdge(dist_edge);
 
                             // check the beacon high with current pose.
-//                            if (with_high) {
-//                                if (fabs(v_high(zupt_index) - beacon_high[bi]) < 1.2) {
-//
-//                                    globalOptimizer.addEdge(dist_edge);
-//                                }
-//                            } else {
-//                                globalOptimizer.addEdge(dist_edge);
-//                            }
 
 
                         }
@@ -468,8 +457,7 @@ int main(int argc, char *argv[]) {
 
             uwb_index++;
         }
-        std::cout << "zupt index:" <<zupt_index << " min time interval :" << time_intervel << std::endl;
-
+        std::cout << "zupt index:" << zupt_index << " min time interval :" << time_intervel << std::endl;
 
 
         range_file << current_range(0);
@@ -515,10 +503,7 @@ int main(int argc, char *argv[]) {
         gy.push_back(data[1]);
         gz.push_back(data[2]);
         imu << data[0] << " " << data[1] << " " << data[2] << std::endl;
-        // pose
-//        axis_file << data[0] << "," << data[1] << "," << data[2] ;//<< ",";//<< ",0,0,1,0,1,0,1,0,0" << std::endl;
 
-        //axis
 
         Sophus::SO3 so3_rotation(data[3], data[4], data[5]);
         Sophus::SE3 se3_transform(so3_rotation,

@@ -432,7 +432,7 @@ int main(int argc, char *argv[]) {
                     last_time = zupt_time;
 
                     for (int bi(0); bi < uwb_raw.cols() - 1; ++bi) {
-                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 100.0) {
+                        if (uwb_raw(uwb_index, bi + 1) > 0 && uwb_raw(uwb_index, bi + 1) < 10.0) {
                             double range = uwb_raw(uwb_index, bi + 1);
                             int beacon_id = bi + beacon_id_offset;
 
@@ -453,7 +453,7 @@ int main(int argc, char *argv[]) {
                             current_range(bi) = range;
 
 
-//                            dist_edge->setRobustKernel(robustKernel);
+                            dist_edge->setRobustKernel(robustKernel);
                             globalOptimizer.addEdge(dist_edge);
 
                             // check the beacon high with current pose.

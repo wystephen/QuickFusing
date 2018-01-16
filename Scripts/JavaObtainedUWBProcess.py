@@ -60,7 +60,8 @@ class UwbProcess:
 
         plt.figure()
         for i in range(1,uwb_data.shape[1]):
-            plt.plot(uwb_data[:,0],uwb_data[:,i],'.',label=str(i))
+            if(np.max(uwb_data[:,i])>0):
+                plt.plot(uwb_data[:,0],uwb_data[:,i],'.',label=str(i))
         plt.legend()
         plt.grid()
         self.uwb_data = uwb_data

@@ -37,10 +37,15 @@ class UwbProcess:
 
 
         mac_list = list()
-        for mac_line in open(mac_file_name).readlines():
-            mac_list.append(mac_line[:-1])
+        mac_file_lines = open(mac_file_name).readlines()
+        beaconSet = np.zeros([len(mac_file_lines),3])
+        for mac_line in mac_file_lines:
+            mac_list.append(mac_line.split(',')[0])
+            for k in range(3):
+                beaconSet[len(mac_list),k] = mac_line.split(',')[k+1]
 
         print(mac_list)
+        print(beaconSet)
 
 
         m_re = re.compile('\\{[0-9|A-Z]{8}:[\\.|0-9]{1,},[\\.|0-9]{1,},}')

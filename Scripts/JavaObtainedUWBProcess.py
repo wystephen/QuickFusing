@@ -42,7 +42,7 @@ class UwbProcess:
         for mac_line in mac_file_lines:
             mac_list.append(mac_line.split(',')[0])
             for k in range(3):
-                beaconSet[len(mac_list),k] = mac_line.split(',')[k+1]
+                beaconSet[len(mac_list)-1,k] = mac_line.split(',')[k+1]
 
         print(mac_list)
         print(beaconSet)

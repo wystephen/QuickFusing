@@ -68,6 +68,6 @@ if __name__ == '__main__':
 
     u = JavaObtainedUWBProcess.UwbProcess(dir_name + 'HEAD_UWB.data', dir_name + '../BeaconSet.csv')
     np.savetxt(dir_name + 'uwb_result.csv', u.uwb_data, '%.19f', delimiter=',')
-    np.savetxt(dir_name+"beaconSet.csv",u.beaconSet,delimiter=',')
+    np.savetxt(dir_name+"beaconSet.csv",u.beaconSet,'%.19f',delimiter=',')
 
     plt.show()

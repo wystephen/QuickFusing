@@ -38,10 +38,6 @@ class trianglepose:
         res = minimize(self.costfunction_multi_range,
                        self.pose,
                        method='L-BFGS-B',
-                       bounds=((-30, 30),
-                               (-30, 30),
-                               (1.00, 3.0)
-                               ),
                        jac=False)
 
         print(res.x)
@@ -75,11 +71,9 @@ class trianglepose:
             res = minimize(self.costfunction_single_range,
                            initial_pose,
                            # method='L-BFGS-B',
-                           bounds=((45, 65),
-                                   (-50,-18),
-                                   (-1.0, 1.0)),
                            jac=False)
             initial_pose = res.x
+            # print(res.x)
             OptResult[i, 0] = uwbdata[i, 0]
             OptResult[i, 1:] = res.x
 

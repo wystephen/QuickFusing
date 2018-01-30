@@ -32,19 +32,20 @@ from Scripts.ViewerModel import TranglePose
 import time
 
 if __name__ == '__main__':
-    dir_name = '/home/steve/Data/NewIU/17/'
-    beaconset = np.loadtxt(dir_name + 'beaconset.csv', delimiter=',')
+    # dir_name = '/home/steve/Data/NewIU/17/'
+    dir_name = "/home/steve/Data/FusingLocationData/0010/"
+    beaconset = np.loadtxt(dir_name + 'beaconSet.csv', delimiter=',')
     uwb_data = np.loadtxt(dir_name + 'uwb_result.csv', delimiter=',')
 
-    choice_list = [3, 2, 6]
-    # choice_list = range(0,8)
-    beaconset = beaconset[choice_list, :]
-
-    tmp = uwb_data[:, 1:].copy()
-    t_ud = np.zeros([uwb_data.shape[0], len(choice_list) + 1])
-    t_ud[:, 0] = uwb_data[:, 0]
-    t_ud[:, 1:] = tmp[:, choice_list]
-    uwb_data = t_ud.copy()
+    # choice_list = [3, 2, 6]
+    # choice_list = range(0,uwb_data.shape[1]-1)
+    # beaconset = beaconset[choice_list, :]
+    #
+    # tmp = uwb_data[:, 1:].copy()
+    # t_ud = np.zeros([uwb_data.shape[0], len(choice_list) + 1])
+    # t_ud[:, 0] = uwb_data[:, 0]
+    # t_ud[:, 1:] = tmp[:, choice_list]
+    # uwb_data = t_ud.copy()
 
     ## only particle filter
     # filter_start = time.time()
@@ -79,7 +80,7 @@ if __name__ == '__main__':
 
     plt.figure()
     # plt.plot(only_pf_result[:, 0], only_pf_result[:, 1], label='only uwb pf')
-    plt.plot(op_result[:, 0], op_result[:, 1], label='optimized result')
+    plt.plot(op_result[:, 0], op_result[:, 1],'*', label='optimized result')
     plt.legend()
     plt.grid()
     plt.show()

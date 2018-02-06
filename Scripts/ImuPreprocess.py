@@ -115,6 +115,7 @@ class ImuPreprocess:
         Try extrac 
         '''
 
+
         for index in range(self.data.shape[0]):
             # if (index > 2):
             #     ins_filter.para.Ts = self.data[index, 0] - self.data[index - 1, 0]
@@ -123,10 +124,12 @@ class ImuPreprocess:
                 ins_filter.GetPosition(self.data[index, 1:7],
                                        self.zupt_result[index]).reshape(18)[:9]
 
+
             self.all_quat[index, :] = ins_filter.quat1.reshape([1, -1])
 
         self.trace_x = self.trace_x.transpose()
         print(ins_filter.P)
+
 
         print(self.trace_x.shape)
         np.savetxt("./tmp_data/trace.txt", self.trace_x)
@@ -140,6 +143,13 @@ class ImuPreprocess:
         plt.title("filter result ")
         plt.plot(self.trace_x[:, 0], self.trace_x[:, 1], '.-')
         plt.grid(True)
+
+        plt.figure()
+        plt.title("filter result velocity")
+        for i in range(3):
+            plt.plot(self.trace_x[:,i+3],'.-',label=str(i))
+        plt.grid()
+        plt.legend()
 
         return
 

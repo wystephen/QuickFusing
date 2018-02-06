@@ -65,6 +65,11 @@ if __name__ == '__main__':
             'r*-',
             label='trace')
     ax.legend()
+    # trace_fig.savefig(dir_name+"/3d_trace.png")
+    plt.figure()
+    plt.grid()
+    plt.plot(ip.vertics[:,0],ip.vertics[:,1],'*-')
+    plt.savefig(dir_name+"/3d_trace.png")
 
     u = JavaObtainedUWBProcess.UwbProcess(dir_name + 'HEAD_UWB.data', dir_name + '../BeaconSet.csv')
     np.savetxt(dir_name + 'uwb_result.csv', u.uwb_data, '%.19f', delimiter=',')

@@ -143,6 +143,7 @@ class ImuPreprocess:
         plt.title("filter result ")
         plt.plot(self.trace_x[:, 0], self.trace_x[:, 1], '.-')
         plt.grid(True)
+        # plt.savefig('')
 
         plt.figure()
         plt.title("filter result velocity")

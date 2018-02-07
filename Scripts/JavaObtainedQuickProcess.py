@@ -38,7 +38,7 @@ import JavaObtainedUWBProcess
 
 if __name__ == '__main__':
     # dir_name = "/home/steve/Code/Mini_IMU/Scripts/IMUWB/73/"
-    dir_name = "/home/steve/Data/FusingLocationData/0010/"
+    dir_name = "/home/steve/Data/FusingLocationData/0017/"
 
     a = np.loadtxt(dir_name + 'LEFT_FOOT.data', delimiter=',')
     a = a[:, 1:]
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     plt.figure()
     plt.grid()
     plt.plot(ip.vertics[:,0],ip.vertics[:,1],'*-')
-    plt.savefig(dir_name+"/3d_trace.png")
+    plt.savefig(dir_name[:-1]+"_trace.png")
 
     u = JavaObtainedUWBProcess.UwbProcess(dir_name + 'HEAD_UWB.data', dir_name + '../BeaconSet.csv')
     np.savetxt(dir_name + 'uwb_result.csv', u.uwb_data, '%.19f', delimiter=',')
